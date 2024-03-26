@@ -211,6 +211,10 @@
   border-radius: 10px;
 }
 
+.searchIcon {
+  color: #666;
+}
+
 .search {
   width: 100%;
   max-width: 320px;
