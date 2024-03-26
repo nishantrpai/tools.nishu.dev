@@ -128,7 +128,9 @@ main {
 }
 
 
-
+code {
+  font-size: 14px;
+}
 
 @media (prefers-color-scheme: dark) {
   html {
