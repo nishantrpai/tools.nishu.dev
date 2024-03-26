@@ -1,3 +1,4 @@
+import Head from 'next/head'
 import styles from '@/styles/Tool.module.css'
 import { useState } from 'react'
 
@@ -9,6 +10,13 @@ const Tool = () => {
   };
   const [query, setQuery] = useState('');
   return (
+    <>
+    <Head>
+      <title>Boolean Search</title>
+      <meta name="description" content="Get boolean search strings for Google, LinkedIn, Github, and more based on the signal you want to find." />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <link rel="icon" href="/favicon.ico" />
+    </Head>
     <main>
       {/* add home button to top left */}
       <a href='/' className={styles.home}>🏠</a>
@@ -58,6 +66,7 @@ const Tool = () => {
 
       </div>
     </main>
+    </>
   );
 }
 
