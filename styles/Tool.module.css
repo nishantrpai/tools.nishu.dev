@@ -51,3 +51,35 @@
 .title {
   font-size: 25px;
 }
+
+.home {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  font-size: 2rem;
+}
+
+/* add mobile css */
+
+@media (max-width: 768px) {
+  .main {
+    font-size: 10px;
+    padding: 0rem;
+  }
+  .col {
+    gap: 10px;
+  }
+  .search {
+    font-size: 1rem;
+  }
+  .copy {
+    font-size: 0.8rem;
+  }
+  .title {
+    font-size: 16px;
+  }
+  .home {
+    font-size: 1.5rem;
+  }
+}

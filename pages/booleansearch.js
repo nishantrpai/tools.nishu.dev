@@ -10,6 +10,8 @@ const Tool = () => {
   const [query, setQuery] = useState('');
   return (
     <main>
+      {/* add home button to top left */}
+      <a href='/' className={styles.home}>🏠</a>
       <h1>{tool.title}</h1>
       <span className={styles.date}>{tool.publishDate}</span>
 
