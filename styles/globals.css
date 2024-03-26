@@ -112,7 +112,6 @@ main {
   align-items: center;
   padding: 6rem;
   min-height: 100vh;
-  
 }
 
 .grid {
@@ -130,6 +129,12 @@ main {
 
 code {
   font-size: 14px;
+}
+
+@media screen and (max-width: 600px) {
+  main {
+    padding: 2rem;
+  }
 }
 
 @media (prefers-color-scheme: dark) {
