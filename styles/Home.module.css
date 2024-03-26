@@ -1,7 +1,9 @@
 .main {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  gap: 10px;
+  max-width: 720px;
+  margin: auto;
   align-items: center;
   padding: 6rem;
   min-height: 100vh;
@@ -47,16 +49,25 @@
 }
 
 .card {
+  cursor: pointer;
   padding: 1rem 1.2rem;
   border-radius: var(--border-radius);
+  max-width: 300px;
   background: rgba(var(--card-rgb), 0);
   border: 1px solid rgba(var(--card-border-rgb), 0);
   transition: background 200ms, border 200ms;
 }
 
-.card span {
+.description {
   display: inline-block;
+  color: #888;
+  font-size: 14px;
   transition: transform 200ms;
+}
+
+.date {
+  font-size: 10px;
+  color: #666;
 }
 
 .card h2 {
@@ -110,12 +121,12 @@
 /* Enable hover only on non-touch devices */
 @media (hover: hover) and (pointer: fine) {
   .card:hover {
-    background: rgba(var(--card-rgb), 0.1);
-    border: 1px solid rgba(var(--card-border-rgb), 0.15);
+    background: rgba(var(--card-rgb), 0.15);
+    /* border: 1px solid rgba(var(--card-border-rgb), 0.15); */
   }
 
   .card:hover span {
-    transform: translateX(4px);
+    /* transform: translateX(4px); */
   }
 }
 
@@ -200,6 +211,21 @@
     );
     z-index: 1;
   }
+}
+
+.search {
+  width: 100%;
+  max-width: 320px;
+  border: none;
+  outline: none;
+  padding: 0.5rem;
+  border-radius: 5px;
+  background-color: rgba(255, 255, 255, 0.1);
+  transition: background-color 200ms;
+}
+
+.search:hover {
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 /* Tablet and Smaller Desktop */
