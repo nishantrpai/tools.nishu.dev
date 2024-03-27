@@ -44,6 +44,7 @@
   max-width: 150px;
   background: rgba(var(--card-rgb), 0);
   border: 1px solid rgba(var(--card-border-rgb), 0);
+  text-align: center;
 }
 
 .description {
@@ -62,6 +63,7 @@
   font-weight: 600;
   margin-bottom: 0.7rem;
   text-align: center;
+  width: 100%;
 }
 
 .card p {

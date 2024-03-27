@@ -23,6 +23,13 @@ export default function Home() {
       publishDate: '27th March 2024',
       icon: '⏳',
       url: '/daydiff'
+    },
+    {
+      title: 'NFT v/s NFT',
+      description: 'Compare two NFTs side by side.',
+      publishDate: '28th March 2024',
+      icon: '🖼️/🖼️',
+      url: '/nftcompare'
     }
   ]
   
