@@ -55,7 +55,7 @@ const DayDiff = () => {
         placeholder="Enter date 2"
       />
       <button className={styles.copy} onClick={handleCalculate}>Calculate</button>
-      <p>{diff}</p>
+      <p>{diff} days</p>
     </main>
     </>
   );
