@@ -17,6 +17,13 @@ export default function Home() {
       icon: '🔍',
       url: '/booleansearch'
     },
+    {
+      title: 'Day Difference Calculator',
+      description: 'Calculate the difference between two dates in days.',
+      publishDate: '27th March 2024',
+      icon: '⏳',
+      url: '/daydiff'
+    }
   ]
   
   const [search, setSearch] = useState('')
@@ -29,7 +36,7 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Create Next App</title>
+        <title>Tools by Nishu</title>
         <meta name="description" content="tools.nishu.dev" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
