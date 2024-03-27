@@ -35,7 +35,7 @@ const DayDiff = () => {
     <>
     <Head>
       <title>Day Difference Calculator</title>
-      <meta name="description" content="Calculate the difference between two dates in days." />
+      <meta name="description" content="Calculate the days between two dates." />
       <meta name="viewport" content="width=device-width, initial-scale=1" />
       <link rel="icon" href="/favicon.ico" />
     </Head>
