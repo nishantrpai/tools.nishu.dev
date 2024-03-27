@@ -256,3 +256,11 @@
     transform: rotate(0deg);
   }
 }
+
+.home {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  font-size: 2rem;
+}
