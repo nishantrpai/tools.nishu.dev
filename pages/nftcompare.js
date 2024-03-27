@@ -74,10 +74,18 @@ const NFTCompare = () => {
   return (
     // one input for collection address and two inputs for token ids
     <main className={styles.main}>
-            <a href='/' className={styles.home}>🏠</a>
+      <a href='/' className={styles.home}>🏠</a>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-        <h1>Compare 2 nfts side by side from the same collection</h1>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '100%' }}>
+        <h1>NFT v/s NFT</h1>
+        <span style={
+          {
+            color: 'gray',
+            fontSize: '14px'
+          }
+        }>Enter the collection address and token ids of two nfts to compare
+        </span>
+
         {/* create a select with RPC chains */}
         <select style={{ border: 'none', padding: '10px', borderRadius: '5px', outline: 'none' }}
           onChange={(e) => {
@@ -141,7 +149,7 @@ const NFTCompare = () => {
                 ))}
               </div>
             </div>
-          : null  
+            : null
           }
         </div>
 
