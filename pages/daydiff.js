@@ -1,4 +1,4 @@
-
+import Head from "next/head";
 import { useState } from "react";
 import styles from '@/styles/Tool.module.css'
 
@@ -32,6 +32,13 @@ const DayDiff = () => {
   };
 
   return (
+    <>
+    <Head>
+      <title>Day Difference Calculator</title>
+      <meta name="description" content="Calculate the difference between two dates in days." />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <link rel="icon" href="/favicon.ico" />
+    </Head>
     <main>
       <a href='/' className={styles.home}>🏠</a>
       <h1>Day Difference Calculator</h1>
@@ -50,6 +57,7 @@ const DayDiff = () => {
       <button className={styles.copy} onClick={handleCalculate}>Calculate</button>
       <p>{diff}</p>
     </main>
+    </>
   );
 }
 
