@@ -29,7 +29,12 @@ const NFTCompare = () => {
     const contract = new ethers.Contract(collection_address, ['function tokenURI(uint256) view returns (string)'], provider)
     const tokenURI = await contract.tokenURI(id)
     // if tokenURI is a url, fetch the metadata, if it is ipfs replace with ipfs.io
-    if (tokenURI.startsWith('http')) {
+    // if token uri is data:// json parse it
+    if (tokenURI.startsWith('data:')) {
+      const metadata = JSON.parse(atob(tokenURI.split('data:application/json;base64,')[1]))
+      return metadata
+    }
+    else if (tokenURI.startsWith('http')) {
       const response = await fetch(tokenURI)
       const metadata = await response.json()
       return metadata
