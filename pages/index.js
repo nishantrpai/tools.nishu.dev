@@ -30,6 +30,12 @@ export default function Home() {
       publishDate: '28th March 2024',
       icon: '🖼️/🖼️',
       url: '/nftcompare'
+    },
+    {
+      title: 'Voice to Text',
+      description: 'Convert your voice to text.',
+      publishDate: '29th March 2024',
+      icon: '🎤',
     }
   ]
   
