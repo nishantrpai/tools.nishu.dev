@@ -36,6 +36,7 @@ export default function Home() {
       description: 'Convert your voice to text.',
       publishDate: '29th March 2024',
       icon: '🎤',
+      url: '/voice2txt'
     }
   ]
   
