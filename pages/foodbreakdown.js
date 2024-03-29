@@ -29,6 +29,7 @@ const FoodBreakdown = () => {
           Get the breakdown of food in terms of protein, carbs, and fats.
           Enter the food, press enter and see the magic happen.
           <br/>
+          <br/>
 
           PS: This tool uses the GPT-3.5-turbo model from OpenAI. Might not be accurate.
         </span>
@@ -57,7 +58,7 @@ const FoodBreakdown = () => {
             }
           }}
         />
-        <pre
+        {breakdown && <pre
           style={{
             background: '#111',
             color: '#eee',
@@ -68,7 +69,7 @@ const FoodBreakdown = () => {
             marginTop: '10px'
           
           }}
-        >{breakdown}</pre>
+        >{breakdown}</pre>}
       </main>
     </>
   )
