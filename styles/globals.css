@@ -119,9 +119,7 @@ main {
   flex-direction: row;
   flex-wrap: wrap;
   gap: 5px;
-  justify-content: space-between;
   align-items: flex-start;
-  
   width: 100%;
   max-width: var(--max-width);
 }
