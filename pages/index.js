@@ -34,6 +34,13 @@ export default function Home() {
       publishDate: '29th March 2024',
       icon: '🎤',
       url: '/voice2txt'
+    },
+    {
+      title: 'Food Breakdown',
+      description: 'Get the breakdown of food in terms of protein, carbs, and fats.',
+      publishDate: '30th March 2024',
+      icon: '🍔',
+      url: '/foodbreakdown'
     }
   ]
   
