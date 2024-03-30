@@ -129,6 +129,17 @@ code {
   font-size: 14px;
 }
 
+button {
+  width: max-content;
+  padding: 0.25rem 0.75rem;
+  color: #fff;
+  background-color: #333;
+  border: none;
+  outline: none;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
 @media screen and (max-width: 600px) {
   main {
     padding: 2rem;
