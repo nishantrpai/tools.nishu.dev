@@ -41,6 +41,13 @@ export default function Home() {
       publishDate: '30th March 2024',
       icon: '🍔',
       url: '/foodbreakdown'
+    },
+    {
+      title: 'Draw',
+      description: 'Simple tool for drawing and copying that image to clipboard',
+      publishDate: '31st March 2024',
+      icon: '✏️',
+      url: '/draw'
     }
   ]
   
