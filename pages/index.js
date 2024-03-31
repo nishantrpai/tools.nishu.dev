@@ -54,6 +54,7 @@ export default function Home() {
       description: 'Generate QR code for any text.',
       publishDate: '1st April 2024',
       icon: '🔲',
+      url: '/qrcode'
     }
   ]
   
