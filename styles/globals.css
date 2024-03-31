@@ -122,7 +122,6 @@ main {
   align-items: flex-start;
   width: 100%;
   max-width: var(--max-width);
-  justify-content: space-evenly;
 }
 
 
