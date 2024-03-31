@@ -18,12 +18,28 @@ export default function Draw() {
   }, [])
 
   const startDrawing = (event) => {
-    setDrawing(true)
-    context.beginPath()
-    // background
-    context.strokeStyle = 'black'
-    context.lineWidth = 4
-    context.moveTo(event.nativeEvent.offsetX, event.nativeEvent.offsetY)
+    setDrawing(true);
+    console.log('startDrawing')
+    context.beginPath();
+    context.strokeStyle = 'black';
+    context.lineWidth = 4;
+
+    // Check if it's a touch event
+    const isTouchEvent = event.touches && event.touches.length > 0;
+    console.log('isTouchEvent', isTouchEvent)
+
+    // Get the correct position depending on the event type
+    const posX = isTouchEvent ? event.touches[0].clientX : event.nativeEvent.offsetX;
+    const posY = isTouchEvent ? event.touches[0].clientY : event.nativeEvent.offsetY;
+
+    // Adjust for canvas position if it's a touch event
+    if (isTouchEvent) {
+      const rect = event.target.getBoundingClientRect();
+      console.log('rect', rect)
+      context.moveTo(posX - rect.left, posY - rect.top);
+    } else {
+      context.moveTo(posX, posY);
+    }
   }
 
   const stopDrawing = () => {
@@ -53,7 +69,7 @@ export default function Draw() {
       context.fillStyle = 'white'
       context.fillRect(0, 0, canvas.width, canvas.height)
       context.drawImage(img, 0, 0)
-      
+
       canvas.toBlob((blob) => {
         navigator.clipboard.write([
           new ClipboardItem({
@@ -78,7 +94,7 @@ export default function Draw() {
       </Head>
 
       <main className={styles.main}>
-      <a href='/' className={styles.home}>🏠</a>
+        <a href='/' className={styles.home}>🏠</a>
         <h1 className={styles.title}>
           Draw
         </h1>
@@ -100,8 +116,6 @@ export default function Draw() {
           onMouseMove={draw}
           onTouchStart={startDrawing}
           onTouchEnd={stopDrawing}
-          onPointerDown={startDrawing}
-          onPointerUp={stopDrawing}
         ></canvas>
         <button onClick={restCanvas}>Reset</button>
         <button onClick={copyToClipboard}>Copy to clipboard</button>
