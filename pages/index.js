@@ -48,6 +48,12 @@ export default function Home() {
       publishDate: '31st March 2024',
       icon: '✏️',
       url: '/draw'
+    },
+    {
+      title: 'QR Code Generator',
+      description: 'Generate QR code for any text.',
+      publishDate: '1st April 2024',
+      icon: '🔲',
     }
   ]
   
