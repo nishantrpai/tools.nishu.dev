@@ -55,6 +55,13 @@ export default function Home() {
       publishDate: '1st April 2024',
       icon: '🔲',
       url: '/qrcode'
+    },
+    {
+      title: 'Prompt Enhancer',
+      description: 'Enhance your image prompt with more details.',
+      publishDate: '2nd April 2024',
+      icon: '🖼️',
+      url: '/promptenhancer'
     }
   ]
   
