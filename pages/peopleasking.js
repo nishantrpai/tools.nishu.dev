@@ -58,7 +58,7 @@ const PeopleAsking = () => {
                 if (e.key === 'Enter') {
                   // fetch the breakdown
                   setOutput('Loading...');
-                  fetch(`/api/gpt?prompt="Find relevant questions from Reddit around the topic ${encodeURI(inputPrompt)} to refine the language. Don't add quotes to the questions. Display relevant questions that mean the same thing but use different words. The intention is to learn the ways people ask the same thing."`).then(res => res.json())
+                  fetch(`/api/gpt?prompt="Find relevant questions from Reddit around the topic ${encodeURI(inputPrompt)} to refine the language. Don't add quotes to the questions. Include relevant questions that mean the same thing but use different words. The intention is to learn the ways people ask the same thing."`).then(res => res.json())
                     .then(data => {
                       setOutput(data.response);
                     });
@@ -76,7 +76,7 @@ const PeopleAsking = () => {
               onClick={() => {
                 // fetch the breakdown
                 setOutput('Loading...');
-                fetch(`/api/gpt?prompt="Find relevant questions from Reddit around the topic ${encodeURI(inputPrompt)} to refine the language. Don't add quotes to the questions. Display relevant questions that mean the same thing but use different words. The intention is to learn the ways people ask the same thing."`).then(res => res.json())
+                fetch(`/api/gpt?prompt="Find relevant questions from Reddit around the topic ${encodeURI(inputPrompt)} to refine the language. Don't add quotes to the questions. Include relevant questions that mean the same thing but use different words. The intention is to learn the ways people ask the same thing."`).then(res => res.json())
                   .then(data => {
                     setOutput(data.response);
                   });
