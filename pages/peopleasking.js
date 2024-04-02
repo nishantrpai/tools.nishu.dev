@@ -9,6 +9,11 @@ const PeopleAsking = () => {
   const [output, setOutput] = useState('');
   const [copy, setCopy] = useState(false);
 
+  let prompt = `Find relevant questions from Reddit around the topic ${encodeURI(inputPrompt)} to refine the language.
+  Don't add quotes to the questions. Include relevant questions that mean the same thing but use different words. 
+  The intention is to learn the ways people ask the same thing. 
+  Include long tail questions that include as a part of the question for e.g., "learn design as a" you can include "learn design as a beginner" or "learn design as a student" and so on.`;
+
   return (
     <>
       <Head>
@@ -58,7 +63,7 @@ const PeopleAsking = () => {
                 if (e.key === 'Enter') {
                   // fetch the breakdown
                   setOutput('Loading...');
-                  fetch(`/api/gpt?prompt="Find relevant questions from Reddit around the topic ${encodeURI(inputPrompt)} to refine the language. Don't add quotes to the questions. Include relevant questions that mean the same thing but use different words. The intention is to learn the ways people ask the same thing."`).then(res => res.json())
+                  fetch(`/api/gpt?prompt="${prompt}"`).then(res => res.json())
                     .then(data => {
                       setOutput(data.response);
                     });
@@ -76,7 +81,7 @@ const PeopleAsking = () => {
               onClick={() => {
                 // fetch the breakdown
                 setOutput('Loading...');
-                fetch(`/api/gpt?prompt="Find relevant questions from Reddit around the topic ${encodeURI(inputPrompt)} to refine the language. Don't add quotes to the questions. Include relevant questions that mean the same thing but use different words. The intention is to learn the ways people ask the same thing."`).then(res => res.json())
+                fetch(`/api/gpt?prompt="${prompt}"`).then(res => res.json())
                   .then(data => {
                     setOutput(data.response);
                   });
@@ -87,20 +92,20 @@ const PeopleAsking = () => {
           </div>
         </div>
         {output && <pre
-            style={{
-              background: '#333',
-              color: '#fff',
-              padding: '10px',
-              borderRadius: '5px',
-              width: '100%',
-              overflow: 'auto',
-              maxHeight: '300px',
-              wordBreak: 'break-all',
-              whiteSpace: 'pre-wrap'
-            }}
-          >
-            {output}
-          </pre>}
+          style={{
+            background: '#333',
+            color: '#fff',
+            padding: '10px',
+            borderRadius: '5px',
+            width: '100%',
+            overflow: 'auto',
+            maxHeight: '300px',
+            wordBreak: 'break-all',
+            whiteSpace: 'pre-wrap'
+          }}
+        >
+          {output}
+        </pre>}
       </main>
     </>
   )
