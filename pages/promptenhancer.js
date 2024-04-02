@@ -60,9 +60,9 @@ const PromptEnhancer = () => {
           />
           <button
             style={{
-              background: 'purple',
-              color: '#fff',
-              padding: '10px',
+              background: '#d8b4fe',
+              color: '#581c87',
+            padding: '10px',
               borderRadius: '5px',
               border: 'none',
               cursor: 'pointer',
