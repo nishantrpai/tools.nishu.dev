@@ -86,6 +86,19 @@ export default function Home() {
         }}>
         </input> */}
         {/* create an input with search icon */}
+        {/* add twitter at the top */}
+        <a href='https://twitter.com/PaiNishant' style={{
+          top: '10px',
+          right: '10px',
+          color: '#888',
+          textDecoration: 'none',
+          fontSize: '14px',
+          marginBottom: '10px',
+        }}
+        target='_blank'
+        >
+          @PaiNishant
+          </a>
         <div className={styles.searchContainer}>
           <FiSearch className={styles.searchIcon} />
           <input className={styles.search} onChange={(e) => {
