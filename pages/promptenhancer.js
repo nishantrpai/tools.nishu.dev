@@ -40,7 +40,7 @@ const PromptEnhancer = () => {
             onChange={(e) => setInputPrompt(e.target.value)}
             style={{
               border: 'none',
-              background: '#333',
+              background: '#111',
               outline: 'none',
               width: '100%',
               padding: '10px',
@@ -60,9 +60,9 @@ const PromptEnhancer = () => {
           />
           <button
             style={{
-              background: '#d8b4fe',
-              color: '#581c87',
-              padding: '10px',
+              background: '#111',
+              color: '#ccc',
+              padding: '10px 15px',
               borderRadius: '5px',
               border: 'none',
               cursor: 'pointer',
@@ -81,7 +81,7 @@ const PromptEnhancer = () => {
         </div>
         {output && <pre
           style={{
-            background: '#333',
+            background: '#111',
             color: '#fff',
             padding: '10px',
             borderRadius: '5px',
