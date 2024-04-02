@@ -62,6 +62,13 @@ export default function Home() {
       publishDate: '2nd April 2024',
       icon: '🖼️',
       url: '/promptenhancer'
+    },
+    {
+      title: 'What Are People Asking',
+      description: 'What are people asking on the internet for your idea.',
+      publishDate: '3rd April 2024',
+      icon: '❓',
+      url: '/peopleasking'
     }
   ]
   
