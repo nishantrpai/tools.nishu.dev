@@ -69,7 +69,14 @@ export default function Home() {
       publishDate: '3rd April 2024',
       icon: '❓',
       url: '/peopleasking'
-    }
+    },
+    {
+      title: 'Encrypt',
+      description: 'Encrypt text using MD5, SHA1, SHA256, SHA512.',
+      publishDate: '4th April 2024',
+      icon: '🔐',
+      url: '/encrypt'
+    } 
   ]
   
   const [search, setSearch] = useState('')
