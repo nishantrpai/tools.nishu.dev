@@ -119,6 +119,36 @@ export default function Draw() {
         ></canvas>
         <button onClick={restCanvas}>Reset</button>
         <button onClick={copyToClipboard}>Copy to clipboard</button>
+        {/* add a mint button so people can mint the image to zora */}
+        <button 
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+        }}
+        onClick={() => {
+          // compress the image to 200x200
+          let dataURL = canvas.toDataURL('image/png')
+          const img = new Image()
+          img.src = dataURL
+          img.onload = () => {
+            const canvas = document.createElement('canvas')
+            const context = canvas.getContext('2d')
+            canvas.width = 400
+            canvas.height = 300
+            context.drawImage(img, 0, 0, 400, 300)
+            dataURL = canvas.toDataURL('image/png')
+            window.open(`https://zora.co/create/single-edition?image=${encodeURIComponent(dataURL)}`);
+          }
+
+          // open in new tab
+        }}>
+          <img style={{
+            width: '20px',
+            height: '20px',
+            marginRight: '10px'
+          
+          }} src="/zora.png" id="zora"></img>
+          Mint</button>
         {copy && <p>Copied to clipboard</p>}
       </main>
     </div>
