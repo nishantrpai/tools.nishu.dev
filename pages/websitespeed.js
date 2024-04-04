@@ -11,6 +11,13 @@ const WebsiteSpeed = () => {
   const [loading, setLoading] = useState(false);
   
   const checkSpeed = async () => {
+    // if url is not correct in regex set error
+    const urlRegex = new RegExp(/^(http|https):\/\/[^ "]+$/);
+    if (!urlRegex.test(url)) {
+      setLoading(false);
+      alert('Please enter a valid URL');
+      return;
+    }
     if (url) {
       // fetch the breakdown
       setLoading(true);
