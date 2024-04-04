@@ -76,7 +76,15 @@ export default function Home() {
       publishDate: '4th April 2024',
       icon: '🔐',
       url: '/encrypt'
-    } 
+    },
+    {
+      title: 'Website speed',
+      description: 'Check the speed of a website.',
+      publishDate: '5th April 2024',
+      icon: '🚀',
+      url: '/websitespeed'
+    }
+    
   ]
   
   const [search, setSearch] = useState('')
