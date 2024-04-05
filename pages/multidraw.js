@@ -20,12 +20,21 @@ export default function Draw() {
     const canvas = document.getElementById('canvas')
     const context = canvas.getContext('2d')
     socket.emit('joinRoom', '123');
-    socket.emit('getStrokes', '123');
     setCanvas(canvas)
     setContext(context)
 
     socket.on('getStrokens', (strokes) => {
-      console.log('strokes', strokes)
+      console.log('strokes', strokes);
+      strokes.forEach((stroke) => {
+        context.beginPath();
+        context.strokeStyle = 'black';
+        context.lineWidth = 4;
+        context.moveTo(stroke.from.x, stroke.from.y);
+        stroke.paths.forEach((path) => {
+          context.stroke();
+          context.lineTo(path.posX, path.posY)
+        });
+      })
     });
 
     socket.on('drawing', (strokes) => {
