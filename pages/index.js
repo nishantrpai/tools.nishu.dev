@@ -83,6 +83,13 @@ export default function Home() {
       publishDate: '5th April 2024',
       icon: '🚀',
       url: '/websitespeed'
+    },
+    {
+      title: 'Multiplayer Drawing',
+      description: 'Draw with your friends in real-time.',
+      publishDate: '6th April 2024',
+      icon: '🎨',
+      url: '/multidraw'
     }
     
   ]
