@@ -3,7 +3,7 @@ import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { useState, useEffect } from 'react'
 import io from 'socket.io-client';
-const socket = io.connect('https://socketserver-draw-production.up.railway.app:6244');
+const socket = io.connect('https://socketserver-draw-production.up.railway.app');
 
 export default function Draw() {
   const [drawing, setDrawing] = useState(false)
