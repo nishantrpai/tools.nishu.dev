@@ -37,6 +37,8 @@ export default function Draw() {
       })
     });
 
+    socket.emit('getStrokes', room);
+
     socket.on('drawing', (strokes) => {
       console.log('strokes', strokes)
       // each stroke is in the currentPath format from, paths
