@@ -90,8 +90,15 @@ export default function Home() {
       publishDate: '6th April 2024',
       icon: '🎨',
       url: '/multidraw'
+    },
+    {
+      title: 'Simple Timer',
+      description: 'Set a timer for your tasks.',
+      publishDate: '7th April 2024',
+      icon: '⏱️',
+      url: '/timer'
     }
-    
+
   ]
   
   const [search, setSearch] = useState('')
