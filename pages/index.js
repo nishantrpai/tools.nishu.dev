@@ -97,6 +97,13 @@ export default function Home() {
       publishDate: '7th April 2024',
       icon: '⏱️',
       url: '/timer'
+    },
+    {
+      title: 'Random Number Generator',
+      description: 'Generate random numbers.',
+      publishDate: '8th April 2024',
+      icon: '🎲',
+      url: '/random'
     }
 
   ]
