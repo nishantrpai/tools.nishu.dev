@@ -104,6 +104,13 @@ export default function Home() {
       publishDate: '8th April 2024',
       icon: '🎲',
       url: '/random'
+    },
+    {
+      title: 'Workout for each muscle',
+      description: 'Get a workout for each muscle in your body.',
+      publishDate: '9th April 2024',
+      icon: '💪',
+      url: '/workout'
     }
 
   ]
