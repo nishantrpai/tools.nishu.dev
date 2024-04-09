@@ -48,7 +48,7 @@ const Deck = () => {
           setQuery(e.target.value)
         }, 1000)
       }} />
-      {loading && !results.length <p>Loading...</p>}
+      {(loading && !results.length) ? <p>Loading...</p> : null}
       {results.map((result, index) => (
         <a key={index} style={{
           border: '1px solid #222',
