@@ -111,6 +111,14 @@ export default function Home() {
       publishDate: '9th April 2024',
       icon: '💪',
       url: '/workout'
+    },
+    {
+      title: 'Tweetdeck for Warpcast',
+      description: 'Tweetdeck for Warpcast',
+      publishDate: '10th April 2024',
+      icon: '📁',
+      url: '/warpdeck',
+      publishDate: '10th April 2024',
     }
 
   ]
