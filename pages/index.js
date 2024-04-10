@@ -119,6 +119,13 @@ export default function Home() {
       icon: '📁',
       url: '/warpdeck',
       publishDate: '10th April 2024',
+    },
+    {
+      title: 'What time is it right now in ___',
+      description: 'Get the current time in any city.',
+      publishDate: '11th April 2024',
+      icon: '⏰',
+      url: '/whattime'
     }
 
   ]
