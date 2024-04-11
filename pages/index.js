@@ -126,6 +126,13 @@ export default function Home() {
       publishDate: '11th April 2024',
       icon: '⏰',
       url: '/whattime'
+    },
+    {
+      title: 'Text to Speech',
+      description: 'Convert text to speech.',
+      publishDate: '12th April 2024',
+      icon: '🔊',
+      url: '/tts'
     }
 
   ]
