@@ -4,7 +4,7 @@ import styles from '@/styles/Home.module.css'
 import { useState, useEffect } from 'react'
 
 export default function WhatTime() {
-  const [city, setCity] = useState('New York')
+  const [city, setCity] = useState('Asia/Kabul')
   const [time, setTime] = useState('')
 
   let cities = [
@@ -30107,13 +30107,12 @@ export default function WhatTime() {
       </Head>
       <main>
         <h1>What Time Is It?</h1>
-        <p>It is currently {time}</p>
-
         <select onChange={(e) => setCity(e.target.value)}>
           {cities.map((city) => (
             <option key={city.city} value={city.timezone}>{city.city}</option>
           ))}
         </select>
+        <p>{time}</p>
       </main>
     </div>
   )
