@@ -77,7 +77,7 @@ export default function VoiceToDo() {
           cursor: 'pointer',
           marginBottom: '20px'
         }}>
-          {isListening ? 'Listening...' : 'Listen'}
+          {isListening ? 'Stop' : 'Play'}
         </button>
         <button onClick={addTodo} style={{
           padding: '10px',
