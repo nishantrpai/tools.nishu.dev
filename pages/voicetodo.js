@@ -114,8 +114,9 @@ export default function VoiceToDo() {
             // checkbox for todo
             <div key={index} style={{
               display: 'flex',
-              alignItems: 'flex-start',
-              marginBottom: '10px'
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginTop: '10px',
             }}>
               <input type="checkbox" id={`todo-${index}`} name={`todo-${index}`} value={todo} style={{
                 marginRight: '10px'
