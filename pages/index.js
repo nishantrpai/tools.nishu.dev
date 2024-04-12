@@ -133,6 +133,13 @@ export default function Home() {
       publishDate: '12th April 2024',
       icon: '🔊',
       url: '/tts'
+    },
+    {
+      title: 'Voice to Todo List',
+      description: 'Convert your voice to a todo list.',
+      publishDate: '13th April 2024',
+      icon: '🗒️',
+      url: '/voicetodo'
     }
 
   ]
