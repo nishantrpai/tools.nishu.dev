@@ -42,9 +42,11 @@ export default function Warpspaces() {
 function Profile() {
   const [room, setRoom] = useState('');
   const [members, setMembers] = useState([]);
+  const [rooms, setRooms] = useState([]);
   const [heading, setHeading] = useState('');
   const [isSpeaking, setIsSpeaking] = useState(null);
   const [audio, setAudio] = useState(null);
+  const [displayMode, setDisplayMode] = useState('join');
   const profile = useProfile();
   const {
     isAuthenticated,
@@ -55,6 +57,22 @@ function Profile() {
   const sendAudio = (audio) => {
     socket.emit('audio', { roomId: room, username: displayName, audio });
   }
+
+  useEffect(() => {
+    if (displayMode == 'spaces') {
+      setMembers([]);
+      socket.emit('fetchRooms');
+      socket.on('rooms', (rooms) => {
+        console.log('all rooms', rooms);
+        setRooms(rooms);
+      });
+    }
+    if (displayMode == 'join') {
+      setRooms([]);
+      socket.emit('getMembers', room);
+    }
+
+  }, [displayMode]);
 
   useEffect(() => {
     if (!audio) return;
@@ -91,9 +109,8 @@ function Profile() {
     setHeading(room);
     socket.on('getMembers', (members) => {
       // if members has the current user, set the members
-      setMembers([]);
-      if (members[displayName])
-        setMembers(members);
+      if (!members) return;
+      setMembers(members);
     });
 
     socket.emit('getMembers', room);
@@ -135,12 +152,7 @@ function Profile() {
             fontSize: "2rem",
             marginBottom: "20px",
           }}>Warpspaces</h1>
-          <p style={{
-            marginBottom: "12px",
-          }}>
-            Hello, {displayName}!
-          </p>
-          {Object.keys(members).length == 0 ?
+          {(!heading) ?
             <div style={{
               display: "flex",
               gap: "12px",
@@ -186,8 +198,33 @@ function Profile() {
             </div>
           }
 
-          <h2 style={{ width: '100%', marginBottom: '20px', fontSize: "3rem" }}>{heading}</h2>
+          {heading && <h2 style={{ width: '100%', marginBottom: '20px', marginTop: "20px", fontSize: "2rem" }}>🎧 {heading}</h2>}
           <div style={{
+            display: "flex",
+            width: "100%",
+            flex: "1",
+            marginBottom: "20px",
+            marginTop: "20px",
+          }}>
+            <button style={{
+              width: "100%",
+              backgroundColor: "#000",
+              opacity: `${displayMode === 'join' ? 1 : 0.5}`,
+            }}
+              onClick={() => { setDisplayMode('join') }}
+            >
+              Join Space</button>
+            <button style={{
+              width: "100%",
+              backgroundColor: "#000",
+              opacity: `${displayMode === 'spaces' ? 1 : 0.5}`,
+            }}
+              onClick={() => { setDisplayMode('spaces') }}
+            >
+              Spaces</button>
+          </div>
+
+          {displayMode == 'join' ? <div style={{
             display: "grid",
             gap: "10px",
             gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))",
@@ -206,7 +243,8 @@ function Profile() {
                 flexDirection: "column",
                 alignContent: "center",
               }}>
-                <div className={members[member].isSpeaking ? styles.memberiSSpeaking : null}>
+                <div
+                  className={members[member].isSpeaking ? styles.memberiSSpeaking : null}>
                   <img style={{
                     width: "50px",
                     height: "50px",
@@ -216,7 +254,6 @@ function Profile() {
                   }}
                     src={fetchIdenticon(member)}
                   >
-
                   </img>
                 </div>
                 <span style={{
@@ -226,8 +263,63 @@ function Profile() {
                 }}>{member}</span>
               </div>
             ))}
-          </div>
+          </div> : null}
+
+          {displayMode == 'spaces' ?
+            <div style={{
+              display: "flex",
+              flexDirection: "column",
+              border: "1px solid #111",
+              borderRadius: "10px",
+              padding: "20px 5px",
+              height: "500px",
+            }}>
+              {rooms.map((room, index) => (
+                <div key={index} style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  flexDirection: "row",
+                  alignContent: "center",
+                  borderBottom: "1px solid #111",
+                  padding: "10px",
+                  justifyContent: "space-between",
+                }}>
+                  <div style={{
+                    display: "flex",
+                    flexDirection: "column",
+                  }}>
+                    <span style={{
+                      color: "#fff",
+                      fontSize: "1rem",
+                      fontWeight: "100",
+                    }}>{room.room}</span>
+                    <span style={{
+                      color: "#ccc",
+                      fontSize: "12px",
+                      fontWeight: "100",
+                    }}>{room.members} members</span>
+                  </div>
+                  <button style={{
+                    padding: "10px",
+                    height: "max-content"
+                  }}
+                    onClick={() => {
+                      setRoom(room.room);
+                      setHeading(room.room);
+                      setRooms([]);
+                      setDisplayMode('join');
+                      handleJoin(displayName);
+                    }}
+                  >
+                    Join
+                  </button>
+                </div>
+              ))}
+            </div> : null
+          }
+
           {/* show microphone panel */}
+
           {Object.keys(members).length ? <div style={{
             display: "flex",
             alignContent: "center",
