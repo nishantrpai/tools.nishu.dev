@@ -291,7 +291,7 @@ function Profile() {
                       fontWeight: "100",
                     }}>{room.members} members</span>
                   </div>
-                  {room !== room.room ? <button style={{
+                  {heading !== room.room ? <button style={{
                     padding: "10px",
                     height: "max-content"
                   }}
