@@ -84,6 +84,7 @@ function Profile() {
     setHeading(room);
     socket.on('getMembers', (members) => {
       // if members has the current user, set the members
+      setMembers([]);
       if (members[displayName])
         setMembers(members);
     });
