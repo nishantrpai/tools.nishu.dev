@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import io from 'socket.io-client';
 import { createIcon } from 'opepen-standard';
 import { FiMic } from "react-icons/fi";
-const socket = io.connect('http://localhost:8080')
+const socket = io.connect('https://voiceserver-production.up.railway.app')
 
 
 const fetchIdenticon = (username) => {
@@ -21,8 +21,8 @@ const config = {
   // RPC URL from a provider like Alchemy or Infura.
   relay: "https://relay.farcaster.xyz",
   rpcUrl: "https://mainnet.optimism.io",
-  domain: "localhost:3000",
-  siweUri: "https://localhost:3000",
+  domain: "tools.nishu.dev",
+  siweUri: "https://tools.nishu.dev/warpspaces",
 };
 
 
@@ -184,9 +184,10 @@ function Profile() {
             gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))",
             textAlign: "center",
             alignContent: "flex-start",
-            border: "1px solid #222",
-            padding: "20px",
-            height: "600px",
+            border: "1px solid #111",
+            borderRadius: "10px",
+            padding: "20px 5px",
+            height: "500px",
             overflowY: "auto",
           }}>
             {Object.keys(members).map((member, index) => (
