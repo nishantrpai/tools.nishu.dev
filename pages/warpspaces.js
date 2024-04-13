@@ -11,7 +11,7 @@ const socket = io.connect('http://localhost:8080')
 const fetchIdenticon = (username) => {
   return(createIcon({
     seed: username,
-    size: 400,
+    size: 200,
   })).toDataURL();
 }
 
@@ -44,7 +44,7 @@ function Profile() {
   const [members, setMembers] = useState([]);
   const [heading, setHeading] = useState('');
   const [membersSpeaking, setMemberSpeaking] = useState([]);
-  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(null);
   const profile = useProfile();
   const {
     isAuthenticated,
@@ -57,28 +57,8 @@ function Profile() {
     socket.emit('joinRoom', { roomId: room, username: 'jack' });
     socket.emit('joinRoom', { roomId: room, username: 'jalil' });
     socket.emit('joinRoom', { roomId: room, username: 'derrick' });
-    socket.emit('joinRoom', { roomId: room, username: 'jack' });
-    socket.emit('joinRoom', { roomId: room, username: 'jalil' });
-    socket.emit('joinRoom', { roomId: room, username: 'derrick' });
-    socket.emit('joinRoom', { roomId: room, username: 'jack' });
-    socket.emit('joinRoom', { roomId: room, username: 'jalil' });
-    socket.emit('joinRoom', { roomId: room, username: 'derrick' });
-    socket.emit('joinRoom', { roomId: room, username: 'jack' });
-    socket.emit('joinRoom', { roomId: room, username: 'jalil' });
-    socket.emit('joinRoom', { roomId: room, username: 'derrick' });
-    socket.emit('joinRoom', { roomId: room, username: 'jack' });
-    socket.emit('joinRoom', { roomId: room, username: 'jalil' });
-    socket.emit('joinRoom', { roomId: room, username: 'derrick' });
-    socket.emit('joinRoom', { roomId: room, username: 'jack' });
-    socket.emit('joinRoom', { roomId: room, username: 'jalil' });
-    socket.emit('joinRoom', { roomId: room, username: 'derrick' });
-    socket.emit('joinRoom', { roomId: room, username: 'jack' });
-    socket.emit('joinRoom', { roomId: room, username: 'jalil' });
-    socket.emit('joinRoom', { roomId: room, username: 'derrick' });
-    socket.emit('joinRoom', { roomId: room, username: 'jack' });
-    socket.emit('joinRoom', { roomId: room, username: 'jalil' });
-    socket.emit('joinRoom', { roomId: room, username: 'derrick' });
     socket.on('getMembers', (members) => {
+      console.log('getMembers');
       setMembers(members);
     });
 
@@ -91,6 +71,15 @@ function Profile() {
 
   };
 
+  useEffect(() => {
+    if(isSpeaking == null) return;
+    if(isSpeaking) {
+      socket.emit('isSpeaking', {roomId: room, username: displayName});
+    } else {
+      socket.emit('notSpeaking', {roomId: room, username: displayName});
+    }
+  }, [isSpeaking]);
+
   return (
     <>
 
@@ -98,6 +87,10 @@ function Profile() {
         <div style={{
           width: '100%'
         }}>
+          <h1 style={{
+            fontSize: "2rem",
+            marginBottom: "20px",
+          }}>Warpspaces</h1>
           <p style={{
             marginBottom: "12px",
           }}>
@@ -141,20 +134,20 @@ function Profile() {
             alignContent: "flex-start",
             border: "1px solid #222",
             padding: "20px",
-            height: "500px",
+            height: "600px",
             overflowY: "auto",
           }}>
-              {members.map((member, index) => (
+              {Object.keys(members).map((member, index) => (
                 <div key={index} style={{
                   display: "flex",
                   justifyContent: "center",
                   flexDirection: "column",
                   alignContent: "center",
                 }}>
-                <div className={styles.isSpeaking}>
+                <div className={members[member].isSpeaking ? styles.memberiSSpeaking : null}>
                   <img style={{
-                      width: "100px",
-                      height: "100px",
+                      width: "50px",
+                      height: "50px",
                       margin: "auto",
                       marginBottom: "10px",
                       borderRadius: "5px",
@@ -164,7 +157,11 @@ function Profile() {
                     
                     </img>
                     </div>
-                  <span>{member}</span>
+                  <span style={{
+                    color: "#ccc",
+                    fontSize: "12px",
+                    fontWeight: "100",
+                  }}>{member}</span>
                 </div>
               ))}
             </div>
@@ -183,6 +180,7 @@ function Profile() {
               >
               <FiMic/>
               </button>
+            
             </div>
         </div>
       ) : (
