@@ -84,7 +84,7 @@
 html,
 body {
   max-width: 100vw;
-  overflow-x: hidden;
+  overflow: auto;
 }
 
 body {
@@ -134,9 +134,9 @@ button {
   width: max-content;
   padding: 0.25rem 0.75rem;
   color: #fff;
-  background-color: #333;
-  border: none;
-  outline: none;
+  background-color: #222;
+  border: none !important;
+  outline: none !important;
   border-radius: 5px;
   font-size: 1rem;
 }
@@ -152,3 +152,25 @@ button {
     color-scheme: dark;
   }
 }
+
+*::-webkit-scrollbar-track
+{
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	border-radius: 1px;
+	background-color: #000;
+}
+
+*::-webkit-scrollbar
+{
+	width: 5px;
+	background-color: #F5F5F5;
+}
+
+*::-webkit-scrollbar-thumb
+{
+	border-radius: 10px;
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+	background-color: #555;
+}
+
+ 

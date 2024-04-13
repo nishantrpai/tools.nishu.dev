@@ -264,3 +264,43 @@
   width: 100%;
   font-size: 2rem;
 }
+
+.isSpeaking {
+  animation: borderChange 0.5s infinite;
+}
+
+@keyframes borderChange {
+  /* border will increase and decrease */
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(3px);
+  }
+  100% {
+    transform: translateY(0px);
+  } 
+}
+
+.buttonSpeaking {
+  background-color: #fff;
+  color: purple;
+  border: none;
+  border-radius: 5px;
+  padding: 0.5rem 1rem;
+  font-size: 3rem;
+  cursor: pointer;
+  padding-top: 16px;
+}
+
+.buttonNotSpeaking {
+  background-color: #222;
+  color: #ccc;
+  border: 1px solid #222;
+  border-radius: 5px;
+  padding: 0.5rem 1rem;
+  font-size: 3rem;
+  cursor: pointer;
+  padding-top: 16px;
+
+}

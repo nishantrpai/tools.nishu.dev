@@ -140,6 +140,13 @@ export default function Home() {
       publishDate: '13th April 2024',
       icon: '🗒️',
       url: '/voicetodo'
+    },
+    {
+      title: 'WarpSpaces',
+      description: 'WarpSpaces: Twitter Spaces for Warpcast',
+      publishDate: '14th April 2024',
+      icon: '🎤',
+      url: '/warpspaces'
     }
 
   ]
