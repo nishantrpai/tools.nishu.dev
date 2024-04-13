@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import io from 'socket.io-client';
 import { createIcon } from 'opepen-standard';
 import { FiMic } from "react-icons/fi";
+import Head from 'next/head';
 const socket = io.connect('https://voiceserver-production.up.railway.app')
 
 
@@ -29,6 +30,11 @@ const config = {
 export default function Warpspaces() {
   return (
     <AuthKitProvider config={config}>
+      <Head>
+        <title>Warpspaces</title>
+        <link rel="icon" href="/favicon.ico" />
+        <meta name="description" content="Warpspaces: Twitter Spaces but on Farcaster" />
+      </Head>
       <main>
         <div style={{ position: "fixed", top: "12px", right: "12px" }}>
           <SignInButton />
