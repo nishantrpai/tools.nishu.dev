@@ -4,7 +4,7 @@ import { AuthKitProvider, SignInButton, useProfile } from "@farcaster/auth-kit";
 import { useEffect, useState } from "react";
 import io from 'socket.io-client';
 import { createIcon } from 'opepen-standard';
-import { FiMic } from "react-icons/fi";
+import { FiLogOut, FiMic } from "react-icons/fi";
 import Head from 'next/head';
 const socket = io.connect('https://voiceserver-production.up.railway.app')
 
@@ -187,21 +187,7 @@ function Profile() {
               >
                 Join
               </button>
-            </div> :
-            <div>
-              <button style={{
-                padding: "10px",
-                height: "max-content"
-              }}
-                onClick={() => {
-                  socket.emit('leftRoom', { roomId: room, username: displayName });
-                  setRoom('');
-                  setHeading('');
-                  setMembers([]);
-                }}
-              > Leave Room
-              </button>
-            </div>
+            </div> : null
           }
 
           {heading && <h2 style={{ width: '100%', marginBottom: '20px', marginTop: "20px", fontSize: "2rem" }}>🎧 {heading}</h2>}
@@ -329,16 +315,27 @@ function Profile() {
           {Object.keys(members).length ? <div style={{
             display: "flex",
             alignContent: "center",
-            justifyContent: "center",
+            justifyContent: "space-around",
             fontSize: "2rem",
             marginTop: "20px",
           }}>
-            <button className={isSpeaking ? styles.buttonSpeaking : styles.buttonNotSpeaking}
+            {heading ? <button className={isSpeaking ? styles.buttonSpeaking : styles.buttonNotSpeaking}
               onMouseDown={() => setIsSpeaking(true)}
               onMouseUp={() => setIsSpeaking(false)}
               onMouseLeave={() => setIsSpeaking(false)}
             >
               <FiMic />
+            </button> : null}
+
+
+            <button className={styles.buttonNotSpeaking}
+              onClick={() => {
+                socket.emit('leftRoom', { roomId: room, username: displayName });
+                setRoom('');
+                setHeading('');
+                setMembers([]);
+              }}
+            > <FiLogOut />
             </button>
 
           </div> : null}
