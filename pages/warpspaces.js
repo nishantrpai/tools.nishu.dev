@@ -45,12 +45,40 @@ function Profile() {
   const [heading, setHeading] = useState('');
   const [membersSpeaking, setMemberSpeaking] = useState([]);
   const [isSpeaking, setIsSpeaking] = useState(null);
+  const [audioChunks, setAudioChunks] = useState([]);
   const profile = useProfile();
   const {
     isAuthenticated,
     profile: { fid, displayName, custody },
   } = profile;
+  const [mediaRecorder, setMediaRecorder] = useState(null);
 
+  useEffect(() => {
+    if (!displayName) return;
+    navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+      const tmpRecorder = new MediaRecorder(stream);
+      tmpRecorder.ondataavailable = (event) => {
+        console.log(event.data);
+        // hear the blob as an audio element
+        // audio blob to base64
+        const reader = new FileReader();
+        reader.readAsDataURL(event.data);
+        reader.onloadend = () => {
+          const base64data = reader.result;
+          socket.emit('audio', {roomId: room, username: displayName, audio: base64data});
+        }
+      };
+      tmpRecorder.onstart = () => {
+        console.log('recorder started');
+        setAudioChunks([]);
+      };
+      tmpRecorder.onstop = () => {
+        console.log('recorder stopped');
+      };
+      setMediaRecorder(tmpRecorder);
+    });
+  }, [displayName]);
+  
   const handleJoin = (displayName) => {
     socket.emit('joinRoom', { roomId: room, username: displayName });
     setHeading(room);
@@ -69,13 +97,22 @@ function Profile() {
       socket.emit('getMembers', room);
     });
 
+    socket.on('audio', ({username, audio}) => {
+      // play the audio, if it's not from the current user
+      if (username === displayName) return;
+      const audioElement = new Audio(audio);
+      audioElement.play();
+    });
+
   };
 
   useEffect(() => {
     if(isSpeaking == null) return;
     if(isSpeaking) {
+      mediaRecorder.start();
       socket.emit('isSpeaking', {roomId: room, username: displayName});
     } else {
+      mediaRecorder.stop();
       socket.emit('notSpeaking', {roomId: room, username: displayName});
     }
   }, [isSpeaking]);
