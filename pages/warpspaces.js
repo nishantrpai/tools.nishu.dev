@@ -21,7 +21,7 @@ const config = {
   // RPC URL from a provider like Alchemy or Infura.
   relay: "https://relay.farcaster.xyz",
   rpcUrl: "https://mainnet.optimism.io",
-  domain: "localhost:3000",
+  domain: "tools.nishu.dev",
   siweUri: "localhost:3000/warpspaces",
 };
 
@@ -44,6 +44,7 @@ function Profile() {
   const [members, setMembers] = useState([]);
   const [heading, setHeading] = useState('');
   const [isSpeaking, setIsSpeaking] = useState(null);
+  const [audio, setAudio] = useState(null);
   const profile = useProfile();
   const {
     isAuthenticated,
@@ -51,20 +52,28 @@ function Profile() {
   } = profile;
   const [mediaRecorder, setMediaRecorder] = useState(null);
 
+  const sendAudio = (audio) => {
+    socket.emit('audio', { roomId: room, username: displayName, audio });
+  }
+
+  useEffect(() => {
+    if (!audio) return;
+    sendAudio(audio);
+  }, [audio]);
+
   useEffect(() => {
     if (!displayName) return;
-    if(mediaRecorder) return;
+    if (mediaRecorder) return;
     navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
       const tmpRecorder = new MediaRecorder(stream);
       tmpRecorder.ondataavailable = (event) => {
-        console.log(event.data);
         // hear the blob as an audio element
         // audio blob to base64
         const reader = new FileReader();
         reader.readAsDataURL(event.data);
         reader.onloadend = () => {
           const base64data = reader.result;
-          socket.emit('audio', { roomId: room, username: displayName, audio: base64data });
+          setAudio(base64data);
         }
       };
       tmpRecorder.onstart = () => {
@@ -234,7 +243,7 @@ function Profile() {
               <FiMic />
             </button>
 
-          </div> :null }
+          </div> : null}
         </div>
       ) : (
         <p>
