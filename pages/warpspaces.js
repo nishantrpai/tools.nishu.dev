@@ -285,11 +285,11 @@ function Profile() {
                       fontSize: "1rem",
                       fontWeight: "100",
                     }}>{room.room}</span>
-                    <span style={{
+                    {room !== room.room ? <span style={{
                       color: "#ccc",
                       fontSize: "12px",
                       fontWeight: "100",
-                    }}>{room.members} members</span>
+                    }}>{room.members} members</span> : null}
                   </div>
                   <button style={{
                     padding: "10px",
