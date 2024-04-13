@@ -285,13 +285,13 @@ function Profile() {
                       fontSize: "1rem",
                       fontWeight: "100",
                     }}>{room.room}</span>
-                    {room !== room.room ? <span style={{
+                    <span style={{
                       color: "#ccc",
                       fontSize: "12px",
                       fontWeight: "100",
-                    }}>{room.members} members</span> : null}
+                    }}>{room.members} members</span>
                   </div>
-                  <button style={{
+                  {room !== room.room ? <button style={{
                     padding: "10px",
                     height: "max-content"
                   }}
@@ -304,7 +304,7 @@ function Profile() {
                     }}
                   >
                     Join
-                  </button>
+                  </button> : null}
                 </div>
               ))}
             </div> : null
