@@ -231,9 +231,9 @@ function Profile() {
               onMouseLeave={() => setIsSpeaking(false)}
             >
               <FiMic />
-            </button> : null}
+            </button>
 
-          </div>
+          </div> :null }
         </div>
       ) : (
         <p>
