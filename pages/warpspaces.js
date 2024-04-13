@@ -21,8 +21,8 @@ const config = {
   // RPC URL from a provider like Alchemy or Infura.
   relay: "https://relay.farcaster.xyz",
   rpcUrl: "https://mainnet.optimism.io",
-  domain: "tools.nishu.dev",
-  siweUri: "https://tools.nishu.dev/warpspaces",
+  domain: "localhost:3000",
+  siweUri: "localhost:3000/warpspaces",
 };
 
 
@@ -43,9 +43,7 @@ function Profile() {
   const [room, setRoom] = useState('');
   const [members, setMembers] = useState([]);
   const [heading, setHeading] = useState('');
-  const [membersSpeaking, setMemberSpeaking] = useState([]);
   const [isSpeaking, setIsSpeaking] = useState(null);
-  const [audioChunks, setAudioChunks] = useState([]);
   const profile = useProfile();
   const {
     isAuthenticated,
@@ -55,6 +53,7 @@ function Profile() {
 
   useEffect(() => {
     if (!displayName) return;
+    if(mediaRecorder) return;
     navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
       const tmpRecorder = new MediaRecorder(stream);
       tmpRecorder.ondataavailable = (event) => {
@@ -70,14 +69,13 @@ function Profile() {
       };
       tmpRecorder.onstart = () => {
         console.log('recorder started');
-        setAudioChunks([]);
       };
       tmpRecorder.onstop = () => {
         console.log('recorder stopped');
       };
       setMediaRecorder(tmpRecorder);
     });
-  }, [displayName]);
+  }, [displayName, room]);
 
   const handleJoin = (displayName) => {
     socket.emit('joinRoom', { roomId: room, username: displayName });
@@ -96,7 +94,7 @@ function Profile() {
       socket.emit('getMembers', room);
     });
 
-    socket.on('audio', ({ username, audio }) => {
+    socket.on('audio', ({ username, audio, roomId }) => {
       console.log('audio received');
       // play the audio, if it's not from the current user
       if (username === displayName) return;
