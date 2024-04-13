@@ -97,6 +97,7 @@ function Profile() {
     });
 
     socket.on('audio', ({ username, audio }) => {
+      console.log('audio received');
       // play the audio, if it's not from the current user
       if (username === displayName) return;
       const audioElement = new Audio(audio);
