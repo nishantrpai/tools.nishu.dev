@@ -9,7 +9,7 @@ const socket = io.connect('http://localhost:8080')
 
 
 const fetchIdenticon = (username) => {
-  return(createIcon({
+  return (createIcon({
     seed: username,
     size: 200,
   })).toDataURL();
@@ -65,7 +65,7 @@ function Profile() {
         reader.readAsDataURL(event.data);
         reader.onloadend = () => {
           const base64data = reader.result;
-          socket.emit('audio', {roomId: room, username: displayName, audio: base64data});
+          socket.emit('audio', { roomId: room, username: displayName, audio: base64data });
         }
       };
       tmpRecorder.onstart = () => {
@@ -78,16 +78,14 @@ function Profile() {
       setMediaRecorder(tmpRecorder);
     });
   }, [displayName]);
-  
+
   const handleJoin = (displayName) => {
     socket.emit('joinRoom', { roomId: room, username: displayName });
     setHeading(room);
-    socket.emit('joinRoom', { roomId: room, username: 'jack' });
-    socket.emit('joinRoom', { roomId: room, username: 'jalil' });
-    socket.emit('joinRoom', { roomId: room, username: 'derrick' });
     socket.on('getMembers', (members) => {
-      console.log('getMembers');
-      setMembers(members);
+      // if members has the current user, set the members
+      if (members[displayName])
+        setMembers(members);
     });
 
     socket.emit('getMembers', room);
@@ -97,7 +95,7 @@ function Profile() {
       socket.emit('getMembers', room);
     });
 
-    socket.on('audio', ({username, audio}) => {
+    socket.on('audio', ({ username, audio }) => {
       // play the audio, if it's not from the current user
       if (username === displayName) return;
       const audioElement = new Audio(audio);
@@ -107,13 +105,13 @@ function Profile() {
   };
 
   useEffect(() => {
-    if(isSpeaking == null) return;
-    if(isSpeaking) {
+    if (isSpeaking == null) return;
+    if (isSpeaking) {
       mediaRecorder.start();
-      socket.emit('isSpeaking', {roomId: room, username: displayName});
+      socket.emit('isSpeaking', { roomId: room, username: displayName });
     } else {
       mediaRecorder.stop();
-      socket.emit('notSpeaking', {roomId: room, username: displayName});
+      socket.emit('notSpeaking', { roomId: room, username: displayName });
     }
   }, [isSpeaking]);
 
@@ -133,36 +131,53 @@ function Profile() {
           }}>
             Hello, {displayName}!
           </p>
-          <div style={{
-            display: "flex",
-            gap: "12px",
-          }}>
+          {Object.keys(members).length == 0 ?
+            <div style={{
+              display: "flex",
+              gap: "12px",
+            }}>
 
-            <input
-              type="text"
-              placeholder="Which room do you want to join?"
-              style={{
+              <input
+                type="text"
+                placeholder="Which room do you want to join?"
+                style={{
+                  padding: "10px",
+                  fontSize: "16px",
+                  width: "100%",
+                  marginBottom: "12px",
+                  outline: "none",
+                  borderRadius: "4px",
+                  border: "none",
+                  fontSize: "1rem",
+                  backgroundColor: "#222",
+                }}
+                onChange={(e) => setRoom(e.target.value)} />
+              <button style={{
                 padding: "10px",
-                fontSize: "16px",
-                width: "100%",
-                marginBottom: "12px",
-                outline: "none",
-                borderRadius: "4px",
-                border: "none",
-                fontSize: "1rem",
-                backgroundColor: "#222",
+                height: "max-content"
               }}
-              onChange={(e) => setRoom(e.target.value)} />
-            <button style={{
-              padding: "10px",
-              height: "max-content"
-            }}
-              onClick={() => handleJoin(displayName)}
-            >
-              Join
-            </button>
-          </div>
-          <h2 style={{width: '100%', marginBottom: '20px', fontSize: "3rem"}}>{heading}</h2>
+                onClick={() => handleJoin(displayName)}
+              >
+                Join
+              </button>
+            </div> :
+            <div>
+              <button style={{
+                padding: "10px",
+                height: "max-content"
+              }}
+                onClick={() => {
+                  socket.emit('leftRoom', { roomId: room, username: displayName });
+                  setRoom('');
+                  setHeading('');
+                  setMembers([]);
+                }}
+              > Leave Room
+              </button>
+            </div>
+          }
+
+          <h2 style={{ width: '100%', marginBottom: '20px', fontSize: "3rem" }}>{heading}</h2>
           <div style={{
             display: "grid",
             gap: "10px",
@@ -174,51 +189,51 @@ function Profile() {
             height: "600px",
             overflowY: "auto",
           }}>
-              {Object.keys(members).map((member, index) => (
-                <div key={index} style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  flexDirection: "column",
-                  alignContent: "center",
-                }}>
+            {Object.keys(members).map((member, index) => (
+              <div key={index} style={{
+                display: "flex",
+                justifyContent: "center",
+                flexDirection: "column",
+                alignContent: "center",
+              }}>
                 <div className={members[member].isSpeaking ? styles.memberiSSpeaking : null}>
                   <img style={{
-                      width: "50px",
-                      height: "50px",
-                      margin: "auto",
-                      marginBottom: "10px",
-                      borderRadius: "5px",
+                    width: "50px",
+                    height: "50px",
+                    margin: "auto",
+                    marginBottom: "10px",
+                    borderRadius: "5px",
                   }}
                     src={fetchIdenticon(member)}
                   >
-                    
-                    </img>
-                    </div>
-                  <span style={{
-                    color: "#ccc",
-                    fontSize: "12px",
-                    fontWeight: "100",
-                  }}>{member}</span>
+
+                  </img>
                 </div>
-              ))}
-            </div>
-            {/* show microphone panel */}
-            <div style={{
-                display: "flex",
-                alignContent: "center",
-                justifyContent: "center",
-                fontSize: "2rem",
-                marginTop: "20px",
-            }}>
-              <button className={isSpeaking ? styles.buttonSpeaking: styles.buttonNotSpeaking}
+                <span style={{
+                  color: "#ccc",
+                  fontSize: "12px",
+                  fontWeight: "100",
+                }}>{member}</span>
+              </div>
+            ))}
+          </div>
+          {/* show microphone panel */}
+          {Object.keys(members).length ? <div style={{
+            display: "flex",
+            alignContent: "center",
+            justifyContent: "center",
+            fontSize: "2rem",
+            marginTop: "20px",
+          }}>
+            <button className={isSpeaking ? styles.buttonSpeaking : styles.buttonNotSpeaking}
               onMouseDown={() => setIsSpeaking(true)}
               onMouseUp={() => setIsSpeaking(false)}
               onMouseLeave={() => setIsSpeaking(false)}
-              >
-              <FiMic/>
-              </button>
-            
-            </div>
+            >
+              <FiMic />
+            </button> : null}
+
+          </div>
         </div>
       ) : (
         <p>
