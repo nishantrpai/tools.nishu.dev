@@ -308,7 +308,7 @@ function Profile() {
                       setHeading(room.room);
                       setRooms([]);
                       setDisplayMode('join');
-                      handleJoin(displayName);
+                      handleJoin(room.room);
                     }}
                   >
                     Join
