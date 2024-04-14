@@ -147,6 +147,13 @@ export default function Home() {
       publishDate: '14th April 2024',
       icon: '🎤',
       url: '/warpspaces'
+    },
+    {
+      title: 'Pick random winner from a list',
+      description: 'Pick a random winner from a list of names.',
+      publishDate: '15th April 2024',
+      icon: '🎉',
+      url: '/randomwinner'
     }
 
   ]
