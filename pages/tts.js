@@ -15,7 +15,8 @@ export default function Home() {
   useEffect(() => {
     if (!window.speechSynthesis) return;
     setVoices(window.speechSynthesis.getVoices());
-    setVoice(window.speechSynthesis.getVoices()[0]);
+    if (!voice)
+      setVoice(window.speechSynthesis.getVoices()[0]);
 
   }, [text]);
 
@@ -44,12 +45,12 @@ export default function Home() {
           <textarea value={text} onChange={e => setText(e.target.value)}></textarea>
         </div>
         <div>
-          {voices.length > 0 && 
-          <select value={vidx} onChange={e => {setVoice(voices[e.target.value]); setVoiceIndex(e.target.value) }}>
-            {voices.map((voice, index) => (
-              <option key={index} value={index}>{voice.name}</option>
-            ))}
-          </select>}
+          {voices.length > 0 &&
+            <select value={vidx} onChange={e => { setVoice(voices[e.target.value]); setVoiceIndex(e.target.value) }}>
+              {voices.map((voice, index) => (
+                <option key={index} value={index}>{voice.name}</option>
+              ))}
+            </select>}
         </div>
         <div>
           <h3>Rate</h3>
