@@ -111,6 +111,7 @@ function Profile() {
   }, [displayName, room]);
 
   const handleJoin = (displayName) => {
+    if(!room) return;
     socket.emit('joinRoom', { roomId: room, username: displayName });
     setHeading(room);
     socket.on('getMembers', (members) => {
@@ -137,6 +138,13 @@ function Profile() {
   };
 
   useEffect(() => {
+    window.onbeforeunload = () => {
+      socket.emit('leftRoom', { roomId: room, username: displayName });
+    }
+  }, [])
+
+
+  useEffect(() => {
     if (isSpeaking == null) return;
     if (isSpeaking) {
       mediaRecorder.start();
@@ -158,7 +166,7 @@ function Profile() {
             fontSize: "2rem",
             marginBottom: "20px",
           }}>Warpspaces</h1>
-          {(!heading) ?
+          {!heading ?
             <div style={{
               display: "flex",
               gap: "12px",
