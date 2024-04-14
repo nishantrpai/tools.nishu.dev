@@ -299,7 +299,7 @@ function Profile() {
                       fontWeight: "100",
                     }}>{room.members} members</span>
                   </div>
-                  {heading !== room.room ? <button style={{
+                  {<button style={{
                     padding: "10px",
                     height: "max-content"
                   }}
@@ -308,11 +308,11 @@ function Profile() {
                       setHeading(room.room);
                       setRooms([]);
                       setDisplayMode('join');
-                      handleJoin(room.room);
+                      handleJoin(displayName);
                     }}
                   >
                     Join
-                  </button> : null}
+                  </button>}
                 </div>
               ))}
             </div> : null
