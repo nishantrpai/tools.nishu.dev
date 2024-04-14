@@ -14,7 +14,7 @@ export default function Home() {
 
   useEffect(() => {
     if (!window.speechSynthesis) return;
-    setVoices(window.speechSynthesis.getVoices());
+      setVoices(window.speechSynthesis.getVoices());
     if (!voice)
       setVoice(window.speechSynthesis.getVoices()[0]);
 
