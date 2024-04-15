@@ -5,7 +5,7 @@ import { AuthKitProvider, SignInButton, useProfile } from "@farcaster/auth-kit";
 import styles from '@/styles/Home.module.css'
 import { useState, useEffect } from 'react'
 import io from 'socket.io-client';
-const socket = io.connect('https://socketserver-draw-production.up.railway.app');
+const socket = io.connect('https://warpcanvasserver-production.up.railway.app');
 
 const fetchIdenticon = (username) => {
   return (createIcon({
@@ -21,7 +21,7 @@ const config = {
   relay: "https://relay.farcaster.xyz",
   rpcUrl: "https://mainnet.optimism.io",
   domain: "tools.nishu.dev",
-  siweUri: "tools.nishu.dev/warpcanvas",
+  siweUri: "localhost:3000/warpcanvas",
 };
 
 
@@ -33,12 +33,10 @@ export default function WarpCanvas() {
         <link rel="icon" href="/favicon.ico" />
         <meta name="description" content="WarpCanvas: Draw with your friends in real-time." />
       </Head>
-      <main>
-        <div style={{ position: "fixed", top: "12px", right: "12px" }}>
-          <SignInButton />
-        </div>
-        <Profile />
-      </main>
+      <div style={{ position: "fixed", top: "12px", right: "12px" }}>
+        <SignInButton />
+      </div>
+      <Draw />
     </AuthKitProvider>
   );
 }
@@ -55,28 +53,26 @@ function Draw() {
   const [fromY, setFromY] = useState(0)
   const [room, setRoom] = useState('123')
   const [paths, setPaths] = useState([])
+  const [members, setMembers] = useState([])
+  const [allMembers, setAllMembers] = useState([])
   const profile = useProfile();
   const {
     isAuthenticated,
     profile: { fid, displayName, custody },
   } = profile;
 
-  if(!isAuthenticated) {
-    return <p>
-      Please sign in to draw
-    </p>
-  }
-
   useEffect(() => {
+    if(!isAuthenticated) return;
+
     const canvas = document.getElementById('canvas')
     const context = canvas.getContext('2d')
-    socket.emit('joinRoom', '123');
+    socket.emit('joinRoom', {roomId: room, username: displayName});
     setCanvas(canvas)
     setContext(context)
 
     socket.on('getStrokens', (strokes) => {
       console.log('strokes', strokes);
-      strokes.forEach((stroke) => {
+      strokes['data'].forEach((stroke) => {
         context.beginPath();
         context.strokeStyle = 'black';
         context.lineWidth = 4;
@@ -90,10 +86,15 @@ function Draw() {
 
     socket.emit('getStrokes', room);
 
+    socket.on('isDrawing', (users) => {
+      setAllMembers(Object.keys(users))
+      setMembers(Object.keys(users).filter((user) => users[user].isDrawing))
+    });
+
     socket.on('drawing', (strokes) => {
       console.log('strokes', strokes)
       // each stroke is in the currentPath format from, paths
-      strokes.forEach((stroke) => {
+      strokes['data'].forEach((stroke) => {
         context.beginPath();
         context.strokeStyle = 'black';
         context.lineWidth = 4;
@@ -104,10 +105,13 @@ function Draw() {
         });
       })
     });
-  }, [])
+  }, [displayName])
+
+
 
   const startDrawing = (event) => {
     setDrawing(true);
+    socket.emit('isDrawing', { roomId: room, username: displayName });
     console.log('startDrawing')
     context.beginPath();
     context.strokeStyle = 'black';
@@ -143,6 +147,7 @@ function Draw() {
         paths: paths
       }
     ])
+    socket.emit('notDrawing', { roomId: room, username: displayName });
     socket.emit('drawing', { roomId: room, data: { from: { x: fromX, y: fromY }, paths: paths }, username: displayName });
     setPaths([])
     setFromX(0)
@@ -190,101 +195,138 @@ function Draw() {
   }
 
   return (
-    <div className={styles.container}>
-      <Head>
-        <title>Multi Draw</title>
-        <meta name="description" content="Simple tool for multi-user sketching and copying that image to clipboard" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+    <>
+      {isAuthenticated ?
+        (<div className={styles.container}>
+          <Head>
+            <title>Multi Draw</title>
+            <meta name="description" content="Simple tool for multi-user sketching and copying that image to clipboard" />
+            <link rel="icon" href="/favicon.ico" />
+          </Head>
 
-      <main className={styles.main}>
-        <a href='/' className={styles.home}>🏠</a>
-        <h1 className={styles.title}>
-          Multi Draw
-        </h1>
-        <span style={{
-          width: '100%',
-          textAlign: 'center',
-          color: '#666',
-          fontSize: '14px'
-        }}>
-          Simple tool for multi-user sketching and copying that image to clipboard
-        </span>
-        <div style={{
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'center',
-          marginBottom: '20px'
-        }}>
-          <input type="text" value={room} onChange={(e) => setRoom(e.target.value)}
-            style={{
+          <main className={styles.main}>
+            <a href='/' className={styles.home}>🏠</a>
+            <h1 className={styles.title}>
+              Multi Draw
+            </h1>
+            <span style={{
               width: '100%',
-              padding: '10px',
-              fontSize: '16px',
-              border: 'none',
-              borderRadius: '5px',
-              marginRight: '10px'
-            }}
-          ></input>
-          <button onClick={() => {
-            // clear canvas 
-            context.clearRect(0, 0, canvas.width, canvas.height)
-            setPaths([])
-            setFromX(0)
-            setFromY(0)
-            socket.emit('joinRoom', room);
-            socket.emit('getStrokes', room);
-          }}>Join Room</button>
-        </div>
-        <canvas
-          id="canvas"
-          width="800"
-          height="600"
-          style={{
-            border: '1px solid white',
-            background: 'white',
-            cursor: "url('/pointer.png'), auto"
-          }}
-          onMouseDown={startDrawing}
-          onMouseUp={stopDrawing}
-          onMouseMove={draw}
-          onTouchStart={startDrawing}
-          onTouchEnd={stopDrawing}
-        ></canvas>
-        <button onClick={restCanvas}>Reset</button>
-        <button onClick={copyToClipboard}>Copy to clipboard</button>
-        {/* add a mint button so people can mint the image to zora */}
-        <button
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-          }}
-          onClick={() => {
-            // compress the image to 200x200
-            let dataURL = canvas.toDataURL('image/png')
-            const img = new Image()
-            img.src = dataURL
-            img.onload = () => {
-              const canvas = document.createElement('canvas')
-              const context = canvas.getContext('2d')
-              canvas.width = 400
-              canvas.height = 300
-              context.drawImage(img, 0, 0, 400, 300)
-              dataURL = canvas.toDataURL('image/png')
-              window.open(`https://zora.co/create/single-edition?image=${encodeURIComponent(dataURL)}`);
-            }
+              textAlign: 'center',
+              color: '#666',
+              fontSize: '14px'
+            }}>
+              Simple tool for multi-user sketching and copying that image to clipboard
+            </span>
+            <div style={{
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginBottom: '20px'
+            }}>
+              <input type="text" value={room} onChange={(e) => setRoom(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  fontSize: '16px',
+                  border: 'none',
+                  borderRadius: '5px',
+                  marginRight: '10px'
+                }}
+              ></input>
+              <button onClick={() => {
+                // clear canvas 
+                context.clearRect(0, 0, canvas.width, canvas.height)
+                setPaths([])
+                setFromX(0)
+                setFromY(0)
+                socket.emit('joinRoom', {roomId: room, username: displayName});
+                socket.emit('getStrokes', room);
+              }}>Join Room</button>
+            </div>
+            <canvas
+              id="canvas"
+              width="800"
+              height="600"
+              style={{
+                border: '1px solid white',
+                background: 'white',
+                cursor: "url('/pointer.png'), auto"
+              }}
+              onMouseDown={startDrawing}
+              onMouseUp={stopDrawing}
+              onMouseMove={draw}
+              onTouchStart={startDrawing}
+              onTouchEnd={stopDrawing}
+            ></canvas>
+            {/* render users who are drawing */}
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-start !important',
+              textAlign: 'left',
+              width: '100%',
+            }}>
+              <h2 style={{
+                textAlign: 'left',
+                width: '100%'
+              }}>Currently Drawing</h2>
+              {members.map((member, index) => (
+                <span style={{color: '#888', fontWeight: '100'}}>{member} is drawing...</span>
+              ))}
+            </div>
+            <hr />
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-start !important',
+              textAlign: 'left',
+              width: '100%',
+            }}>
+              <h2 style={{
+                textAlign: 'left',
+                width: '100%'
+              }}>Everyone in the room</h2>
+              {allMembers.map((member, index) => (
+                <span style={{color: '#888', fontWeight: '100'}}>{member}</span>
+              ))}
+            </div>
+            <button onClick={restCanvas}>Reset</button>
+            <button onClick={copyToClipboard}>Copy to clipboard</button>
+            {/* add a mint button so people can mint the image to zora */}
+            <button
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+              }}
+              onClick={() => {
+                // compress the image to 200x200
+                let dataURL = canvas.toDataURL('image/png')
+                const img = new Image()
+                img.src = dataURL
+                img.onload = () => {
+                  const canvas = document.createElement('canvas')
+                  const context = canvas.getContext('2d')
+                  canvas.width = 400
+                  canvas.height = 300
+                  context.drawImage(img, 0, 0, 400, 300)
+                  dataURL = canvas.toDataURL('image/png')
+                  window.open(`https://zora.co/create/single-edition?image=${encodeURIComponent(dataURL)}`);
+                }
 
-            // open in new tab
-          }}>
-          <img style={{
-            width: '20px',
-            height: '20px',
-            marginRight: '10px'
+                // open in new tab
+              }}>
+              <img style={{
+                width: '20px',
+                height: '20px',
+                marginRight: '10px'
 
-          }} src="/zora.png" id="zora"></img>
-          Mint</button>
-        {copy && <p>Copied to clipboard</p>}
-      </main>
-    </div>
+              }} src="/zora.png" id="zora"></img>
+              Mint</button>
+            {copy && <p>Copied to clipboard</p>}
+          </main>
+        </div>) : (<div>Sign in to draw</div>
+
+        )}
+    </>
   )
 }
