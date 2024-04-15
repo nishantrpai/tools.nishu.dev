@@ -6,7 +6,7 @@ import io from 'socket.io-client';
 import { createIcon } from 'opepen-standard';
 import { FiLogOut, FiMic } from "react-icons/fi";
 import Head from 'next/head';
-const socket = io.connect('https://voiceserver-production.up.railway.app')
+const socket = io.connect('http://localhost:8080')
 
 
 const fetchIdenticon = (username) => {
@@ -58,9 +58,10 @@ function Profile() {
     isAuthenticated,
     profile: { fid, displayName, custody },
   } = profile;
-  const [mediaRecorder, setMediaRecorder] = useState(null);
+  const [mediaStream, setMediaStream] = useState(null);
 
   const sendAudio = (audio) => {
+    console.log('sending audio');
     socket.emit('audio', { roomId: room, username: displayName, audio });
   }
 
@@ -87,31 +88,48 @@ function Profile() {
 
   useEffect(() => {
     if (!displayName) return;
-    if (mediaRecorder) return;
     navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
-      const tmpRecorder = new MediaRecorder(stream);
-      tmpRecorder.ondataavailable = (event) => {
-        // hear the blob as an audio element
-        // audio blob to base64
-        const reader = new FileReader();
-        reader.readAsDataURL(event.data);
-        reader.onloadend = () => {
-          const base64data = reader.result;
-          setAudio(base64data);
+      // on audioprocess send chunks to the server
+      let obj = { audioContext: null, source: null, processor: null};
+      obj.start = () => {
+        obj.audioContext = new AudioContext();
+        obj.source = obj.audioContext.createMediaStreamSource(stream);
+        obj.processor = obj.audioContext.createScriptProcessor(4096, 2, 2);
+        obj.source.connect(obj.processor);
+        obj.processor.connect(obj.audioContext.destination);
+
+        obj.processor.onaudioprocess = (e) => {
+          const audio = e.inputBuffer.getChannelData(0);
+          sendAudio(audio);
         }
-      };
-      tmpRecorder.onstart = () => {
-        console.log('recorder started');
-      };
-      tmpRecorder.onstop = () => {
-        console.log('recorder stopped');
-      };
-      setMediaRecorder(tmpRecorder);
+      }
+
+      obj.play = (audio) => {
+        obj.audioContext = new AudioContext();
+        console.log(audio);
+        let fbu = new Float32Array(audio);
+        obj.source = obj.audioContext.createBufferSource();
+        let buffer = obj.audioContext.createBuffer(1, 4096, obj.audioContext.sampleRate);
+        buffer.copyToChannel(fbu, 0);
+        obj.source.buffer = buffer;
+        obj.source.connect(obj.audioContext.destination);
+        obj.source.start(0);
+      }
+
+      obj.stop = () => {
+        if (!obj.processor) return;
+        obj.processor.onaudioprocess = null;
+        obj.processor.disconnect();
+        obj.source.disconnect();
+        obj.audioContext.close();
+      }
+
+      setMediaStream(obj);
     });
   }, [displayName, room]);
 
   const handleJoin = (displayName) => {
-    if(!room) return;
+    if (!room) return;
     socket.emit('joinRoom', { roomId: room, username: displayName });
     setHeading(room);
     socket.on('getMembers', (members) => {
@@ -130,9 +148,7 @@ function Profile() {
     socket.on('audio', ({ username, audio, roomId }) => {
       console.log('audio received');
       // play the audio, if it's not from the current user
-      if (username === displayName) return;
-      const audioElement = new Audio(audio);
-      audioElement.play();
+      mediaStream.play(audio);
     });
 
   };
@@ -146,11 +162,12 @@ function Profile() {
 
   useEffect(() => {
     if (isSpeaking == null) return;
+    if (!mediaStream) return;
     if (isSpeaking) {
-      mediaRecorder.start();
+      mediaStream?.start();
       socket.emit('isSpeaking', { roomId: room, username: displayName });
     } else {
-      mediaRecorder.stop();
+      mediaStream?.stop();
       socket.emit('notSpeaking', { roomId: room, username: displayName });
     }
   }, [isSpeaking]);
