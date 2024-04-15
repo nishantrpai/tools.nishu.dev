@@ -30,8 +30,8 @@ export default function WarpCanvas() {
     <AuthKitProvider config={config}>
       <Head>
         <title>WarpCanvas</title>
+        <meta name="description" content="Draw with Warpcast friends in real-time" />
         <link rel="icon" href="/favicon.ico" />
-        <meta name="description" content="WarpCanvas: Draw with your friends in real-time." />
       </Head>
       <div style={{ position: "fixed", top: "12px", right: "12px" }}>
         <SignInButton />
@@ -62,11 +62,11 @@ function Draw() {
   } = profile;
 
   useEffect(() => {
-    if(!isAuthenticated) return;
+    if (!isAuthenticated) return;
 
     const canvas = document.getElementById('canvas')
     const context = canvas.getContext('2d')
-    socket.emit('joinRoom', {roomId: room, username: displayName});
+    socket.emit('joinRoom', { roomId: room, username: displayName });
     setCanvas(canvas)
     setContext(context)
 
@@ -198,16 +198,10 @@ function Draw() {
     <>
       {isAuthenticated ?
         (<div className={styles.container}>
-          <Head>
-            <title>Multi Draw</title>
-            <meta name="description" content="Simple tool for multi-user sketching and copying that image to clipboard" />
-            <link rel="icon" href="/favicon.ico" />
-          </Head>
-
           <main className={styles.main}>
             <a href='/' className={styles.home}>🏠</a>
             <h1 className={styles.title}>
-              Multi Draw
+              WarpCanvas
             </h1>
             <span style={{
               width: '100%',
@@ -215,7 +209,7 @@ function Draw() {
               color: '#666',
               fontSize: '14px'
             }}>
-              Simple tool for multi-user sketching and copying that image to clipboard
+              Draw with Warpcast friends in real-time
             </span>
             <div style={{
               display: 'flex',
@@ -239,7 +233,7 @@ function Draw() {
                 setPaths([])
                 setFromX(0)
                 setFromY(0)
-                socket.emit('joinRoom', {roomId: room, username: displayName});
+                socket.emit('joinRoom', { roomId: room, username: displayName });
                 socket.emit('getStrokes', room);
               }}>Join Room</button>
             </div>
@@ -271,7 +265,7 @@ function Draw() {
                 width: '100%'
               }}>Currently Drawing</h2>
               {members.map((member, index) => (
-                <span style={{color: '#888', fontWeight: '100'}}>{member} is drawing...</span>
+                <span style={{ color: '#888', fontWeight: '100' }}>{member} is drawing...</span>
               ))}
             </div>
             <hr />
@@ -287,7 +281,7 @@ function Draw() {
                 width: '100%'
               }}>Everyone in the room</h2>
               {allMembers.map((member, index) => (
-                <span style={{color: '#888', fontWeight: '100'}}>{member}</span>
+                <span style={{ color: '#888', fontWeight: '100' }}>{member}</span>
               ))}
             </div>
             <button onClick={restCanvas}>Reset</button>
