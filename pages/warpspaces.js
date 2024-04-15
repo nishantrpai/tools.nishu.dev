@@ -23,7 +23,7 @@ const config = {
   relay: "https://relay.farcaster.xyz",
   rpcUrl: "https://mainnet.optimism.io",
   domain: "tools.nishu.dev",
-  siweUri: "tools.nishu.dev/warpspaces",
+  siweUri: "localhost:3000/warpspaces",
 };
 
 
