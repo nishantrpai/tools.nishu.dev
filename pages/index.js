@@ -154,6 +154,13 @@ export default function Home() {
       publishDate: '15th April 2024',
       icon: '🎉',
       url: '/randomwinner'
+    },
+    {
+      title: 'WarpCanvas',
+      description: 'WarpCanvas: Draw with your friends in real-time.',
+      publishDate: '16th April 2024',
+      icon: '🎨',
+      url: '/warpcanvas'
     }
 
   ]
