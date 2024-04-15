@@ -6,7 +6,7 @@ import io from 'socket.io-client';
 import { createIcon } from 'opepen-standard';
 import { FiLogOut, FiMic } from "react-icons/fi";
 import Head from 'next/head';
-const socket = io.connect('http://localhost:8080')
+const socket = io.connect('https://voiceserver-production.up.railway.app')
 
 
 const fetchIdenticon = (username) => {
@@ -23,7 +23,7 @@ const config = {
   relay: "https://relay.farcaster.xyz",
   rpcUrl: "https://mainnet.optimism.io",
   domain: "tools.nishu.dev",
-  siweUri: "localhost:3000/warpspaces",
+  siweUri: "tools.nishu.dev/warpspaces",
 };
 
 
