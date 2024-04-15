@@ -324,7 +324,7 @@ function Draw() {
               Mint</button>
             {copy && <p>Copied to clipboard</p>}
           </main>
-        </div>) : (<div>Sign in to draw</div>
+        </div>) : (<div> <main>Sign in to draw</main></div>
 
         )}
     </>
