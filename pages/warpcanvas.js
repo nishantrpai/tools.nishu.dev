@@ -72,6 +72,7 @@ function Draw() {
 
     socket.on('getStrokens', (strokes) => {
       console.log('strokes', strokes);
+      setAllMembers(Object.keys(strokes['users']))
       strokes['data'].forEach((stroke) => {
         context.beginPath();
         context.strokeStyle = 'black';
