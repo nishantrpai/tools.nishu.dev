@@ -161,6 +161,12 @@ export default function Home() {
       publishDate: '16th April 2024',
       icon: '🎨',
       url: '/warpcanvas'
+    },
+    {
+      title: 'Higher',
+      description: 'Add "↑" on any image',
+      publishDate: '17th April 2024',
+      url: '/higher',
     }
 
   ]
