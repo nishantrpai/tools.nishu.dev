@@ -9,7 +9,7 @@ export default function RandomWinner() {
   const [winner, setWinner] = useState("");
 
   const pickWinner = () => {
-    const participantsList = participants.trim().split("\n");
+    const participantsList = participants.trim().split("\n").filter((p) => p.trim() !== "");
     const randomIndex = Math.floor(Math.random() * participantsList.length);
     setWinner(participantsList[randomIndex]);
   }
