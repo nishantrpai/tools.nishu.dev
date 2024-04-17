@@ -167,6 +167,14 @@ export default function Home() {
       description: 'Add "↑" on any image',
       publishDate: '17th April 2024',
       url: '/higher',
+      icon: '↑',
+    },
+    {
+      title: 'Rep Aloud',
+      description: 'Tell reps aloud',
+      publishDate: '18th April 2024',
+      url: '/repaloud',
+      icon: '🔊',
     }
 
   ]
