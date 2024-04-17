@@ -20,15 +20,17 @@ export default function Higher() {
       canvas.width = img.width
       canvas.height = img.height
       // add opacity to image
-      ctx.globalAlpha = 0.9
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
-      
+      // draw a rectangle with 0.8 opacity
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.3)'
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+
       ctx.font = `${ratio * 5}rem  -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif`
       ctx.textAlign = 'center'
       ctx.fillStyle = '#fff'
       // add opacity to 
       ctx.globalAlpha = 1
-      ctx.fillText(higher, canvas.width / 2 + 20, canvas.height / 2 - 50)
+      ctx.fillText(higher, canvas.width / 2 + (10 * ratio), canvas.height / 2 - 50)
     }
   }, [image])
 
