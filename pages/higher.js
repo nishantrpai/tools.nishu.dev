@@ -22,8 +22,10 @@ export default function Higher() {
       // add opacity to image
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
       // draw a rectangle with 0.8 opacity
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.3)'
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.1)'
       ctx.fillRect(0, 0, canvas.width, canvas.height)
+      // remove opacity
+      ctx.globalAlpha = 1
 
       ctx.font = `${ratio * 5}rem  -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif`
       ctx.textAlign = 'center'
