@@ -7,32 +7,38 @@ export default function Higher() {
   const [image, setImage] = useState(null)
   let higher = '↑';
   // upload image, add text in the center
-  
+
+
   useEffect(() => {
     if (!image) return
     const canvas = document.getElementById('canvas')
     const ctx = canvas.getContext('2d')
     const img = new Image()
     img.src = image
-    img.onload = () => {
-      
-      let ratio = img.height / img.width
-      canvas.width = img.width
-      canvas.height = img.height
-      // add opacity to image
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
-      // draw a rectangle with 0.8 opacity
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.1)'
-      ctx.fillRect(0, 0, canvas.width, canvas.height)
-      // remove opacity
-      ctx.globalAlpha = 1
 
-      ctx.font = `${ratio * 10}rem  -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif`
-      ctx.textAlign = 'center'
-      ctx.fillStyle = '#fff'
-      // add opacity to 
-      ctx.globalAlpha = 1
-      ctx.fillText(higher, canvas.width / 2 + (ratio * 22), canvas.height / 2 - 50)
+    const arrowImg = new Image()
+    arrowImg.src = '/arrow.png'
+
+
+    arrowImg.onload = () => {
+      img.onload = () => {
+        let ratio = img.height / img.width
+        canvas.width = img.width
+        canvas.height = img.height
+        // add opacity to image
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+        // draw a rectangle with 0.8 opacity
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.1)'
+        ctx.fillRect(0, 0, canvas.width, canvas.height)
+        // remove opacity
+        ctx.globalAlpha = 1
+        console.log('img', img.width, img.height)
+        console.log('arrowImg', arrowImg.width, arrowImg.height)
+        // draw arrow in the middle
+        let arrowWidth = 300
+        let arrowHeight = 300
+        ctx.drawImage(arrowImg, ((img.width / 2) - (arrowWidth / 2.5)), ((img.height / 2) - (arrowHeight / 2) - 30), 300, 300)
+      }
     }
   }, [image])
 
@@ -52,32 +58,35 @@ export default function Higher() {
       <Head>
         <title>Higher</title>
         <meta name="description" content="Add '↑' on any image" />
-        <link rel="icon" href="/favicon.ico" /> 
+        <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-      <h1>Higher</h1>
-      <span style={{
-        fontSize: '14px',
-        color: 'gray',
-        marginBottom: '20px',
-      }}>
-        Go Higher! Add "↑" on any image
-      </span>
-      <form>
-        <input type="file" onChange={e => setImage(URL.createObjectURL(e.target.files[0]))}  placeholder='Choose your file'/>
-      </form>
-      <canvas id="canvas" width="300" height="300"></canvas>
-      {image && <button style={{
-        padding: '10px',
-        backgroundColor: '#111',
-        color: 'white',
-        borderRadius: '5px',
-        cursor: 'pointer',
-        marginTop: '20px',
-      }} onClick={download}>Download</button>}
+        <h1>Higher</h1>
+        <span style={{
+          fontSize: '14px',
+          color: 'gray',
+          marginBottom: '20px',
+        }}>
+          Go Higher! Add "↑" on any image
+        </span>
+        <form>
+          <input type="file" onChange={e => {
+            if (e.target.files.length === 0) return
+            setImage(URL.createObjectURL(e.target.files[0]))
+          }} placeholder='Choose your file' />
+        </form>
+        <canvas id="canvas" width="300" height="300"></canvas>
+        {image && <button style={{
+          padding: '10px',
+          backgroundColor: '#111',
+          color: 'white',
+          borderRadius: '5px',
+          cursor: 'pointer',
+          marginTop: '20px',
+        }} onClick={download}>Download</button>}
 
       </main>
-      
+
     </>
   )
 }
