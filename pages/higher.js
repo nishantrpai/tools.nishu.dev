@@ -19,9 +19,11 @@ export default function Higher() {
     const arrowImg = new Image()
     arrowImg.src = '/arrow.png'
 
-
-    arrowImg.onload = () => {
-      img.onload = () => {
+    // wait for arrow image to load
+    img.onload = () => {
+      arrowImg.onload = () => {
+      console.log('arrowImg loaded')
+        console.log('img loaded')
         let ratio = img.height / img.width
         canvas.width = img.width
         canvas.height = img.height
@@ -40,6 +42,7 @@ export default function Higher() {
         ctx.drawImage(arrowImg, ((img.width / 2) - (arrowWidth / 2.5)), ((img.height / 2) - (arrowHeight / 2) - 30), 300, 300)
       }
     }
+
   }, [image])
 
   const download = () => {
@@ -71,7 +74,7 @@ export default function Higher() {
         </span>
         <form>
           <input type="file" onChange={e => {
-            if (e.target.files.length === 0) return
+            setImage(null)
             setImage(URL.createObjectURL(e.target.files[0]))
           }} placeholder='Choose your file' />
         </form>
