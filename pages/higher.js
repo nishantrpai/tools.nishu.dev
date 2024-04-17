@@ -27,7 +27,7 @@ export default function Higher() {
       // remove opacity
       ctx.globalAlpha = 1
 
-      ctx.font = `${ratio * 5}rem  -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif`
+      ctx.font = `${ratio * 10}rem  -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif`
       ctx.textAlign = 'center'
       ctx.fillStyle = '#fff'
       // add opacity to 
