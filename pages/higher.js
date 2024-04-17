@@ -32,7 +32,7 @@ export default function Higher() {
       ctx.fillStyle = '#fff'
       // add opacity to 
       ctx.globalAlpha = 1
-      ctx.fillText(higher, canvas.width / 2 + (10 * ratio), canvas.height / 2 - 50)
+      ctx.fillText(higher, canvas.width / 2 + (ratio * 22), canvas.height / 2 - 50)
     }
   }, [image])
 
