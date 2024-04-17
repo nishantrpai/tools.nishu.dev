@@ -39,7 +39,7 @@ export default function Higher() {
         // draw arrow in the middle
         let arrowWidth = 300
         let arrowHeight = 300
-        ctx.drawImage(arrowImg, ((img.width / 2) - (arrowWidth / 2.5)), ((img.height / 2) - (arrowHeight / 2) - 30), 300, 300)
+        ctx.drawImage(arrowImg, ((img.width / 2) - (arrowWidth / 2.75)), ((img.height / 2) - (arrowHeight / 2) - 30), 300, 300)
       }
     }
 
