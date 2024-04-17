@@ -61,7 +61,7 @@ export default function Higher() {
         color: 'gray',
         marginBottom: '20px',
       }}>
-        Go Higer! Add "↑" on any image
+        Go Higher! Add "↑" on any image
       </span>
       <form>
         <input type="file" onChange={e => setImage(URL.createObjectURL(e.target.files[0]))}  placeholder='Choose your file'/>
