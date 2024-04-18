@@ -2,6 +2,7 @@
 import Head from 'next/head'
 import { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
+import { FiX } from 'react-icons/fi'
 
 function InfiniteCanvas() {
 
@@ -54,14 +55,12 @@ function InfiniteCanvas() {
           <div style={{
             position: 'absolute',
             width: `${width}px`,
-            height: `${height}px`,
+            height: `${height + 25}px`,
             left: '200px',
             top: '200px',
             display: 'inline-block',
-            border: '2px solid red',
+            border: '2px solid #333',
             borderRadius: '10px',
-            padding: '2px',
-            paddingTop: '10px',
           }}
             onMouseEnter={() => {
               console.log('entered parent')
@@ -83,9 +82,27 @@ function InfiniteCanvas() {
               changeCursor('default')
             }}
           >
-          <iframe is="x-frame-bypass" src="https://en.wikipedia.org/wiki/Vincent_van_Gogh" style={{
+          <div style={{
+            display: 'flex',
             width: '100%',
-            height: '100%',
+            padding: '5px'
+          }}>
+            <button style={{
+              padding: '2px',
+              fontSize: '5px',
+              borderRadius: '100%',
+              background: 'red', 
+              color: '#000'
+            }}>
+              <FiX />
+            </button>
+          </div>
+          <iframe is="x-frame-bypass" src="https://news.ycombinator.com/item?id=36504661" style={{
+            width: '100%',
+            height: `${height}px`,
+            borderRadius: '0 0 10px 10px',
+            outline: 'none',
+            userSelect: 'none',
           }} 
           frameBorder={0}
           onMouseEnter={() => {
