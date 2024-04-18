@@ -22,7 +22,7 @@ export default function Repaloud() {
     msg.onend = () => {
       setTimeout(() => {
         setCount(count - 1)
-      }, 1000)
+      }, 2000)
     }
   }, [counting, count])
 
