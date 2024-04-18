@@ -63,11 +63,11 @@ function InfiniteCanvas() {
           <div style={{
             position: 'absolute',
             width: `${width}px`,
-            height: `${height + 25}px`,
+            height: `${height + 30}px`,
             left: `${x}px`,
             top: `${y}px`,
             display: 'inline-block',
-            border: '3px solid #333',
+            border: '5px solid #333',
             borderRadius: '10px',
           }}
             onMouseEnter={() => {
