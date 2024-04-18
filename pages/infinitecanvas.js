@@ -1,10 +1,15 @@
 // infinite canvas with iframes for viewing all links in one place
 import Head from 'next/head'
-import styles from '@/styles/Home.module.css'
 import { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 
 function InfiniteCanvas() {
+
+  const [resize, setResize] = useState(false)
+  const [width, setWidth] = useState(300)
+  const [height, setHeight] = useState(300)
+  const [x, setX] = useState(0)
+  const [y, setY] = useState(0)
 
   const wheelListener = (e) => {
     // console.log('wheel listener')
@@ -12,9 +17,23 @@ function InfiniteCanvas() {
   }
 
   const pointerMoveListener = (e) => {
-    // console.log('pointer move listener')
-    console.log(e)
+    if(resize) {
+      console.log('resizing')
+      setWidth(width + e.movementX)
+      setHeight(height + e.movementY)
+    }
   }
+
+  const changeCursor = (cursor) => {
+    document.body.style.cursor = cursor
+  }
+
+  useEffect(() => {
+    document.body.style.cursor = 'default'
+    document.body.style.overflow = 'hidden'
+    document.body.style.position = 'fixed'
+  }, [])
+
 
   return (
     <>
@@ -24,12 +43,62 @@ function InfiniteCanvas() {
         <link rel="icon" href="/favicon.ico" />
         <script type="module" src="/xframebypass.js"></script>
       </Head>
-      <div style={{ width: '100vw', height: '100vh', border: '1px solid red' }} onWheel={wheelListener} onPointerMove={pointerMoveListener}>
-      <iframe is="x-frame-bypass" src="https://reddit.com" style={{
-        width: '20vw',
-        height: '20vh',
-      }}/>
+      <div style={{ width: '100vw', height: '100vh', overflow: 'hidden !important' }} onWheel={wheelListener} onPointerMove={pointerMoveListener} onClick={() => {
+        setResize(false)
+      }}>
+        <div style={{
+          transformOrigin: 'left top',
+          width: '100vw',
+          height: '100vh',
+        }}>
+          <div style={{
+            position: 'absolute',
+            width: `${width}px`,
+            height: `${height}px`,
+            left: '200px',
+            top: '200px',
+            display: 'inline-block',
+            border: '2px solid red',
+            borderRadius: '10px',
+            padding: '2px',
+            paddingTop: '10px',
+          }}
+            onMouseEnter={() => {
+              console.log('entered parent')
+              // set mouse to resize 
+              changeCursor('nwse-resize')
+            }}
+            onMouseDown={() => {
+              if(document.body.style.cursor === 'nwse-resize') {
+                console.log('trying to resize')
+                setResize(true)
+                console.log('clicked parent')
+              }
+            }}
+            onMouseUp={() => {
+              setResize(false)
+              changeCursor('default')
+            }}
+            onMouseLeave={() => {
+              changeCursor('default')
+            }}
+          >
+          <iframe is="x-frame-bypass" src="https://en.wikipedia.org/wiki/Vincent_van_Gogh" style={{
+            width: '100%',
+            height: '100%',
+          }} 
+          frameBorder={0}
+          onMouseEnter={() => {
+            console.log('entered iframe')
+            // remove mouse resize
+            changeCursor('default')
+          }}
+          />
 
+          </div>
+          
+
+        </div>
       </div>
     </>
   )
