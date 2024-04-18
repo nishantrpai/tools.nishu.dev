@@ -7,10 +7,11 @@ import { FiX } from 'react-icons/fi'
 function InfiniteCanvas() {
 
   const [resize, setResize] = useState(false)
+  const [move, setMove] = useState(false)
   const [width, setWidth] = useState(300)
   const [height, setHeight] = useState(300)
-  const [x, setX] = useState(0)
-  const [y, setY] = useState(0)
+  const [x, setX] = useState(200)
+  const [y, setY] = useState(200)
 
   const wheelListener = (e) => {
     // console.log('wheel listener')
@@ -18,10 +19,16 @@ function InfiniteCanvas() {
   }
 
   const pointerMoveListener = (e) => {
-    if(resize) {
-      console.log('resizing')
+    console.log('pointer move listener', document.body.style.cursor)
+    if(resize && document.body.style.cursor === 'nwse-resize') {
+      console.log('resizing', document.body.style.cursor)
       setWidth(width + e.movementX)
       setHeight(height + e.movementY)
+    }
+    if(move && document.body.style.cursor === 'move') {
+      console.log('moving', document.body.style.cursor)
+      setX(x + e.movementX)
+      setY(y + e.movementY)
     }
   }
 
@@ -46,6 +53,7 @@ function InfiniteCanvas() {
       </Head>
       <div style={{ width: '100vw', height: '100vh', overflow: 'hidden !important' }} onWheel={wheelListener} onPointerMove={pointerMoveListener} onClick={() => {
         setResize(false)
+        setMove(false)
       }}>
         <div style={{
           transformOrigin: 'left top',
@@ -56,10 +64,10 @@ function InfiniteCanvas() {
             position: 'absolute',
             width: `${width}px`,
             height: `${height + 25}px`,
-            left: '200px',
-            top: '200px',
+            left: `${x}px`,
+            top: `${y}px`,
             display: 'inline-block',
-            border: '2px solid #333',
+            border: '3px solid #333',
             borderRadius: '10px',
           }}
             onMouseEnter={() => {
@@ -73,20 +81,34 @@ function InfiniteCanvas() {
                 setResize(true)
                 console.log('clicked parent')
               }
+              // if(document.body.style.cursor === 'move') {
+              //   setMove(true)
+              //   console.log('clicked parent')
+              // }
             }}
             onMouseUp={() => {
               setResize(false)
+              setMove(false)
               changeCursor('default')
             }}
             onMouseLeave={() => {
-              changeCursor('default')
+              // changeCursor('default')
             }}
           >
           <div style={{
             display: 'flex',
             width: '100%',
-            padding: '5px'
-          }}>
+            padding: '5px',
+          }}
+            onMouseDown={() => {
+              setMove(true)
+              document.body.style.cursor = 'move'
+            }}
+            onMouseUp={() => {
+              setMove(false)
+              document.body.style.cursor = 'default'
+            }}
+          >
             <button style={{
               padding: '2px',
               fontSize: '5px',
