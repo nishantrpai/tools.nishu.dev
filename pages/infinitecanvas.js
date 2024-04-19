@@ -129,16 +129,11 @@ function InfiniteCanvas() {
         <link rel="icon" href="/favicon.ico" />
         <script type="module" src="/xframebypass.js"></script>
       </Head>
-      <div style={{ width: '100vw', height: '100vh', overflow: 'hidden !important' }} onWheel={wheelListener} onPointerMove={pointerMoveListener} onClick={() => {
-        setResize(false)
-        setMove(false)
-      }}
+      <div style={{ width: '100vw', height: '100vh', overflow: 'hidden !important' }} onWheel={wheelListener} onPointerMove={pointerMoveListener}
         onKeyDown={(e) => {
           if (e.key === 'Escape') {
-            setResize(false)
-            setMove(false)
+            document.body.style.cursor = 'default'
           }
-
         }}
         onMouseDown={(e) => {
           console.log('starting click')
