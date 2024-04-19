@@ -5,13 +5,13 @@ import dynamic from 'next/dynamic'
 import { FiX } from 'react-icons/fi'
 
 class Window {
-  constructor(url, width, height, x, y) {
+  constructor(url, width, height, x, y, z = 1) {
     this.url = url
-    this.width = 300
-    this.height = 300
+    this.width = width
+    this.height = height
     this.x = x
     this.y = y
-    this.z = 1
+    this.z = z
   }
 }
 
@@ -46,9 +46,7 @@ function InfiniteCanvas() {
   const [y, setY] = useState(200)
   const [canvas, setCanvas] = useState(new Canvas())
   const [currentWindow, setCurrentWindow] = useState(null)
-  const [clicking, setClicking] = useState(false)
-  const [startX, setStartX] = useState(null)
-  const [startY, setStartY] = useState(null)
+  const [currentTop, setCurrentTop] = useState(1)
 
 
   const wheelListener = (e) => {
@@ -58,17 +56,20 @@ function InfiniteCanvas() {
 
   const pointerMoveListener = (e) => {
     if (document.body.style.cursor === 'nwse-resize' && currentWindow !== null && e.buttons === 1) {
-      console.log('pointer resize', e.pageX, e.pageY, startX, startY, e.pageX - startX, e.pageY - startY)
-      canvas.windows[currentWindow].width += e.movementX
-      canvas.windows[currentWindow].height += e.movementY
+      canvas.windows[currentWindow].width += e.movementX * 2
+      canvas.windows[currentWindow].height += e.movementY * 2
       setCanvas({ ...canvas })
       console.log('pointer resize listener', document.body.style.cursor, currentWindow, e.movementX, e.movementY, canvas.windows[currentWindow].width, canvas.windows[currentWindow].height)
     }
     if (document.body.style.cursor === 'move' && currentWindow !== null && e.buttons === 1) {
-      console.log('pointer move', e.pageX, e.pageY, startX, startY, e.pageX - startX, e.pageY - startY)
+      console.log('current window', canvas.windows[currentWindow].z, canvas.windows[currentWindow].x, canvas.windows[currentWindow].y, canvas.windows[currentWindow].width, canvas.windows[currentWindow].height)
       canvas.windows[currentWindow].x += e.movementX
       canvas.windows[currentWindow].y += e.movementY
+      canvas.windows[currentWindow].z = currentTop
+      setCurrentTop(currentTop + 1)
       setCanvas({ ...canvas })
+      // save canvas to local storage
+      window.localStorage.setItem('canvas', JSON.stringify(canvas))
       console.log('pointer move listener', document.body.style.cursor, currentWindow, e.movementX, e.movementY, canvas.windows[currentWindow].x, canvas.windows[currentWindow].y)
     }
   }
@@ -81,9 +82,17 @@ function InfiniteCanvas() {
     // canvas.addWindow(new Window('https://news.ycombinator.com/item?id=36504661', 300, 300, 200, 200))
 
     if (canvas.windows.length == 0) {
-      canvas.windows.push(new Window('https://news.ycombinator.com/item?id=36504661', 300, 300, 200, 200))
-      console.log(canvas.windows.length)
-      setCanvas({ ...canvas })
+      // open in the middle of the screen
+      if (window.localStorage.getItem('canvas')) {
+        setCanvas(JSON.parse(window.localStorage.getItem('canvas')))
+      } else {
+        canvas.windows.push(new Window('https://news.ycombinator.com/item?id=36504661', 300, 300, window.innerWidth / 2 - 150, window.innerHeight / 2 - 150, canvas.windows.length + 1))
+        canvas.windows.push(new Window('https://en.wikipedia.org/wiki/Vincent_van_Gogh', 300, 400, window.innerWidth / 2 - 150, window.innerHeight / 2 - 150, canvas.windows.length + 1))
+        canvas.windows.push(new Window('https://www.webexhibits.org/vangogh/letter/2/025.htm?qp=attitude.death', 300, 500, window.innerWidth / 2 - 150, window.innerHeight / 2 - 150, canvas.windows.length + 1))
+        setCurrentTop(3)
+        console.log('canvas windows', canvas.windows)
+        setCanvas({ ...canvas })
+      }
     }
     document.body.style.cursor = 'default'
     document.body.style.overflow = 'hidden'
@@ -112,16 +121,10 @@ function InfiniteCanvas() {
         }}
         onMouseDown={(e) => {
           console.log('starting click')
-          setClicking(true)
-          setStartX(e.pageX)
-          setStartY(e.pageY)
         }}
         onMouseUp={() => {
           console.log('ending click')
-          setClicking(false)
           document.body.style.cursor = 'default'
-          setStartX(null)
-          setStartY(null)
         }}
       >
         <div style={{
@@ -129,81 +132,6 @@ function InfiniteCanvas() {
           width: '100vw',
           height: '100vh',
         }}>
-          {/* <div style={{
-            position: 'absolute',
-            width: `${width}px`,
-            height: `${height + 30}px`,
-            left: `${x}px`,
-            top: `${y}px`,
-            display: 'inline-block',
-            border: '5px solid #333',
-            borderRadius: '10px',
-          }}
-            onMouseEnter={() => {
-              console.log('entered parent')
-              // set mouse to resize 
-              changeCursor('nwse-resize')
-            }}
-            onMouseDown={() => {
-              if(document.body.style.cursor === 'nwse-resize') {
-                console.log('trying to resize')
-                setResize(true)
-                console.log('clicked parent')
-              }
-              // if(document.body.style.cursor === 'move') {
-              //   setMove(true)
-              //   console.log('clicked parent')
-              // }
-            }}
-            onMouseUp={() => {
-              setResize(false)
-              setMove(false)
-              changeCursor('default')
-            }}
-            onMouseLeave={() => {
-              // changeCursor('default')
-            }}
-          >
-          <div style={{
-            display: 'flex',
-            width: '100%',
-            padding: '5px',
-          }}
-            onMouseDown={() => {
-              setMove(true)
-              document.body.style.cursor = 'move'
-            }}
-            onMouseUp={() => {
-              setMove(false)
-              document.body.style.cursor = 'default'
-            }}
-          >
-            <button style={{
-              padding: '2px',
-              fontSize: '5px',
-              borderRadius: '100%',
-              background: 'red', 
-              color: '#000'
-            }}>
-              <FiX />
-            </button>
-          </div>
-          <iframe is="x-frame-bypass" src="https://news.ycombinator.com/item?id=36504661" style={{
-            width: '100%',
-            height: `${height}px`,
-            borderRadius: '0 0 10px 10px',
-            outline: 'none',
-            userSelect: 'none',
-          }} 
-          frameBorder={0}
-          onMouseEnter={() => {
-            console.log('entered iframe')
-            // remove mouse resize
-            changeCursor('default')
-          }}
-          />
-
-          </div> */}
 
           {canvas.windows.map((window, idx) => {
             return (
@@ -212,10 +140,16 @@ function InfiniteCanvas() {
                 height: `${window.height}px`,
                 left: `${window.x}px`,
                 top: `${window.y}px`,
+                zIndex: `${window.z}`,
                 position: 'absolute',
                 border: '3px solid #333',
                 borderRadius: '10px',
               }}
+                onClick={() => {
+                  console.log('clicked parent')
+                  setCurrentTop(currentTop + 1)
+                  setCanvas({ ...canvas })
+                }}
                 onMouseEnter={() => {
                   console.log('entered window')
                   document.body.style.cursor = 'nwse-resize'
@@ -232,7 +166,7 @@ function InfiniteCanvas() {
                   width: '100%',
                   height: '30px',
                   background: '#000',
-                  borderRadius: '10px 10px 0 0',
+                  borderRadius: '7px 7px 0 0',
                 }}
                   onMouseEnter={() => {
                     document.body.style.cursor = 'move'
@@ -242,17 +176,15 @@ function InfiniteCanvas() {
                   }}
                   onMouseUp={() => {
                     console.log('mouseup')
-                    // document.body.style.cursor = 'default'
                     setCurrentWindow(null)
                   }}
                   onMouseLeave={() => {
                     console.log('leaving window')
-                    // document.body.style.cursor = 'default'
                   }}
                 >
                   {/* window nav bar */}
                 </div>
-                <iframe is="x-frame-bypass" src="https://news.ycombinator.com/item?id=36504661" style={{
+                <iframe is="x-frame-bypass" src={window.url} style={{
                   width: '100%',
                   height: `${window.height - 35}px`,
                   borderRadius: '0 0 10px 10px',
@@ -260,10 +192,14 @@ function InfiniteCanvas() {
                   userSelect: 'none',
                 }}
                   frameBorder={0}
+                  onClick={() => {
+                    console.log('clicked iframe')
+                    window.z = currentTop
+                  }}
                   onMouseEnter={() => {
                     console.log('entered iframe')
                     // remove mouse resize
-                    document.body.style.cursor = 'default'
+                    // document.body.style.cursor = 'default'
                   }}
                 />
 
