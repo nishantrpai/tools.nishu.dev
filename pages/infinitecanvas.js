@@ -267,7 +267,7 @@ function InfiniteCanvas() {
             setCurrentTop(currentTop + 1)
             setCanvas({ ...canvas })
             setNewURL('')
-            window.localStorage.setItem('canvas', JSON.stringify(canvas))
+            globalThis.window.localStorage.setItem('canvas', JSON.stringify(canvas))
           }}>
             <FiPlus/>
           </button>
