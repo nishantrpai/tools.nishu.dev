@@ -2,7 +2,7 @@
 import Head from 'next/head'
 import { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
-import { FiX, FiPlus, FiHome, FiSearch } from 'react-icons/fi'
+import { FiX, FiPlus, FiHome, FiNavigation } from 'react-icons/fi'
 
 class Window {
   constructor(url, width, height, x, y, z = 1) {
@@ -339,7 +339,7 @@ function InfiniteCanvas() {
                   setSearchMode(true)
                 }}
               >
-                <FiSearch />
+                <FiNavigation />
               </button>
             </div>
             <input style={{
@@ -349,8 +349,10 @@ function InfiniteCanvas() {
               outline: 'none',
               padding: '19px',
               background: '#222',
-            }} placeholder={
-              searchMode ? 'Search' : 'Add URL'
+            }}
+            value={newURL} 
+            placeholder={
+              searchMode ? 'Where do you want to go?' : 'Add URL'
             } onChange={(e) => {
               if (!searchMode) {
                 setNewURL(e.target.value)
