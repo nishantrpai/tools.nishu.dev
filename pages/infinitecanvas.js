@@ -350,7 +350,6 @@ function InfiniteCanvas() {
               padding: '19px',
               background: '#222',
             }}
-            value={newURL} 
             placeholder={
               searchMode ? 'Where do you want to go?' : 'Add URL'
             } onChange={(e) => {
