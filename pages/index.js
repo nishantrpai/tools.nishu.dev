@@ -175,6 +175,13 @@ export default function Home() {
       publishDate: '18th April 2024',
       url: '/repaloud',
       icon: '🔊',
+    },
+    {
+      title: 'Infinite Canvas',
+      description: 'Browse the internet on an infinite canvas',
+      publishDate: '19th April 2024',
+      url: '/infinitecanvas',
+      icon: '🌐',
     }
 
   ]
