@@ -2,11 +2,13 @@
 import Head from 'next/head'
 import { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
-import { FiX, FiPlus, FiHome } from 'react-icons/fi'
+import { FiX, FiPlus, FiHome, FiSearch } from 'react-icons/fi'
 
 class Window {
   constructor(url, width, height, x, y, z = 1) {
     this.url = url
+    this.title = ''
+    this.description = ''
     this.width = width
     this.height = height
     this.x = x
@@ -31,6 +33,8 @@ function InfiniteCanvas() {
   const [currentWindow, setCurrentWindow] = useState(null)
   const [currentTop, setCurrentTop] = useState(1)
   const [newURL, setNewURL] = useState('')
+  const [searchMode, setSearchMode] = useState(false)
+  const [searchResults, setSearchResults] = useState([])
 
 
   const wheelListener = (e) => {
@@ -74,8 +78,8 @@ function InfiniteCanvas() {
       // save canvas to local storage
       window.localStorage.setItem('canvas', JSON.stringify(canvas))
       console.log('pointer move listener', document.body.style.cursor, currentWindow, e.movementX, e.movementY, canvas.windows[currentWindow].x, canvas.windows[currentWindow].y)
-    } 
-    if(e.buttons === 1 && document.body.style.cursor === 'default') {
+    }
+    if (e.buttons === 1 && document.body.style.cursor === 'default') {
       canvas.cameraX += e.movementX * 2 * -1
       canvas.cameraY += e.movementY * 2 * -1
       setCanvas({ ...canvas })
@@ -133,6 +137,7 @@ function InfiniteCanvas() {
         onKeyDown={(e) => {
           if (e.key === 'Escape') {
             document.body.style.cursor = 'default'
+            setSearchResults([])
           }
         }}
         onMouseDown={(e) => {
@@ -237,6 +242,13 @@ function InfiniteCanvas() {
                     // remove mouse resize
                     // document.body.style.cursor = 'default'
                   }}
+                  onLoad={(e) => {
+                    // get the title and favicon 
+                    canvas.windows[idx].title = e.target.contentDocument.title
+                    canvas.windows[idx].description = e.target.contentDocument.querySelector('meta[name="description"]')?.content
+                    setCanvas({ ...canvas })
+                    globalThis.window.localStorage.setItem('canvas', JSON.stringify(canvas))
+                  }}
                 />
               </div>
             )
@@ -253,20 +265,109 @@ function InfiniteCanvas() {
           background: 'transparent',
           display: 'flex',
           justifyContent: 'center',
-          alignItems: 'center',
+          alignItems: 'flex-end',
           borderRadius: '10px 10px 0 0',
           fontSize: '14px',
         }}>
-          <input style={{
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
             width: '40%',
-            height: '30px',
-            borderRadius: '2px 6px',
-            border: 'none',
-            outline: 'none',
-            padding: '19px',
-            background: '#222',
             border: '1px solid #333',
-          }} placeholder="Enter URL" onChange={(e) => { setNewURL(e.target.value) }} />
+            borderRadius: '2px 6px',
+          }}>
+            {searchResults &&
+              <div style={{
+                width: '100%',
+                background: '#000'
+              }}>
+                {searchResults.map((result, idx) => (
+                  <div style={{
+                    cursor: 'pointer',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    padding: '5px',
+                    borderBottom: '1px solid #333',
+                  }}
+                    onClick={() => {
+                      // scroll to the window and set the z index
+                      canvas.windows[canvas.windows.indexOf(result)].z = currentTop
+                      canvas.cameraX = result.x + 300
+                      canvas.cameraY = result.y + 150
+                      canvas.zoom = 1
+                      setCurrentTop(currentTop + 1)
+                      setCanvas({ ...canvas })
+                      setSearchResults([])
+                      globalThis.window.localStorage.setItem('canvas', JSON.stringify(canvas))
+                    }}
+                  >
+                    <span style={{
+                      color: '#fff',
+                      fontSize: '10px',
+                    }}>
+                      {result.title}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            }
+            <div style={{
+              width: '100%',
+              display: 'flex',
+            }}>
+              <button style={{
+                width: '100%',
+                background: searchMode ? '#000' : '#111',
+                border: '1px solid #333',
+                borderRadius: '2px 0 0 2px',
+              }}
+                onClick={() => {
+                  setSearchMode(false)
+                }}
+              >
+                <FiPlus />
+              </button>
+              <button style={{
+                width: '100%',
+                background: searchMode ? '#111' : '#000',
+                border: '1px solid #333',
+                borderRadius: '0 2px 2px 0',
+              }}
+                onClick={() => {
+                  setSearchMode(true)
+                }}
+              >
+                <FiSearch />
+              </button>
+            </div>
+            <input style={{
+              width: '100%',
+              height: '30px',
+              border: 'none',
+              outline: 'none',
+              padding: '19px',
+              background: '#222',
+            }} placeholder={
+              searchMode ? 'Search' : 'Add URL'
+            } onChange={(e) => {
+              if (!searchMode) {
+                setNewURL(e.target.value)
+              } else {
+                console.log('searching')
+                // search for the url, title and description in the windows
+                let results = []
+                canvas.windows.forEach(w => {
+                  if (w.url?.toLowerCase()?.includes(e.target.value) || w.title?.toLowerCase()?.includes(e.target.value) || w.description?.toLowerCase()?.includes(e.target.value)) {
+                    results.push(w)
+                  }
+                })
+                console.log('search results', results)
+                setSearchResults(results)
+              }
+            }} />
+          </div>
           <button style={{
             borderRadius: '2px 6px',
             background: '#222',
