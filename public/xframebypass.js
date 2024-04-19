@@ -256,13 +256,12 @@ customElements.define('x-frame-bypass', class extends HTMLIFrameElement {
   }
   fetchProxy(url, options, i) {
 
-    if (url.includes('reddit.com')) i = 3
+    if (url.includes('reddit.com')) url = url.replace('www.reddit.com', 'embed.reddit.com')
 
     const proxies = (options || {}).proxies || [
       '',
       'https://cors-anywhere.herokuapp.com/',
       'https://api.codetabs.com/v1/proxy/?quest=',
-      'https://rdx.overdevs.com/comments.html?url='
     ]
     return fetch(proxies[i] + url, {
       headers: {
