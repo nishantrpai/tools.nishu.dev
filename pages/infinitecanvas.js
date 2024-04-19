@@ -78,17 +78,19 @@ function InfiniteCanvas() {
     }
   }
 
-  const changeCursor = (cursor) => {
-    document.body.style.cursor = cursor
-  }
-
   useEffect(() => {
-    // canvas.addWindow(new Window('https://news.ycombinator.com/item?id=36504661', 300, 300, 200, 200))
-
     if (canvas.windows.length == 0) {
       // open in the middle of the screen
       if (window.localStorage.getItem('canvas')) {
         setCanvas(JSON.parse(window.localStorage.getItem('canvas')))
+        // go through each window z and set the current top
+        let maxZ = 0
+        canvas.windows.forEach(window => {
+          if (window.z > maxZ) {
+            maxZ = window.z
+          }
+        })
+        setCurrentTop(maxZ)
       } else {
         canvas.windows.push(new Window('https://news.ycombinator.com/item?id=36504661', 300, 300, window.innerWidth / 2 - 150, window.innerHeight / 2 - 150, canvas.windows.length + 1))
         canvas.windows.push(new Window('https://en.wikipedia.org/wiki/Vincent_van_Gogh', 300, 400, window.innerWidth / 2 - 150, window.innerHeight / 2 - 150, canvas.windows.length + 1))
@@ -190,15 +192,18 @@ function InfiniteCanvas() {
                 >
                   <button style={{
                     cursor: 'pointer',
-                    padding: '2px',
-                    fontSize: '14px',
+                    padding: '3px',
+                    paddingTop: '4px',
+                    height: 'max-content',
+                    fontSize: '10px',
+                    background: '#000'
                   }}>
                     <FiX onClick={() => {
                       console.log('clicked close')
                       canvas.windows.splice(idx, 1)
                       setCanvas({ ...canvas })
-                      if(window.localStorage.getItem('canvas')) {
-                        window.localStorage.setItem('canvas', JSON.stringify(canvas))
+                      if(globalThis.window.localStorage.getItem('canvas')) {
+                        globalThis.window.localStorage.setItem('canvas', JSON.stringify(canvas))
                       }
                     }}/>
                   </button>
@@ -258,7 +263,7 @@ function InfiniteCanvas() {
             padding: '8px 10px'
           }} onClick={() => {
             console.log('clicked add window')
-            canvas.windows.push(new Window(newURL, 300, 300, window.innerWidth / 2 - 150, window.innerHeight / 2 - 150, currentTop))
+            canvas.windows.push(new Window(newURL, 300, 300, window.innerWidth / 2 - 150, window.innerHeight / 2 - 150, currentTop + 1))
             setCurrentTop(currentTop + 1)
             setCanvas({ ...canvas })
             setNewURL('')
