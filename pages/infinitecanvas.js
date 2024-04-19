@@ -70,8 +70,8 @@ function InfiniteCanvas() {
     }
     if (document.body.style.cursor === 'move' && currentWindow !== null && e.buttons === 1) {
       console.log('current window', canvas.windows[currentWindow].z, canvas.windows[currentWindow].x, canvas.windows[currentWindow].y, canvas.windows[currentWindow].width, canvas.windows[currentWindow].height)
-      canvas.windows[currentWindow].x += e.movementX * 4
-      canvas.windows[currentWindow].y += e.movementY * 4
+      canvas.windows[currentWindow].x += e.movementX * 2
+      canvas.windows[currentWindow].y += e.movementY * 2
       canvas.windows[currentWindow].z = currentTop
       setCurrentTop(currentTop + 1)
       setCanvas({ ...canvas })
