@@ -97,8 +97,8 @@ function InfiniteCanvas() {
       console.log('pointer move listener', document.body.style.cursor, currentWindow, e.movementX, e.movementY, canvas.windows[currentWindow].x, canvas.windows[currentWindow].y)
     } 
     if(e.buttons === 1 && document.body.style.cursor === 'default') {
-      canvas.cameraX += e.movementX * 2
-      canvas.cameraY += e.movementY * 2
+      canvas.cameraX += e.movementX * 2 * -1
+      canvas.cameraY += e.movementY * 2 * -1
       setCanvas({ ...canvas })
       globalThis.window.localStorage.setItem('canvas', JSON.stringify(canvas))
     }
