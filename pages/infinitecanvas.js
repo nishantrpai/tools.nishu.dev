@@ -2,7 +2,7 @@
 import Head from 'next/head'
 import { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
-import { FiX } from 'react-icons/fi'
+import { FiX, FiPlus } from 'react-icons/fi'
 
 class Window {
   constructor(url, width, height, x, y, z = 1) {
@@ -47,6 +47,7 @@ function InfiniteCanvas() {
   const [canvas, setCanvas] = useState(new Canvas())
   const [currentWindow, setCurrentWindow] = useState(null)
   const [currentTop, setCurrentTop] = useState(1)
+  const [newURL, setNewURL] = useState('')
 
 
   const wheelListener = (e) => {
@@ -58,7 +59,10 @@ function InfiniteCanvas() {
     if (document.body.style.cursor === 'nwse-resize' && currentWindow !== null && e.buttons === 1) {
       canvas.windows[currentWindow].width += e.movementX * 2
       canvas.windows[currentWindow].height += e.movementY * 2
+      canvas.windows[currentWindow].z = currentTop
+      setCurrentTop(currentTop + 1)
       setCanvas({ ...canvas })
+      window.localStorage.setItem('canvas', JSON.stringify(canvas))
       console.log('pointer resize listener', document.body.style.cursor, currentWindow, e.movementX, e.movementY, canvas.windows[currentWindow].width, canvas.windows[currentWindow].height)
     }
     if (document.body.style.cursor === 'move' && currentWindow !== null && e.buttons === 1) {
@@ -163,8 +167,10 @@ function InfiniteCanvas() {
                 }}
               >
                 <div style={{
+                  display: 'flex',
                   width: '100%',
                   height: '30px',
+                  padding: '2px',
                   background: '#000',
                   borderRadius: '7px 7px 0 0',
                 }}
@@ -182,6 +188,20 @@ function InfiniteCanvas() {
                     console.log('leaving window')
                   }}
                 >
+                  <button style={{
+                    cursor: 'pointer',
+                    padding: '2px',
+                    fontSize: '14px',
+                  }}>
+                    <FiX onClick={() => {
+                      console.log('clicked close')
+                      canvas.windows.splice(idx, 1)
+                      setCanvas({ ...canvas })
+                      if(window.localStorage.getItem('canvas')) {
+                        window.localStorage.setItem('canvas', JSON.stringify(canvas))
+                      }
+                    }}/>
+                  </button>
                   {/* window nav bar */}
                 </div>
                 <iframe is="x-frame-bypass" src={window.url} style={{
@@ -202,10 +222,51 @@ function InfiniteCanvas() {
                     // document.body.style.cursor = 'default'
                   }}
                 />
-
               </div>
             )
           })}
+
+
+        {/* at the bottom the a url window to add links */}
+        <div style={{
+          position: 'absolute',
+          bottom: 20,
+          width: '100%',
+          height: '50px',
+          background: '#000',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          borderRadius: '10px 10px 0 0',
+          fontSize: '14px',
+        }}>
+          <input style={{
+            width: '40%',
+            height: '30px',
+            borderRadius: '2px 6px',
+            border: 'none',
+            outline: 'none',
+            padding: '19px',
+          }} placeholder="Enter URL" onChange={(e) => { setNewURL(e.target.value)}}/>
+          <button style={{
+            borderRadius: '2px 6px',
+            background: '#333',
+            color: '#fff',
+            marginLeft: '10px',
+            border: 'none',
+            outline: 'none',
+            padding: '8px 10px'
+          }} onClick={() => {
+            console.log('clicked add window')
+            canvas.windows.push(new Window(newURL, 300, 300, window.innerWidth / 2 - 150, window.innerHeight / 2 - 150, currentTop))
+            setCurrentTop(currentTop + 1)
+            setCanvas({ ...canvas })
+            setNewURL('')
+            window.localStorage.setItem('canvas', JSON.stringify(canvas))
+          }}>
+            <FiPlus/>
+          </button>
+        </div>
 
         </div>
       </div>
