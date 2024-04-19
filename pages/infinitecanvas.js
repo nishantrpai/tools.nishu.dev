@@ -22,31 +22,10 @@ class Canvas {
     this.zoom = 1
     this.windows = []
   }
-  // addWindow(window) {
-  //   this.windows.push(window)
-  // }
-  // removeWindow(idx) {
-  //   this.windows.splice(idx, 1)
-  // }
-  // moveWindow(idx, x, y) {
-  //   this.windows[idx].x = x
-  //   this.windows[idx].y = y
-  // }
-  // resizeWindow(idx, width, height) {
-  //   this.windows[idx].width = width
-  //   this.windows[idx].height = height
-  // }
 }
 
 
 function InfiniteCanvas() {
-
-  const [resize, setResize] = useState(false)
-  const [move, setMove] = useState(false)
-  const [width, setWidth] = useState(300)
-  const [height, setHeight] = useState(300)
-  const [x, setX] = useState(200)
-  const [y, setY] = useState(200)
 
   const [canvas, setCanvas] = useState(new Canvas())
   const [currentWindow, setCurrentWindow] = useState(null)
@@ -118,8 +97,8 @@ function InfiniteCanvas() {
         })
         setCurrentTop(maxZ)
       } else {
-        canvas.windows.push(new Window('https://news.ycombinator.com/item?id=36504661', 300, 300, window.innerWidth / 2 - 150, window.innerHeight / 2 - 150, canvas.windows.length + 1))
-        canvas.windows.push(new Window('https://en.wikipedia.org/wiki/Vincent_van_Gogh', 300, 400, window.innerWidth / 2 - 150, window.innerHeight / 2 - 150, canvas.windows.length + 1))
+        canvas.windows.push(new Window('https://news.ycombinator.com/item?id=36504661', 300, 300, window.innerWidth / 2 - 100, window.innerHeight / 2 - 150, canvas.windows.length + 1))
+        canvas.windows.push(new Window('https://en.wikipedia.org/wiki/Vincent_van_Gogh', 300, 400, window.innerWidth / 2 + 120, window.innerHeight / 2 - 150, canvas.windows.length + 1))
         canvas.windows.push(new Window('https://www.webexhibits.org/vangogh/letter/2/025.htm?qp=attitude.death', 300, 500, window.innerWidth / 2 - 150, window.innerHeight / 2 - 150, canvas.windows.length + 1))
         setCurrentTop(3)
         console.log('canvas windows', canvas.windows)
