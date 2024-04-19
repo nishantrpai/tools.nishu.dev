@@ -124,6 +124,26 @@ function InfiniteCanvas() {
     return y - canvas.cameraY + window.innerHeight / 2
   }
 
+  const smoothScroll = (x, y) => {
+    // smooth scroll the camera to the x and y position
+    let deltaX = x - canvas.cameraX
+    let deltaY = y - canvas.cameraY
+    let stepX = deltaX / 100
+    let stepY = deltaY / 100
+    let i = 0
+    let interval = setInterval(() => {
+      canvas.cameraX += stepX
+      canvas.cameraY += stepY
+      setCanvas({ ...canvas })
+      i++
+      if (i === 100) {
+        clearInterval(interval)
+      }
+    }, 5)
+    setCanvas({ ...canvas })
+    globalThis.window.localStorage.setItem('canvas', JSON.stringify(canvas))
+  }
+
 
   return (
     <>
@@ -294,9 +314,8 @@ function InfiniteCanvas() {
                     onClick={() => {
                       // scroll to the window and set the z index
                       canvas.windows[canvas.windows.indexOf(result)].z = currentTop
-                      canvas.cameraX = result.x + 300
-                      canvas.cameraY = result.y + 150
                       canvas.zoom = 1
+                      smoothScroll(result.x, result.y)
                       setCurrentTop(currentTop + 1)
                       setCanvas({ ...canvas })
                       setSearchResults([])
