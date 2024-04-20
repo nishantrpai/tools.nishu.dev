@@ -225,6 +225,8 @@ customElements.define('x-frame-bypass', class extends HTMLIFrameElement {
 </body>
 </html>`
     this.fetchProxy(url, options, 0).then(res => res.text()).then(data => {
+      // if url is missing https://, append it
+      if (!url.startsWith('https://') && !url.startsWith('http://')) url = 'https://' + url
       console.log('X-Frame-Bypass loaded:', url)
       if (data)
         this.srcdoc = data.replace(/<head([^>]*)>/i, `<head$1>
