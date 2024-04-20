@@ -65,7 +65,7 @@ function InfiniteCanvas() {
       setCanvas({ ...canvas })
       window.localStorage.setItem('canvas', JSON.stringify(canvas))
     }
-    if (document.body.style.cursor === 'move' && currentWindow !== null && e.buttons === 1) {
+    else if (document.body.style.cursor === 'move' && currentWindow !== null && e.buttons === 1) {
       // console.log('current window', canvas.windows[currentWindow].z, canvas.windows[currentWindow].x, canvas.windows[currentWindow].y, canvas.windows[currentWindow].width, canvas.windows[currentWindow].height)
       canvas.windows[currentWindow].x += e.movementX * 2
       canvas.windows[currentWindow].y += e.movementY * 2
@@ -75,7 +75,7 @@ function InfiniteCanvas() {
       // save canvas to local storage
       window.localStorage.setItem('canvas', JSON.stringify(canvas))
     }
-    if (e.buttons === 1 && document.body.style.cursor === 'default') {
+    else if (e.buttons === 1 && document.body.style.cursor === 'default') {
       canvas.cameraX += e.movementX * 2 * -1
       canvas.cameraY += e.movementY * 2 * -1
       setCanvas({ ...canvas })
