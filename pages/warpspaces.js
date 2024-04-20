@@ -306,7 +306,6 @@ function Profile() {
                     onClick={() => {
                       setRoom(room.room);
                       setHeading(room.room);
-                      setRooms([]);
                       setDisplayMode('join');
                       handleJoin(displayName);
                     }}
