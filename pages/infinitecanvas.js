@@ -38,7 +38,7 @@ function InfiniteCanvas() {
 
 
   const wheelListener = (e) => {
-    // console.log('wheel listener')
+    // // console.log('wheel listener')
     let friction = 1;
     let deltaX = e.deltaX * friction
     let deltaY = e.deltaY * friction
@@ -54,8 +54,6 @@ function InfiniteCanvas() {
       setCanvas({ ...canvas })
       globalThis.window.localStorage.setItem('canvas', JSON.stringify(canvas))
     }
-    console.log(deltaX, deltaY)
-
   }
 
   const pointerMoveListener = (e) => {
@@ -66,10 +64,9 @@ function InfiniteCanvas() {
       setCurrentTop(currentTop + 1)
       setCanvas({ ...canvas })
       window.localStorage.setItem('canvas', JSON.stringify(canvas))
-      console.log('pointer resize listener', document.body.style.cursor, currentWindow, e.movementX, e.movementY, canvas.windows[currentWindow].width, canvas.windows[currentWindow].height)
     }
     if (document.body.style.cursor === 'move' && currentWindow !== null && e.buttons === 1) {
-      console.log('current window', canvas.windows[currentWindow].z, canvas.windows[currentWindow].x, canvas.windows[currentWindow].y, canvas.windows[currentWindow].width, canvas.windows[currentWindow].height)
+      // console.log('current window', canvas.windows[currentWindow].z, canvas.windows[currentWindow].x, canvas.windows[currentWindow].y, canvas.windows[currentWindow].width, canvas.windows[currentWindow].height)
       canvas.windows[currentWindow].x += e.movementX * 2
       canvas.windows[currentWindow].y += e.movementY * 2
       canvas.windows[currentWindow].z = currentTop
@@ -77,7 +74,6 @@ function InfiniteCanvas() {
       setCanvas({ ...canvas })
       // save canvas to local storage
       window.localStorage.setItem('canvas', JSON.stringify(canvas))
-      console.log('pointer move listener', document.body.style.cursor, currentWindow, e.movementX, e.movementY, canvas.windows[currentWindow].x, canvas.windows[currentWindow].y)
     }
     if (e.buttons === 1 && document.body.style.cursor === 'default') {
       canvas.cameraX += e.movementX * 2 * -1
@@ -105,7 +101,6 @@ function InfiniteCanvas() {
         canvas.windows.push(new Window('https://en.wikipedia.org/wiki/Vincent_van_Gogh', 300, 400, window.innerWidth / 2 + 120, window.innerHeight / 2 - 150, canvas.windows.length + 1))
         canvas.windows.push(new Window('https://www.webexhibits.org/vangogh/letter/2/025.htm?qp=attitude.death', 300, 500, window.innerWidth / 2 - 150, window.innerHeight / 2 - 150, canvas.windows.length + 1))
         setCurrentTop(3)
-        console.log('canvas windows', canvas.windows)
         setCanvas({ ...canvas })
       }
     }
@@ -161,10 +156,8 @@ function InfiniteCanvas() {
           }
         }}
         onMouseDown={(e) => {
-          console.log('starting click')
         }}
         onMouseUp={() => {
-          console.log('ending click')
           document.body.style.cursor = 'default'
         }}
       >
@@ -188,12 +181,10 @@ function InfiniteCanvas() {
                 borderRadius: '10px',
               }}
                 onClick={() => {
-                  console.log('clicked parent')
                   setCurrentTop(currentTop + 1)
                   setCanvas({ ...canvas })
                 }}
                 onMouseEnter={() => {
-                  console.log('entered window')
                   document.body.style.cursor = 'nwse-resize'
                 }}
                 onMouseDown={() => {
@@ -201,7 +192,7 @@ function InfiniteCanvas() {
                 }}
                 onMouseUp={() => {
                   setCurrentWindow(null)
-                  console.log('mouseup')
+                  // // console.log('mouseup')
                 }}
               >
                 <div style={{
@@ -219,11 +210,11 @@ function InfiniteCanvas() {
                     setCurrentWindow(idx)
                   }}
                   onMouseUp={() => {
-                    console.log('mouseup')
+                    // console.log('mouseup')
                     setCurrentWindow(null)
                   }}
                   onMouseLeave={() => {
-                    console.log('leaving window')
+                    // console.log('leaving window')
                   }}
                 >
                   <button style={{
@@ -235,7 +226,7 @@ function InfiniteCanvas() {
                     background: '#000'
                   }}>
                     <FiX onClick={() => {
-                      console.log('clicked close')
+                      // console.log('clicked close')
                       canvas.windows.splice(idx, 1)
                       setCanvas({ ...canvas })
                       if (globalThis.window.localStorage.getItem('canvas')) {
@@ -254,11 +245,11 @@ function InfiniteCanvas() {
                 }}
                   frameBorder={0}
                   onClick={() => {
-                    console.log('clicked iframe')
+                    // console.log('clicked iframe')
                     window.z = currentTop
                   }}
                   onMouseEnter={() => {
-                    console.log('entered iframe')
+                    // console.log('entered iframe')
                     // remove mouse resize
                     // document.body.style.cursor = 'default'
                   }}
@@ -375,7 +366,7 @@ function InfiniteCanvas() {
               if (!searchMode) {
                 setNewURL(e.target.value)
               } else {
-                console.log('searching')
+                // console.log('searching')
                 // search for the url, title and description in the windows
                 let results = []
                 canvas.windows.forEach(w => {
@@ -383,7 +374,7 @@ function InfiniteCanvas() {
                     results.push(w)
                   }
                 })
-                console.log('search results', results)
+                // console.log('search results', results)
                 setSearchResults(results)
               }
             }} />
@@ -398,7 +389,7 @@ function InfiniteCanvas() {
             padding: '8px 10px',
             border: '1px solid #333',
           }} onClick={() => {
-            console.log('clicked add window')
+            // console.log('clicked add window')
             // open new window at the center of the screen
             if(newURL == '') return;
             canvas.windows.push(new Window(newURL, 300, 300, canvas.cameraX - 150, canvas.cameraY - 150, currentTop + 1))
