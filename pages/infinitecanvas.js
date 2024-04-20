@@ -401,10 +401,8 @@ function InfiniteCanvas() {
                   }}
                     onClick={() => {
                       // scroll to the window and set the z index
-                      canvas.windows[canvas.windows.indexOf(result)].z = currentTop
                       canvas.zoom = 1
                       smoothScroll((result.x), result.y + 300)
-                      setCurrentTop(currentTop + 1)
                       setCanvas({ ...canvas })
                       setSearchResults([])
                       globalThis.window.localStorage.setItem('canvas', JSON.stringify(canvas))
