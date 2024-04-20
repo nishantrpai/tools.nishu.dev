@@ -46,7 +46,7 @@ function InfiniteCanvas() {
   const [currentNoteIdx, setCurrentNoteIdx] = useState(null)
   const [currentTop, setCurrentTop] = useState(1)
   const [newURL, setNewURL] = useState('')
-  const [searchMode, setSearchMode] = useState(false)
+  const [searchMode, setSearchMode] = useState(true)
   const [searchResults, setSearchResults] = useState([])
 
 
@@ -205,18 +205,18 @@ function InfiniteCanvas() {
                 borderRadius: '10px 2px 10px 10px',
                 padding: '5px',
               }}
-              onMouseEnter={() => {
-                document.body.style.cursor = 'move'
-              }}
-              onMouseLeave={() => {
-                document.body.style.cursor = 'default'
-              }}
-              onMouseDown={() => {
-                setCurrentNoteIdx(idx)
-              }}
-              onMouseUp={(() => {
-                setCurrentNoteIdx(null)
-              })}
+                onMouseEnter={() => {
+                  document.body.style.cursor = 'move'
+                }}
+                onMouseLeave={() => {
+                  document.body.style.cursor = 'default'
+                }}
+                onMouseDown={() => {
+                  setCurrentNoteIdx(idx)
+                }}
+                onMouseUp={(() => {
+                  setCurrentNoteIdx(null)
+                })}
               >
                 {/* add close button to the top right */}
                 <button style={{
@@ -407,7 +407,7 @@ function InfiniteCanvas() {
                       // scroll to the window and set the z index
                       canvas.windows[canvas.windows.indexOf(result)].z = currentTop
                       canvas.zoom = 1
-                      smoothScroll(result.x, result.y)
+                      smoothScroll((result.x), result.y + 300)
                       setCurrentTop(currentTop + 1)
                       setCanvas({ ...canvas })
                       setSearchResults([])
@@ -430,19 +430,7 @@ function InfiniteCanvas() {
             }}>
               <button style={{
                 width: '100%',
-                background: searchMode ? '#000' : '#111',
-                border: '1px solid #333',
-                borderRadius: '2px 0 0 2px',
-              }}
-                onClick={() => {
-                  setSearchMode(false)
-                }}
-              >
-                <FiPlus />
-              </button>
-              <button style={{
-                width: '100%',
-                background: searchMode ? '#111' : '#000',
+                background: searchMode ? '#1e1e1e' : '#000',
                 border: '1px solid #333',
                 borderRadius: '0 2px 2px 0',
               }}
@@ -451,6 +439,20 @@ function InfiniteCanvas() {
                 }}
               >
                 <FiNavigation />
+              </button>
+
+              <button style={{
+                width: '100%',
+                background: searchMode ? '#000' : '#1e1e1e',
+                border: '1px solid #333',
+                borderRadius: '2px 0 0 2px',
+              }}
+                onClick={() => {
+                  setSearchResults([])
+                  setSearchMode(false)
+                }}
+              >
+                <FiPlus />
               </button>
             </div>
             <input style={{
@@ -469,6 +471,8 @@ function InfiniteCanvas() {
                 } else {
                   // console.log('searching')
                   // search for the url, title and description in the windows
+                  setSearchResults([])
+                  if(e.target.value === '') return;
                   let results = []
                   canvas.windows.forEach(w => {
                     if (w.url?.toLowerCase()?.includes(e.target.value) || w.title?.toLowerCase()?.includes(e.target.value) || w.description?.toLowerCase()?.includes(e.target.value)) {
