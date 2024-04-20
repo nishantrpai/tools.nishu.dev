@@ -182,6 +182,13 @@ export default function Home() {
       publishDate: '19th April 2024',
       url: '/infinitecanvas',
       icon: '🌐',
+    },
+    {
+      title: 'Duplicate Photos',
+      description: 'Duplicate your photos 100s or 1000s of times',
+      publishDate: '20th April 2024',
+      url: '/duplicatephotos',
+      icon: '📸',
     }
 
   ]
