@@ -208,6 +208,9 @@ function InfiniteCanvas() {
               onMouseEnter={() => {
                 document.body.style.cursor = 'move'
               }}
+              onMouseLeave={() => {
+                document.body.style.cursor = 'default'
+              }}
               onMouseDown={() => {
                 setCurrentNoteIdx(idx)
               }}
@@ -280,6 +283,9 @@ function InfiniteCanvas() {
                 onMouseEnter={() => {
                   document.body.style.cursor = 'nwse-resize'
                 }}
+                onMouseLeave={() => {
+                  document.body.style.cursor = 'default'
+                }}
                 onMouseDown={() => {
                   setCurrentWindow(idx)
                 }}
@@ -299,6 +305,7 @@ function InfiniteCanvas() {
                   onMouseEnter={() => {
                     document.body.style.cursor = 'move'
                   }}
+
                   onMouseDown={() => {
                     setCurrentWindow(idx)
                   }}
@@ -308,6 +315,7 @@ function InfiniteCanvas() {
                   }}
                   onMouseLeave={() => {
                     // console.log('leaving window')
+                    document.body.style.cursor = 'default'
                   }}
                 >
                   <button style={{
@@ -488,7 +496,6 @@ function InfiniteCanvas() {
             canvas.windows.push(new Window(newURL, 300, 300, canvas.cameraX - 150, canvas.cameraY - 150, currentTop + 1))
             setCurrentTop(currentTop + 1)
             setCanvas({ ...canvas })
-            setNewURL('')
             globalThis.window.localStorage.setItem('canvas', JSON.stringify(canvas))
           }}>
             <FiPlus />
