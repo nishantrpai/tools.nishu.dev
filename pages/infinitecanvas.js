@@ -2,8 +2,19 @@
 import Head from 'next/head'
 import { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
-import { FiX, FiPlus, FiHome, FiNavigation } from 'react-icons/fi'
+import { FiX, FiPlus, FiHome, FiNavigation, FiFilePlus } from 'react-icons/fi'
 
+class StickyNote {
+  constructor(note, x, y, z = 1, width = 200, height = 200) {
+    this.x = x
+    this.y = y
+    this.z = z
+    this.width = width
+    this.height = height
+    this.note = note
+  }
+
+}
 class Window {
   constructor(url, width, height, x, y, z = 1) {
     this.url = url
@@ -23,6 +34,7 @@ class Canvas {
     this.cameraY = globalThis.window.innerHeight / 2
     this.zoom = 1
     this.windows = []
+    this.notes = []
   }
 }
 
@@ -31,6 +43,7 @@ function InfiniteCanvas() {
 
   const [canvas, setCanvas] = useState(new Canvas())
   const [currentWindow, setCurrentWindow] = useState(null)
+  const [currentNoteIdx, setCurrentNoteIdx] = useState(null)
   const [currentTop, setCurrentTop] = useState(1)
   const [newURL, setNewURL] = useState('')
   const [searchMode, setSearchMode] = useState(false)
@@ -80,6 +93,13 @@ function InfiniteCanvas() {
       canvas.cameraY += e.movementY * 2 * -1
       setCanvas({ ...canvas })
       globalThis.window.localStorage.setItem('canvas', JSON.stringify(canvas))
+    } else if (document.body.style.cursor === 'move' && currentNoteIdx !== null && e.buttons === 1) {
+      canvas.notes[currentNoteIdx].x += e.movementX * 2
+      canvas.notes[currentNoteIdx].y += e.movementY * 2
+      canvas.notes[currentNoteIdx].z = currentTop
+      setCurrentTop(currentTop + 1)
+      setCanvas({ ...canvas })
+      window.localStorage.setItem('canvas', JSON.stringify(canvas))
     }
   }
 
@@ -168,6 +188,79 @@ function InfiniteCanvas() {
           transform: `scale(${canvas.zoom})`,
         }}>
 
+          {/* render notes  */}
+          {canvas.notes?.map((note, idx) => {
+            return (
+              <div style={{
+                width: `${note.width}px`,
+                minHeight: `${note.height}px`,
+                height: 'max-content',
+                left: `${calculateX(note.x)}px`,
+                top: `${calculateY(note.y)}px`,
+                zIndex: `${note.z}`,
+                position: 'absolute',
+                background: '#FDD173',
+                border: '1px solid #9A6601',
+                color: '#000',
+                borderRadius: '10px 2px 10px 10px',
+                padding: '5px',
+              }}
+              onMouseEnter={() => {
+                document.body.style.cursor = 'move'
+              }}
+              onMouseDown={() => {
+                setCurrentNoteIdx(idx)
+              }}
+              onMouseUp={(() => {
+                setCurrentNoteIdx(null)
+              })}
+              >
+                {/* add close button to the top right */}
+                <button style={{
+                  cursor: 'pointer',
+                  padding: '3px',
+                  paddingTop: '4px',
+                  height: 'max-content',
+                  fontSize: '10px',
+                  background: '#FDD173',
+                  border: 'none',
+                  outline: 'none',
+                  position: 'absolute',
+                  color: '#9A6601',
+                  fontSize: '14px',
+                  fontWeight: 'bold',
+                  right: '0',
+                }}>
+                  <FiX onClick={() => {
+                    canvas.notes.splice(idx, 1)
+                    setCanvas({ ...canvas })
+                    globalThis.window.localStorage.setItem('canvas', JSON.stringify(canvas))
+                  }} />
+                </button>
+                <textarea style={{
+                  width: '100%',
+                  minHeight: `${note.height - 30}px`,
+                  height: '100%',
+                  background: 'transparent',
+                  border: 'none',
+                  outline: 'none',
+                  resize: 'none',
+                  color: '#000',
+                  fontSize: '14px',
+                }}
+                  value={note.note}
+                  onChange={(e) => {
+                    canvas.notes[idx].note = e.target.value
+                    setCanvas({ ...canvas })
+                    globalThis.window.localStorage.setItem('canvas', JSON.stringify(canvas))
+                  }}
+                />
+              </div>
+            )
+          })}
+
+
+          {/* render links */}
           {canvas.windows.map((window, idx) => {
             return (
               <div style={{
@@ -360,24 +453,24 @@ function InfiniteCanvas() {
               padding: '19px',
               background: '#222',
             }}
-            placeholder={
-              searchMode ? 'Where do you want to go?' : 'Add URL'
-            } onChange={(e) => {
-              if (!searchMode) {
-                setNewURL(e.target.value)
-              } else {
-                // console.log('searching')
-                // search for the url, title and description in the windows
-                let results = []
-                canvas.windows.forEach(w => {
-                  if (w.url?.toLowerCase()?.includes(e.target.value) || w.title?.toLowerCase()?.includes(e.target.value) || w.description?.toLowerCase()?.includes(e.target.value)) {
-                    results.push(w)
-                  }
-                })
-                // console.log('search results', results)
-                setSearchResults(results)
-              }
-            }} />
+              placeholder={
+                searchMode ? 'Where do you want to go?' : 'Add URL'
+              } onChange={(e) => {
+                if (!searchMode) {
+                  setNewURL(e.target.value)
+                } else {
+                  // console.log('searching')
+                  // search for the url, title and description in the windows
+                  let results = []
+                  canvas.windows.forEach(w => {
+                    if (w.url?.toLowerCase()?.includes(e.target.value) || w.title?.toLowerCase()?.includes(e.target.value) || w.description?.toLowerCase()?.includes(e.target.value)) {
+                      results.push(w)
+                    }
+                  })
+                  // console.log('search results', results)
+                  setSearchResults(results)
+                }
+              }} />
           </div>
           <button style={{
             borderRadius: '2px 6px',
@@ -391,7 +484,7 @@ function InfiniteCanvas() {
           }} onClick={() => {
             // console.log('clicked add window')
             // open new window at the center of the screen
-            if(newURL == '') return;
+            if (newURL == '') return;
             canvas.windows.push(new Window(newURL, 300, 300, canvas.cameraX - 150, canvas.cameraY - 150, currentTop + 1))
             setCurrentTop(currentTop + 1)
             setCanvas({ ...canvas })
@@ -421,6 +514,29 @@ function InfiniteCanvas() {
             }}
           >
             <FiHome />
+          </button>
+          <button style={{
+            borderRadius: '2px 6px',
+            background: '#222',
+            color: '#fff',
+            marginLeft: '10px',
+            border: 'none',
+            outline: 'none',
+            padding: '8px 10px',
+            border: '1px solid #333'
+          }}
+            onClick={() => {
+              // if notes is not in the canvas add it
+              if (!canvas.notes) {
+                canvas.notes = []
+              }
+              canvas.notes.push(new StickyNote('your note', canvas.cameraX, canvas.cameraY, currentTop + 1))
+              setCurrentTop(currentTop + 1)
+              setCanvas({ ...canvas })
+              globalThis.window.localStorage.setItem('canvas', JSON.stringify(canvas))
+            }}
+          >
+            <FiFilePlus />
           </button>
         </div>
 
