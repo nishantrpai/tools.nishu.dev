@@ -75,32 +75,26 @@ function InfiniteCanvas() {
       canvas.windows[currentWindow].height += e.movementY * 2
       canvas.windows[currentWindow].z = currentTop
       setCurrentTop(currentTop + 1)
-      setCanvas({ ...canvas })
-      window.localStorage.setItem('canvas', JSON.stringify(canvas))
     }
-    else if (document.body.style.cursor === 'move' && currentWindow !== null && e.buttons === 1) {
+    if (document.body.style.cursor === 'move' && currentWindow !== null && e.buttons === 1) {
       // console.log('current window', canvas.windows[currentWindow].z, canvas.windows[currentWindow].x, canvas.windows[currentWindow].y, canvas.windows[currentWindow].width, canvas.windows[currentWindow].height)
       canvas.windows[currentWindow].x += e.movementX * 2
       canvas.windows[currentWindow].y += e.movementY * 2
       canvas.windows[currentWindow].z = currentTop
       setCurrentTop(currentTop + 1)
-      setCanvas({ ...canvas })
-      // save canvas to local storage
-      window.localStorage.setItem('canvas', JSON.stringify(canvas))
     }
-    else if (e.buttons === 1 && document.body.style.cursor === 'default') {
+    if (e.buttons === 1 && document.body.style.cursor === 'default') {
       canvas.cameraX += e.movementX * 2 * -1
       canvas.cameraY += e.movementY * 2 * -1
-      setCanvas({ ...canvas })
-      globalThis.window.localStorage.setItem('canvas', JSON.stringify(canvas))
-    } else if (document.body.style.cursor === 'move' && currentNoteIdx !== null && e.buttons === 1) {
+    } 
+    if (document.body.style.cursor === 'move' && currentNoteIdx !== null && e.buttons === 1) {
       canvas.notes[currentNoteIdx].x += e.movementX * 2
       canvas.notes[currentNoteIdx].y += e.movementY * 2
       canvas.notes[currentNoteIdx].z = currentTop
       setCurrentTop(currentTop + 1)
-      setCanvas({ ...canvas })
-      window.localStorage.setItem('canvas', JSON.stringify(canvas))
     }
+    setCanvas({ ...canvas })
+    globalThis.window.localStorage.setItem('canvas', JSON.stringify(canvas))
   }
 
   useEffect(() => {
@@ -200,7 +194,7 @@ function InfiniteCanvas() {
                 zIndex: `${note.z}`,
                 position: 'absolute',
                 background: '#FDD173',
-                border: '1px solid #9A6601',
+                border: '2px solid #9A6601',
                 color: '#000',
                 borderRadius: '10px 2px 10px 10px',
                 padding: '5px',
@@ -213,9 +207,11 @@ function InfiniteCanvas() {
                 }}
                 onMouseDown={() => {
                   setCurrentNoteIdx(idx)
+                  setCurrentWindow(null)
                 }}
                 onMouseUp={(() => {
                   setCurrentNoteIdx(null)
+                  setCurrentWindow(null)
                 })}
               >
                 {/* add close button to the top right */}
