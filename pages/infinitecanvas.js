@@ -194,7 +194,7 @@ function InfiniteCanvas() {
                 zIndex: `${note.z}`,
                 position: 'absolute',
                 background: '#FDD173',
-                border: '5px solid #9A6601',
+                border: '3px solid #9A6601',
                 color: '#000',
                 borderRadius: '10px 2px 10px 10px',
                 padding: '5px',
@@ -272,6 +272,7 @@ function InfiniteCanvas() {
                 position: 'absolute',
                 border: '3px solid #333',
                 borderRadius: '10px',
+                overflow: 'hidden',
               }}
                 onClick={() => {
                   setCurrentTop(currentTop + 1)
