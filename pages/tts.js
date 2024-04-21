@@ -230,7 +230,7 @@ export default function Home() {
             </select>}
         </div>
         <div>
-          <h3>Rate</h3>
+          <h3>Rate: {rate}</h3>
           <input type="range" min="0" max="2" step="0.1" value={rate} onChange={e => setRate(e.target.value)} />
         </div>
         <div>
