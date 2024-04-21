@@ -194,7 +194,7 @@ function InfiniteCanvas() {
                 zIndex: `${note.z}`,
                 position: 'absolute',
                 background: '#FDD173',
-                border: '2px solid #9A6601',
+                border: '3px solid transparent',
                 color: '#000',
                 borderRadius: '10px 2px 10px 10px',
                 padding: '5px',
