@@ -83,7 +83,7 @@ function InfiniteCanvas() {
       canvas.windows[currentWindow].z = currentTop
       setCurrentTop(currentTop + 1)
     }
-    if (e.buttons === 1 && document.body.style.cursor === 'default') {
+    if (e.buttons === 1 && document.body.style.cursor === 'default' && currentNoteIdx == null && currentWindow == null) {
       canvas.cameraX += e.movementX * 2 * -1
       canvas.cameraY += e.movementY * 2 * -1
     } 
