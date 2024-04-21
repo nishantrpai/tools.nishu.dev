@@ -194,10 +194,11 @@ function InfiniteCanvas() {
                 zIndex: `${note.z}`,
                 position: 'absolute',
                 background: '#FDD173',
-                border: '3px solid transparent',
+                border: '5px solid #9A6601',
                 color: '#000',
                 borderRadius: '10px 2px 10px 10px',
                 padding: '5px',
+                overflow: 'hidden'
               }}
                 onMouseEnter={() => {
                   document.body.style.cursor = 'move'
