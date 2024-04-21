@@ -247,7 +247,7 @@ export default function Home() {
         }}>
           <button onClick={speak}>Speak</button>
           <button onClick={stop}>Stop</button>
-          <button onClick={download}>download</button>
+          <button onClick={download}>Download</button>
 
         </div>
       </main>
