@@ -163,6 +163,8 @@ export default function Home() {
     // clear canvas
     let canvas = document.getElementById('video-container');
     let ctx = canvas.getContext('2d');
+    canvas.width = canvas.width;
+    canvas.height = canvas.height;
 
     canvas.style.background = 'black';
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -173,19 +175,12 @@ export default function Home() {
     ctx.fillText(currentChar || '😐', canvas.width / 2, canvas.height / 2);
 
     // draw current word on canvas below it
-  }, [currentChar])
-
-  useEffect(() => {
-    let canvas = document.getElementById('video-container');
-    let ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
     ctx.font = "100px Arial";
     ctx.fillStyle = "white";
     ctx.textAlign = "center";
     ctx.fillText(currentWord, canvas.width / 2, canvas.height / 2 + 100);
   
-  }, [currentWord])
+  }, [currentChar, currentWord])
 
   const phoneticEmoji = (text) => {
     // get phonetic from enPhonetics
