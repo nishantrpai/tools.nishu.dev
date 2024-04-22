@@ -163,24 +163,29 @@ export default function Home() {
     // clear canvas
     let canvas = document.getElementById('video-container');
     let ctx = canvas.getContext('2d');
-    canvas.width = canvas.width;
-    canvas.height = canvas.height;
 
     canvas.style.background = 'black';
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     // draw current char on canvas
-    ctx.font = "120px Arial";
+    ctx.font = "240px Arial";
     ctx.fillStyle = "white";
     ctx.textAlign = "center";
     ctx.fillText(currentChar || '😐', canvas.width / 2, canvas.height / 2);
 
     // draw current word on canvas below it
-    ctx.font = "50px Arial";
+  }, [currentChar])
+
+  useEffect(() => {
+    let canvas = document.getElementById('video-container');
+    let ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    ctx.font = "100px Arial";
     ctx.fillStyle = "white";
     ctx.textAlign = "center";
     ctx.fillText(currentWord, canvas.width / 2, canvas.height / 2 + 100);
   
-  }, [currentChar, currentWord])
+  }, [currentWord])
 
   const phoneticEmoji = (text) => {
     // get phonetic from enPhonetics
@@ -302,7 +307,16 @@ export default function Home() {
         >
           {isListening ? 'Stop' : 'Record'}
         </button>
-        <canvas width={500} height={500}
+        <canvas 
+        width={1000}
+        height={1000}
+        style={{
+          width: '500px',
+          height: '500px',
+          background: 'black',
+          display: 'block',
+        
+        }}
           id='video-container'
         >
           {/* <span style={{
