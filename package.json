@@ -11,7 +11,9 @@
   "dependencies": {
     "@farcaster/auth-kit": "^0.2.1",
     "ethers": "^6.11.1",
+    "fs": "^0.0.1-security",
     "jszip": "^3.10.1",
+    "natural": "^7.0.5",
     "next": "13.4.10",
     "openai": "^4.29.2",
     "opepen-standard": "^1.0.1",

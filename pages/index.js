@@ -189,6 +189,12 @@ export default function Home() {
       publishDate: '20th April 2024',
       url: '/duplicatephotos',
       icon: '📸',
+    },
+    {
+      title: 'Voice to Emoji style voiceover',
+      description: 'Convert your voice to emoji style voiceover',
+      publishDate: '21st April 2024',
+      url: '/voicetoemoji',
     }
 
   ]
