@@ -193,8 +193,16 @@ export default function Home() {
     {
       title: 'Voice to Emoji style voiceover',
       description: 'Convert your voice to emoji style voiceover',
-      publishDate: '21st April 2024',
+      publishDate: '22nd April 2024',
       url: '/voicetoemoji',
+      icon: '🎤',
+    },
+    {
+      title: 'Interval Timer',
+      description: 'Set a fixed timer and beeps at different intervals',
+      publishDate: '23rd April 2024',
+      url: '/intervaltimer',
+      icon: '🔊',
     }
 
   ]

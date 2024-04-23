@@ -48,6 +48,8 @@ function InfiniteCanvas() {
   const [newURL, setNewURL] = useState('')
   const [searchMode, setSearchMode] = useState(true)
   const [searchResults, setSearchResults] = useState([])
+  const [startX, setStartX] = useState(0)
+  const [startY, setStartY] = useState(0)
 
 
   const wheelListener = (e) => {
@@ -71,25 +73,25 @@ function InfiniteCanvas() {
 
   const pointerMoveListener = (e) => {
     if (document.body.style.cursor === 'nwse-resize' && currentWindow !== null && e.buttons === 1) {
-      canvas.windows[currentWindow].width += e.movementX * 2
-      canvas.windows[currentWindow].height += e.movementY * 2
+      canvas.windows[currentWindow].width += (e.clientX - startX)
+      canvas.windows[currentWindow].height += (e.clientY - startY)
       canvas.windows[currentWindow].z = currentTop
       setCurrentTop(currentTop + 1)
     }
     if (document.body.style.cursor === 'move' && currentWindow !== null && e.buttons === 1) {
       // console.log('current window', canvas.windows[currentWindow].z, canvas.windows[currentWindow].x, canvas.windows[currentWindow].y, canvas.windows[currentWindow].width, canvas.windows[currentWindow].height)
-      canvas.windows[currentWindow].x += e.movementX * 2
-      canvas.windows[currentWindow].y += e.movementY * 2
+      canvas.windows[currentWindow].x += (e.clientX - startX)
+      canvas.windows[currentWindow].y += (e.clientY - startY)
       canvas.windows[currentWindow].z = currentTop
       setCurrentTop(currentTop + 1)
     }
     if (e.buttons === 1 && document.body.style.cursor === 'default' && currentNoteIdx == null && currentWindow == null) {
-      canvas.cameraX += e.movementX * 2 * -1
-      canvas.cameraY += e.movementY * 2 * -1
+      canvas.cameraX += (e.clientX - startX) * -1
+      canvas.cameraY += (e.clientY - startY) * -1
     } 
     if (document.body.style.cursor === 'move' && currentNoteIdx !== null && e.buttons === 1) {
-      canvas.notes[currentNoteIdx].x += e.movementX * 2
-      canvas.notes[currentNoteIdx].y += e.movementY * 2
+      canvas.notes[currentNoteIdx].x += (e.clientX - startX)
+      canvas.notes[currentNoteIdx].y += (e.clientY - startY)
       canvas.notes[currentNoteIdx].z = currentTop
       setCurrentTop(currentTop + 1)
     }
@@ -170,6 +172,8 @@ function InfiniteCanvas() {
           }
         }}
         onMouseDown={(e) => {
+          setStartX(e.clientX)
+          setStartY(e.clientY)
         }}
         onMouseUp={() => {
           document.body.style.cursor = 'default'
@@ -202,9 +206,6 @@ function InfiniteCanvas() {
               }}
                 onMouseEnter={() => {
                   document.body.style.cursor = 'move'
-                }}
-                onMouseLeave={() => {
-                  document.body.style.cursor = 'default'
                 }}
                 onMouseDown={() => {
                   setCurrentNoteIdx(idx)
@@ -270,7 +271,7 @@ function InfiniteCanvas() {
                 top: `${calculateY(window.y)}px`,
                 zIndex: `${window.z}`,
                 position: 'absolute',
-                border: '3px solid #333',
+                border: '5px solid #333',
                 borderRadius: '10px',
                 overflow: 'hidden',
               }}
@@ -280,9 +281,6 @@ function InfiniteCanvas() {
                 }}
                 onMouseEnter={() => {
                   document.body.style.cursor = 'nwse-resize'
-                }}
-                onMouseLeave={() => {
-                  document.body.style.cursor = 'default'
                 }}
                 onMouseDown={() => {
                   setCurrentWindow(idx)
