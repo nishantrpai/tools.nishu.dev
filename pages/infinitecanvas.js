@@ -70,16 +70,19 @@ function InfiniteCanvas() {
   }
 
   const pointerMoveListener = (e) => {
+    if(e.buttons == 0) {
+      document.body.style.cursor = 'default'
+    }
     if (document.body.style.cursor === 'nwse-resize' && currentWindow !== null && e.buttons === 1) {
-      canvas.windows[currentWindow].width += e.movementX * 2
-      canvas.windows[currentWindow].height += e.movementY * 2
+      canvas.windows[currentWindow].width += e.movementX * (1 / canvas.zoom)
+      canvas.windows[currentWindow].height += e.movementY * (1 / canvas.zoom)
       canvas.windows[currentWindow].z = currentTop
       setCurrentTop(currentTop + 1)
     }
     if (document.body.style.cursor === 'move' && currentWindow !== null && e.buttons === 1) {
       // console.log('current window', canvas.windows[currentWindow].z, canvas.windows[currentWindow].x, canvas.windows[currentWindow].y, canvas.windows[currentWindow].width, canvas.windows[currentWindow].height)
-      canvas.windows[currentWindow].x += e.movementX * 2
-      canvas.windows[currentWindow].y += e.movementY * 2
+      canvas.windows[currentWindow].x += e.movementX * (1 / canvas.zoom)
+      canvas.windows[currentWindow].y += e.movementY * (1 / canvas.zoom)
       canvas.windows[currentWindow].z = currentTop
       setCurrentTop(currentTop + 1)
     }
@@ -88,8 +91,8 @@ function InfiniteCanvas() {
       canvas.cameraY += e.movementY * 2 * -1
     } 
     if (document.body.style.cursor === 'move' && currentNoteIdx !== null && e.buttons === 1) {
-      canvas.notes[currentNoteIdx].x += e.movementX * 2
-      canvas.notes[currentNoteIdx].y += e.movementY * 2
+      canvas.notes[currentNoteIdx].x += e.movementX * (1 / canvas.zoom)
+      canvas.notes[currentNoteIdx].y += e.movementY * (1 / canvas.zoom)
       canvas.notes[currentNoteIdx].z = currentTop
       setCurrentTop(currentTop + 1)
     }
@@ -170,9 +173,6 @@ function InfiniteCanvas() {
           }
         }}
         onMouseDown={(e) => {
-        }}
-        onMouseUp={() => {
-          document.body.style.cursor = 'default'
         }}
       >
         <div style={{
