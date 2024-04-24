@@ -20,7 +20,7 @@ const NFTCompare = () => {
 
   const [collectionAddress, setCollectionAddress] = useState('0xb8da418ffc2cb675b8b3d73dca0e3f10811fbbdd')
   const [chain, setChain] = useState('ETHEREUM')
-  const [token1, setToken1] = useState(4759)
+  const [token1, setToken1] = useState(4758)
   const [token2, setToken2] = useState('')
   const [token1Data, setToken1Data] = useState({})
   const [token2Data, setToken2Data] = useState({})
