@@ -203,6 +203,20 @@ export default function Home() {
       publishDate: '23rd April 2024',
       url: '/intervaltimer',
       icon: '🔊',
+    },
+    {
+      title: 'NFT Music Player',
+      description: 'Play music from NFTs',
+      publishDate: '24th April 2024',
+      url: '/mus1c',
+      icon: '🎵',
+    },
+    {
+      title: 'Blend layer onto image',
+      description: 'Blend a layer onto an image',
+      publishDate: '25th April 2024',
+      url: '/blendlayer',
+      icon: '🎨',
     }
 
   ]
