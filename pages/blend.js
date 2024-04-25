@@ -80,7 +80,7 @@ const BlendLayer = () => {
   }, [image1, image2, blendMode, opacity])
 
   return (
-    <div className={styles.container}>
+    <>
       <Head>
         <title>Blend Layer</title>
         <meta name="description" content="Blend two images together using canvas in the browser" />
@@ -125,7 +125,7 @@ const BlendLayer = () => {
           </div>
         </div>
       </main>
-    </div>
+    </>
   )
 }
 
