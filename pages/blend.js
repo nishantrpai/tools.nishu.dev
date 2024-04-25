@@ -119,7 +119,7 @@ const BlendLayer = () => {
               <option value="luminosity">Luminosity</option>
             </select>
             <input type="range" min="0" max="1" step="0.01" value={opacity} onChange={handleOpacity} />
-            <canvas id="canvas" width={image1.width || 500} height={image1.height || 500}></canvas>
+            <canvas id="canvas" width={image1?.width || 500} height={image1?.height || 500}></canvas>
 
             <button style={{border: '1px solid #333'}} onClick={downloadImage}>Download</button>
           </div>
