@@ -96,7 +96,7 @@ const BlendLayer = () => {
           Blend two images together
         </p>
         
-        <div style={{ display: 'flex', flexDirection: 'column', maxWidth: '500px',}}>
+        <div style={{ display: 'flex', flexDirection: 'column', maxWidth: '500px', width: '100%'}}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px'}}>
             <input type="file" onChange={handleImage1} />
             <input type="file" onChange={handleImage2} />
