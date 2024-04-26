@@ -10,7 +10,7 @@ export default function Home() {
   const [opacity, setOpacity] = useState(1)
   const [canvas, setCanvas] = useState(null)
   const [ctx, setCtx] = useState(null)
-
+  const allBlends = ['normal', 'multiply', 'screen', 'overlay', 'darken', 'lighten', 'color-dodge', 'color-burn', 'hard-light', 'soft-light', 'difference', 'exclusion', 'hue', 'saturation', 'color', 'luminosity']
   const handleImage1 = async (e) => {
     const files = e.target.files
     setImages1([])
@@ -55,9 +55,9 @@ export default function Home() {
     setOpacity(e.target.value)
   }
 
-  const downloadImage = (i, j) => {
+  const downloadImage = (i, j, k) => {
     // get higher resolution image
-    const canvas = document.getElementById(`canvas-${i}-${j}`)
+    const canvas = document.getElementById(`canvas-${i}-${j}-${k}`)
     const dataURL = canvas.toDataURL('image/png')
     const a = document.createElement('a')
     a.href = dataURL
@@ -65,27 +65,30 @@ export default function Home() {
     a.click()
   }
 
-  const renderCanvas = (image1, image2, i, j) => {
-    const canvas = document.getElementById(`canvas-${i}-${j}`)
+  const renderCanvas = (image1, image2, i, j, k) => {
+    const canvas = document.getElementById(`canvas-${i}-${j}-${k}`)
     const ctx = canvas.getContext('2d')
     canvas.width = image1.width
     canvas.height = image1.height
     ctx.globalAlpha = opacity
-    ctx.globalCompositeOperation = blendMode
+    ctx.globalCompositeOperation = allBlends[k]
     // draw rectangle to not add transparency to the image
     ctx.drawImage(image1, 0, 0, canvas.width, canvas.height)
     ctx.drawImage(image2, 0, 0, canvas.width, canvas.height)
-}
+  }
 
   useEffect(() => {
     console.log(images1.length, images2.length)
     if (images1.length > 0 && images2.length > 0) {
-      images1.forEach((image1, i) => {
-        images2.forEach((image2, j) => {
-          console.log(i, j)
-          renderCanvas(image1, image2, i, j)
+      allBlends.forEach((blend, k) => {
+        images1.forEach((image1, i) => {
+          images2.forEach((image2, j) => {
+            console.log(i, j)
+            renderCanvas(image1, image2, i, j, k)
+          })
         })
       })
+
     }
   }, [images1, images2, blendMode, opacity])
 
@@ -113,7 +116,7 @@ export default function Home() {
         <div className={styles.searchContainer}>
           <input type='file' onChange={handleImage1} multiple />
           <input type='file' onChange={handleImage2} multiple />
-          <select onChange={handleBlendMode}>
+          {/* <select onChange={handleBlendMode}>
             <option value='normal'>Normal</option>
             <option value='multiply'>Multiply</option>
             <option value='screen'>Screen</option>
@@ -130,18 +133,21 @@ export default function Home() {
             <option value='saturation'>Saturation</option>
             <option value='color'>Color</option>
             <option value='luminosity'>Luminosity</option>
-          </select>
+          </select> */}
           <input type='range' min='0' max='1' step='0.01' onChange={handleOpacity} />
         </div>
         <div className='grid'>
-          {images1.map((image1, i) => (
-            images2.map((image2, j) => (
-              <div key={i + j} className={styles.gridItem}>
-                <canvas id={`canvas-${i}-${j}`} style={{ width: '500px' }} ref={setCanvas} />
-                <button onClick={() => downloadImage(i, j)}>Download</button>
-              </div>
-            ))
+          {allBlends.map((blend, k) => (
+            (images1.map((image1, i) => (
+              images2.map((image2, j) => (
+                <div key={i + j} className={styles.gridItem}>
+                  <canvas id={`canvas-${i}-${j}-${k}`} style={{ width: '500px' }} ref={setCanvas} />
+                  <button onClick={() => downloadImage(i, j, k)}>Download</button>
+                </div>
+              ))
+            )))
           ))}
+
         </div>
       </main>
     </>
