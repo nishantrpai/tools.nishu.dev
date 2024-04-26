@@ -72,9 +72,10 @@ export default function Home() {
     canvas.height = image1.height
     ctx.globalAlpha = opacity
     ctx.globalCompositeOperation = blendMode
-    ctx.drawImage(image1, 0, 0)
-    ctx.drawImage(image2, 0, 0)
-  }
+    // draw rectangle to not add transparency to the image
+    ctx.drawImage(image1, 0, 0, canvas.width, canvas.height)
+    ctx.drawImage(image2, 0, 0, canvas.width, canvas.height)
+}
 
   useEffect(() => {
     console.log(images1.length, images2.length)
