@@ -217,6 +217,13 @@ export default function Home() {
       publishDate: '25th April 2024',
       url: '/blendlayer',
       icon: '🎨',
+    },
+    {
+      title: 'Bulk blend layer onto image',
+      description: 'Bulk blend a layer onto images',
+      publishDate: '26th April 2024',
+      url: '/bulkblendlayer',
+      icon: '🎨',
     }
 
   ]
