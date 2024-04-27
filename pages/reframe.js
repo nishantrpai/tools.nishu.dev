@@ -17,7 +17,7 @@ export default function Home() {
   }
 
   const reframeText = () => {
-    fetch(`/api/gpt?prompt="Given the text: ${text}, reframe it in a ${direction} way."`)
+    fetch(`/api/gpt?prompt="Given the text: ${text}, reframe it in a ${direction} way. No quotes"`)
     .then(res => res.json())
     .then(data => {
       console.log(data)
