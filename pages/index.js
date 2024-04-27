@@ -224,6 +224,13 @@ export default function Home() {
       publishDate: '26th April 2024',
       url: '/bulkblendlayer',
       icon: '🎨',
+    },
+    {
+      title: 'Reframe a sentence',
+      description: 'Reframe a sentence to paint the picture you want',
+      publishDate: '27th April 2024',
+      url: '/reframe',
+      icon: '🖼️',
     }
 
   ]
