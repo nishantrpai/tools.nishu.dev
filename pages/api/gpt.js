@@ -8,12 +8,26 @@ const openai = new OpenAI({
 });
 
 export default async function handler(req, res) {
-  let { prompt } = req.query;
-  const chatCompletion = await openai.chat.completions.create({
-    messages: [{ role: 'user', content: prompt }],
-    model: 'gpt-3.5-turbo',
-  });
+  // if request is a GET request
+  if (req.method !== 'GET') {
+    // check body for prompt
+    let { prompt } = req.body;
+    const chatCompletion = await openai.chat.completions.create({
+      messages: [{ role: 'user', content: prompt }],
+      model: 'gpt-3.5-turbo',
+    });
 
 
-  res.status(200).json({ response: chatCompletion.choices[0].message.content });
+    res.status(200).json({ response: chatCompletion.choices[0].message.content });
+  }
+  else {
+    let { prompt } = req.query;
+    const chatCompletion = await openai.chat.completions.create({
+      messages: [{ role: 'user', content: prompt }],
+      model: 'gpt-3.5-turbo',
+    });
+
+
+    res.status(200).json({ response: chatCompletion.choices[0].message.content });
+  }
 }
