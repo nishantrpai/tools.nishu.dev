@@ -31,7 +31,16 @@ export default function Home() {
   }
 
   const summarize = (casts, username) => {
-    fetch(`/api/gpt?prompt="Given the tweets of ${username}: ${casts.join(' ')}, summarize what ${username} does and what they like/dislike. Don't summarize what is obvious, read between the lines and see the repeating patterns. Avoid recency bias. Replace any mention of twitter with farcaster or tweets with posts. Speak in third person. No quotes. Keep 3 sections of concise information, first is About, Like and third is Dislike. Add new lines between each section. For each section keep bullet points."`)
+    fetch(`/api/gpt?prompt="Given the tweets of ${username}: ${casts.join(' ')}, summarize what ${username} does and what they like/dislike. 
+    Tips for summarizing: 
+    0. Keep 3 sections of concise information, first is About, Like and third is Dislike. 
+    1. Don't summarize what is obvious, read between the lines and see the repeating patterns.
+    2. Avoid recency bias.
+    3. Replace any mention of twitter with farcaster or tweets with posts. 
+    4. Speak in third person. No quotes. 
+    5. Add new lines between each section. 
+    6. For each point in the section keep concise simple bullet points."
+    `)
       .then(res => res.json())
       .then(data => {
         setSummary(data.response)
