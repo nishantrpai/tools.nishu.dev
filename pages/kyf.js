@@ -40,7 +40,8 @@ export default function Home() {
     3. Replace any mention of twitter with farcaster or tweets with posts. 
     4. Speak in third person. No quotes. 
     5. Add new lines between each section. 
-    6. For each point in the section keep concise simple bullet points."
+    6. For each section have bullet points.
+    7. Each bullet point in the section must be concise."
     `)
       .then(res => res.json())
       .then(data => {
