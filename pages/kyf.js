@@ -19,13 +19,7 @@ export default function Home() {
       .then(data => {
         let fid = data[0].body.id
         console.log(fid)
-        fetch(`https://client.warpcast.com/v2/casts?fid=${fid}&limit=30`,
-          {
-            headers: {
-              'Access-Control-Allow-Origin': '*',
-              'Content-Type': 'application/json',
-            }
-          }
+        fetch(`https://api.codetabs.com/v1/proxy/?quest=https://client.warpcast.com/v2/casts?fid=${fid}&limit=30`
         ).then(res => res.json()).then(data => {
           let casts = data.result.casts
           casts = casts.filter(cast => cast.author.fid === fid)
