@@ -231,6 +231,13 @@ export default function Home() {
       publishDate: '27th April 2024',
       url: '/reframe',
       icon: '🖼️',
+    },
+    {
+      title: 'Know your farcaster',
+      description: 'Know your farcaster',
+      publishDate: '28th April 2024',
+      url: '/kyf',
+      icon: '🧑'
     }
 
   ]

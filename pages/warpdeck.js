@@ -11,7 +11,7 @@ export default function WarpDeck() {
   const [decks, setDecks] = useState([1])
   useEffect(() => {
     queries.forEach(query => {
-      fetch(`https://searchcaster.xyz/search?q=${query}`)
+      fetch(`https://searchcaster.xyz/api/search?q=${query}`)
         .then(response => response.json())
         .then(data => {
           setResults([...results, data])
