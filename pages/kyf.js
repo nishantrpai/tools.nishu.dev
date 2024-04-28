@@ -66,7 +66,7 @@ export default function Home() {
         </h1>
 
         <p className={styles.description} style={{ width: '100%', textAlign: 'center' }}>
-          Fetch tweets from a farcaster and summarize what they do and what they like/dislike
+          Fetch casts from a farcaster and summarize what they do and what they like/dislike
         </p>
 
         <div style={{ width: '100%' }}>
