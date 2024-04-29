@@ -62,8 +62,9 @@ export default function Home() {
     3. Avoid recency bias. 
     4. Replace any mention of twitter with farcaster or tweets with posts.  
     5. No quotes. 
-    6. Don't repeat the name, just share the information.
-    7. Each point will be value in array.`
+    6. Speak in third person.
+    7. Don't repeat the name, just share the information.
+    8. Each point will be value in array.`
     fetch(`/api/gpt?prompt`, {
       method: 'POST',
       body: JSON.stringify({ prompt }),
