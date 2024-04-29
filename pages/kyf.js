@@ -55,7 +55,14 @@ export default function Home() {
   }
 
   const summarize = (casts, username) => {
-    let prompt = `Given the tweets of ${username}: ${casts.join(' ')}, summarize what ${username} does and what they like/dislike. Tips for summarizing: 0. respond in json and the keys should be lower case 1. Keep 3 sections of concise information, first is "about", "like" and third is "dislike".  2. Don't summarize what is obvious, read between the lines and see the repeating patterns. 3. Avoid recency bias. 4. Replace any mention of twitter with farcaster or tweets with posts.  5. Speak in third person. No quotes.  6. Each point will be value in array.`
+    let prompt = `Given the tweets of ${username}: ${casts.join(' ')}, summarize what ${username} does and what they like/dislike. 
+    Tips for summarizing: 0. respond in json and the keys should be lower case 
+    1. Keep 3 sections of concise information, first is "about", "like" and third is "dislike". 
+    2. Don't summarize what is obvious, read between the lines and see the repeating patterns. 
+    3. Avoid recency bias. 
+    4. Replace any mention of twitter with farcaster or tweets with posts.  
+    5. Speak in third person. No quotes. Don't repeat the name, just share the information.
+    6. Each point will be value in array.`
     fetch(`/api/gpt?prompt`, {
       method: 'POST',
       body: JSON.stringify({ prompt }),
