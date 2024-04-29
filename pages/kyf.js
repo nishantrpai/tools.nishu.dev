@@ -61,8 +61,9 @@ export default function Home() {
     2. Don't summarize what is obvious, read between the lines and see the repeating patterns. 
     3. Avoid recency bias. 
     4. Replace any mention of twitter with farcaster or tweets with posts.  
-    5. Speak in third person. No quotes. Don't repeat the name, just share the information.
-    6. Each point will be value in array.`
+    5. No quotes. 
+    6. Don't repeat the name, just share the information.
+    7. Each point will be value in array.`
     fetch(`/api/gpt?prompt`, {
       method: 'POST',
       body: JSON.stringify({ prompt }),
