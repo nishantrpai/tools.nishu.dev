@@ -39,7 +39,7 @@ export default function Home() {
 
         <div style={{ display: 'flex', width: '100%', fontSize: '12px', gap: '20px'}}>
           <input style={{flexBasis: '90%', padding: '10px', border: '1px solid #333', outline: 'none'}} type="text" placeholder="Enter an idea" value={idea} onChange={handleIdea} />
-          <button onClick={fetchProblems}>Find</button>
+          <button onClick={fetchProblems}>Suggest</button>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', width: '100%', fontSize: '12px', gap: '20px', fontFamily: 'monospace'}}>
