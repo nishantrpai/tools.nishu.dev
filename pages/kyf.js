@@ -24,7 +24,7 @@ export default function Home() {
         <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '10px' }}>
           <h4>{key.toUpperCase()}</h4>
           <ul style={{ listStyle: 'none' }}>
-            {formattedSummary[key].map((item, index) => <li style={{ color: '#ccc', marginBottom: '5px' }} key={index}>- {item}</li>)}
+            {formattedSummary[key].map((item, index) => <li style={{ color: '#ccc', marginBottom: '5px' }} key={index}>- {item.toLowerCase()}</li>)}
           </ul>
         </div>
       sections.push(elem)
