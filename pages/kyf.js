@@ -40,8 +40,9 @@ export default function Home() {
         setProfile(data[0].body)
         let fid = data[0].body.id
         console.log(fid)
-        fetch(`https://api.codetabs.com/v1/proxy/?quest=https://client.warpcast.com/v2/casts?fid=${fid}&limit=30`
-        ).then(res => res.json()).then(data => {
+        let url = encodeURIComponent(`https://client.warpcast.com/v2/casts?fid=${fid}&limit=30`)
+
+        fetch(`https://cors-proxy-production-a6e6.up.railway.app/?url=${url}`).then(res => res.json()).then(data => {
           let casts = data.result.casts
           casts = casts.filter(cast => cast.author.fid === fid)
           casts = casts.map(cast => cast.text)
