@@ -2,6 +2,7 @@
 import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { useState, useEffect } from 'react'
+import html2canvas from 'html2canvas'
 
 export default function Home() {
   const [username, setUsername] = useState('')
@@ -68,6 +69,21 @@ export default function Home() {
       })
   }
 
+  const shareProfile = () => {
+    // capture the profile div as image and share it
+    let profile = document.getElementById('profile')
+    html2canvas(profile, {
+      allowTaint: true,
+      useCORS: true,
+    }).then(canvas => {
+      let img = canvas.toDataURL('image/png')
+      let a = document.createElement('a')
+      a.href = img
+      a.download = 'profile.png'
+      a.click()
+    });
+  }
+
   useEffect(() => {
     summarize(tweets, username)
   }, [tweets])
@@ -95,9 +111,9 @@ export default function Home() {
               <input style={{ border: '1px solid #333', background: '#000', padding: '5px 10px', outline: 'none', fontSize: '16px', flexBasis: '90%' }} type="text" placeholder="Enter username" value={username} onChange={handleUsername} />
               <button onClick={fetchTweets}>Analyze</button>
             </div>
-            {Object.keys(profile).length ? <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', border: '1px solid #333', borderRadius: '5px', padding: '10px', }}>
+            {Object.keys(profile).length ? <div id="profile" style={{ display: 'flex', flexDirection: 'column', gap: '10px', border: '1px solid #333', background: '#000', borderRadius: '5px', padding: '10px', }}>
               <div style={{ display: 'flex', gap: '20px', padding: '30px 10px', borderBottom: '1px solid #333' }}>
-                <img src={profile.avatarUrl} style={{ width: '100px', height: '100px', borderRadius: '50%', border: '1px solid #333' }} />
+                <img crossorigin="anonymous" src={profile.avatarUrl} style={{ width: '100px', height: '100px', borderRadius: '50%', border: '1px solid #333' }} />
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   <h2>{profile.displayName}</h2>
                   <h3 style={{ color: '#aaa', fontSize: '14px', fontWeight: '100' }}>@{profile.username}</h3>
@@ -107,6 +123,10 @@ export default function Home() {
               <p style={{ fontSize: '14px', fontFamily: 'monospace', fontSize: '12px', marginTop: '0px', padding: '20px' }}>{formatSummary(summary)}</p>
             </div> : null}
           </div>
+
+          {Object.keys(profile).length ? <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+            <button onClick={shareProfile}>Share Profile</button>
+          </div> : null}
         </div>
       </main>
     </div>
