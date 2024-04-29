@@ -238,6 +238,13 @@ export default function Home() {
       publishDate: '28th April 2024',
       url: '/kyf',
       icon: '🧑'
+    },
+    {
+      title: 'Idea to problem',
+      description: 'Find problems that are solved with your idea',
+      publishDate: '29th April 2024',
+      url: '/idea2problem',
+      icon: '❓'
     }
 
   ]
