@@ -13,7 +13,7 @@ export default function Home() {
 
   const fetchProblems = () => {
     setProblems(['Loading...'])
-    fetch(`http://localhost:3000/api/gpt?prompt="Given the idea: ${idea}, find problems (maybe even business problem) that are solved with this idea. Respond a list of array of problems for e.g., ["1","2","3"].  Don't include the idea in the response or any other information."`)
+    fetch(`/api/gpt?prompt="Given the idea: ${idea}, find problems (maybe even business problem) that are solved with this idea. Respond a list of array of problems for e.g., ["1","2","3"].  Don't include the idea in the response or any other information."`)
       .then(res => res.json())
       .then(data => {
         setProblems(JSON.parse(data.response))
