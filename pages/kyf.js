@@ -74,6 +74,7 @@ export default function Home() {
     let profile = document.getElementById('profile')
     html2canvas(profile, {
       allowTaint: true,
+      backgroundColor: 'transparent',
       useCORS: true,
     }).then(canvas => {
       let img = canvas.toDataURL('image/png')
