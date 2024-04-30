@@ -245,6 +245,13 @@ export default function Home() {
       publishDate: '29th April 2024',
       url: '/idea2problem',
       icon: '❓'
+    },
+    {
+      title: 'Similar Phrases',
+      description: 'Find similar phrases to your phrase',
+      publishDate: '30th April 2024',
+      url: '/similarphrases',
+      icon: '🔍'
     }
 
   ]
