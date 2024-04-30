@@ -9,6 +9,9 @@ export default function Home() {
   const [profile, setProfile] = useState({})
   const [tweets, setTweets] = useState([])
   const [summary, setSummary] = useState('')
+  const [question, setQuestion] = useState('')
+  const [askedQuestion, setAskedQuestion] = useState('')
+  const [answer, setAnswer] = useState('')
 
   const handleUsername = (e) => {
     setUsername(e.target.value)
@@ -94,6 +97,33 @@ export default function Home() {
     });
   }
 
+  const formatSummaryForGPT = (summary) => {
+    let { about, like, dislike } = JSON.parse(summary)
+    let profile = `About ${username}: ${about.join(' ')}. Likes: ${like.join(' ')}. Dislikes: ${dislike.join(' ')}`
+    return profile
+  }
+
+  const askQuestion = () => {
+    console.log(question)
+    // ask gpt to answer the question
+    setAnswer('Loading...')
+    setAskedQuestion(question)
+    let prompt = `You are  ${username}: \n\n${formatSummaryForGPT(summary)}. Here is a question: ${question}. How would you answer. Speak in first person, don't speak about yourself in third person.`
+    fetch(`/api/gpt?prompt`, {
+      method: 'POST',
+      body: JSON.stringify({ prompt }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(res => res.json())
+      .then(data => {
+        console.log(data.response)
+        setAnswer(data.response)
+      })
+
+  }
+
   useEffect(() => {
     summarize(tweets, username)
   }, [tweets])
@@ -123,7 +153,7 @@ export default function Home() {
             </div>
             {Object.keys(profile).length ? <div id="profile" style={{ display: 'flex', flexDirection: 'column', gap: '10px', border: '1px solid #333', background: '#000', borderRadius: '5px', padding: '10px', }}>
               <div style={{ display: 'flex', gap: '20px', padding: '30px 10px', borderBottom: '1px solid #333' }}>
-                <img crossorigin="anonymous" src={profile.avatarUrl} style={{ width: '100px', height: '100px', borderRadius: '50%', border: '1px solid #333' }} />
+                <img crossorigin="anonymous" src={profile.avatarUrl} style={{ width: '100px', height: '100px', borderRadius: '50%', border: '1px solid #333'}} />
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   <h2>{profile.displayName}</h2>
                   <h3 style={{ color: '#aaa', fontSize: '14px', fontWeight: '100' }}>@{profile.username}</h3>
@@ -138,6 +168,28 @@ export default function Home() {
             <button onClick={shareProfile}>Share Profile</button>
           </div> : null}
         </div>
+
+        {/* ask questions with the summary of the profile */}
+        {(summary.length > 0 && summary !== 'Loading...') ? <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '100%', marginTop: '50px' }}>
+          <h2>Ask Questions</h2>
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <input style={{ border: '1px solid #333', background: '#000', padding: '5px 10px', outline: 'none', fontSize: '16px', flexBasis: '90%' }} type="text" placeholder="Enter question" onChange={(e) => { setQuestion(e.target.value) }} />
+            <button onClick={askQuestion}>Ask</button>
+          </div>
+          {askedQuestion ? <div style={{ display: 'flex', gap: '10px', alignContent: 'center', justifyContent: 'center', border: '1px solid #333', padding: '20px' }}>
+            <img src={profile.avatarUrl} style={{ width: '50px', height: '50px', borderRadius: '50%', border: '1px solid #333', margin: 'auto', marginTop: '15px'  }} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', flexBasis: '90%' }}>
+              <p style={{ fontSize: '14px', fontFamily: 'monospace', fontSize: '12px', marginTop: '0px', padding: '20px' }}>
+                {askedQuestion}
+              </p>
+              <p style={{ fontSize: '14px', fontFamily: 'monospace', fontSize: '12px', marginTop: '0px', padding: '20px', color: '#ccc', paddingTop: '0px' }}>
+                <b>{username}</b>: {answer}
+              </p>
+
+            </div>
+          </div> : null}
+        </div> : null}
+
       </main>
     </div>
   )
