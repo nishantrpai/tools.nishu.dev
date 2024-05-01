@@ -252,7 +252,20 @@ export default function Home() {
       publishDate: '30th April 2024',
       url: '/similarphrases',
       icon: '🔍'
+    },
+    {
+      title: 'Sensationalize',
+      description: 'Sensationalize your text',
+      publishDate: '1st May 2024',
+      url: '/sensationalize',
     }
+    // {
+    //   title: 'Face Swap',
+    //   description: 'Swap faces in gifs',
+    //   publishDate: '1st May 2024',
+    //   url: '/faceswap',
+    //   icon: '👥'
+    // }
 
   ]
   
