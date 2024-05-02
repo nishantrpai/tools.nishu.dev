@@ -72,7 +72,7 @@ export default function AskYT() {
             <FiPlus />
           </button> */}
         </div>
-        <div style={{ display: 'flex', gap: '20px', width: '100%' }}>
+        <div className={styles.row} style={{ gap: '20px', width: '100%' }}>
           {/* youtube video on one side and chat on other */}
           <div style={{ flexBasis: '60%', border: '1px solid #333', height: '500px' }}>
             {/* embed video */}
