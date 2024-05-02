@@ -41,6 +41,7 @@ const PromptEnhancer = () => {
             style={{
               border: 'none',
               background: '#111',
+              color: '#fff',
               outline: 'none',
               width: '100%',
               padding: '10px',

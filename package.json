@@ -26,6 +26,7 @@
     "react-speech-recognition": "^3.10.0",
     "regenerator-runtime": "^0.14.1",
     "socket.io-client": "^4.7.5",
-    "viem": "^2.9.16"
+    "viem": "^2.9.16",
+    "youtube-transcript": "^1.2.1"
   }
 }

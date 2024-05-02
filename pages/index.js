@@ -258,6 +258,15 @@ export default function Home() {
       description: 'Sensationalize your text',
       publishDate: '1st May 2024',
       url: '/sensationalize',
+      icon: '🔥',
+    },
+    {
+
+      title: 'Ask youtube video',
+      description: 'Ask questions in a youtube video',
+      publishDate: '2nd May 2024',
+      url: '/askyt',
+      icon: '🎥',
     }
     // {
     //   title: 'Face Swap',
