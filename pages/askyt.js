@@ -40,7 +40,8 @@ export default function AskYT() {
   }
 
   const getYoutubeVideo = (url) => {
-    const videoId = url.split('v=')[1];
+    // could be v= or si= or be= or e= or list=
+    const videoId = url.split(/(v=|si=|be=|e=|list=)/)[2].split('&')[0];
     // get youtube video transcript 
     fetch(`https://vid.puffyan.us/api/v1/captions/${videoId}?label=English%20(auto-generated)&hmac_key=7d08353429cc95b7e8c8a56e5407b31d727a41ee`)
       .then(res => res.text())
