@@ -267,7 +267,20 @@ export default function Home() {
       publishDate: '2nd May 2024',
       url: '/askyt',
       icon: '🎥',
+    },
+    {
+      title: 'Valid email',
+      description: 'Check if an email is valid',
+      publishDate: '3rd May 2024',
+      url: '/validemail',
     }
+    // {
+    //   title: 'Best Time',
+    //   description: 'Pick the best time for you and your friends across timezones',
+    //   publishDate: '3rd May 2024',
+    //   url: '/besttime',
+    //   icon: '🕒',
+    // }
     // {
     //   title: 'Face Swap',
     //   description: 'Swap faces in gifs',

@@ -312,5 +312,30 @@
   font-size: 2rem;
   cursor: pointer;
   padding-top: 16px;
+}
 
+.time {
+  cursor: pointer;
+  font-size: 14px;
+  color: #ccc;
+  cursor: pointer;
+  padding: 20px 10px;
+  text-align: center;
+}
+
+.time:hover {
+  background-color: #333;
+}
+
+
+.timeCtr {
+  display: flex;
+  gap: 10px;
+  border-radius: 10px;
+  border: 1px solid #333;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+.timeCtr:last-child {
+  border: 0 0 20px 20px;
 }
