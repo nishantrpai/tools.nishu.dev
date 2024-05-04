@@ -74,8 +74,11 @@ const BlendLayer = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height)
       ctx.globalAlpha = opacity
       ctx.globalCompositeOperation = blendMode
+      const scaleFactor = canvas.width / image2.height
+      const scaledWidth = image2.width * scaleFactor
+      const center = (canvas.width - scaledWidth) / 2
       ctx.drawImage(image1, 0, 0, canvas.width, canvas.height)
-      ctx.drawImage(image2, 0, 0, canvas.width, canvas.height)
+      ctx.drawImage(image2, center, 0, scaledWidth, canvas.height)
     }
   }, [image1, image2, blendMode, opacity])
 
