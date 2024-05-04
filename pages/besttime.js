@@ -95,6 +95,12 @@ function Vote({ creatorTz, creatorComfortStart, creatorComfortEnd, preview, room
       socket.emit("getVotes", pollId);
     }
 
+    if(preview) {
+      // no need to join room
+      setVoted(true);
+      return;
+    }
+
     socket.on("roomJoined", (roomInfo) => {
       // console.log('roomInfo', roomInfo);
       if (roomInfo.voters?.includes(fingerprint)) {
