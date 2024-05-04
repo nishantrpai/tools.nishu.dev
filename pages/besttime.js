@@ -7,6 +7,7 @@ import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { useSearchParams } from 'next/navigation'
 import { useState, useEffect } from 'react'
+import moment from 'moment';
 
 
 export default function PollTime() {
@@ -19,7 +20,7 @@ export default function PollTime() {
   const searchParams = useSearchParams()
 
   const getCurrentTimezone = () => {
-    return new Date().getTimezoneOffset() / 60;
+    return new Date().getTimezoneOffset() / 60 * -1;
   }
 
   const getAverageTimezone = () => {
@@ -29,7 +30,14 @@ export default function PollTime() {
   }
 
   const getHour = (timezone) => {
-    return (new Date().getHours() + timezone) % 24;
+    // get the current hour in the timezone
+    let date = new Date();
+    // set to utc time first
+    date = new Date(date.getTime() + date.getTimezoneOffset() * 60 * 1000);
+    const utc = date.getTime() + (timezone * 60 * 60 * 1000);
+    const newDate = new Date(utc);
+    console.log('newDate', newDate, date);
+    return newDate.getHours();
   }
 
   useEffect(() => {
@@ -74,39 +82,45 @@ export default function PollTime() {
   const bestOverlap = () => {
   }
 
-  let creatorTz = 4;
-  let myTz = getCurrentTimezone() * -1;
+  let creatorTz = 10;
+  let myTz = getCurrentTimezone();
 
-  let creatorHour = getHour(creatorTz);
   let myHour = getHour(myTz);
+  let creatorHour = getHour(creatorTz);
+  console.log(myHour, creatorHour);
+  let creatorMins = Math.abs(creatorTz % 1 * 60);
+  let myMins = Math.abs(myTz % 1 * 60);
 
   return (
     <>
       <main>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           {/* creator tz will be from normal mode like 12am to 12pm and my tz will be offset difference to creator */}
+          {/* have to start from   */}
+          <label>Australia Time</label>
           <div className={styles.timeCtr}>
-          {Array.from({ length: 24 }).map((_, index) => (
-            <div className={styles.time}  key={index} >
-              <div>{Math.round(creatorTz + index) % 24}</div>
-            </div>
-          ))}
+            {Array.from({ length: 24 }).map((_, index) => (
+              <div className={styles.time} key={index} >
+                <span className={styles.hour}>{Math.round(creatorHour + index) % 24 }</span>
+                <span className={styles.min}>
+                  {creatorMins != 0 ? creatorMins : ''}
+                </span>
+              </div>
+            ))}
           </div>
+          <label>India Time</label>
           <div className={styles.timeCtr}>
-          {Array.from({ length: 24 }).map((_, index) => (
-            <div className={styles.time} key={index} style={{
-              backgroundColor: (creatorHour === myHour) ? 'red' : 'white',
-            }}>
-              <div>{(Math.round(myTz + index) + 24) % 24}</div>
-            
-              <div>{(Math.round(myTz + index) + 24) % 24}</div>
-            </div>
-          ))}
+            {Array.from({ length: 24 }).map((_, index) => (
+              <div className={styles.time} key={index} >
+                <span className={styles.hour}>
+                  {Math.round(myHour + index) % 24 }
+                  </span>
+                <span className={styles.min}>
+                  {myMins != 0 ? myMins : ''}
+                </span>
+              </div>
+            ))}
           </div>
-
-
-
-
         </div>
       </main>
     </>

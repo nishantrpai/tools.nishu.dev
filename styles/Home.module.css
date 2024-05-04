@@ -315,6 +315,8 @@
 }
 
 .time {
+  display: flex;
+  flex-direction: column;
   cursor: pointer;
   font-size: 14px;
   color: #ccc;
@@ -327,6 +329,20 @@
   background-color: #333;
 }
 
+.hour {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+.min {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.ampm {
+  font-size: 0.8rem;
+  font-weight: 700;
+
+}
 
 .timeCtr {
   display: flex;
