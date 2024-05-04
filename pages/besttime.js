@@ -18,47 +18,49 @@ export default function PollTime() {
   // get query params from url
   const searchParams = useSearchParams();
   const router = useRouter();
-  const poll = searchParams.get('poll');
+  let poll = searchParams.get('poll');
   const [roomInfo, setRoomInfo] = useState({});
   // check socket to see if poll exists
   // if poll exists, show vote component
   // else show create component
   useEffect(() => {
+    if (!poll) return;
     socket.emit("checkRoom", poll);
     socket.on("roomExists", (roomInfo) => {
-      console.log('roomInfo', roomInfo);
+      // console.log('roomInfo', roomInfo);
+      // join that room
+      socket.emit("joinRoom", poll);
       setRoomInfo(roomInfo);
     });
     socket.on("roomNotFound", () => {
       router.push('/besttime');
     });
-
-  }, []);
+  }, [poll]);
 
   return (
     <>
       <main>
-        {poll ? <Vote {...roomInfo} /> :
+        {poll ? <Vote {...roomInfo} pollId={poll} allVotes={roomInfo.votes} /> :
           <Create />}
       </main>
     </>
   )
 }
 
-function Vote({ creatorTz, creatorComfortStart, creatorComfortEnd, preview, roomGoal }) {
-
-  useEffect(() => {
-    console.log('creatorTz', creatorTz, creatorComfortStart, creatorComfortEnd, preview, roomGoal);
-  }, []);
+function Vote({ creatorTz, creatorComfortStart, creatorComfortEnd, preview, roomGoal, pollId, allVotes }) {
 
   // two branches one to create room and other to join room, if there is a router param then join room
-  const [roomId, setRoomId] = useState('');
-  const [fingerprint, setFingerprint] = useState('');
+  const router = useRouter();
+  const [roomId, setRoomId] = useState(pollId);
+  const [fingerprint, setFingerprint] = useState('123');
   const [vote, setVote] = useState('');
-  const [votes, setVotes] = useState({});
+  const [votes, setVotes] = useState(allVotes);
   const [averageTimezone, setAverageTimezone] = useState(0);
   const searchParams = useSearchParams()
   const [myVote, setMyVote] = useState(null);
+  const [voted, setVoted] = useState(false);
+  const [votesArray, setVotesArray] = useState({});
+
 
   const getCurrentTimezone = () => {
     return new Date().getTimezoneOffset() / 60 * -1;
@@ -77,47 +79,44 @@ function Vote({ creatorTz, creatorComfortStart, creatorComfortEnd, preview, room
     date = new Date(date.getTime() + date.getTimezoneOffset() * 60 * 1000);
     const utc = date.getTime() + (timezone * 60 * 60 * 1000);
     const newDate = new Date(utc);
-    console.log('newDate', newDate, date);
     return newDate.getHours();
   }
 
+
+
+
   useEffect(() => {
-    // getBrowserFingerprint().then((fingerprint) => {
-    //   setFingerprint(fingerprint);
-    // });
+    // get fingerprint
+    let fingerprint = getBrowserFingerprint();
+    setFingerprint(fingerprint);
+    // console.log('creatorTz', creatorTz, creatorComfortStart, creatorComfortEnd, preview, roomGoal, pollId, allVotes);
+    if(pollId){
+      socket.emit("joinRoom", pollId);
+      socket.emit("getVotes", pollId);
+    }
+
+    socket.on("roomJoined", (roomInfo) => {
+      // console.log('roomInfo', roomInfo);
+      if (roomInfo.voters?.includes(fingerprint)) {
+        setVoted(true);
+      }
+    });
+    socket.on("allVotes", (votes) => {
+      // console.log('votes', votes);
+      setVotesArray(votes);
+    });
+    socket.on("alreadyVoted", () => {
+      // console.log('already voted');
+      setVoted(true);
+    });
+
   }, []);
 
 
-  useEffect(() => {
-    if (searchParams.has('roomId')) {
-      setRoomId(searchParams.get('roomId'));
-    }
-  });
-
-  useEffect(() => {
-    if (roomId) {
-      ;
-      socket.emit("joinRoom", roomId);
-      socket.on("roomJoined", () => {
-        socket.on("vote", (votes) => {
-          setVotes(votes);
-          setAverageTimezone(getAverageTimezone());
-        });
-      });
-    }
-  }, [roomId]);
-
-  const createRoom = () => {
-    ;
-    socket.emit("createRoom");
-    socket.on("roomCreated", (roomId) => {
-      setRoomId(roomId);
-    });
-  }
 
   const voteTimezone = () => {
-    ;
-    socket.emit("vote", { roomId, vote: getCurrentTimezone(), fingerprint });
+    // console.log('vote', roomId, myVote, fingerprint);
+    socket.emit("vote", { roomId, vote: myVote, fingerprint });
   }
 
 
@@ -127,12 +126,6 @@ function Vote({ creatorTz, creatorComfortStart, creatorComfortEnd, preview, room
   let creatorMins = Math.abs(creatorTz % 1 * 60);
   let myMins = Math.abs(myTz % 1 * 60);
 
-  let votesArray = {
-    9: 1,
-    10: 1,
-    12: 30,
-    13: 1,
-  }
 
   return (
     <>
@@ -237,6 +230,9 @@ function Vote({ creatorTz, creatorComfortStart, creatorComfortEnd, preview, room
         }}>
           Your time zone
         </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 20 }}>
+          {!voted && <button onClick={() => { voteTimezone(); setVoted(true) }} style={{ margin: 'auto' }}>Vote</button>}
+        </div>
       </div>
     </>
 
@@ -259,6 +255,7 @@ function Create() {
       creatorFingerprint: ''
     });
     socket.on("roomCreated", (roomId) => {
+      // redirect to the poll page and refresh
       router.push(`/besttime?poll=${roomId}`);
     });
   }
