@@ -9,9 +9,8 @@ import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/router'
 
 import { useState, useEffect, useRef } from 'react'
-import moment from 'moment';
 import io from 'socket.io-client';
-const socket = io.connect('http://localhost:8080');
+const socket = io.connect('https://pollserver-production.up.railway.app');
 
 
 export default function PollTime() {
@@ -50,13 +49,8 @@ export default function PollTime() {
 function Vote({ creatorTz, creatorComfortStart, creatorComfortEnd, preview, roomGoal, pollId, allVotes }) {
 
   // two branches one to create room and other to join room, if there is a router param then join room
-  const router = useRouter();
   const [roomId, setRoomId] = useState(pollId);
   const [fingerprint, setFingerprint] = useState('123');
-  const [vote, setVote] = useState('');
-  const [votes, setVotes] = useState(allVotes);
-  const [averageTimezone, setAverageTimezone] = useState(0);
-  const searchParams = useSearchParams()
   const [myVote, setMyVote] = useState(null);
   const [voted, setVoted] = useState(false);
   const [votesArray, setVotesArray] = useState({});
@@ -66,12 +60,7 @@ function Vote({ creatorTz, creatorComfortStart, creatorComfortEnd, preview, room
     return new Date().getTimezoneOffset() / 60 * -1;
   }
 
-  const getAverageTimezone = () => {
-    const votesArray = Object.values(votes);
-    const total = votesArray.reduce((acc, curr) => acc + curr, 0);
-    return total / votesArray.length;
-  }
-
+  
   const getHour = (timezone) => {
     // get the current hour in the timezone
     let date = new Date();
@@ -169,7 +158,7 @@ function Vote({ creatorTz, creatorComfortStart, creatorComfortEnd, preview, room
         }}
         >
           {Array.from({ length: 24 }).map((_, index) => (
-            <div>
+            <div key={(index+100)*1000}>
               <div className={styles.time} style={{
                 borderLeft: (Math.round(creatorHour + index) % 24) == (creatorComfortStart) ? '2px solid green' : '',
                 borderRight: (Math.round(creatorHour + index) % 24) == (creatorComfortEnd) ? '2px solid red' : '',
