@@ -6,7 +6,7 @@ import getBrowserFingerprint from 'get-browser-fingerprint';
 import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { useSearchParams } from 'next/navigation'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import moment from 'moment';
 
 
@@ -21,7 +21,7 @@ export default function PollTime() {
   )
 }
 
-function Vote() {
+function Vote({ creatorTz, creatorComfortStart, creatorComfortEnd, preview, roomGoal }) {
 
   // two branches one to create room and other to join room, if there is a router param then join room
   const [roomId, setRoomId] = useState('');
@@ -30,6 +30,7 @@ function Vote() {
   const [votes, setVotes] = useState({});
   const [averageTimezone, setAverageTimezone] = useState(0);
   const searchParams = useSearchParams()
+  const [myVote, setMyVote] = useState(0);
 
   const getCurrentTimezone = () => {
     return new Date().getTimezoneOffset() / 60 * -1;
@@ -94,11 +95,7 @@ function Vote() {
   const bestOverlap = () => {
   }
 
-  let creatorTz = 10;
   let myTz = getCurrentTimezone();
-  let creatorComfortStart = 9;
-  let creatorComfortEnd = 18;
-
   let myHour = getHour(myTz);
   let creatorHour = getHour(creatorTz);
   let creatorMins = Math.abs(creatorTz % 1 * 60);
@@ -117,12 +114,40 @@ function Vote() {
         {/* creator tz will be from normal mode like 12am to 12pm and my tz will be offset difference to creator */}
         {/* have to start from   */}
 
-        <div className={styles.timeCtr}>
+        <p style={{
+          color: '#888',
+          fontSize: 16,
+          marginTop: 14,
+          marginBottom: 14,
+          textAlign: 'center'
+        }}>
+          {roomGoal || 'What is the best time to mint this collection together?'}
+        </p>
+
+        <div style={{
+            width: '100%',
+            border: '1px solid #333',
+            color: '#666',
+            fontSize: 12,
+            borderRadius: '10px 10px 0 0',
+            padding: '5px',
+          }}>
+            My time zone
+          </div>
+        <div className={styles.timeCtr} onScroll={(e) => {
+          //  when i scroll right to end, go to beginning
+          // when i scroll left to beginning, go to end
+          if ((e.target.scrollLeft + e.target.clientWidth) >= e.target.scrollWidth) {
+            e.target.scrollLeft = 0;
+          }
+          
+        }}
+        >
           {Array.from({ length: 24 }).map((_, index) => (
             <div>
               <div className={styles.time} style={{
-                borderRight: (Math.round(creatorHour + index) % 24) == (creatorComfortStart - 1) ? '2px solid green' : '',
-                borderLeft: (Math.round(creatorHour + index) % 24) == (creatorComfortEnd + 1) ? '2px solid red' : '',
+                borderLeft: (Math.round(creatorHour + index) % 24) == (creatorComfortStart) ? '2px solid green' : '',
+                borderRight: (Math.round(creatorHour + index) % 24) == (creatorComfortEnd) ? '2px solid red' : '',
                 backgroundColor: (Math.round(creatorHour + index) % 24) >= creatorComfortStart && (Math.round(creatorHour + index) % 24) <= creatorComfortEnd ? '#111' : 'transparent',
                 cursor: (Math.round(creatorHour + index) % 24) >= creatorComfortStart && (Math.round(creatorHour + index) % 24) <= creatorComfortEnd ? 'pointer' : 'not-allowed',
               }}
@@ -153,7 +178,7 @@ function Vote() {
                 <span className={styles.vote} style={{
                   visibility: votesArray[Math.round(creatorHour + index) % 24] ? 'visible' : 'hidden'
                 }}>
-                  {votesArray[Math.round(creatorHour + index) % 24] || '-'}
+                  {votesArray[Math.round(creatorHour + index) % 24] || '-'} {votesArray[Math.round(creatorHour + index) % 24] > 1 ? 'votes' : 'vote'}
                 </span>
               </div>
               <div className={styles.time}
@@ -171,6 +196,16 @@ function Vote() {
             </div>
           ))}
         </div>
+        <div style={{
+          width: '100%',
+          border: '1px solid #333',
+          color: '#666',
+          fontSize: 12,
+          borderRadius: '0 0 10px 10px',
+          padding: '5px',
+        }}>
+          Your time zone
+        </div>
       </div>
     </>
 
@@ -180,8 +215,8 @@ function Vote() {
 function Create() {
   // create poll
   const [roomGoal, setRoomGoal] = useState('');
-  const [startBestTime, setStartBestTime] = useState('');
-  const [endBestTime, setEndBestTime] = useState('');
+  const [startBestTime, setStartBestTime] = useState(0);
+  const [endBestTime, setEndBestTime] = useState(12);
 
   const createRoom = () => {
     const socket = io();
@@ -242,13 +277,15 @@ function Create() {
         </div>
         <button style={{ margin: 'auto', marginTop: '20px' }} onClick={() => createRoom()}>Start Poll</button>
       </div>
-      <p>Preview:</p>
-      <Vote 
-        creatorTz={new Date().getTimezoneOffset() / 60 * -1}
+      <b>Preview:</b>
+      <Vote
+        // creatorTz={new Date().getTimezoneOffset() / 60 * -1}
+        creatorTz={-5}
         creatorComfortStart={startBestTime}
         creatorComfortEnd={endBestTime}
+        roomGoal={roomGoal}
         preview={true}
-       />
+      />
     </>
   )
 }
