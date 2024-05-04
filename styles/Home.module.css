@@ -317,25 +317,34 @@
 .time {
   display: flex;
   flex-direction: column;
+  align-items: center;
   cursor: pointer;
   font-size: 14px;
   color: #ccc;
   cursor: pointer;
-  padding: 20px 10px;
+  padding: 20px;
   text-align: center;
+  min-width: 60px;
 }
 
 .time:hover {
   background-color: #333;
 }
 
+.vote {
+  min-height: 10px;
+  margin-top: 10px;
+}
+
 .hour {
-  font-size: 1.5rem;
+  font-size: 2.5rem;
+  color: #fff;
   font-weight: 700;
 }
 .min {
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: 0.75rem;
+  color: #888;
+  font-weight: 500;
 }
 
 .ampm {
@@ -346,11 +355,12 @@
 
 .timeCtr {
   display: flex;
-  gap: 10px;
   border-radius: 10px;
   border: 1px solid #333;
   margin-bottom: 20px;
-  overflow: hidden;
+  overflow-x: scroll;
+  scrollbar-width: thin;
+  max-width: 600px;
 }
 .timeCtr:last-child {
   border: 0 0 20px 20px;

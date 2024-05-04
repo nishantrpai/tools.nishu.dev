@@ -84,6 +84,8 @@ export default function PollTime() {
 
   let creatorTz = 10;
   let myTz = getCurrentTimezone();
+  let creatorComfortStart = 9;
+  let creatorComfortEnd = 18;
 
   let myHour = getHour(myTz);
   let creatorHour = getHour(creatorTz);
@@ -91,33 +93,73 @@ export default function PollTime() {
   let creatorMins = Math.abs(creatorTz % 1 * 60);
   let myMins = Math.abs(myTz % 1 * 60);
 
+  let votesArray = {
+    9: 1,
+    10: 1,
+    12: 30,
+    13: 1,
+  }
+
+
   return (
     <>
       <main>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           {/* creator tz will be from normal mode like 12am to 12pm and my tz will be offset difference to creator */}
           {/* have to start from   */}
-          <label>Australia Time</label>
+         
           <div className={styles.timeCtr}>
             {Array.from({ length: 24 }).map((_, index) => (
-              <div className={styles.time} key={index} >
-                <span className={styles.hour}>{Math.round(creatorHour + index) % 24 }</span>
-                <span className={styles.min}>
-                  {creatorMins != 0 ? creatorMins : ''}
-                </span>
-              </div>
-            ))}
-          </div>
-          <label>India Time</label>
-          <div className={styles.timeCtr}>
-            {Array.from({ length: 24 }).map((_, index) => (
-              <div className={styles.time} key={index} >
-                <span className={styles.hour}>
-                  {Math.round(myHour + index) % 24 }
+              <div>
+                <div className={styles.time} style={{
+                  borderRight: (Math.round(creatorHour + index) % 24) == (creatorComfortStart - 1) ? '2px solid green' : '',
+                  borderLeft: (Math.round(creatorHour + index) % 24) == (creatorComfortEnd + 1) ? '2px solid red' : '',
+                  backgroundColor: (Math.round(creatorHour + index) % 24) >= creatorComfortStart && (Math.round(creatorHour + index) % 24) <= creatorComfortEnd ? '#111' : 'transparent',
+                  cursor: (Math.round(creatorHour + index) % 24) >= creatorComfortStart && (Math.round(creatorHour + index) % 24) <= creatorComfortEnd ? 'pointer' : 'not-allowed',
+                }}
+                  disabled={(Math.round(creatorHour + index) % 24) >= creatorComfortStart && (Math.round(creatorHour + index) % 24) <= creatorComfortEnd}
+                  key={index} >
+                    {/* highest vote */}
+                    <span style={{
+                      // draw on top right of the div
+                      position: 'relative',
+                      top: 0,
+                      left: 10,
+                      padding: '5px',
+                      fontSize: '1.5rem',
+                      transform: 'translate(20%, -60%)',
+                      borderRadius: '5px',
+                      color: '#ca8a04',
+                      // show only highest vote
+                      visibility: Object.values(votesArray).includes(Math.max(...Object.values(votesArray))) && votesArray[Math.round(creatorHour + index) % 24] == Math.max(...Object.values(votesArray)) ? 'visible' : 'hidden',
+                    }}>
+                      🥇
+                    </span>
+                  <span className={styles.hour}>
+                    {Math.round(creatorHour + index) % 24 < 10 ? '0' + Math.round(creatorHour + index) % 24 : Math.round(creatorHour + index) % 24}
                   </span>
-                <span className={styles.min}>
-                  {myMins != 0 ? myMins : ''}
-                </span>
+                  <span className={styles.min}>
+                    {creatorMins != 0 ? creatorMins : ''}
+                  </span>
+                  <span className={styles.vote} style={{
+                    visibility: votesArray[Math.round(creatorHour + index) % 24] ? 'visible' : 'hidden'
+                  }}>
+                    {votesArray[Math.round(creatorHour + index) % 24] || '-'}
+                  </span>
+                </div>
+                <div className={styles.time}
+                  key={index}
+                  style={{
+                    cursor: (Math.round(creatorHour + index) % 24) >= creatorComfortStart && (Math.round(creatorHour + index) % 24) <= creatorComfortEnd ? 'pointer' : 'not-allowed',
+                  }}>
+                  <span className={styles.hour}>
+                    {Math.round(myHour + index) % 24 < 10 ? '0' + Math.round(myHour + index) % 24 : Math.round(myHour + index) % 24}
+                  </span>
+                  <span className={styles.min}>
+                    {myMins != 0 ? myMins : ''}
+                  </span>
+                </div>
+
               </div>
             ))}
           </div>
