@@ -185,7 +185,12 @@ function Vote({ creatorTz, creatorComfortStart, creatorComfortEnd, preview, room
                 key={index}
                 style={{
                   cursor: (Math.round(creatorHour + index) % 24) >= creatorComfortStart && (Math.round(creatorHour + index) % 24) <= creatorComfortEnd ? 'pointer' : 'not-allowed',
-                }}>
+                  background: myVote == Math.round(creatorHour + index) % 24 ? '#333' : 'transparent',
+                }}
+                onClick={() => {
+                  setMyVote(Math.round(creatorHour + index) % 24);
+                }}
+                >
                 <span className={styles.hour}>
                   {Math.round(myHour + index) % 24 < 10 ? '0' + Math.round(myHour + index) % 24 : Math.round(myHour + index) % 24}
                 </span>
