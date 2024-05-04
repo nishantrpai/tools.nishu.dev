@@ -38,6 +38,11 @@ export default function PollTime() {
 
   return (
     <>
+    <Head>
+      <title>Best Time Poll</title>
+      <meta name="description" content="Find out what is the best time for you and friends to connect online" />
+      <link rel="icon" href="/favicon.ico" />
+    </Head>
       <main>
         {poll ? <Vote {...roomInfo} pollId={poll} allVotes={roomInfo.votes} /> :
           <Create />}
