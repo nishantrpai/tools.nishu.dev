@@ -6,22 +6,50 @@ import getBrowserFingerprint from 'get-browser-fingerprint';
 import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/router'
+
 import { useState, useEffect, useRef } from 'react'
 import moment from 'moment';
+import io from 'socket.io-client';
+const socket = io.connect('http://localhost:8080');
 
 
 export default function PollTime() {
+  // get query params from url
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const poll = searchParams.get('poll');
+  const [roomInfo, setRoomInfo] = useState({});
+  // check socket to see if poll exists
+  // if poll exists, show vote component
+  // else show create component
+  useEffect(() => {
+    socket.emit("checkRoom", poll);
+    socket.on("roomExists", (roomInfo) => {
+      console.log('roomInfo', roomInfo);
+      setRoomInfo(roomInfo);
+    });
+    socket.on("roomNotFound", () => {
+      router.push('/besttime');
+    });
+
+  }, []);
 
   return (
     <>
       <main>
-        <Create />
+        {poll ? <Vote {...roomInfo} /> :
+          <Create />}
       </main>
     </>
   )
 }
 
 function Vote({ creatorTz, creatorComfortStart, creatorComfortEnd, preview, roomGoal }) {
+
+  useEffect(() => {
+    console.log('creatorTz', creatorTz, creatorComfortStart, creatorComfortEnd, preview, roomGoal);
+  }, []);
 
   // two branches one to create room and other to join room, if there is a router param then join room
   const [roomId, setRoomId] = useState('');
@@ -30,7 +58,7 @@ function Vote({ creatorTz, creatorComfortStart, creatorComfortEnd, preview, room
   const [votes, setVotes] = useState({});
   const [averageTimezone, setAverageTimezone] = useState(0);
   const searchParams = useSearchParams()
-  const [myVote, setMyVote] = useState(0);
+  const [myVote, setMyVote] = useState(null);
 
   const getCurrentTimezone = () => {
     return new Date().getTimezoneOffset() / 60 * -1;
@@ -68,7 +96,7 @@ function Vote({ creatorTz, creatorComfortStart, creatorComfortEnd, preview, room
 
   useEffect(() => {
     if (roomId) {
-      const socket = io();
+      ;
       socket.emit("joinRoom", roomId);
       socket.on("roomJoined", () => {
         socket.on("vote", (votes) => {
@@ -80,7 +108,7 @@ function Vote({ creatorTz, creatorComfortStart, creatorComfortEnd, preview, room
   }, [roomId]);
 
   const createRoom = () => {
-    const socket = io();
+    ;
     socket.emit("createRoom");
     socket.on("roomCreated", (roomId) => {
       setRoomId(roomId);
@@ -88,12 +116,10 @@ function Vote({ creatorTz, creatorComfortStart, creatorComfortEnd, preview, room
   }
 
   const voteTimezone = () => {
-    const socket = io();
+    ;
     socket.emit("vote", { roomId, vote: getCurrentTimezone(), fingerprint });
   }
 
-  const bestOverlap = () => {
-  }
 
   let myTz = getCurrentTimezone();
   let myHour = getHour(myTz);
@@ -125,22 +151,22 @@ function Vote({ creatorTz, creatorComfortStart, creatorComfortEnd, preview, room
         </p>
 
         <div style={{
-            width: '100%',
-            border: '1px solid #333',
-            color: '#666',
-            fontSize: 12,
-            borderRadius: '10px 10px 0 0',
-            padding: '5px',
-          }}>
-            My time zone
-          </div>
+          width: '100%',
+          border: '1px solid #333',
+          color: '#666',
+          fontSize: 12,
+          borderRadius: '10px 10px 0 0',
+          padding: '5px',
+        }}>
+          My time zone
+        </div>
         <div className={styles.timeCtr} onScroll={(e) => {
           //  when i scroll right to end, go to beginning
           // when i scroll left to beginning, go to end
           if ((e.target.scrollLeft + e.target.clientWidth) >= e.target.scrollWidth) {
             e.target.scrollLeft = 0;
           }
-          
+
         }}
         >
           {Array.from({ length: 24 }).map((_, index) => (
@@ -152,7 +178,7 @@ function Vote({ creatorTz, creatorComfortStart, creatorComfortEnd, preview, room
                 cursor: (Math.round(creatorHour + index) % 24) >= creatorComfortStart && (Math.round(creatorHour + index) % 24) <= creatorComfortEnd ? 'pointer' : 'not-allowed',
               }}
                 disabled={(Math.round(creatorHour + index) % 24) >= creatorComfortStart && (Math.round(creatorHour + index) % 24) <= creatorComfortEnd}
-                key={index} >
+                key={(index + 10) * 10} >
                 {/* highest vote */}
                 <span style={{
                   // draw on top right of the div
@@ -173,7 +199,7 @@ function Vote({ creatorTz, creatorComfortStart, creatorComfortEnd, preview, room
                   {Math.round(creatorHour + index) % 24 < 10 ? '0' + Math.round(creatorHour + index) % 24 : Math.round(creatorHour + index) % 24}
                 </span>
                 <span className={styles.min}>
-                  {creatorMins != 0 ? creatorMins : ''}
+                  {creatorMins != 0 ? creatorMins : ''}min
                 </span>
                 <span className={styles.vote} style={{
                   visibility: votesArray[Math.round(creatorHour + index) % 24] ? 'visible' : 'hidden'
@@ -190,12 +216,12 @@ function Vote({ creatorTz, creatorComfortStart, creatorComfortEnd, preview, room
                 onClick={() => {
                   setMyVote(Math.round(creatorHour + index) % 24);
                 }}
-                >
+              >
                 <span className={styles.hour}>
                   {Math.round(myHour + index) % 24 < 10 ? '0' + Math.round(myHour + index) % 24 : Math.round(myHour + index) % 24}
                 </span>
                 <span className={styles.min}>
-                  {myMins != 0 ? myMins : ''}
+                  {myMins != 0 ? myMins : ''}min
                 </span>
               </div>
             </div>
@@ -219,20 +245,20 @@ function Vote({ creatorTz, creatorComfortStart, creatorComfortEnd, preview, room
 
 function Create() {
   // create poll
+  const router = useRouter();
   const [roomGoal, setRoomGoal] = useState('');
   const [startBestTime, setStartBestTime] = useState(0);
   const [endBestTime, setEndBestTime] = useState(12);
 
   const createRoom = () => {
-    const socket = io();
     socket.emit("createRoom", {
-      goal: roomGoal,
-      bestStartTime: startBestTime,
-      bestEndTime: endBestTime,
       tz: new Date().getTimezoneOffset() / 60 * -1,
+      bestStartTime: parseInt(startBestTime),
+      bestEndTime: parseInt(endBestTime),
+      goal: roomGoal,
+      creatorFingerprint: ''
     });
     socket.on("roomCreated", (roomId) => {
-      setRoomId(roomId);
       router.push(`/besttime?poll=${roomId}`);
     });
   }
@@ -264,7 +290,7 @@ function Create() {
               type="number"
               value={startBestTime}
               onChange={(e) => setStartBestTime(e.target.value)}
-              placeholder='Enter a number between 0 and 24'
+              placeholder='0-24'
             />
           </div>
 
@@ -275,7 +301,7 @@ function Create() {
               type="number"
               value={endBestTime}
               onChange={(e) => setEndBestTime(e.target.value)}
-              placeholder='Enter a number between 0 and 24'
+              placeholder={`0-24`}
             />
           </div>
 
@@ -285,7 +311,7 @@ function Create() {
       <b>Preview:</b>
       <Vote
         // creatorTz={new Date().getTimezoneOffset() / 60 * -1}
-        creatorTz={-5}
+        creatorTz={new Date().getTimezoneOffset() / 60 * -1}
         creatorComfortStart={startBestTime}
         creatorComfortEnd={endBestTime}
         roomGoal={roomGoal}
