@@ -72,9 +72,13 @@ export default function Home() {
     canvas.height = image1.height
     ctx.globalAlpha = opacity
     ctx.globalCompositeOperation = allBlends[k]
+    const scaleFactor = canvas.width / image2.height
+    const scaledWidth = image2.width * scaleFactor
+    const center = (canvas.width - scaledWidth) / 2
+
     // draw rectangle to not add transparency to the image
     ctx.drawImage(image1, 0, 0, canvas.width, canvas.height)
-    ctx.drawImage(image2, 0, 0, canvas.width, canvas.height)
+    ctx.drawImage(image2, center, 0, scaledWidth, canvas.height)
   }
 
   useEffect(() => {
