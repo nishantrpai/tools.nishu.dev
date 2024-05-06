@@ -281,7 +281,7 @@ export default function Home() {
       url: '/besttime',
     }
     {
-      title: 'Compress',
+      title: 'Compress Text',
       description: 'Make your text precise and concise',
       publishDate: '6th May 2024',
       url: '/compresstext',
