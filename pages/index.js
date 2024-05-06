@@ -273,6 +273,12 @@ export default function Home() {
       description: 'Check if an email is valid',
       publishDate: '3rd May 2024',
       url: '/validemail',
+    },
+    {
+      title: 'Compress',
+      description: 'Make your text precise and concise',
+      publishDate: '4th May 2024',
+      url: '/compresstext',
     }
     // {
     //   title: 'Best Time',
