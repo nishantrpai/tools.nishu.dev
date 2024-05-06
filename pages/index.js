@@ -277,7 +277,7 @@ export default function Home() {
     {
       title: 'Compress',
       description: 'Make your text precise and concise',
-      publishDate: '4th May 2024',
+      publishDate: '6th May 2024',
       url: '/compresstext',
     }
     // {
