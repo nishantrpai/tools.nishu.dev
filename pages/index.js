@@ -275,6 +275,12 @@ export default function Home() {
       url: '/validemail',
     },
     {
+      title: 'Poll Best Time',
+      description: 'Poll your friends for the best time for an event',
+      publishDate: '4th May 2024',
+      url: '/besttime',
+    }
+    {
       title: 'Compress',
       description: 'Make your text precise and concise',
       publishDate: '6th May 2024',
