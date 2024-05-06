@@ -279,7 +279,7 @@ export default function Home() {
       description: 'Poll your friends for the best time for an event',
       publishDate: '4th May 2024',
       url: '/besttime',
-    }
+    },
     {
       title: 'Compress Text',
       description: 'Make your text precise and concise',
