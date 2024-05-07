@@ -285,6 +285,12 @@ export default function Home() {
       description: 'Make your text precise and concise',
       publishDate: '6th May 2024',
       url: '/compresstext',
+    },
+    {
+      title: 'AI Canvas',
+      description: 'Draw with AI, save aesthetics and style',
+      publishDate: '7th May 2024',
+      url: '/aicanvas',
     }
     // {
     //   title: 'Best Time',
