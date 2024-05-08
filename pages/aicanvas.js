@@ -75,8 +75,8 @@ export default function AICanvas() {
   const [sessionHash, setSessionHash] = useState('')
   const [websocket, setWebsocket] = useState(null)
   const [seed, setSeed] = useState('')
-  const [width, setWidth] = useState(0)
-  const [height, setHeight] = useState(0)
+  const [width, setWidth] = useState(1024)
+  const [height, setHeight] = useState(1024)
   const [noOfImages, setNofImages] = useState(1)
   const [guidance, setGuidance] = useState(4)
   const [inference, setInference] = useState(30)
@@ -95,27 +95,26 @@ export default function AICanvas() {
       console.log('message', event.data)
       let data = JSON.parse(event.data);
       let session_hash = Math.random().toString(36).substring(2);
+      setSessionHash(session_hash)
       let seed = Math.floor(Math.random() * 1000000000);
       setSeed(seed)
       console.log('session_hash', session_hash)
-      // setSessionHash(session_hash)
       if (data.msg == 'send_hash') {
         tmpsocket.send(JSON.stringify({ fn_index: 3, session_hash: session_hash }));
       }
       if (data.msg.includes('process_') && data.msg !== 'process_starts') {
-        // if (!data.output.error)
+        if (!data.output.error)
           setGen(`https://warp-ai-wuerstchen.hf.space/file=${data.output.data[0][0].name}`)
       }
       if(data.msg == 'process_completed') {
         // add to library
         library.add(new Img({
-          img: gen,
+          img: data.output.data[0][0].name,
           aesthetics: aesthetics,
           scene: scene,
           seed: seed,
           width: width,
           height: height,
-
         }))
       }
     }
@@ -127,17 +126,19 @@ export default function AICanvas() {
       <main style={{ border: '1px solid red' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '100%' }}>
           <div>
-            <input style={{ border: '1px solid #333', background: '#000', width: '100%', padding: '5px 10px' }} placeholder='Describe Aesthetics' onChange={(e) => {
-              setAesthetics(e.target.value)
-            }} />
+            <input style={{ border: '1px solid #333', background: '#000', width: '100%', padding: '5px 10px' }} placeholder='Describe Aesthetics' onChange={(e) => setAesthetics(e.target.value)} />
           </div>
           <div>
-            <input style={{ border: '1px solid #333', background: '#000', width: '100%', padding: '5px 10px' }} placeholder='Describe scene' onChange={(e) => {
-              setScene(e.target.value)
-            }} />
+            <input style={{ border: '1px solid #333', background: '#000', width: '100%', padding: '5px 10px' }} placeholder='Describe scene' onChange={(e) => setScene(e.target.value)} />
+          </div>
+          <div>
+            <input type="number" style={{ border: '1px solid #333', background: '#000', width: '100%', padding: '5px 10px' }} placeholder='Width' onChange={(e) => setWidth(e.target.value)} />
+          </div>
+          <div>
+            <input type="number" style={{ border: '1px solid #333', background: '#000', width: '100%', padding: '5px 10px' }} placeholder='Height' onChange={(e) => setHeight(e.target.value)} />
           </div>
           <button onClick={() => {
-            websocket.send(`{"data":["${aesthetics} ${scene}","",1532293626,1024,1024,30,4,12,0,2],"event_data":null,"fn_index":3,"session_hash":"${sessionHash}"}`)
+            websocket.send(`{"data":["${aesthetics} ${scene}","",${seed},${width},${height},30,4,12,0,2],"event_data":null,"fn_index":3,"session_hash":"${sessionHash}"}`)
           }}>
             Generate
           </button>
