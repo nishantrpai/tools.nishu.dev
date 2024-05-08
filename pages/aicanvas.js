@@ -95,6 +95,8 @@ export default function AICanvas() {
       console.log('message', event.data)
       let data = JSON.parse(event.data);
       let session_hash = Math.random().toString(36).substring(2);
+      let seed = Math.floor(Math.random() * 1000000000);
+      setSeed(seed)
       console.log('session_hash', session_hash)
       // setSessionHash(session_hash)
       if (data.msg == 'send_hash') {
@@ -125,7 +127,7 @@ export default function AICanvas() {
       <main style={{ border: '1px solid red' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '100%' }}>
           <div>
-            <input style={{ border: '1px solid #333', background: '#000', width: '100%', padding: '5px 10px' }} placeholder='Enter Aesthetics' onChange={(e) => {
+            <input style={{ border: '1px solid #333', background: '#000', width: '100%', padding: '5px 10px' }} placeholder='Describe Aesthetics' onChange={(e) => {
               setAesthetics(e.target.value)
             }} />
           </div>
