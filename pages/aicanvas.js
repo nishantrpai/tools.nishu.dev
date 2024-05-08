@@ -132,10 +132,10 @@ export default function AICanvas() {
             <input style={{ border: '1px solid #333', background: '#000', width: '100%', padding: '5px 10px' }} placeholder='Describe scene' onChange={(e) => setScene(e.target.value)} />
           </div>
           <div>
-            <input type="number" style={{ border: '1px solid #333', background: '#000', width: '100%', padding: '5px 10px' }} placeholder='Width' onChange={(e) => setWidth(e.target.value)} />
+            <input value={width} type="number" style={{ border: '1px solid #333', background: '#000', width: '100%', padding: '5px 10px' }} placeholder='Width' onChange={(e) => setWidth(e.target.value)} />
           </div>
           <div>
-            <input type="number" style={{ border: '1px solid #333', background: '#000', width: '100%', padding: '5px 10px' }} placeholder='Height' onChange={(e) => setHeight(e.target.value)} />
+            <input value={height} type="number" style={{ border: '1px solid #333', background: '#000', width: '100%', padding: '5px 10px' }} placeholder='Height' onChange={(e) => setHeight(e.target.value)} />
           </div>
           <button onClick={() => {
             websocket.send(`{"data":["${aesthetics} ${scene}","",${seed},${width},${height},30,4,12,0,2],"event_data":null,"fn_index":3,"session_hash":"${sessionHash}"}`)
