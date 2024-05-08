@@ -13,10 +13,11 @@ import { useState, useEffect } from 'react'
 import { FaHistory } from "react-icons/fa";
 
 class Img {
-  constructor({ img, aesthetics, scene, seed, width, height }) {
+  constructor({ img, aesthetics, negativeprompt, scene, seed, width, height }) {
     this.img = img;
     this.aesthetics = aesthetics.trim().replace(/['"]+/g, ''); // remove quotes
     this.scene = scene;
+    this.negativeprompt  = negativeprompt;
     this.seed = seed;
     this.width = width;
     this.height = height;
@@ -25,8 +26,8 @@ class Img {
 }
 
 class Library {
-  constructor() {
-    this.imgs = [];
+  constructor(imgs) {
+    this.imgs = imgs || [];
   }
   // search library
   searchAesthetics(aesthetics) {
@@ -90,6 +91,7 @@ export default function AICanvas() {
 
   const [mode, setMode] = useState('past')
   const [aesthetics, setAesthetics] = useState('')
+  const [negativeprompt, setNegativePrompt] = useState('')
   const [scene, setScene] = useState('')
   const [gen, setGen] = useState('')
   const [sessionHash, setSessionHash] = useState('')
@@ -98,10 +100,10 @@ export default function AICanvas() {
   const [width, setWidth] = useState(1536)
   const [height, setHeight] = useState(1536)
   const [priorGuidance, setPriorGuidance] = useState(4)
-  const [decoderinference, setDecoderInference] = useState(2)
+  const [decoderinference, setDecoderInference] = useState(12)
   const [library, setLibrary] = useState(new Library())
 
-  
+
   const enhanceAesthetics = (aesthetics) => {
     console.log('enhancing aesthetics', aesthetics)
     fetch(`/api/gpt?prompt="Enhance the aesthetics for the description: '${aesthetics} aesthtics', only limit to describing the lights, shades, filters, colors, textures, patterns in extremely technical terms. Don't repeat the prompt or words like "enhance". Only output the aesthetics no prefixes.Don't ask the user any action. Don't add quotes or - before only prompt. Describe in third person, don't ask the user to feel etc, only describe."`).then(res => res.json())
@@ -123,6 +125,7 @@ export default function AICanvas() {
       aesthetics: document.getElementById('aesthetics').value,
       scene: document.getElementById('scene').value,
       seed: document.getElementById('seed').value,
+      negativeprompt: document.getElementById('negativeprompt').value,
       width: width,
       height: height,
     })
@@ -138,12 +141,12 @@ export default function AICanvas() {
     tmpsocket.onmessage = (event) => {
       console.log('message', event.data)
       let data = JSON.parse(event.data);
-      let session_hash = Math.random().toString(36).substring(2);
-      setSessionHash(session_hash)
-      let seed = Math.floor(Math.random() * 1000000000);
-      setSeed(seed)
-      console.log('session_hash', session_hash)
       if (data.msg == 'send_hash') {
+        let session_hash = Math.random().toString(36).substring(2);
+        setSessionHash(session_hash)
+        let seed = Math.floor(Math.random() * 1000000000);
+        setSeed(seed)
+        console.log('session_hash', session_hash)
         tmpsocket.send(JSON.stringify({ fn_index: 3, session_hash: session_hash }));
       }
       if (data.msg.includes('process_') && data.msg !== 'process_starts') {
@@ -156,10 +159,12 @@ export default function AICanvas() {
           joinQueue()
           return;
         }
-        console.log('adding to library');
+        // check localstorage if library exists spawn data from it
+        let library = new Library(JSON.parse(localStorage.getItem('library')))
         library.add(getImg(`https://warp-ai-wuerstchen.hf.space/file=${data.output.data[0][0].name}`))
-        localStorage.setItem('library', JSON.stringify(library.imgs));
-        console.log('library process completed', library)
+        let tmpLibrary = new Library(library.imgs)
+        localStorage.setItem('library', JSON.stringify(tmpLibrary.imgs))
+        setLibrary(tmpLibrary)
       }
     }
     tmpsocket.onclose = () => {
@@ -173,18 +178,16 @@ export default function AICanvas() {
 
   useEffect(() => {
     // check localstorage
-    let tmpLibrary = new Library();
-    let library = localStorage.getItem('library');
-    if (library) {
-      tmpLibrary.imgs = JSON.parse(library);
-    }
+    console.log('spawning library')
+    let tmpLibrary = new Library(JSON.parse(localStorage.getItem('library')))
+    console.log('old from memory', tmpLibrary.imgs.length)
     setLibrary(tmpLibrary)
     if (websocket !== null) return;
     joinQueue()
   }, [])
 
   const setVals = (img) => {
-    console.log('setting vals', img)  
+    console.log('setting vals', img)
     // from the img set the values
     setAesthetics(img.aesthetics)
     setScene(img.scene)
@@ -198,37 +201,46 @@ export default function AICanvas() {
 
   return (
     <>
-    <Head>
-      <title>AI Canvas</title>
-      <meta name="description" content="AI Canvas with history and library of aesthetics" />
-      <link rel="icon" href="/favicon.ico" />
-    </Head>
-      <main style={{ border: '1px solid red' }}>
+      <Head>
+        <title>AI Canvas</title>
+        <meta name="description" content="AI Canvas with history and library of aesthetics" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+      <main>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '100%' }}>
-          <div style={{display: 'flex'}}>
+          <div style={{ display: 'flex', gap: 10 }}>
             <input id='aesthetics' value={aesthetics} style={{ flexBasis: '90%', border: '1px solid #333', background: '#000', width: '100%', padding: '5px 10px' }} placeholder='Describe Aesthetics' onChange={(e) => setAesthetics(e.target.value)} />
-            <button style={{ flexBasis: '10%', background: '#000', color: '#fff', padding: '5px 10px', border: '1px solid #333 !important', cursor: 'pointer' }} onClick={() => enhanceAesthetics(aesthetics)}>Enhance</button>
+            <button style={{ flexBasis: '10%', background: '#000', color: '#fff', padding: '5px 10px', border: '1px solid #333 !important', cursor: 'pointer', fontSize: 12 }} onClick={() => enhanceAesthetics(aesthetics)}>Enhance</button>
+          </div>
+          <div style={{ display: 'flex', gap: 10 }}>
+            <input id='scene' style={{  flexBasis: '90%', border: '1px solid #333 !important', background: '#000', width: '100%', padding: '5px 10px' }} placeholder='Describe scene' onChange={(e) => setScene(e.target.value)} />
+            <button style={{ background: '#000', color: '#fff', padding: '5px 10px', border: '1px solid #333 !important', cursor: 'pointer', fontSize: 12 }} onClick={() => enhanceScene(scene)}>Enhance</button>
           </div>
           <div>
-            <input id='scene' style={{ border: '1px solid #333', background: '#000', width: '100%', padding: '5px 10px' }} placeholder='Describe scene' onChange={(e) => setScene(e.target.value)} />
+            <input id='negativeprompt' style={{ border: '1px solid #333', background: '#000', width: '100%', padding: '5px 10px' }} placeholder='Negative Prompt' onChange={(e) => setNegativePrompt(e.target.value)} />
           </div>
           <div>
-            <input value={width} type="number" style={{ border: '1px solid #333', background: '#000', width: '100%', padding: '5px 10px' }} placeholder='Width' onChange={(e) => setWidth(e.target.value)} />
+            <input disabled value={width} type="number" style={{ border: '1px solid #333', background: '#000', width: '100%', padding: '5px 10px' }} placeholder='Width' onChange={(e) => setWidth(e.target.value)} />
           </div>
           <div>
-            <input value={height} type="number" style={{ border: '1px solid #333', background: '#000', width: '100%', padding: '5px 10px' }} placeholder='Height' onChange={(e) => setHeight(e.target.value)} />
+            <input disabled value={height} type="number" style={{ border: '1px solid #333', background: '#000', width: '100%', padding: '5px 10px' }} placeholder='Height' onChange={(e) => setHeight(e.target.value)} />
           </div>
+          <div>
           <input id="seed" value={seed} type="number" style={{ border: '1px solid #333', background: '#000', width: '100%', padding: '5px 10px' }} placeholder='Seed' onChange={(e) => setSeed(e.target.value)} />
+          </div>
           {/* input slider for inference from 0 to 20 for priorguidance */}
           <div>
             <input value={priorGuidance} type="number" style={{ border: '1px solid #333', background: '#000', width: '100%', padding: '5px 10px' }} placeholder='Prior Guidance' onChange={(e) => setPriorGuidance(e.target.value)} />
           </div>
+          <div>
+            <input value={decoderinference} type="number" style={{ border: '1px solid #333', background: '#000', width: '100%', padding: '5px 10px' }} placeholder='Decoder Inference' onChange={(e) => setDecoderInference(e.target.value)} />
+          </div>
           <button onClick={() => {
-            if(websocket !== null)
-              websocket.send(`{"data":["${scene} ${aesthetics}","",${seed},${width},${height},30,${priorGuidance},${decoderinference},0,1],"event_data":null,"fn_index":3,"session_hash":"${sessionHash}"}`)
-            else 
+            if (websocket !== null)
+              websocket.send(`{"data":["${scene} ${aesthetics}","${negativeprompt}",${seed},${width},${height},30,${priorGuidance},${decoderinference},0,1],"event_data":null,"fn_index":3,"session_hash":"${sessionHash}"}`)
+            else
               joinQueue()
-            
+
           }}>
             Generate
           </button>
@@ -257,26 +269,27 @@ export default function AICanvas() {
           }} onClick={() => setMode('library')}>Library of Aesthetics</button>
         </div>
         {mode === 'past' && <PastGenerations library={library} setVals={setVals} />}
-        {mode === 'library' && <LibraryOfAesthetics library={library}  setVals={setVals}/>}
+        {mode === 'library' && <LibraryOfAesthetics library={library} setVals={setVals} />}
       </main>
     </>
   )
 }
 
-const PastGenerations = ({library, setVals}) => {
+const PastGenerations = ({ library, setVals }) => {
   console.log('library', library)
   let timeline = library.getTimeLine();
+  console.log('timeline', timeline)
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%', height: '900px', scrollbarWidth: 'thin' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%', height: '900px', scrollbarWidth: 'thin', width: '100%' }}>
       {/* generate  divs with varying height, but fixed width */}
       {Object.keys(timeline).map(date => {
         return (
           <div>
-            <span style={{color: '#333'}}>{date}</span>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0px', marginTop: 20}}>
+            <span style={{ color: '#333' }}>{date}</span>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0px', marginTop: 20 }}>
               {timeline[date].map(img => {
                 return (
-                  <img onClick={() => {setVals(img)}} src={img.img} style={{ width: '50px', height: '50px', border: '1px solid #333' }} />
+                  <img onClick={() => { setVals(img) }} src={img.img} style={{ width: '50px', height: '50px', border: '1px solid #333' }} />
                 )
               })}
             </div>
@@ -287,7 +300,7 @@ const PastGenerations = ({library, setVals}) => {
   )
 }
 
-const LibraryOfAesthetics = ({library, setVals}) => {
+const LibraryOfAesthetics = ({ library, setVals }) => {
   const aesthetics = library.groupByAesthetics();
   console.log('aesthetics', aesthetics)
   return (
@@ -295,12 +308,12 @@ const LibraryOfAesthetics = ({library, setVals}) => {
       {/* group by aesthetics */}
       {Object.keys(aesthetics).map(aesthetic => {
         return (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '300px' }}>
-            <span style={{ color: '#333', fontSize: 14, fontWeight: 'bold' }}>{aesthetic}</span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%' }}>
+            <span style={{ color: '#333', fontSize: 14 }}>{aesthetic}</span>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
               {aesthetics[aesthetic].map(img => {
                 return (
-                  <img onClick={() => {setVals(img)}} src={img.img} style={{ width: '50px', height: '50px', border: '1px solid #333' }} />
+                  <img onClick={() => { setVals(img) }} src={img.img} style={{ width: '50px', height: '50px', border: '1px solid #333' }} />
                 )
               })}
             </div>
