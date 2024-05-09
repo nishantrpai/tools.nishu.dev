@@ -374,7 +374,7 @@
   height: max-content;
   /* From https://css.glass */
   background: rgb(40, 40, 43);
-  border-radius: 0 0 10px 10px;
+  border-radius: 0 10px 10px 10px;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.01);
   backdrop-filter: blur(2px);
   border: 1px solid rgba(180, 151, 151, 0.01);
