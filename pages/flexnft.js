@@ -75,6 +75,8 @@ const NFTCompare = () => {
   }, [token1])
 
   const playSequence = () => {
+    if(!sequence) return
+    if(sequenceTimer) return
     // play the sequence
     // split sequence into array for e.g.,  1 9 13 14 21 22 will be [1, 9, 13, 14, 21, 22]
     // each sequence will be token1 after 1 second, no token2
