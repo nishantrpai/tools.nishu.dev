@@ -125,7 +125,7 @@ const NFTCompare = () => {
             color: 'gray',
             fontSize: '14px'
           }
-        }>Flex your NFT
+        }>Flex your NFT, hover over the card and move out to play the animation. Enter the sequence of tokens and record away.
         </span>
 
         {/* create a select with RPC chains */}
