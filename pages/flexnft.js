@@ -181,7 +181,7 @@ const NFTCompare = () => {
                 display: 'flex',
                 justifyContent: 'center',
                 background: '#000',
-                borderRadius: '10px',
+                borderRadius: '0 10px 10px 10px',
                 alignItems: 'center',
                 overflow: 'hidden',
               }}>
