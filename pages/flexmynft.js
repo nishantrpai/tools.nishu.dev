@@ -2,6 +2,7 @@
 import { ethers } from 'ethers'
 import styles from '@/styles/Home.module.css'
 import { useState, useEffect } from 'react'
+import Head from 'next/head'
 
 const NFTCompare = () => {
   let RPC_CHAINS = {
@@ -108,17 +109,23 @@ const NFTCompare = () => {
 
   return (
     // one input for collection address and two inputs for token ids
+    <>
+    <Head>
+      <title>Flex My NFT</title>
+      <meta name="description" content="Flex your NFT" />
+      <link rel="icon" href="/favicon.ico" />
+    </Head>
     <main className={styles.main}>
       <a href='/' className={styles.home}>🏠</a>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '100%' }}>
-        <h1>NFT v/s NFT</h1>
+        <h1>Flex My NFT</h1>
         <span style={
           {
             color: 'gray',
             fontSize: '14px'
           }
-        }>Enter the collection address and token ids of two nfts to compare
+        }>Flex your NFT
         </span>
 
         {/* create a select with RPC chains */}
@@ -200,6 +207,7 @@ const NFTCompare = () => {
         </div>
       </div>
     </main>
+    </>
   )
 }
 
