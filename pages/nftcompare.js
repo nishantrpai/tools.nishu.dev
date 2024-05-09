@@ -76,6 +76,47 @@ const NFTCompare = () => {
     }
   }, [token2])
 
+
+  const renderCard = (token1Data) => {
+    return (
+      <div className={styles.nftcard} style={{ width: '100%'}}>
+        {Object.keys(token1Data).length ?
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', justifyContent: 'center' }}
+          >
+            {/* add a layer on top */}
+            <div style={{
+              minHeight: 200,
+              display: 'flex',
+              justifyContent: 'center',
+              background: '#000',
+              borderRadius: '0 10px 10px 10px',
+              alignItems: 'center',
+              overflow: 'hidden',
+            }}>
+              <img src={token1Data.image}></img>
+            </div>
+            <div style={{
+              color: 'gray',
+              fontSize: '14px',
+              marginTop: '10px',
+              padding: 20,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '15px',
+            }}
+              className={styles.nftdata}
+            >
+              <b style={{ color: "#fff", fontSize: 20 }}>{token1Data.name}</b>
+              {token1Data.attributes && token1Data.attributes.map((attr, index) => (
+                <div key={index}>{attr.trait_type}: {attr.value}</div>
+              ))}
+            </div>
+          </div> : null}
+      </div>
+
+    )
+  }
+
   return (
     // one input for collection address and two inputs for token ids
     <main className={styles.main}>
@@ -119,19 +160,7 @@ const NFTCompare = () => {
               }}
             ></input>
           </div>
-          {Object.keys(token1Data).length ?
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', justifyContent: 'center' }}>
-              <img src={token1Data.image} style={{ width: '200px', height: '200px' }}></img>
-              <b>{token1Data.name}</b>
-              <div style={{
-                color: 'gray',
-                fontSize: '14px'
-              }}>
-                {token1Data.attributes && token1Data.attributes.map((attr, index) => (
-                  <div key={index}>{attr.trait_type}: {attr.value}</div>
-                ))}
-              </div>
-            </div> : null}
+          {renderCard(token1Data)}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '50%' }}>
           <div className={styles.searchContainer}>
@@ -141,21 +170,7 @@ const NFTCompare = () => {
               }}
             ></input>
           </div>
-          {Object.keys(token2Data).length ?
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', justifyContent: 'center' }}>
-              <img src={token2Data.image} style={{ width: '200px', height: '200px' }}></img>
-              <b>{token2Data.name}</b>
-              <div style={{
-                color: 'gray',
-                fontSize: '14px'
-              }}>
-                {token2Data.attributes && token2Data.attributes.map((attr, index) => (
-                  <div key={index}>{attr.trait_type}: {attr.value}</div>
-                ))}
-              </div>
-            </div>
-            : null
-          }
+          {renderCard(token2Data)}
         </div>
 
       </div>
