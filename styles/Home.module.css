@@ -13,7 +13,6 @@
   flex-direction: row;
 }
 
-
 .description a {
   display: flex;
   justify-content: center;
@@ -105,7 +104,7 @@
 
 .center::before,
 .center::after {
-  content: '';
+  content: "";
   left: 50%;
   position: absolute;
   filter: blur(45px);
@@ -278,7 +277,6 @@
   animation: borderChange 0.5s infinite;
 }
 
-
 @keyframes borderChange {
   /* border will increase and decrease */
   0% {
@@ -289,7 +287,7 @@
   }
   100% {
     transform: translateY(0px);
-  } 
+  }
 }
 
 .buttonSpeaking {
@@ -351,7 +349,6 @@
 .ampm {
   font-size: 0.8rem;
   font-weight: 700;
-
 }
 
 .timeCtr {
@@ -364,4 +361,44 @@
 }
 .timeCtr:last-child {
   border: 0 0 20px 20px;
+}
+
+.nftcard {
+  cursor: none !important;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 5px;
+  color: #fff;
+  width: 70%;
+  height: max-content;
+  /* From https://css.glass */
+  background: rgb(40, 40, 43);
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.01);
+  backdrop-filter: blur(2px);
+  border: 1px solid rgba(180, 151, 151, 0.01);
+  transform: perspective(400px) rotate3d(1, -1, 0, calc(var(--i, 1) * 5deg));
+  mask:
+    linear-gradient(135deg,#000c 50%,#000,#000c 60%)
+    100% 100%/240% 240%;
+  transition: 10s;
+  cursor: pointer;
+
+}
+.nftcard:hover {
+  --i: -0.5;
+  transition: transform 0.25s;
+  mask-position: 0 0;
+}
+
+.nftcard img {
+  display: block;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(0px);
+  min-height: 200px;
+  align-items: center;
+  width: -webkit-fill-available;
 }
