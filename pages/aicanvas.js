@@ -213,7 +213,7 @@ export default function AICanvas() {
             <button style={{ flexBasis: '10%', background: '#000', color: '#fff', padding: '5px 10px', border: '1px solid #333 !important', cursor: 'pointer', fontSize: 12 }} onClick={() => enhanceAesthetics(aesthetics)}>Enhance</button>
           </div>
           <div style={{ display: 'flex', gap: 10 }}>
-            <input id='scene' style={{  flexBasis: '90%', border: '1px solid #333 !important', background: '#000', width: '100%', padding: '5px 10px' }} placeholder='Describe scene' onChange={(e) => setScene(e.target.value)} />
+            <input id='scene' value={scene} style={{  flexBasis: '90%', border: '1px solid #333 !important', background: '#000', width: '100%', padding: '5px 10px' }} placeholder='Describe scene' onChange={(e) => setScene(e.target.value)} />
             <button style={{ background: '#000', color: '#fff', padding: '5px 10px', border: '1px solid #333 !important', cursor: 'pointer', fontSize: 12 }} onClick={() => enhanceScene(scene)}>Enhance</button>
           </div>
           <div>
