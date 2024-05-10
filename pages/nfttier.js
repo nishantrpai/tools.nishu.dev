@@ -135,10 +135,10 @@ export default function NFTTier() {
           ))}
         </div>
         <div style={{ display: 'flex', width: '100%', padding: 20 }}>
-          <button style={{ margin: 'auto' }} onClick={() => {
+          {/* <button style={{ margin: 'auto' }} onClick={() => {
             // copy tier-list to clipboard as image
             const tierList = document.getElementById('tier-list')
-            html2canvas(tierList, {
+            html2canvas(document.body, {
               allowTaint: true,
               backgroundColor: '#000',
               useCORS: true,
@@ -150,16 +150,15 @@ export default function NFTTier() {
               a.download = 'tierlist.png'
               a.click()
             })
-          }}>Copy</button>
+          }}>Copy</button> */}
         </div>
         <div style={{ display: 'flex', width: '100%', height: 100, border: '1px solid #333', marginTop: 20 }}>
           {tokens.map((token, index) => (
             <div style={{ display: 'flex', flexDirection: 'column', width: 'max-content', height: '100%' }}>
               <div style={{ display: 'flex', flexDirection: 'column', width: 'max-content', height: '100%' }}>
-                <img src={token} style={{ width: '100px', height: 'max-content', border: '1px solid #333' }}
+                <img crossOrigin="anonymous" src={token} style={{ width: '100px', height: 'max-content', border: '1px solid #333' }}
                   draggable="true"
                   onDragStart={drag}
-                  crossOrigin="anonymous"
                   id={`token-${index}`}
                 ></img>
               </div>
