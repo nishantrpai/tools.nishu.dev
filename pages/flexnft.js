@@ -8,7 +8,7 @@ import { useRouter } from 'next/router'
 const NFTCompare = () => {
   let RPC_CHAINS = {
     'ETHEREUM': {
-      'rpc': 'https://eth.llamarpc.com',
+      'rpc': 'https://eth-pokt.nodies.app',
       'chainId': 1,
       'network': 'mainnet',
     },
