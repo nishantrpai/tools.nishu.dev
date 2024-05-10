@@ -105,6 +105,11 @@ export default function NFTTier() {
   return (
     // tier list on top
     <>
+    <Head>
+        <title>NFT Tier List</title>
+        <meta name="description" content="NFT Tier List" />
+        <link rel="icon" href="/favicon.ico" />
+    </Head>
       <main style={{ maxWidth: 900 }}>
         <h1>
           NFT Tier List
