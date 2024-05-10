@@ -289,14 +289,26 @@ export default function Home() {
     {
       title: 'AI Canvas',
       description: 'Draw with AI, save aesthetics and style',
-      publishDate: '7th May 2024',
+      publishDate: '8th May 2024',
       url: '/aicanvas',
+    },
+    {
+      title: 'Grade Text',
+      description: 'Grade your text based on readability',
+      publishDate: '8th May 2024',
+      url: '/gradetext',
     },
     {
       title: 'Flex NFT',
       description: 'Flex your NFTs',
-      publishDate: '8th May 2024',
+      publishDate: '9th May 2024',
       url: '/flexnft',
+    },
+    {
+      title: 'NFT Tier List',
+      description: 'Create a tier list of NFTs',
+      publishDate: '10th May 2024',
+      url: '/nfttierlist',
     }
     // {
     //   title: 'Best Time',
