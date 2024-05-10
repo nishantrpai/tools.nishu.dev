@@ -159,6 +159,7 @@ export default function NFTTier() {
                 <img src={token} style={{ width: '100px', height: 'max-content', border: '1px solid #333' }}
                   draggable="true"
                   onDragStart={drag}
+                  crossOrigin="anonymous"
                   id={`token-${index}`}
                 ></img>
               </div>
