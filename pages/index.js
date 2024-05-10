@@ -291,6 +291,12 @@ export default function Home() {
       description: 'Draw with AI, save aesthetics and style',
       publishDate: '7th May 2024',
       url: '/aicanvas',
+    },
+    {
+      title: 'Flex NFT',
+      description: 'Flex your NFTs',
+      publishDate: '8th May 2024',
+      url: '/flexnft',
     }
     // {
     //   title: 'Best Time',
