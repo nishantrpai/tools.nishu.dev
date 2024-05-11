@@ -73,25 +73,25 @@ function InfiniteCanvas() {
 
   const pointerMoveListener = (e) => {
     if (document.body.style.cursor === 'nwse-resize' && currentWindow !== null && e.buttons === 1) {
-      canvas.windows[currentWindow].width += (e.clientX - startX)
-      canvas.windows[currentWindow].height += (e.clientY - startY)
+      canvas.windows[currentWindow].width += (e.movementX)
+      canvas.windows[currentWindow].height += (e.movementY)
       canvas.windows[currentWindow].z = currentTop
       setCurrentTop(currentTop + 1)
     }
     if (document.body.style.cursor === 'move' && currentWindow !== null && e.buttons === 1) {
       // console.log('current window', canvas.windows[currentWindow].z, canvas.windows[currentWindow].x, canvas.windows[currentWindow].y, canvas.windows[currentWindow].width, canvas.windows[currentWindow].height)
-      canvas.windows[currentWindow].x += (e.clientX - startX)
-      canvas.windows[currentWindow].y += (e.clientY - startY)
+      canvas.windows[currentWindow].x += (e.movementX)
+      canvas.windows[currentWindow].y += (e.movementY)
       canvas.windows[currentWindow].z = currentTop
       setCurrentTop(currentTop + 1)
     }
     if (e.buttons === 1 && document.body.style.cursor === 'default' && currentNoteIdx == null && currentWindow == null) {
-      canvas.cameraX += (e.clientX - startX) * -1
-      canvas.cameraY += (e.clientY - startY) * -1
+      canvas.cameraX += (e.movementX) * -1
+      canvas.cameraY += (e.movementY) * -1
     } 
     if (document.body.style.cursor === 'move' && currentNoteIdx !== null && e.buttons === 1) {
-      canvas.notes[currentNoteIdx].x += (e.clientX - startX)
-      canvas.notes[currentNoteIdx].y += (e.clientY - startY)
+      canvas.notes[currentNoteIdx].x += (e.movementX)
+      canvas.notes[currentNoteIdx].y += (e.movementY)
       canvas.notes[currentNoteIdx].z = currentTop
       setCurrentTop(currentTop + 1)
     }
