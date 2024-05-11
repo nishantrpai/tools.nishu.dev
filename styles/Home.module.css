@@ -402,3 +402,22 @@
   align-items: center;
   width: -webkit-fill-available;
 }
+
+.tinderCard {
+  width: 400px;
+  position: absolute;
+  top: 50%;
+  height: 500px;
+  background: #333;
+  transform: perspective(1000px) rotate3d(0, 1, 0, 1deg);
+  border-radius: 10px;
+  z-index: 10;
+  transition: all 0.5s;
+}
+
+@media (max-width: 700px) {
+  .tinderCard {
+    width: 70vw;
+    height: 60vh;
+  }
+}

@@ -24,23 +24,14 @@ export default function LoveCaster() {
           justifyContent: 'center',
           zoom: 1.25,
         }}>
-          <div style={{
-            width: '400px',
-            height: '500px',
-            background: '#111',
-            transform: 'perspective(1000px) rotate3d(0, 1, 0, 1deg)',
-            borderRadius: '10px',
-          }}>
+          <div className={styles.tinderCard} style={{ opacity: 1}}>
 
           </div>
-          <div style={{
-            position: 'absolute',
-            bottom: 10,
-            width: '400px',
-            height: '500px',
-            background: '#333',
+          <div className={styles.tinderCard} style={{
+            top: 5,
+            zIndex: 9,
+            opacity: 1,
             transform: 'perspective(1000px) rotate3d(0, 1, 0, 1deg)',
-            borderRadius: '10px',
           }}>
 
           </div>
