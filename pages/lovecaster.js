@@ -5,7 +5,7 @@ import { AuthKitProvider, SignInButton, useProfile } from "@farcaster/auth-kit";
 import styles from '@/styles/Home.module.css'
 import { useState, useEffect } from 'react'
 import io from 'socket.io-client';
-import { FiHeart, FiUser, FiX } from 'react-icons/fi';
+import { FiHeart, FiUser, FiX, FiMail } from 'react-icons/fi';
 
 export default function LoveCaster() {
 
@@ -35,7 +35,14 @@ DISLIKE
     username: 'nish',
     image: 'https://i.seadn.io/gae/SypPjsAZsAaiNvsh2V7w8M1PXz7o2t0EFNb4Jd04yx5y_rtr7MeA4fFPRlSK-3M9b5Vv7EoF8W7BVHEKZ_NhqQrsBhtTi9hieFk8CXg?w=500&auto=format&',
     id: '1317',
-  }]);
+  },
+  {
+    name: 'nishu',
+    username: 'nish',
+    image: 'https://i.seadn.io/gae/SypPjsAZsAaiNvsh2V7w8M1PXz7o2t0EFNb4Jd04yx5y_rtr7MeA4fFPRlSK-3M9b5Vv7EoF8W7BVHEKZ_NhqQrsBhtTi9hieFk8CXg?w=500&auto=format&',
+    id: '1317',
+  }
+]);
 
   const [unRead, setUnRead] = useState(0);
 
@@ -138,6 +145,19 @@ DISLIKE
                   </div>
                 </div>
               </div>
+              <button style={{
+                background: 'none',
+                border: 'none',
+                color: '#10b981',
+                margin: 'auto'
+              }}
+                onClick={() => {
+                  // window open new tab https://warpcast.com/~/inbox/${match.id}-${myId}
+                  window.open(`https://warpcast.com/${match.username}`, '_blank');
+                }}
+              >
+                <FiMail />
+              </button>
               <button style={{
                 background: 'none',
                 border: 'none',
