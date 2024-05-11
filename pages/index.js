@@ -309,6 +309,12 @@ export default function Home() {
       description: 'Create a tier list of NFTs',
       publishDate: '10th May 2024',
       url: '/nfttierlist',
+    },
+    {
+      title: 'Lovecaster',
+      description: 'Find love on warpcast',
+      publishDate: '11th May 2024',
+      url: '/lovecaster',
     }
     // {
     //   title: 'Best Time',
