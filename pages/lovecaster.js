@@ -8,7 +8,7 @@ import io from 'socket.io-client';
 import { FiHeart, FiUser, FiX } from 'react-icons/fi';
 
 export default function LoveCaster() {
-  
+
   const [members, setMembers] = useState([{
     name: 'nishu',
     username: 'nishu',
@@ -44,49 +44,55 @@ DISLIKE
           height: 'max-content',
           position: 'relative',
           justifyContent: 'center',
+          paddingTop: 100,
           zoom: 1.25,
         }}>
           {members.map((member, index) => (
-            <div className={styles.tinderCard} id={`tinder-card-${index}`} style={{ opacity: 1 - index * 0.1, zIndex: 10 - index, top: 20 + ((index % 5)* 5), borderColor: `rgba(51,51,51,${(index+1)*0.95})` }}>
+            <div className={styles.tinderCard} id={`tinder-card-${index}`} style={{ opacity: 1 - index * 0.1, zIndex: 10 - index, top: 70 + ((index % 5) * 5), borderColor: `rgba(51,51,51,${(index + 1) * 0.95})` }}>
               {/* about */}
               <div>
-                <h1 className={styles.name}>{member.name}</h1>
-                <h2 className={styles.username}>{member.username}</h2>
-                <p className={styles.bio}>{member.bio}</p>
+                <div style={{ display: 'flex', gap: 20 }}>
+                  <img src={member.img} style={{ width: 50, height: 50, borderRadius: '50%', border: '1px solid #333' }} />
+                  <div style={{ display: 'flex', flexDirection: 'column', fontSize: '12px', fontWeight: '100' }}>
+                    <span className={styles.name}>{member.name}</span>
+                    <span className={styles.username}>@{member.username}</span>
+                    <p className={styles.bio}>{member.bio}</p>
+                  </div>
+                </div>
                 <p className={styles.about}>{member.about}</p>
               </div>
-            <div className={styles.swipeMenu}>
-              <button className={styles.swipeButton} style={{  color: '#f87171' }} onClick={() => {
-                document.getElementById(`tinder-card-${index}`).style.background = '#f87171';
-                setTimeout(() => {
-                  if(members.length > 0) {
-                    setMembers(members.filter((m, i) => i !== index));
-                    console.log('swiped left', members.length);
-                    document.getElementById(`tinder-card-${index}`).style.background = '#000';
-                  }
-                }, 500);
-                // set current element background to red
-              }}>
-              <FiX/>
-              </button>
-              <button className={styles.swipeButton} style={{ color: '#10b981' }} onClick={() => {
-                document.getElementById(`tinder-card-${index}`).style.background = '#10b981';
-                setTimeout(() => {
-                  if(members.length > 0) {
-                    document.getElementById(`tinder-card-${index}`).style.background = '#000';
-                    setMembers(members.filter((m, i) => i !== index));
-                    console.log('swiped right', members.length);
-                    // set current element background to green
-                  }
-                }, 500);
-              }}>
-              <FiHeart/>
-              </button>
+              <div className={styles.swipeMenu}>
+                <button className={styles.swipeButton} style={{ color: '#f87171' }} onClick={() => {
+                  document.getElementById(`tinder-card-${index}`).style.background = '#f87171';
+                  setTimeout(() => {
+                    if (members.length > 0) {
+                      setMembers(members.filter((m, i) => i !== index));
+                      console.log('swiped left', members.length);
+                      document.getElementById(`tinder-card-${index}`).style.background = '#000';
+                    }
+                  }, 500);
+                  // set current element background to red
+                }}>
+                  <FiX />
+                </button>
+                <button className={styles.swipeButton} style={{ color: '#10b981' }} onClick={() => {
+                  document.getElementById(`tinder-card-${index}`).style.background = '#10b981';
+                  setTimeout(() => {
+                    if (members.length > 0) {
+                      document.getElementById(`tinder-card-${index}`).style.background = '#000';
+                      setMembers(members.filter((m, i) => i !== index));
+                      console.log('swiped right', members.length);
+                      // set current element background to green
+                    }
+                  }, 500);
+                }}>
+                  <FiHeart />
+                </button>
+              </div>
             </div>
-          </div>
 
           ))}
-          
+
           {/* <div className={styles.tinderCard} style={{
             top: 5,
             zIndex: 9,

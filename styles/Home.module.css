@@ -379,12 +379,9 @@
   backdrop-filter: blur(2px);
   border: 1px solid rgba(180, 151, 151, 0.01);
   transform: perspective(400px) rotate3d(1, -1, 0, calc(var(--i, 1) * 2deg));
-  mask:
-    linear-gradient(135deg,#000c 50%,#000,#000c 60%)
-    100% 100%/240% 240%;
+  mask: linear-gradient(135deg, #000c 50%, #000, #000c 60%) 100% 100%/240% 240%;
   transition: 5s;
   cursor: pointer;
-
 }
 .nftcard:hover {
   --i: -1;
@@ -419,15 +416,13 @@
 }
 
 .tinderCard .name {
-  
+  font-weight: bold;
 }
 
 .tinderCard .img {
-
 }
 
 .tinderCard .bio {
-
 }
 .tinderCard .about {
   font-size: 10px;
@@ -437,8 +432,8 @@
   overflow: scroll;
   font-family: monospace;
   white-space: pre-wrap;
-  color: #777;
-  border: 1px solid red;
+  overflow-x: hidden;
+  color: #888;
 }
 
 .swipeButton {
@@ -465,7 +460,7 @@
 @media (max-width: 700px) {
   .tinderCard {
     width: 70vw;
-    height: 60vh;
+    height: 50vh;
   }
   .tinderCard .about {
     max-height: 50vw;
