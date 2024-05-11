@@ -9,7 +9,7 @@ import { FiHeart, FiUser, FiX } from 'react-icons/fi';
 
 export default function LoveCaster() {
   
-  const [members, setMembers] = useState([]);
+  const [members, setMembers] = useState([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
 
   return (
     <>
@@ -27,26 +27,46 @@ export default function LoveCaster() {
           justifyContent: 'center',
           zoom: 1.25,
         }}>
-          <div className={styles.tinderCard} style={{ opacity: 1}}>
+          {members.map((member, index) => (
+            <div className={styles.tinderCard} id={`tinder-card-${index}`} style={{ opacity: 1 - index * 0.1, zIndex: 10 - index, top: 20 + ((index % 5)* 5), borderColor: `rgba(51,51,51,${(index+1)*0.95})` }}>
 
             <div className={styles.swipeMenu}>
-              <button className={styles.swipeButton} style={{  color: '#f87171' }}>
+              <button className={styles.swipeButton} style={{  color: '#f87171' }} onClick={() => {
+                document.getElementById(`tinder-card-${index}`).style.background = '#f87171';
+                setTimeout(() => {
+                  document.getElementById(`tinder-card-${index}`).style.background = '#000';
+                }, 500);
+                setMembers(members.filter((m, i) => i !== index));
+                console.log('swiped left', members.length);
+                // set current element background to red
+              }}>
               <FiX/>
               </button>
-              <button className={styles.swipeButton} style={{ color: '#10b981' }}>
+              <button className={styles.swipeButton} style={{ color: '#10b981' }} onClick={() => {
+                document.getElementById(`tinder-card-${index}`).style.background = '#10b981';
+                setTimeout(() => {
+                  document.getElementById(`tinder-card-${index}`).style.background = '#000';
+                }, 500);
+                setMembers(members.filter((m, i) => i !== index));
+                console.log('swiped right', members.length);
+                // set current element background to green
+              }}>
               <FiHeart/>
               </button>
             </div>
           </div>
-          <div className={styles.tinderCard} style={{
+
+          ))}
+          
+          {/* <div className={styles.tinderCard} style={{
             top: 5,
             zIndex: 9,
             opacity: 1,
-            background: 'red',
+            background: '#333',
             transform: 'perspective(1000px) rotate3d(0, 1, 0, 1deg)',
           }}>
 
-          </div>
+          </div> */}
         </div>
         {/* at the bottom of main */}
         <div style={{

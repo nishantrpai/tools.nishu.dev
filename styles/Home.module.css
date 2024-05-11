@@ -404,15 +404,17 @@
 }
 
 .tinderCard {
-  width: 400px;
+  width: 350px;
   position: absolute;
   top: 50%;
   height: 500px;
-  background: #111;
+  background: #000;
+  opacity: 1;
   transform: perspective(1000px) rotate3d(0, 1, 0, 1deg);
   border-radius: 10px;
   z-index: 10;
   transition: all 0.5s;
+  border: 1px solid #333;
 }
 
 
