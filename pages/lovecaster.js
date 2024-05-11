@@ -5,9 +5,12 @@ import { AuthKitProvider, SignInButton, useProfile } from "@farcaster/auth-kit";
 import styles from '@/styles/Home.module.css'
 import { useState, useEffect } from 'react'
 import io from 'socket.io-client';
-import { FiHeart, FiUser } from 'react-icons/fi';
+import { FiHeart, FiUser, FiX } from 'react-icons/fi';
 
 export default function LoveCaster() {
+  
+  const [members, setMembers] = useState([]);
+
   return (
     <>
       <Head>
@@ -26,11 +29,20 @@ export default function LoveCaster() {
         }}>
           <div className={styles.tinderCard} style={{ opacity: 1}}>
 
+            <div className={styles.swipeMenu}>
+              <button className={styles.swipeButton} style={{  color: '#f87171' }}>
+              <FiX/>
+              </button>
+              <button className={styles.swipeButton} style={{ color: '#10b981' }}>
+              <FiHeart/>
+              </button>
+            </div>
           </div>
           <div className={styles.tinderCard} style={{
             top: 5,
             zIndex: 9,
             opacity: 1,
+            background: 'red',
             transform: 'perspective(1000px) rotate3d(0, 1, 0, 1deg)',
           }}>
 
