@@ -6,30 +6,14 @@ import styles from '@/styles/Home.module.css'
 import { useState, useEffect } from 'react'
 import io from 'socket.io-client';
 import { FiHeart, FiUser, FiX, FiMail } from 'react-icons/fi';
+const socket = io.connect('http://localhost:8080');
 
 export default function LoveCaster() {
 
-  const [myId, setMyId] = useState('5260');
-  const [members, setMembers] = useState([{
-    name: 'nishu',
-    username: 'nishu',
-    bio: 'I am a software engineer',
-    about: `ABOUT
-- nishu creates various tools and scripts for different purposes.
-- nishu enjoys building and sharing projects with the community.
-- nishu values feedback and interaction from others on their work.
-
-LIKE
-- nishu likes developing tools to enhance user experiences.
-- nishu appreciates the support and comments from their audience.
-- nishu enjoys exploring new ideas and expanding their skill set.
-
-DISLIKE
-- nishu dislikes technical issues like website downtime or missed notifications.
-- nishu may find managing multiple projects and maintaining them challenging.
-- nishu might struggle with staying organized or keeping up with all the tasks.`,
-    img: `https://i.seadn.io/gae/SypPjsAZsAaiNvsh2V7w8M1PXz7o2t0EFNb4Jd04yx5y_rtr7MeA4fFPRlSK-3M9b5Vv7EoF8W7BVHEKZ_NhqQrsBhtTi9hieFk8CXg?w=500&auto=format&`
-  }]);
+  const [myusername, setMyUsername] = useState('nishu');
+  const [accounts, setAccounts] = useState([]);
+  const [members, setMembers] = useState([]);
+  const [preferences, setPreferences] = useState('female');
   const [matches, setMatches] = useState([{
     name: 'nishu',
     username: 'nish',
@@ -42,15 +26,51 @@ DISLIKE
     image: 'https://i.seadn.io/gae/SypPjsAZsAaiNvsh2V7w8M1PXz7o2t0EFNb4Jd04yx5y_rtr7MeA4fFPRlSK-3M9b5Vv7EoF8W7BVHEKZ_NhqQrsBhtTi9hieFk8CXg?w=500&auto=format&',
     id: '1317',
   }
-]);
+  ]);
 
-  const [unRead, setUnRead] = useState(0);
+  const [unRead, setUnRead] = useState(1);
 
   const [page, setPage] = useState('profiles');
+
+  useEffect(() => {
+    // for each member we have to add bio, username image and about if it doesn't exist
+    accounts.forEach(account => {
+      if (!members.find(member => member.username === account.username)) {
+        console.log('adding member', account.username, members);
+        setMembers(prev => [...prev, {
+          name: account.username,
+          username: account.username,
+          img: 'https://i.seadn.io/gae/SypPjsAZsAaiNvsh2V7w8M1PXz7o2t0EFNb4Jd04yx5y_rtr7MeA4fFPRlSK-3M9b5Vv7EoF8W7BVHEKZ_NhqQrsBhtTi9hieFk8CXg?w=500&auto=format&',
+          bio: 'I am a warp caster',
+          about: 'I am a warp caster',
+        }]
+        );
+      }
+    });
+  }, [accounts]);
+
+  useEffect(() => {
+    socket.on('connect', () => {
+      console.log('connected to socket');
+    });
+    socket.emit('joinRoom', { preference: preferences, gender: 'female', username: myusername });
+    socket.on('getAccounts', (accounts) => {
+      console.log('accounts', accounts);
+      setAccounts(accounts);
+    });
+  }, [preferences]);
 
   const Profiles = () => {
     return (
       <>
+        {members.length}
+        {/* radio button of male or female */}
+        <select value={preferences} onChange={(e) => {
+          setPreferences(e.target.value);
+        }}> 
+          <option value={'male'}>male</option>
+          <option value={'female'}>female</option>
+        </select>
         <div style={{
           display: 'flex',
           width: 'max-content',
