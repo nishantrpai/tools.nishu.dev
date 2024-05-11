@@ -9,7 +9,26 @@ import { FiHeart, FiUser, FiX } from 'react-icons/fi';
 
 export default function LoveCaster() {
   
-  const [members, setMembers] = useState([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+  const [members, setMembers] = useState([{
+    name: 'nishu',
+    username: 'nishu',
+    bio: 'I am a software engineer',
+    about: `ABOUT
+- nishu creates various tools and scripts for different purposes.
+- nishu enjoys building and sharing projects with the community.
+- nishu values feedback and interaction from others on their work.
+
+LIKE
+- nishu likes developing tools to enhance user experiences.
+- nishu appreciates the support and comments from their audience.
+- nishu enjoys exploring new ideas and expanding their skill set.
+
+DISLIKE
+- nishu dislikes technical issues like website downtime or missed notifications.
+- nishu may find managing multiple projects and maintaining them challenging.
+- nishu might struggle with staying organized or keeping up with all the tasks.`,
+    img: `https://i.seadn.io/gae/SypPjsAZsAaiNvsh2V7w8M1PXz7o2t0EFNb4Jd04yx5y_rtr7MeA4fFPRlSK-3M9b5Vv7EoF8W7BVHEKZ_NhqQrsBhtTi9hieFk8CXg?w=500&auto=format&`
+  }]);
 
   return (
     <>
@@ -29,15 +48,23 @@ export default function LoveCaster() {
         }}>
           {members.map((member, index) => (
             <div className={styles.tinderCard} id={`tinder-card-${index}`} style={{ opacity: 1 - index * 0.1, zIndex: 10 - index, top: 20 + ((index % 5)* 5), borderColor: `rgba(51,51,51,${(index+1)*0.95})` }}>
-
+              {/* about */}
+              <div>
+                <h1 className={styles.name}>{member.name}</h1>
+                <h2 className={styles.username}>{member.username}</h2>
+                <p className={styles.bio}>{member.bio}</p>
+                <p className={styles.about}>{member.about}</p>
+              </div>
             <div className={styles.swipeMenu}>
               <button className={styles.swipeButton} style={{  color: '#f87171' }} onClick={() => {
                 document.getElementById(`tinder-card-${index}`).style.background = '#f87171';
                 setTimeout(() => {
-                  document.getElementById(`tinder-card-${index}`).style.background = '#000';
+                  if(members.length > 0) {
+                    setMembers(members.filter((m, i) => i !== index));
+                    console.log('swiped left', members.length);
+                    document.getElementById(`tinder-card-${index}`).style.background = '#000';
+                  }
                 }, 500);
-                setMembers(members.filter((m, i) => i !== index));
-                console.log('swiped left', members.length);
                 // set current element background to red
               }}>
               <FiX/>
@@ -45,11 +72,13 @@ export default function LoveCaster() {
               <button className={styles.swipeButton} style={{ color: '#10b981' }} onClick={() => {
                 document.getElementById(`tinder-card-${index}`).style.background = '#10b981';
                 setTimeout(() => {
-                  document.getElementById(`tinder-card-${index}`).style.background = '#000';
+                  if(members.length > 0) {
+                    document.getElementById(`tinder-card-${index}`).style.background = '#000';
+                    setMembers(members.filter((m, i) => i !== index));
+                    console.log('swiped right', members.length);
+                    // set current element background to green
+                  }
                 }, 500);
-                setMembers(members.filter((m, i) => i !== index));
-                console.log('swiped right', members.length);
-                // set current element background to green
               }}>
               <FiHeart/>
               </button>

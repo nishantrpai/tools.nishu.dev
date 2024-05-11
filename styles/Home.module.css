@@ -414,9 +414,32 @@
   border-radius: 10px;
   z-index: 10;
   transition: all 0.5s;
+  padding: 20px;
   border: 1px solid #333;
 }
 
+.tinderCard .name {
+  
+}
+
+.tinderCard .img {
+
+}
+
+.tinderCard .bio {
+
+}
+.tinderCard .about {
+  font-size: 10px;
+  margin-top: 20px;
+  max-height: 300px;
+  line-height: 2;
+  overflow: scroll;
+  font-family: monospace;
+  white-space: pre-wrap;
+  color: #777;
+  border: 1px solid red;
+}
 
 .swipeButton {
   cursor: pointer;
@@ -443,5 +466,8 @@
   .tinderCard {
     width: 70vw;
     height: 60vh;
+  }
+  .tinderCard .about {
+    max-height: 50vw;
   }
 }
