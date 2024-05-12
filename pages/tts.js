@@ -219,7 +219,7 @@ export default function Home() {
           Text to Speech
         </h1>
         <div>
-          <textarea value={text} onChange={e => setText(e.target.value)}></textarea>
+          <textarea style={{ background: '#000', border: '1px solid #333', width:'500px', height: '200px' }} value={text} onChange={e => setText(e.target.value)}></textarea>
         </div>
         <div>
           {voices.length > 0 &&
