@@ -14,22 +14,11 @@ export default function LoveCaster() {
   const [accounts, setAccounts] = useState([]);
   const [members, setMembers] = useState([]);
   const [preferences, setPreferences] = useState('female');
+  const [gender, setGender] = useState('male');
   const [loading, setLoading] = useState(false);
-  const [matches, setMatches] = useState([{
-    name: 'nishu',
-    username: 'nish',
-    image: 'https://i.seadn.io/gae/SypPjsAZsAaiNvsh2V7w8M1PXz7o2t0EFNb4Jd04yx5y_rtr7MeA4fFPRlSK-3M9b5Vv7EoF8W7BVHEKZ_NhqQrsBhtTi9hieFk8CXg?w=500&auto=format&',
-    id: '1317',
-  },
-  {
-    name: 'nishu',
-    username: 'nish',
-    image: 'https://i.seadn.io/gae/SypPjsAZsAaiNvsh2V7w8M1PXz7o2t0EFNb4Jd04yx5y_rtr7MeA4fFPRlSK-3M9b5Vv7EoF8W7BVHEKZ_NhqQrsBhtTi9hieFk8CXg?w=500&auto=format&',
-    id: '1317',
-  }
-  ]);
+  const [matches, setMatches] = useState([]);
 
-  const [unRead, setUnRead] = useState(1);
+  const [unRead, setUnRead] = useState(0);
 
   const [page, setPage] = useState('profiles');
 
@@ -144,10 +133,26 @@ export default function LoveCaster() {
     socket.on('connect', () => {
       console.log('connected to socket');
     });
-    socket.emit('joinRoom', { preference: preferences, gender: 'female', username: myusername });
+    socket.emit('joinRoom', { preference: preferences, gender, username: myusername });
     socket.on('getAccounts', (accounts) => {
       console.log('accounts', accounts);
       setAccounts(accounts);
+    });
+    socket.on('match', (match) => {
+      console.log('match', match);
+      setMatches(prev => [...prev, match]);
+      setUnRead(unRead + 1);
+    });
+    socket.emit('getMatches', { username: myusername });
+    socket.on('getMatches', (matches) => {
+      // get matches for user
+      console.log('getMatches', myusername);
+      console.log('matches', matches.length);
+      matches.forEach(match => {
+        fetchMemberData(match.username).then(data => {
+          setMatches(prev => [...prev, data]);
+        });
+      });
     });
   }, [preferences]);
 
@@ -203,7 +208,7 @@ export default function LoveCaster() {
                   document.getElementById(`tinder-card-${index}`).style.background = '#10b981';
                   setTimeout(() => {
                     if (members.length > 0) {
-                      socket.emit('match', { username: myusername, match: member.username });
+                      socket.emit('like', { username: myusername, match: member.username });
                       document.getElementById(`tinder-card-${index}`).style.background = '#000';
                       setMembers(members.filter((m, i) => i !== index));
                       console.log('swiped right', members.length);
@@ -225,6 +230,10 @@ export default function LoveCaster() {
   }
 
   const Match = () => {
+    useEffect(() => {
+      console.log('opened matches')
+      setUnRead(0);
+    }, [])
     return (
       <>
         <div style={{
@@ -250,7 +259,7 @@ export default function LoveCaster() {
                 width: '100%',
               }}>
                 <div style={{ display: 'flex', flexBasis: '90%', gap: 20 }}>
-                  <img src={match.image} style={{ width: 50, height: 50, borderRadius: '50%', border: '1px solid #333' }} />
+                  <img src={match.img} style={{ width: 50, height: 50, borderRadius: '50%', border: '1px solid #333' }} />
                   <div style={{ display: 'flex', flexDirection: 'column', fontSize: '14px', fontWeight: '100', gap: 5, alignItems: 'center' }}>
                     <span className={styles.name}>{match.name}</span>
                     <span className={styles.username}>@{match.username}</span>
@@ -321,7 +330,7 @@ export default function LoveCaster() {
             onClick={() => setPage('matches')}
           >
             <FiHeart />
-            {unRead > 0 && <span style={{
+            {unRead > 0 ? <span style={{
               // top right of heart icon we'll add a badge with the number of matches
               position: 'absolute',
               top: 0,
@@ -329,13 +338,18 @@ export default function LoveCaster() {
               background: '#f87171',
               color: '#991b1b',
               borderRadius: '50%',
-              padding: '5px 8px',
+              padding: '8px',
               fontSize: 10,
               fontWeight: 'bold',
               transition: 'all 0.5s',
-            }}>
-              1
-            </span>}
+            }}
+              onClick={() => {
+                socket.emit('getMatches', { username: myusername });
+                setUnRead(0)
+              }}
+            >
+            
+            </span> : null}
           </button>
         </div>
 
