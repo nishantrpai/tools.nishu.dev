@@ -14,6 +14,7 @@ export default function LoveCaster() {
   const [accounts, setAccounts] = useState([]);
   const [members, setMembers] = useState([]);
   const [preferences, setPreferences] = useState('female');
+  const [loading, setLoading] = useState(false);
   const [matches, setMatches] = useState([{
     name: 'nishu',
     username: 'nish',
@@ -124,11 +125,16 @@ export default function LoveCaster() {
 
   useEffect(() => {
     // for each member we have to add bio, username image and about if it doesn't exist
+    setLoading(true);
     accounts.forEach(account => {
       if (!members.find(member => member.username === account.username)) {
         console.log('adding member', account.username, members);
         fetchMemberData(account.username).then(data => {
           setMembers(prev => [...prev, data]);
+          // if last member then set loading to false
+          if (members.length === accounts.length) {
+            setLoading(false);
+          }
         });
       }
     });
@@ -164,8 +170,9 @@ export default function LoveCaster() {
           paddingTop: 100,
           zoom: 1.25,
         }}>
+          {loading ? <div>Loading...</div> : null}
           {members.length > 0 ? members.map((member, index) => (
-            <div className={styles.tinderCard} id={`tinder-card-${index}`} style={{ opacity: 1 - index * 0.1, zIndex: 10 - index, top: 70 + ((index % 5) * 5), borderColor: `rgba(51,51,51,${(index + 1) * 0.95})` }}>
+            <div className={styles.tinderCard} id={`tinder-card-${index}`} style={{ opacity: 1 - index * 0.1, zIndex: 10 - index, top: 50 + ((index % 5) * 5), borderColor: `rgba(51,51,51,${(index + 1) * 0.95})` }}>
               {/* about */}
               <div>
                 <div style={{ display: 'flex', gap: 20 }}>
@@ -196,6 +203,7 @@ export default function LoveCaster() {
                   document.getElementById(`tinder-card-${index}`).style.background = '#10b981';
                   setTimeout(() => {
                     if (members.length > 0) {
+                      socket.emit('match', { username: myusername, match: member.username });
                       document.getElementById(`tinder-card-${index}`).style.background = '#000';
                       setMembers(members.filter((m, i) => i !== index));
                       console.log('swiped right', members.length);
