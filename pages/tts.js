@@ -174,6 +174,7 @@ export default function Home() {
   }, [text]);
 
   const speak = () => {
+    window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.voice = voice || window.speechSynthesis.getVoices()[0];
     utterance.rate = rate;
