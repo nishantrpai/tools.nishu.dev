@@ -6,7 +6,7 @@ import styles from '@/styles/Home.module.css'
 import { useState, useEffect } from 'react'
 import io from 'socket.io-client';
 import { FiHeart, FiUser, FiX, FiMail } from 'react-icons/fi';
-const socket = io.connect('http://localhost:8080');
+const socket = io.connect('https://lovecasterserver-production.up.railway.app');
 
 const config = {
   // For a production app, replace this with an Optimism Mainnet
