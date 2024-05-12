@@ -8,19 +8,35 @@ import io from 'socket.io-client';
 import { FiHeart, FiUser, FiX, FiMail } from 'react-icons/fi';
 const socket = io.connect('http://localhost:8080');
 
+const config = {
+  // For a production app, replace this with an Optimism Mainnet
+  // RPC URL from a provider like Alchemy or Infura.
+  relay: "https://relay.farcaster.xyz",
+  rpcUrl: "https://mainnet.optimism.io",
+  domain: "tools.nishu.dev",
+  siweUri: "localhost:3000/lovecaster",
+};
+
 export default function LoveCaster() {
 
-  const [myusername, setMyUsername] = useState('nishu');
+  const [myusername, setMyUsername] = useState('');
   const [accounts, setAccounts] = useState([]);
   const [members, setMembers] = useState([]);
   const [preferences, setPreferences] = useState('female');
+  const [fillPreferences, setFillPreferences] = useState(false);
   const [gender, setGender] = useState('male');
   const [loading, setLoading] = useState(false);
   const [matches, setMatches] = useState([]);
 
+  const profile = useProfile();
+  const {
+    isAuthenticated,
+    profile: { fid, displayName, custody },
+  } = profile;
+
   const [unRead, setUnRead] = useState(0);
 
-  const [page, setPage] = useState('profiles');
+  const [page, setPage] = useState('preferences');
 
   const formatSummary = (summary) => {
     // summary is a json object with keys about, like, dislike
@@ -81,7 +97,7 @@ export default function LoveCaster() {
             casts = casts.filter(cast => cast.author.fid === fid)
             casts = casts.map(cast => cast.text)
             casts = casts.filter(cast => cast.length > 0)
-            resolve({casts, profile})
+            resolve({ casts, profile })
           })
         })
     });
@@ -90,11 +106,11 @@ export default function LoveCaster() {
 
   const fetchMemberData = async (username) => {
     return new Promise((resolve, reject) => {
-      fetchTweets(username).then(async ({casts, profile}) => {
+      fetchTweets(username).then(async ({ casts, profile }) => {
         console.log('casts', casts.length);
         let summary = await summarize(casts, username);
         resolve({
-          name:  profile.displayName,
+          name: profile.displayName,
           username: profile.username,
           img: profile.avatarUrl,
           bio: profile.bio,
@@ -114,9 +130,12 @@ export default function LoveCaster() {
 
   useEffect(() => {
     // for each member we have to add bio, username image and about if it doesn't exist
+    if (accounts.length === 0) return;
     setLoading(true);
+    console.log('accounts', accounts.length);
     accounts.forEach(account => {
-      if (!members.find(member => member.username === account.username)) {
+      // remve members that are not in preferences
+      if (!members.find(member => member.username === account.username) && account.gender === preferences) {
         console.log('adding member', account.username, members);
         fetchMemberData(account.username).then(data => {
           setMembers(prev => [...prev, data]);
@@ -127,13 +146,25 @@ export default function LoveCaster() {
         });
       }
     });
+    setMembers(prev => prev.filter(member => accounts.find(account => account.username === member.username || account.gender !== preferences)))
   }, [accounts]);
 
   useEffect(() => {
+    if (myusername === '') return;
+
     socket.on('connect', () => {
       console.log('connected to socket');
     });
-    socket.emit('joinRoom', { preference: preferences, gender, username: myusername });
+    socket.emit('checkIfAccountExists', { username: myusername });
+    socket.on('accountExists', (exists) => {
+      if (!exists) {
+        socket.emit('joinRoom', { preference: preferences, gender, username: myusername });
+      } else {
+        console.log('account exists');
+        setPage('profiles');
+        socket.emit('joinRoom', { username: myusername });
+      }
+    });
     socket.on('getAccounts', (accounts) => {
       console.log('accounts', accounts);
       setAccounts(accounts);
@@ -154,7 +185,16 @@ export default function LoveCaster() {
         });
       });
     });
-  }, [preferences]);
+  }, [myusername, fillPreferences]);
+
+  useEffect(() => {
+    if (displayName === '' || displayName === null) return;
+    console.log('display name', displayName);
+    if (isAuthenticated) {
+      setMyUsername(displayName);
+      setPage('preferences');
+    }
+  }, [displayName])
 
   const Profiles = () => {
     return (
@@ -176,6 +216,7 @@ export default function LoveCaster() {
           zoom: 1.25,
         }}>
           {loading ? <div>Loading...</div> : null}
+          {!loading && members.length === 0 ? <div>No members found</div> : null}
           {members.length > 0 ? members.map((member, index) => (
             <div className={styles.tinderCard} id={`tinder-card-${index}`} style={{ opacity: 1 - index * 0.1, zIndex: 10 - index, top: 50 + ((index % 5) * 5), borderColor: `rgba(51,51,51,${(index + 1) * 0.95})` }}>
               {/* about */}
@@ -296,6 +337,45 @@ export default function LoveCaster() {
     )
   }
 
+  const Preferences = () => {
+    // ask for preferences and gender and set state
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 20, width: '100%' }}>
+        <h1>Interested in:</h1>
+        <select value={preferences} onChange={(e) => {
+          setPreferences(e.target.value);
+        }}>
+          <option value='male'>Men</option>
+          <option value='female'>Women</option>
+        </select>
+
+        <h1>Gender:</h1>
+        <select value={gender} onChange={(e) => {
+          setGender(e.target.value);
+        }}>
+          <option value='male'>Male</option>
+          <option value='female'>Female</option>
+        </select>
+        <button onClick={() => {
+          setPage('profiles');
+          setFillPreferences(true);
+        }}>Submit</button>
+      </div>
+    )
+  }
+
+  const Login = () => {
+    return (
+      <>
+        <SignInButton onSuccess={(profile) => {
+          console.log('profile', profile);
+          setMyUsername(profile.username);
+          setPage('preferences');
+        }} />
+      </>
+    )
+  }
+
   return (
     <>
       <Head>
@@ -303,57 +383,64 @@ export default function LoveCaster() {
         <meta name="description" content="Find love on Warpcast, the dating app for warpcasters" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main style={{ borderRight: '1px solid #333', borderLeft: '1px solid #333', position: 'relative' }}>
-        {page === 'profiles' && <Profiles />}
-        {page === 'matches' && <Match />}
-        <div style={{
-          position: 'absolute',
-          height: 50,
-          bottom: 10,
-          width: '100%',
-          display: 'flex',
-        }}>
-          <button style={{
-            flex: 1,
-            background: 'none',
-          }}
-            onClick={() => setPage('profiles')}
-          >
-            <FiUser />
-          </button>
-          <button style={{
-            flex: 1,
-            background: 'none',
-            borderLeft: '1px solid #333 !important',
-            borderRadius: 0
-          }}
-            onClick={() => setPage('matches')}
-          >
-            <FiHeart />
-            {unRead > 0 ? <span style={{
-              // top right of heart icon we'll add a badge with the number of matches
-              position: 'absolute',
-              top: 0,
-              margin: 'auto',
-              background: '#f87171',
-              color: '#991b1b',
-              borderRadius: '50%',
-              padding: '8px',
-              fontSize: 10,
-              fontWeight: 'bold',
-              transition: 'all 0.5s',
-            }}
-              onClick={() => {
-                socket.emit('getMatches', { username: myusername });
-                setUnRead(0)
-              }}
-            >
-            
-            </span> : null}
-          </button>
-        </div>
+      <AuthKitProvider config={config}>
+        <main style={{ borderRight: '1px solid #333', borderLeft: '1px solid #333', position: 'relative' }}>
+          <span>{displayName} {isAuthenticated}</span>
+          {!myusername ? <Login /> :
+            <>
+              {page === 'preferences' && <Preferences />}
+              {page === 'profiles' && <Profiles />}
+              {page === 'matches' && <Match />}
+              {myusername ? <div style={{
+                position: 'absolute',
+                height: 50,
+                bottom: 10,
+                width: '100%',
+                display: 'flex',
+              }}>
+                <button style={{
+                  flex: 1,
+                  background: 'none',
+                }}
+                  onClick={() => setPage('profiles')}
+                >
+                  <FiUser />
+                </button>
+                <button style={{
+                  flex: 1,
+                  background: 'none',
+                  borderLeft: '1px solid #333 !important',
+                  borderRadius: 0
+                }}
+                  onClick={() => setPage('matches')}
+                >
+                  <FiHeart />
+                  {unRead > 0 ? <span style={{
+                    // top right of heart icon we'll add a badge with the number of matches
+                    position: 'absolute',
+                    top: 0,
+                    margin: 'auto',
+                    background: '#f87171',
+                    color: '#991b1b',
+                    borderRadius: '50%',
+                    padding: '8px',
+                    fontSize: 10,
+                    fontWeight: 'bold',
+                    transition: 'all 0.5s',
+                  }}
+                    onClick={() => {
+                      socket.emit('getMatches', { username: myusername });
+                      setUnRead(0)
+                    }}
+                  >
 
-      </main>
+                  </span> : null}
+                </button>
+              </div>
+                : null}
+            </>}
+        </main>
+      </AuthKitProvider>
     </>
   )
 }
