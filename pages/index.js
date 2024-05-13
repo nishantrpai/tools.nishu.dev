@@ -315,6 +315,12 @@ export default function Home() {
       description: 'Find love on warpcast',
       publishDate: '11th May 2024',
       url: '/lovecaster',
+    },
+    {
+      title: 'Read Smart Contract',
+      description: 'Read a smart contract, regardless of whether it is verified or not',
+      publishDate: '13th May 2024',
+      url: '/readsc',
     }
     // {
     //   title: 'Best Time',
