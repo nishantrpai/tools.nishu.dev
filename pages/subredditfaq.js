@@ -19,7 +19,7 @@ export default function SubredditIdeas() {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ prompt: `"Here are some recent posts from the subreddit ${subreddit}: ${posts.join(', ')}. \n\nFrom the posts problems have two patterns, people are either complaining about it or looking for solutions or maybe something else. Filter only the problems, don't show anything else. Two problems could be the same, but expressed in different langauge consider it as one.  List the problems and frequency for each for e.g., 1/d 1/h 1/w 1/y and how many posts you found related to that. Sort by most frequent to least frequent, many posts would be great. Respond in json format for e.g.,[{problem, frequency, no}]. Don't add \` in the response."` })
+      body: JSON.stringify({ prompt: `"Here are some recent posts from the subreddit ${subreddit}: ${posts.join(', ')}. \n\nFrom the posts problems have two patterns, people are either complaining about it or looking for solutions or maybe something else. Filter only the problems, don't show anything else. Two problems could be the same, but expressed in different langauge consider it as one.  List the problems and frequency for each for e.g., 1/d 1/h 1/w 1/y and how many posts you found related to that. Sort by most frequent to least frequent, many posts would be great. Respond only in json format for e.g.,[{problem, frequency, no}]. Don't add \` in the response."` })
     })
       .then(res => res.json())
       .then(data => {
@@ -45,14 +45,14 @@ export default function SubredditIdeas() {
   return (
     <>
       <Head>
-        <title>Subreddit Ideas</title>
-        <meta name="description" content="Get frequently asked questions/problems from a subreddit" />
+        <title>Subreddit FAQ</title>
+        <meta name="description" content="Get frequently asked questions in a subreddit" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
 
-        <h1 className={styles.title}>Subreddit Ideas</h1>
-        <p className={styles.description} style={{ width: '100%', textAlign: 'center' }}>Get frequently asked questions/problems from a subreddit</p>
+        <h1 className={styles.title}>Subreddit FAQ</h1>
+        <p className={styles.description} style={{ width: '100%', textAlign: 'center' }}>Get frequently asked questions from a subreddit</p>
 
         <form style={{ display: 'flex', gap: '10px', width: '70%' }}>
           <input style={{ background: '#000', color: '#fff', border: '1px solid #333', width: '90%', padding: '5px', borderRadius: 5 }} type="text" defaultValue={subreddit} id="subreddit" placeholder='Enter the subreddit'/>
