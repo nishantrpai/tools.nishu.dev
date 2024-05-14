@@ -75,7 +75,7 @@ export default function SubredditIdeas() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
               <li key={index}>{idea.problem}</li>
               <div style={{ display: 'flex', gap: 10, fontSize: '8px', color: '#888' }}>
-                <span>frequence: {idea.frequency}</span>
+                <span>frequency: {idea.frequency}</span>
                 <span>number: {idea.no}</span>
               </div>
             </div>
