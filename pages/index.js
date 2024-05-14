@@ -321,6 +321,12 @@ export default function Home() {
       description: 'Read a smart contract, regardless of whether it is verified or not',
       publishDate: '13th May 2024',
       url: '/readsc',
+    },
+    {
+      title: 'Get ideas from subreddit',
+      description: 'Get frequently asked questions from a subreddit',
+      publishDate: '14th May 2024',
+      url: '/subredditideas',
     }
     // {
     //   title: 'Best Time',
