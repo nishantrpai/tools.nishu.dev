@@ -52,7 +52,7 @@ export default function SubredditIdeas() {
       <main>
 
         <h1 className={styles.title}>Subreddit FAQ</h1>
-        <p className={styles.description} style={{ width: '100%', textAlign: 'center' }}>Get frequently asked questions from a subreddit</p>
+        <p className={styles.description} style={{ width: '100%', textAlign: 'center' }}>Get frequently asked questions in a subreddit</p>
 
         <form style={{ display: 'flex', gap: '10px', width: '70%' }}>
           <input style={{ background: '#000', color: '#fff', border: '1px solid #333', width: '90%', padding: '5px', borderRadius: 5 }} type="text" defaultValue={subreddit} id="subreddit" placeholder='Enter the subreddit'/>
