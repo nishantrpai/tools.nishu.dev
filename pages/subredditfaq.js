@@ -34,7 +34,7 @@ export default function SubredditIdeas() {
       setStatus('fetching posts...')
       const res = await fetch(`https://www.reddit.com/r/${subreddit}/hot.json?limit=20`)
       const data = await res.json()
-      let posts = data.data.children.map(post => `${post.data.title}`)
+      let posts = data.data.children.map(post => `${post.data.title} ${post.data.selftext}`)
       getIdeas(posts)
       setLoading(false)
     }
