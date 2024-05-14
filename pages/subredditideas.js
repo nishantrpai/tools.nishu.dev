@@ -19,7 +19,7 @@ export default function SubredditIdeas() {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ prompt: `"Here are some recent posts from the subreddit ${subreddit}: ${posts.join(', ')}. \n\nFrom the posts problems have two patterns, people are either complaining about it or looking for solutions or maybe something else. Filter only the problems, don't show anything else. Two problems could be the same, but expressed in different langauge consider it as one.  List the problems and frequency for each for e.g., 1/d 1/h 1/w 1/y and how many posts you found related to that. Sort by most frequent to least frequent, many posts would be great. Respond in json format for e.g.,[{problem, frequency, no}]."` })
+      body: JSON.stringify({ prompt: `"Here are some recent posts from the subreddit ${subreddit}: ${posts.join(', ')}. \n\nFrom the posts problems have two patterns, people are either complaining about it or looking for solutions or maybe something else. Filter only the problems, don't show anything else. Two problems could be the same, but expressed in different langauge consider it as one.  List the problems and frequency for each for e.g., 1/d 1/h 1/w 1/y and how many posts you found related to that. Sort by most frequent to least frequent, many posts would be great. Respond in json format for e.g.,[{problem, frequency, no}]. Don't add \` in the response."` })
     })
       .then(res => res.json())
       .then(data => {
