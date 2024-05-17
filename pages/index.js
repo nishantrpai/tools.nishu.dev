@@ -327,6 +327,12 @@ export default function Home() {
       description: 'Get frequently asked questions from a subreddit',
       publishDate: '14th May 2024',
       url: '/subredditideas',
+    },
+    {
+      title: 'Is there a tool for that',
+      description: 'Find tools for your idea',
+      publishDate: '15th May 2024',
+      url: '/isthereatool',
     }
     // {
     //   title: 'Best Time',
