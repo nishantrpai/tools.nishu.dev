@@ -6,6 +6,9 @@
   max-width: var(--max-width);
   width: 100%;
   z-index: 2;
+  width: 100%;
+  text-align: center;
+  margin-bottom: 20px;
 }
 
 .row {
