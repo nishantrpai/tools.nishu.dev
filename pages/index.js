@@ -343,6 +343,12 @@ export const tools = [
     description: 'Find words for a given word',
     publishDate: '19th May 2024',
     url: '/wordfor',
+  },
+  {
+    title: 'Extract Images from PDF/DOCX/PPTX',
+    description: 'Extract images from PDF/DOCX/PPTX',
+    publishDate: '20th May 2024',
+    url: '/extractimages',
   }
   // {
   //   title: 'Elaborate',
