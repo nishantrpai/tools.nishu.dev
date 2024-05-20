@@ -5,18 +5,41 @@ import { useState, useEffect } from 'react'
 import JSZip from 'jszip'
 
 export default function ExtractImages() {
+  
+  const zip = new JSZip();
+  
   const handleFileChange = (e) => {
     console.log(e.target.files)
     // extract images from the files
     let files = e.target.files
     if (files.length === 0) return
     files = Array.from(files)
-    files.forEach(file => {
-      const reader = new FileReader()
-      reader.onload = async (e) => {
-        console.log('loaded')
-      }
-      reader.readAsDataURL(file)
+    files.forEach(async file => {
+      zip.loadAsync(file).then(async (zipFiles) => {
+        // get all images from media folder could be /word/media or /ppt/media regardless
+        const images = zipFiles.file(/\/media\//)
+        // zip.file all images and download
+        let imgfolder =  zip.folder('images')
+        await Promise.all(images.map(async (image, index) => {
+          const content = await image.async('blob')
+          imgfolder.file(`${index+1}.${image.name.split('.').pop()}`, content)
+        }));
+        zip.generateAsync({type:"blob",
+          compression: "DEFLATE",
+          compressionOptions: {
+            level: 9
+          }
+        })
+          .then(content => {
+            // create content as photos.zip and download
+            const a = document.createElement('a')
+            const url = URL.createObjectURL(content)
+            a.href = url
+            a.download = 'images.zip'
+            a.click()
+            URL.revokeObjectURL(url)
+          })     
+      });
     })
   }
   const handleDownload = (e) => {
@@ -42,7 +65,8 @@ export default function ExtractImages() {
         width: '100%',
         textAlign: 'center'
       }}>
-        Extract images from a PDF/Docx/Doc/PPTX/PPT file
+        Extract images from a PDF/Docx/Doc/PPTX/PPT file.
+        On Mac use `unzip images.zip` to extract (idk why)
       </p>
 
       <div style={{
@@ -74,13 +98,6 @@ export default function ExtractImages() {
             width: '100%',
             border: '1px solid #000'
           }}/> */}
-        </div>
-        <div style={{
-          display: 'flex',
-          justifyContent: 'center',
-          textAlign: 'center'
-        }}>
-          <button onClick={handleDownload}>Download</button>
         </div>
       </div>
     </main>
