@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { useState, useEffect } from 'react'
-import {FiSearch} from 'react-icons/fi'
+import { FiSearch } from 'react-icons/fi'
 
 
 export const tools = [
@@ -375,7 +375,7 @@ export const tools = [
 
 export default function Home() {
 
-  
+
   const [search, setSearch] = useState('')
   const [filteredTools, setFilteredTools] = useState(tools)
 
@@ -406,26 +406,35 @@ export default function Home() {
           fontSize: '14px',
           marginBottom: '10px',
         }}
-        target='_blank'
+          target='_blank'
         >
           @PaiNishant
-          </a>
+        </a>
         <div className={styles.searchContainer}>
           <FiSearch className={styles.searchIcon} />
           <input className={styles.search} onChange={(e) => {
             setSearch(e.target.value)
           }} placeholder="Search for tools..."></input>
         </div>
-        <div className='grid'>
-        {filteredTools.map((tool, index) => (
-          <a key={index} className={styles.card} href={tool.url}>
-            <h2>{tool.icon}</h2>
-            <p>{tool.title}</p>
-            <span className={styles.date}>{tool.publishDate}</span>
-          </a>
-        ))}
+        <div style={{ display: 'flex', flexDirection: 'column', width: '100%', gap: '20px', marginBottom: 30 }}>
+          {filteredTools.map((tool, index) => (
+            <a key={index} href={tool.url}>
+              <p style={{
+                fontSize: '1rem',
+                color: '#eee',
+                marginBottom: '10px',
+              }}>{tool.title}</p>
+              <p style={{
+                fontSize: '0.8rem',
+                display: 'flex',
+                color: '#888',
+                marginBottom: '10px',
+              }}>{tool.description}</p>
+              <span className={styles.date}>{tool.publishDate}</span>
+            </a>
+          ))}
         </div>
-        
+
       </main>
     </>
   )
