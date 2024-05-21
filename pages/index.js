@@ -349,13 +349,13 @@ export const tools = [
     description: 'Extract images from PDF/DOCX/PPTX',
     publishDate: '20th May 2024',
     url: '/extractimages',
+  },
+  {
+    title: 'Elaborate',
+    description: 'Elaborate on your text to provide more context',
+    publishDate: '21st May 2024',
+    url: '/elaborate',
   }
-  // {
-  //   title: 'Elaborate',
-  //   description: 'Elaborate on your text to provide more context',
-  //   publishDate: '17th May 2024',
-  //   url: '/elaborate',
-  // }
   // {
   //   title: 'Best Time',
   //   description: 'Pick the best time for you and your friends across timezones',
