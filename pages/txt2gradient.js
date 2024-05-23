@@ -2,6 +2,7 @@
 import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { useState, useEffect } from 'react'
+import html2canvas from 'html2canvas'
 
 
 export default function Home() {
@@ -49,7 +50,7 @@ export default function Home() {
         />
 
         <button onClick={sensationalize} className={styles.button}>
-          {loading ? 'Analyzing...' : 'Analyze'}
+          {loading ? 'Generating...' : 'Generate'}
         </button>
 
         {sensationalizedText && (
@@ -59,11 +60,23 @@ export default function Home() {
               height: '500px',
               width: '500px',
               borderRadius: 10,
-            }}>
+            }} id="gradient-square">
             </div>
             {sensationalizedText}
           </div>
         )}
+        <div style={{ marginTop: '20px' }}>
+          <button onClick={() => {
+            html2canvas(document.getElementById('gradient-square')).then(function(canvas) {
+              var a = document.createElement('a');
+              a.href = canvas.toDataURL("image/png");
+              a.download = 'gradient.png';
+              a.click();
+            });
+          }} className={styles.button}>
+            Download Gradient
+            </button>
+          </div>
       </main>
     </>
   )

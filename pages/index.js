@@ -355,6 +355,18 @@ export const tools = [
     description: 'Elaborate on your text to provide more context',
     publishDate: '21st May 2024',
     url: '/elaborate',
+  },
+  {
+    title: 'Sales Signals',
+    description: 'Find sales signals for your idea',
+    publishDate: '22nd May 2024',
+    url: '/salessignal',
+  },
+  {
+    title: 'Text to Gradient',
+    description: 'Convert text to gradient',
+    publishDate: '23rd May 2024',
+    url: '/txt2gradient',
   }
   // {
   //   title: 'Best Time',
