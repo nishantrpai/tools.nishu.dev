@@ -12,7 +12,7 @@ export default function Home() {
   const sensationalize = async () => {
     // make api call to /api/gpt?prompt
     setLoading(true)
-    const res = await fetch(`/api/gpt?prompt='"Given an app idea: ${text}", what sales signal should I track to know if it's a good idea? For e.g., if it is a privacy app, how many companies are selling user data and such related signals.'`)
+    const res = await fetch(`/api/gpt?prompt='"Given a business idea/text: ${text}", what sales signal should I track to know if it's a good idea? For e.g., if it is a privacy app, how many companies are selling user data and such related signals.'`)
     const data = await res.json()
     setSensationalizedText(data.response)
     setLoading(false)
