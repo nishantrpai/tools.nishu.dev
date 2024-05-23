@@ -39,7 +39,7 @@ export default function Home() {
           type="text"
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="Enter your text"
+          placeholder="Enter the type of gradient you want to generate"
           style={{
             width: '100%',
             border: '1px solid #333',
@@ -58,6 +58,7 @@ export default function Home() {
               background: sensationalizedText,
               height: '500px',
               width: '500px',
+              borderRadius: 10,
             }}>
             </div>
             {sensationalizedText}
