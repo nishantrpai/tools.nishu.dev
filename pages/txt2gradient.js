@@ -67,7 +67,9 @@ export default function Home() {
         )}
         <div style={{ marginTop: '20px' }}>
           <button onClick={() => {
-            html2canvas(document.getElementById('gradient-square')).then(function(canvas) {
+            html2canvas(document.getElementById('gradient-square'), {
+              backgroundColor: 'transparent'
+            }).then(function(canvas) {
               var a = document.createElement('a');
               a.href = canvas.toDataURL("image/png");
               a.download = 'gradient.png';

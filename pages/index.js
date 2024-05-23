@@ -367,6 +367,12 @@ export const tools = [
     description: 'Convert text to gradient',
     publishDate: '23rd May 2024',
     url: '/txt2gradient',
+  },
+  {
+    title: 'Combine two words',
+    description: 'Combine two words to create a new word',
+    publishDate: '24th May 2024',
+    url: '/combine',
   }
   // {
   //   title: 'Best Time',
