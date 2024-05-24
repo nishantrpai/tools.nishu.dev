@@ -369,8 +369,8 @@ export const tools = [
     url: '/txt2gradient',
   },
   {
-    title: 'Combine two words',
-    description: 'Combine two words to create a new word',
+    title: 'Mix Words',
+    description: 'Mix two words to create a new word',
     publishDate: '24th May 2024',
     url: '/combine',
   }
@@ -441,7 +441,7 @@ export default function Home() {
                 fontSize: '1rem',
                 color: '#eee',
                 marginBottom: '10px',
-              }}>{tool.title}</p>
+              }}>{index + 1}. {tool.title}</p>
               <p style={{
                 fontSize: '0.8rem',
                 display: 'flex',
