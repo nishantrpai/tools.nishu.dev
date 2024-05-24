@@ -372,7 +372,7 @@ export const tools = [
     title: 'Mix Words',
     description: 'Mix two words to create a new word',
     publishDate: '24th May 2024',
-    url: '/combine',
+    url: '/mix',
   }
   // {
   //   title: 'Best Time',
