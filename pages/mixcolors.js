@@ -16,7 +16,7 @@ export default function Home() {
   const sensationalize = async () => {
     // make api call to /api/gpt?prompt
     setLoading(true)
-    let prompt = encodeURIComponent(`List all mixes of these two colors (hex) that are fun and minimal ${word1} and ${word2} as array (make it so I can JSON.parse) for e.g., [1,2,3] to get a new gradient as background-color for a div element. Keep it minimal and beautiful. Only respond in linear-gradient, radial-gradient, or conic-gradient. Don't add any other text or html tags.`)
+    let prompt = encodeURIComponent(`List all possible mixes of these two colors (hex) that are fun and minimal ${word1} and ${word2} as array (make it so I can JSON.parse) for e.g., [1,2,3] to get a new gradient as background-color for a div element. Keep it minimal and beautiful. Only respond in linear-gradient, radial-gradient, or conic-gradient. Don't add any other text or html tags.`)
     const res = await fetch(`/api/gpt?prompt=${prompt}`)
     const data = await res.json()
     setMixes(JSON.parse(data.response))
