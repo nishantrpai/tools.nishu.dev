@@ -373,6 +373,12 @@ export const tools = [
     description: 'Mix two words to create a new word',
     publishDate: '24th May 2024',
     url: '/mix',
+  },
+  {
+    title: 'Mix Colors',
+    description: 'Mix two colors to create a gradient',
+    publishDate: '24th May 2024',
+    url: '/mixcolors',
   }
   // {
   //   title: 'Best Time',
