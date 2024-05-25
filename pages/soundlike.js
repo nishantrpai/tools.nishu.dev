@@ -12,7 +12,7 @@ export default function Home() {
   const sensationalize = async () => {
     // make api call to /api/gpt?prompt
     setLoading(true)
-    let prompt = `What does this message: ${text} sound like? Respond in first person, present tense. Don't prescribe anything, only describe what you feel. Don't try to spin it positively or negatively, just describe it as it is.`
+    let prompt = `What does this message: ${text} sound like? is it confusing? Respond in first person, present tense. Don't prescribe anything, only describe what you feel. Don't try to spin it positively or negatively, just describe it as it is.`
     const res = await fetch(`/api/gpt?prompt=${prompt}`)
     const data = await res.json()
     setSensationalizedText(data.response)
