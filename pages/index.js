@@ -379,6 +379,12 @@ export const tools = [
     description: 'Mix two colors to create a gradient',
     publishDate: '24th May 2024',
     url: '/mixcolors',
+  },
+  {
+    title: 'What does your message sound like',
+    description: 'What does your message sound like or trigger in the mind',
+    publishDate: '25th May 2024',
+    url: '/soundlike',
   }
   // {
   //   title: 'Best Time',
