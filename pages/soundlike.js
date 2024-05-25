@@ -12,7 +12,7 @@ export default function Home() {
   const sensationalize = async () => {
     // make api call to /api/gpt?prompt
     setLoading(true)
-    let prompt = `What does this message: ${text} sound like , how does it feel, what does it remind you of?`;
+    let prompt = `What does this message: ${text} sound like? Respond in first person, present tense. Don't prescribe anything, only describe what you feel.`
     const res = await fetch(`/api/gpt?prompt=${prompt}`)
     const data = await res.json()
     setSensationalizedText(data.response)
@@ -62,7 +62,7 @@ export default function Home() {
           </div>
         )}
         <div style={{ textAlign: 'center', marginTop: 20, color: '#777', fontSize: 12 }}>
-          If you want to change your message, try the <a href="/reframe" style={{ color: '#fff', textDecoration: 'underline'}} target='_blank'> reframe tool</a>
+          If you want to reframe your message, try the <a href="/reframe" style={{ color: '#fff', textDecoration: 'underline'}} target='_blank'> reframe tool</a>
         </div>
       </main>
     </>
