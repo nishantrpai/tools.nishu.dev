@@ -146,8 +146,8 @@ export default function Draw() {
   return (
     <>
       <Head>
-        <title>Draw</title>
-        <meta name="description" content="Simple tool for sketching and copying that image to clipboard" />
+        <title>Chrono Canvas</title>
+        <meta name="description" content="Simple tool for sketching and capturing frames of it to showcase" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
