@@ -165,7 +165,9 @@ export default function Draw() {
           fontSize: '14px',
           marginBottom: '20px'
         }}>
-          Simple tool for sketching and capturing frames of it to showcase
+          Simple tool for sketching and capturing frames of it to showcase. 
+          <br/>
+          PS: Draw from the center
         </span>
         <canvas
           id="canvas"
@@ -245,8 +247,7 @@ export default function Draw() {
           padding: '10px',
           marginTop: 20,
         }}>
-          <h2>Preview</h2>
-          {frames.length}
+          <h2>Frames</h2>
           <span style={{ color: '#eee', fontSize: 20 }}>{timerText}</span>
           <div style={{
             display: 'flex',
@@ -387,37 +388,7 @@ export default function Draw() {
 
           </button>
           {/* add a mint button so people can mint the image to zora */}
-          <button
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              borderRadius: '0 10px 10px 10px',
-              padding: '10px 15px',
-              paddingTop: '14px'
-            }}
-            onClick={() => {
-              // compress the image to 200x200
-              let dataURL = canvas.toDataURL('image/png')
-              const img = new Image()
-              img.src = dataURL
-              img.onload = () => {
-                const canvas = document.createElement('canvas')
-                const context = canvas.getContext('2d')
-                canvas.width = 400
-                canvas.height = 300
-                context.drawImage(img, 0, 0, 400, 300)
-                dataURL = canvas.toDataURL('image/png')
-                window.open(`https://zora.co/create/single-edition?image=${encodeURIComponent(dataURL)}`);
-              }
-
-              // open in new tab
-            }}>
-            <img style={{
-              width: '20px',
-              height: '20px',
-            }} src="/zora.png" id="zora"></img>
-          </button>
-
+          
         </div>
       </main>
     </>
