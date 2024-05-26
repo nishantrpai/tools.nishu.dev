@@ -391,6 +391,12 @@ export const tools = [
     description: 'Capture frames of your canvas and create a beautiful picture',
     publishDate: '26th May 2024',
     url: '/chronocanvas',
+  },
+  {
+    title: 'Tune your message',
+    description: 'Tune your message to make it more impactful',
+    publishDate: '27th May 2024',
+    url: '/tunemessage',
   }
   // {
   //   title: 'Best Time',
