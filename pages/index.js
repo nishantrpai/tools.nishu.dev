@@ -385,6 +385,12 @@ export const tools = [
     description: 'What does your message sound like or trigger in the mind',
     publishDate: '25th May 2024',
     url: '/soundlike',
+  },
+  {
+    title: 'Chrono Canvas',
+    description: 'Capture frames of your canvas and create a beautiful picture',
+    publishDate: '26th May 2024',
+    url: '/chronocanvas',
   }
   // {
   //   title: 'Best Time',
