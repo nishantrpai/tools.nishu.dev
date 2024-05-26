@@ -298,7 +298,7 @@ export default function Draw() {
               <img
                 src={frames[0]} style={{
                   width: '100%',
-                  height: 550,
+                  height: 600,
                   border: '1px solid #666',
                   borderRadius: '0 10px 10px 10px',
                   textIndent: frames[0] == null ? '-9999px' : '0px'
@@ -327,7 +327,7 @@ export default function Draw() {
               <img
                 src={frames[1]} style={{
                   width: '100%',
-                  height: 550,
+                  height: 600,
                   border: '1px solid #666',
                   borderRadius: '0 10px 10px 10px',
                   textIndent: frames[1] == null ? '-9999px' : '0px'
@@ -355,7 +355,7 @@ export default function Draw() {
               <img
                 src={frames[2]} style={{
                   width: '100%',
-                  height: 550,
+                  height: 600,
                   border: '1px solid #666',
                   borderRadius: '0 10px 10px 10px',
                   textIndent: frames[2] == null ? '-9999px' : '0px'
