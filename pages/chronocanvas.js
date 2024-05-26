@@ -119,7 +119,7 @@ export default function Draw() {
       context.drawImage(img, center, 0, width, height, 0, 0, width, height)
       let dataURLtmp = canvas2.toDataURL('image/png')
       // replace null with the image
-      let tmpFrames = [...frames]
+      let tmpFrames = frames
       tmpFrames[index] = dataURLtmp
       setFrames(tmpFrames)
     }
