@@ -118,12 +118,10 @@ export default function Draw() {
       canvas2.height = height
       context.drawImage(img, center, 0, width, height, 0, 0, width, height)
       let dataURLtmp = canvas2.toDataURL('image/png')
-      console.log('dataURLtmp', dataURLtmp)
       // replace null with the image
       let tmpFrames = frames
       tmpFrames[index] = dataURLtmp
       setFrames(tmpFrames)
-      console.log('frames', frames)
     }
   }
 
@@ -184,12 +182,14 @@ export default function Draw() {
           display: 'flex',
           alignItems: 'center',
           gap: 30,
-          marginTop: 20
+          marginTop: 20,
+          fontSize: 20,
         }}>
           <button style={{
             borderRadius: '0 10px 10px 10px',
             padding: '10px 20px',
-            paddingTop: '12px'
+            paddingTop: '12px',
+            fontSize: 20,
           }}
             title="Start Recording"
             onClick={() => {
@@ -202,6 +202,7 @@ export default function Draw() {
                   let times = parseTimeFrames(timeFrames)
                   for (let i = 0; i < times.length; i++) {
                     if (minutes == times[i].minutes && seconds == times[i].seconds) {
+                      console.log('capturing frame', i)
                       captureCurrentCanvas(i)
                     }
                   }
@@ -226,16 +227,31 @@ export default function Draw() {
             clearInterval(timer)
             setTimer(null)
             setTimerText('00:00')
+            setFrames([null, null, null])
             restCanvas()
           }} style={{
             borderRadius: '0 10px 10px 10px',
             padding: '10px 20px',
-            paddingTop: '12px'
+            paddingTop: '12px',
+            fontSize: 20,
           }}
             title="Reset"
           >
             <RxReset />
           </button>
+          <button onClick={copyToClipboard} style={{
+            borderRadius: '0 10px 10px 10px',
+            padding: '10px 20px',
+            paddingTop: '12px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            fontSize: 20,
+          }}>
+              <FiCopy />
+              {copy && <span>Copied</span>}
+            </button>
+
         </div>
         {/* preview */}
         <div style={{
@@ -284,7 +300,8 @@ export default function Draw() {
                   width: '100%',
                   height: 550,
                   border: '1px solid #666',
-                  borderRadius: '0 10px 10px 10px'
+                  borderRadius: '0 10px 10px 10px',
+                  textIndent: frames[0] == null ? '-9999px' : '0px'
                 }}
                 id="frame0"
               />
@@ -312,7 +329,8 @@ export default function Draw() {
                   width: '100%',
                   height: 550,
                   border: '1px solid #666',
-                  borderRadius: '0 10px 10px 10px'
+                  borderRadius: '0 10px 10px 10px',
+                  textIndent: frames[1] == null ? '-9999px' : '0px'
                 }}
                 id="frame1"
               />
@@ -331,9 +349,6 @@ export default function Draw() {
                 onInput={(e) => {
                   setTimeFrames([timeFrames[0], timeFrames[1], e.target.textContent])
                 }}
-                onChange={(e) => {
-                  console.log('e', e)
-                }}
               >
                 {timeFrames[2]}
               </span>
@@ -342,7 +357,8 @@ export default function Draw() {
                   width: '100%',
                   height: 550,
                   border: '1px solid #666',
-                  borderRadius: '0 10px 10px 10px'
+                  borderRadius: '0 10px 10px 10px',
+                  textIndent: frames[2] == null ? '-9999px' : '0px'
                 }}
                 id="frame2"
               />
@@ -381,6 +397,7 @@ export default function Draw() {
             display: 'flex',
             alignItems: 'center',
             gap: 10,
+            fontSize: 20,
           }}
             title="Copy to Clipboard">
             <FiCopy />
