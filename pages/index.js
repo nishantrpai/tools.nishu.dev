@@ -393,10 +393,10 @@ export const tools = [
     url: '/chronocanvas',
   },
   {
-    title: 'Tune your message',
-    description: 'Tune your message to make it more impactful',
+    title: 'Audience to Idea',
+    description: 'Find ideas from your audience',
     publishDate: '27th May 2024',
-    url: '/tunemessage',
+    url: '/audience2idea',
   }
   // {
   //   title: 'Best Time',
