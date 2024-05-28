@@ -397,6 +397,12 @@ export const tools = [
     description: 'Find ideas from your audience',
     publishDate: '27th May 2024',
     url: '/audience2idea',
+  },
+  {
+    title: 'URL Parser',
+    description: 'Parse a URL into its components',
+    publishDate: '28th May 2024',
+    url: '/urlparser',
   }
   // {
   //   title: 'Best Time',
