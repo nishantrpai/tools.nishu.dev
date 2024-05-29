@@ -87,12 +87,14 @@ export default function AskYT() {
                     color: '#ccc',
                     fontFamily: 'monospace',
                     fontSize: '12px',
-                    marginBottom: '5px'
+                    marginBottom: '5px',
+                    whiteSpace: 'pre-wrap'
                   }}>Q: {item.question}</p>
                   <p style={{
                     color: '#fff',
                     fontFamily: 'monospace',
-                    fontSize: '12px'
+                    fontSize: '12px',
+                    whiteSpace: 'pre-wrap'
                   }}
                   >A: {item.answer}</p>
                 </div>
