@@ -474,3 +474,11 @@
     max-height: 50vw;
   }
 }
+
+.pie-slice {
+  transition: transform 0.2s ease-in-out;
+}
+
+.pie-slice:hover {
+  transform: scale(2.1);
+}

@@ -403,7 +403,19 @@ export const tools = [
     description: 'Parse a URL into its components',
     publishDate: '28th May 2024',
     url: '/urlparser',
+  },
+  {
+    title: 'Phrase Remixer',
+    description: 'Remix a phrase to create a new phrase',
+    publishDate: '29th May 2024',
+    url: '/phraseremixer',
   }
+  // {
+  //   title: 'NFT Holders',
+  //   description: 'Get aggregated view of NFT holders',
+  //   publishDate: '29th May 2024',
+  //   url: '/nftholders',
+  // }
   // {
   //   title: 'Best Time',
   //   description: 'Pick the best time for you and your friends across timezones',
