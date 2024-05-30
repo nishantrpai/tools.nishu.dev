@@ -474,7 +474,7 @@ export default function Home() {
           <FiSearch className={styles.searchIcon} />
           <input className={styles.search} onChange={(e) => {
             setSearch(e.target.value)
-          }} placeholder="Search for tools... for e.g., 'nft'">
+          }} placeholder="Search for tools... for e.g., 'nft'"/>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', width: '100%', gap: '20px', marginBottom: 30 }}>
           {filteredTools.map((tool, index) => (
