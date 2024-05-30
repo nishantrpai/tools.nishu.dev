@@ -409,13 +409,13 @@ export const tools = [
     description: 'Remix a phrase to create a new phrase',
     publishDate: '29th May 2024',
     url: '/phraseremixer',
+  },
+  {
+    title: 'NFT Holders',
+    description: 'Get aggregated view of NFT holders',
+    publishDate: '30th May 2024',
+    url: '/nftholders',
   }
-  // {
-  //   title: 'NFT Holders',
-  //   description: 'Get aggregated view of NFT holders',
-  //   publishDate: '29th May 2024',
-  //   url: '/nftholders',
-  // }
   // {
   //   title: 'Best Time',
   //   description: 'Pick the best time for you and your friends across timezones',
@@ -474,7 +474,7 @@ export default function Home() {
           <FiSearch className={styles.searchIcon} />
           <input className={styles.search} onChange={(e) => {
             setSearch(e.target.value)
-          }} placeholder="Search for tools..."></input>
+          }} placeholder="Search for tools... for e.g., 'nft'">
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', width: '100%', gap: '20px', marginBottom: 30 }}>
           {filteredTools.map((tool, index) => (
