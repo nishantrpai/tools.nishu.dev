@@ -8,15 +8,15 @@ export default function Home() {
   const [text, setText] = useState('')
   const [sensationalizedText, setSensationalizedText] = useState('')
   const [loading, setLoading] = useState(false)
-  
+
   const sensationalize = async () => {
-    // make api call to /api/gpt?prompt
     setLoading(true)
-    let prompt = "List all variations of the phrase: " + text + " in a new way"
+    let prompt = `List all remixes of this phrase: ${text}. An example of remix is "i'm notable" to "i'm not able". Don't show similar phrases, only show remixes.`
     const res = await fetch(`/api/gpt?prompt=${prompt}`)
     const data = await res.json()
     setSensationalizedText(data.response)
     setLoading(false)
+
   }
 
   return (
@@ -61,9 +61,9 @@ export default function Home() {
             {sensationalizedText}
           </div>
         )}
-        <div style={{ textAlign: 'center', marginTop: 20, color: '#777', fontSize: 12 }}>
-          If you want to reframe your message, try the <a href="/reframe" style={{ color: '#fff', textDecoration: 'underline'}} target='_blank'> reframe tool</a>
-        </div>
+        {/* <div style={{ textAlign: 'center', marginTop: 20, color: '#777', fontSize: 12 }}>
+          If you want to find similar phrases, try the <a href="/similarphrases" style={{ color: '#fff', textDecoration: 'underline'}} target='_blank'> reframe tool</a>
+        </div> */}
       </main>
     </>
   )
