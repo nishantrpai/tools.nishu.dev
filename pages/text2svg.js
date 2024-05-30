@@ -29,8 +29,8 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Text to Gradient</title>
-        <meta name="description" content="Convert text to gradient" />
+        <title>Text to SVG</title>
+        <meta name="description" content="Convert text to svg" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
