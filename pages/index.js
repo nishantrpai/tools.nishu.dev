@@ -411,10 +411,10 @@ export const tools = [
     url: '/phraseremixer',
   },
   {
-    title: 'NFT Holders',
-    description: 'Get aggregated view of NFT holders',
+    title: 'Text to SVG',
+    description: 'Convert text to SVG',
     publishDate: '30th May 2024',
-    url: '/nftholders',
+    url: '/text2svg',
   }
   // {
   //   title: 'Best Time',
