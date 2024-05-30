@@ -20,7 +20,13 @@ export default function Home() {
     // make api call to /api/gpt?prompt
     setLoading(true)
     let prompt = `"given the prompt: ${text}", generate svg text based on the text, will be used as image source. Keep it minimal and focus on keeping it beautiful. For some cases like spheres, you can create the illusion of 3d, similar for cubes, etc. Keep it isometric and minimal. Don't create any other shapes or text. All 3d elements should be filled with minimal colors. Shouldn't look out of place when used as an image source. Keep all images at 480x480px. Don't fill with #000 as the background is #000. Don't generate half shapes or shapes that are cut off. For 3d it should be isometric views as much as possible unless asked in the text, not inner view. Elements should be in the center. Size shouldn't be too big or too small. Keep it minimal and beautiful."`
-    const res = await fetch(`/api/gpt?prompt='${prompt}'`)
+    const res = await fetch(`/api/gpt?prompt`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ prompt })
+    })
     const data = await res.json()
     setSensationalizedText(data.response)
     setLoading(false)
