@@ -19,7 +19,7 @@ export default function Home() {
   const sensationalize = async () => {
     // make api call to /api/gpt?prompt
     setLoading(true)
-    let prompt = `"given the prompt: ${text}", generate svg text based on the text, will be used as image source. Keep it minimal and focus on keeping it beautiful. For some cases like spheres, you can create the illusion of 3d, similar for cubes, etc. Keep it isometric and minimal. Don't create any other shapes or text. All 3d elements should be filled with minimal colors. Shouldn't look out of place when used as an image source. Keep all images at 480x480px. Don't fill with #000 as the background is #000. Don't generate half shapes or shapes that are cut off. For 3d it should be isometric views as much as possible unless asked in the text, not inner view. Elements should be in the center. Size shouldn't be too big or too small. Keep it minimal and beautiful."`
+    let prompt = `"given the prompt: ${text}", generate svg text based on the text, will be used as image source. Keep it minimal and focus on keeping it beautiful. For some cases like spheres, you can create the illusion of 3d by using gradients and differnt opacity etc, similar for cubes, etc. Don't add any other text or html tags. SVG should be 480x480px. All renders should be symmetrical and not have any text or html tags. Transparent background. Don't render other shapes or objects. Don't fragment the elements, or disjointed or disconnected elements. Keep it simple and beautiful. Strokes shouldn't be black as the background is black."`
     const res = await fetch(`/api/gpt?prompt`, {
       method: 'POST',
       headers: {
