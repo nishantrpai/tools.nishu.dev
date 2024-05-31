@@ -53,7 +53,7 @@ export default function Home() {
           type="text"
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="Enter the type of gradient you want to generate"
+          placeholder="Enter the type of svg you want to generate"
           style={{
             width: '100%',
             border: '1px solid #333',
