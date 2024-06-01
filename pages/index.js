@@ -415,6 +415,12 @@ export const tools = [
     description: 'Convert text to SVG',
     publishDate: '30th May 2024',
     url: '/text2svg',
+  },
+  {
+    title: 'Reverse Keyword Lookup',
+    description: 'Find keywords that are related to your website',
+    publishDate: '1st June 2024',
+    url: '/reversekeyword',
   }
   // {
   //   title: 'Best Time',
