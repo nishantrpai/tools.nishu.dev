@@ -421,6 +421,12 @@ export const tools = [
     description: 'Find keywords that are related to your website',
     publishDate: '1st June 2024',
     url: '/reversekeyword',
+  },
+  {
+    title: 'Physics to Metaphysics',
+    description: 'Convert physics to metaphysics',
+    publishDate: '2nd June 2024',
+    url: '/phys2meta',
   }
   // {
   //   title: 'Best Time',
