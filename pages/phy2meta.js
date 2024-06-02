@@ -19,7 +19,7 @@ export default function Home() {
 
   const reframeText = () => {
     setLoading(true)
-    fetch(`/api/gpt?prompt="Get a random sentence from your physics corpus and reframe it in a metaphysical way. No quotes. First sentence will be physics and then metaphysical interpretation."`)
+    fetch(`/api/gpt?prompt="Get a random law/statement from your physics corpus (could be advanced) and reframe it in a metaphysical way. No quotes. First sentence will be physics and then metaphysical interpretation."`)
       .then(res => res.json())
       .then(data => {
         console.log(data)
