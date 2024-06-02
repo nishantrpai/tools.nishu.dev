@@ -65,7 +65,7 @@ export default function Home() {
             <button onClick={reframeText} style={{
               margin: 'auto'
             }}>
-              {loading ? 'Finding...' : 'Find'}
+              {loading ? 'Infering...' : 'Infer'}
             </button>
             {reframedText ? <div style={{ whiteSpace: 'pre-wrap', fontFamily: 'monospace', textAlign: 'left', padding: '10px', border: '1px solid #333', borderRadius: 10, padding: 20, background: '#000', width: '100%', lineHeight: 1.5, fontSize: 16 }}>
               {reframedText}
