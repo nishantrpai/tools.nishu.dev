@@ -19,7 +19,7 @@ export default function Home() {
 
   const reframeText = () => {
     setLoading(true)
-    fetch(`/api/gpt?prompt="Get a random law/statement from your physics corpus (could be advanced) and reframe it in a metaphysical way. No quotes. First sentence will be physics and then metaphysical interpretation."`)
+    fetch(`/api/gpt?prompt="Given this physics statement ${text} and reframe it in a metaphysical way. No quotes. First sentence will be physics and then metaphysical interpretation."`)
       .then(res => res.json())
       .then(data => {
         console.log(data)
@@ -31,8 +31,8 @@ export default function Home() {
   return (
     <div className={styles.container}>
       <Head>
-        <title>Reframe</title>
-        <meta name="description" content="Reframe a sentence" />
+        <title>Physics to Metaphysics</title>
+        <meta name="description" content="Infer metaphysics from physics corpus" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -47,6 +47,21 @@ export default function Home() {
 
         <div style={{ width: '100%' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '100%' }}>
+            <input
+              type="text"
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              placeholder="Enter your text"
+              style={{
+                width: '100%',
+                border: '1px solid #333',
+                background: '#000',
+                padding: '10px',
+                borderRadius: 10,
+                outline: 'none',
+                fontSize: 16
+              }}
+            />
             <button onClick={reframeText} style={{
               margin: 'auto'
             }}>
