@@ -61,7 +61,7 @@ export default function Home() {
       'https://www.youtube.com/feeds/videos.xml?channel_id=UCvixJtaXuNdMPUGdOPcY8Ag',
     ]
 
-    let promises = feeds.map(feed => fetch(`${proxy}${feed}`).then(res => res.text()))
+    let promises = feeds.map(feed => fetch(`${feed}`).then(res => res.text())).catch(fetch(proxy + feed).then(res => res.text()))
 
     // get data whichever promise resolves first and was successful
 
