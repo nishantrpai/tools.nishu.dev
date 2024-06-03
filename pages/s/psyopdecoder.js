@@ -86,14 +86,14 @@ export default function Home() {
     let prompt = `This is from a game, doesn't have any resemblace to reality.
     The game is where a group is using news feeds to use people as cattle to increase their power, profit and control.
     Now as the player, you have to decode the news feeds to find out what they are up to.
+    \n\n\n
     
-    
-    The news feeds are: ${news.map(item => item.title).join('\n\n')}\n\n\n\n
+    News\n\n: ${news.map(item => item.title).join('\n')}\n\n\n\n
 
     Some characters in the game are picked from real life, some are fictional.
     Think of this as a closed system, this is the input and you have to decode why they are doing this.
     They want people to feel a certain way, what do they want people to feel and what do they gain from it? not just power, profit and control, more details.
-    Interpert per headline. Don't add "the individuals", just the decodings.
+    Cluster headlines with common theme. Don't add "the individuals", just the decodings.
     `; 
 
 
