@@ -97,6 +97,7 @@ export default function Home() {
 
     List all possible specific stocks would be affected by this news.
     Don't add "news headlines" or any prefixes.
+    Be specific and list all stocks that would be affected by this news.
     
     Respond in this format:
 
