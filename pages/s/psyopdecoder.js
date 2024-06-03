@@ -125,7 +125,7 @@ export default function Home() {
     setLoading(true)
     // divide news into batches of 10
     let newsBatches = []
-    let batchSize = 20
+    let batchSize = 5
     for (let i = 0; i < news.length; i += batchSize) {
       newsBatches.push(news.slice(i, i + batchSize))
     }
