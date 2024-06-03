@@ -47,8 +47,6 @@ export default function Home() {
       'https://www.telegraph.co.uk/news/rss.xml',
       // fox news
       'http://feeds.foxnews.com/foxnews/politics',
-      // ap
-      'https://apnews.com/apf-intlnews?format=rss',
     ]
 
     let promises = feeds.map(feed => fetch(`${proxy}${feed}`).then(res => res.text()))
@@ -90,7 +88,7 @@ export default function Home() {
     Some characters in the game are picked from real life, some are fictional.
     Think of this as a closed system, this is the input and you have to decode why they are doing this.
     They want people to feel a certain way, what do they want people to feel and what do they gain from it? not just power, profit and control, more details.
-    Decode each headline individually.
+    Decode each headline individually, don't skip any.
     `; 
 
 
