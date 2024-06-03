@@ -427,6 +427,12 @@ export const tools = [
     description: 'Convert physics to metaphysics',
     publishDate: '2nd June 2024',
     url: '/phys2meta',
+  },
+  {
+    title: 'Greed',
+    description: 'What stocks would be affected by current news',
+    publishDate: '3rd June 2024',
+    url: '/greed',
   }
   // {
   //   title: 'Best Time',
