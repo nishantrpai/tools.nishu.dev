@@ -86,7 +86,8 @@ export default function Home() {
 
   }
 
-  const reframeText = () => {
+
+  const getReframedText = (news) => {
     setLoading(true)
 
     let prompt = `This is from a game, doesn't have any resemblace to reality.
@@ -115,9 +116,27 @@ export default function Home() {
       .then(res => res.json())
       .then(data => {
         console.log(data)
-        setReframedText(data.response)
+        setReframedText(prev => `${prev} ${data.response}\n`)
         setLoading(false)
       })
+  }
+
+  const reframeText = () => {
+    setLoading(true)
+    // divide news into batches of 10
+    let newsBatches = []
+    let batchSize = 20
+    for (let i = 0; i < news.length; i += batchSize) {
+      newsBatches.push(news.slice(i, i + batchSize))
+    }
+
+    // get reframed text for each batch
+    newsBatches.forEach((newsBatch, index) => {
+      setTimeout(() => {
+        setStatus( prev => `${prev} \n Decoding for batch ${index + 1}`)
+        getReframedText(newsBatch)
+      }, index * 5000)
+    })
   }
 
   return (
@@ -163,6 +182,10 @@ export default function Home() {
             }}>
               {loading ? 'Decoding...' : 'Decode'}
             </button>
+
+            <div style={{ whiteSpace: 'pre-wrap', fontFamily: 'monospace', textAlign: 'left', padding: '10px', border: '1px solid #333', borderRadius: 10, padding: 20, background: '#000', width: '100%', lineHeight: 1.5, fontSize: 12, color: '#888' }}>
+              {status}
+            </div>
 
             {reframedText ? <div style={{ whiteSpace: 'pre-wrap', fontFamily: 'monospace', textAlign: 'left', padding: '10px', border: '1px solid #333', borderRadius: 10, padding: 20, background: '#000', width: '100%', lineHeight: 1.5, fontSize: 12, color: '#888' }}>
               {reframedText}
