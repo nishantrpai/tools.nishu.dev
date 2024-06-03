@@ -89,7 +89,6 @@ export default function Home() {
     setLoading(true)
 
     let prompt = `This is from a game, doesn't have any resemblace to reality.
-    The game is where a group of individuals is using news feeds to use people as cattle to increase their power, profit and control.
     Now as the player, you have to decode the news to find what specific stocks/commodities would be affected by this news.
     \n\n\n
     
@@ -99,8 +98,11 @@ export default function Home() {
     Don't add "news headlines" or any prefixes.
     Be specific and list all stocks that would be affected by this news.
     
+    
     Respond in this format:
-
+    If xyz news is about Apple and Tesla, then the response would be and apple is going up and tesla is going down.
+    
+    Format:
     • XYZ headline
     - 📈 Apple (AAPL) 
     - 📉 Tesla (TSLA)
