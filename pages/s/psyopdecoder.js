@@ -160,7 +160,6 @@ export default function Home() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '100%' }}>
 
             <div style={{ whiteSpace: 'pre-wrap', fontFamily: 'monospace', color: '#888', textAlign: 'left', padding: '10px', border: '1px solid #333', borderRadius: 10, padding: 20, background: '#000', width: '100%', lineHeight: 1.5, fontSize: 12 }}>
-              {status}
               {news.map((item, index) => (
                 <div key={index}>
                   <span>{item.title}</span>
