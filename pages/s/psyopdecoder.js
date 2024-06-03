@@ -47,6 +47,18 @@ export default function Home() {
       'https://www.telegraph.co.uk/news/rss.xml',
       // fox news
       'http://feeds.foxnews.com/foxnews/politics',
+      // breitbart
+      'http://feeds.feedburner.com/breitbart',
+      // rt
+      'https://www.rt.com/rss/',
+      // valuetainment
+      'https://www.youtube.com/feeds/videos.xml?channel_id=UCIHdDJ0tjn_3j-FS7s_X1kQ',
+      // timcast
+      'https://www.youtube.com/feeds/videos.xml?channel_id=UCe02lGcO-ahAURWuxAJnjdA',
+      // ben shapiro
+      'https://www.youtube.com/feeds/videos.xml?channel_id=UCaeO5vkdj5xOQHp4UmIN6dw',
+      // david pakman
+      'https://www.youtube.com/feeds/videos.xml?channel_id=UCvixJtaXuNdMPUGdOPcY8Ag',
     ]
 
     let promises = feeds.map(feed => fetch(`${proxy}${feed}`).then(res => res.text()))
@@ -55,7 +67,6 @@ export default function Home() {
 
     Promise.any(promises)
       .then((data) => {
-        console.log(data)
         // parse the data
         let parser = new DOMParser();
         let xmlDoc = parser.parseFromString(data, "text/xml");
