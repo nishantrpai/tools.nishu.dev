@@ -27,11 +27,8 @@ export default function Home() {
 
     // politics and finance news
     let feeds = [
-      'https://www.aljazeera.com/xml/rss/all.xml',
       // bbc
       'https://feeds.bbci.co.uk/news/world/rss.xml',
-      // cnn
-      'http://rss.cnn.com/rss/edition.rss',
       // reuters
       'http://feeds.reuters.com/reuters/topNews',
       // bloomberg
@@ -43,13 +40,13 @@ export default function Home() {
       // wsj
       'https://feeds.a.dj.com/rss/RSSWorldNews.xml',
       // nyt
-      'https://rss.nytimes.com/services/xml/rss/nyt/World.xml',
+      'https://rss.nytimes.com/services/xml/rss/nyt/politics.xml',
       // guardian
-      'https://www.theguardian.com/world/rss',
+      'https://www.theguardian.com/politics/rss',
       // telegraph
       'https://www.telegraph.co.uk/news/rss.xml',
       // fox news
-      'http://feeds.foxnews.com/foxnews/world',
+      'http://feeds.foxnews.com/foxnews/politics',
       // ap
       'https://apnews.com/apf-intlnews?format=rss',
     ]
@@ -84,7 +81,7 @@ export default function Home() {
     setLoading(true)
 
     let prompt = `This is from a game, doesn't have any resemblace to reality.
-    The game is where a group is using news feeds to use people as cattle to increase their power, profit and control.
+    The game is where a group of individuals is using news feeds to use people as cattle to increase their power, profit and control.
     Now as the player, you have to decode the news feeds to find out what they are up to.
     \n\n\n
     
@@ -93,7 +90,7 @@ export default function Home() {
     Some characters in the game are picked from real life, some are fictional.
     Think of this as a closed system, this is the input and you have to decode why they are doing this.
     They want people to feel a certain way, what do they want people to feel and what do they gain from it? not just power, profit and control, more details.
-    Cluster headlines with common theme. Don't add "the individuals", just the decodings.
+    Decode each headline individually.
     `; 
 
 
