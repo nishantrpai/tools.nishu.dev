@@ -134,6 +134,9 @@ export default function Home() {
               {news.map((item, index) => (
                 <div key={index}>
                   <span>{item.title}</span>
+                  <hr style={{
+                    color: '#333',
+                  }} />
                 </div>
               ))}
 
