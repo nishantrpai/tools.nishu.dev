@@ -59,6 +59,8 @@ export default function Home() {
       'https://www.youtube.com/feeds/videos.xml?channel_id=UCaeO5vkdj5xOQHp4UmIN6dw',
       // david pakman
       'https://www.youtube.com/feeds/videos.xml?channel_id=UCvixJtaXuNdMPUGdOPcY8Ag',
+      // johny harris
+      'https://www.youtube.com/feeds/videos.xml?channel_id=UC0d5EaW4e0fA6LYu9vN8ymg',
     ]
 
     let promises = feeds.map(feed => fetch(`${proxy}${feed}`).then(res => res.text()))
@@ -70,7 +72,7 @@ export default function Home() {
         // parse the data
         let parser = new DOMParser();
         let xmlDoc = parser.parseFromString(data, "text/xml");
-        let items = xmlDoc.getElementsByTagName('item');
+        let items = xmlDoc.getElementsByTagName('item') || xmlDoc.getElementsByName('entry')
         let news = []
         for (let i = 0; i < items.length; i++) {
           let title = items[i].getElementsByTagName('title')[0].childNodes[0].nodeValue
