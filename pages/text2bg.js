@@ -7,6 +7,7 @@ import html2canvas from 'html2canvas'
 
 export default function Home() {
   const [text, setText] = useState('')
+  const [bg, setBg] = useState('')
   const [sensationalizedText, setSensationalizedText] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -29,6 +30,7 @@ export default function Home() {
     })
     const data = await res.json()
     setSensationalizedText(data.response)
+    setBg(getDataURI(data.response))
     setLoading(false)
   }
 
@@ -78,7 +80,7 @@ export default function Home() {
               marginBottom: 20,
               border: '1px solid #333',
               backgroundColor: '#000',
-              backgroundImage: `url(${getDataURI(sensationalizedText)})`,
+              backgroundImage: `url(${bg})`,
               backgroundRepeat: 'repeat',
               backgroundSize: '50px 50px',
               borderRadius: 10,
