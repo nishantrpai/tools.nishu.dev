@@ -121,13 +121,13 @@ export default function Home() {
             canvas.style.borderRadius = '10px'
             // add rectangle with #000
             ctx.fillStyle = '#000'
-            ctx.fillRect(0, 0, 500, 500)
+            ctx.fillRect(0, 0, 1000, 1000)
             const img = new Image()
             img.src = getDataURI(sensationalizedText)
             // with repeat pattern and background size 100px 100px
             img.onload = () => {
-              for (let x = 0; x < 500; x += 100) {
-                for (let y = 0; y < 500; y += 100) {
+              for (let x = 0; x < 1000; x += 100) {
+                for (let y = 0; y < 1000; y += 100) {
                   ctx.drawImage(img, x, y, 100, 100)
                 }
               }
