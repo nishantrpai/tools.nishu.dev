@@ -438,7 +438,7 @@ export const tools = [
     title: 'Text to SVG Pattern',
     description: 'Convert text to SVG background pattern',
     publishDate: '4th June 2024',
-    url: '/text2svgpattern',
+    url: '/text2bg',
   }
   // {
   //   title: 'Best Time',
