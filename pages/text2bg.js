@@ -9,7 +9,7 @@ export default function Home() {
   const [text, setText] = useState('')
   const [sensationalizedText, setSensationalizedText] = useState('')
   const [loading, setLoading] = useState(false)
-  
+
   const getDataURI = (svg) => {
     // svg text to data uri
     return `data:image/svg+xml,${encodeURIComponent(svg)}`
@@ -19,7 +19,7 @@ export default function Home() {
   const sensationalize = async () => {
     // make api call to /api/gpt?prompt
     setLoading(true)
-    let prompt = `"given the prompt: ${text}", generate svg text based on the text, will be used as background pattern.\n\nKeep it minimal and focus on keeping it beautiful. For some cases like spheres, you can create the illusion of 3d by using gradients and differnt opacity etc, similar for cubes, etc. For some cases you maye need to apply varying opacity to create the shape. Don't add any other text or html tags. SVG should be 480x480px. All renders should be symmetrical and not have any text or html tags. Transparent background. Don't render other shapes or objects. Don't fragment the elements, or disjointed or disconnected elements. Keep it simple and beautiful. Strokes shouldn't be black as the background is black. Don't add backticks or other characters, only the svg text.\n\n`
+    let prompt = `"given the prompt: ${text}", generate svg text that matches prompt. It will be used as background pattern. Keep it beautiful and clean. Use minimal colors. For some cases like spheres, you can create the illusion of 3d by using gradients and differnt opacity etc, similar for cubes, etc. For some cases you maye need to apply varying opacity to create the shape. Don't add any other text or html tags. SVG should be 480x480px. All renders should be symmetrical and not have any text or html tags. Transparent background. Don't render other shapes or objects. Don't fragment the elements, or disjointed or disconnected elements. Keep it simple and beautiful. Strokes shouldn't be black as the background is black. Don't add backticks or other characters, only the svg text.\n\n`
     const res = await fetch(`/api/gpt?prompt`, {
       method: 'POST',
       headers: {
@@ -70,19 +70,20 @@ export default function Home() {
         </button>
 
         {sensationalizedText && (
-          <div style={{ whiteSpace: 'pre-wrap', fontFamily: 'monospace', textAlign: 'left', padding: '10px', border: '1px solid #333', background: '#000', borderRadius: 10, width: '100%', lineHeight: 1.5}}>
+          <div style={{ whiteSpace: 'pre-wrap', fontFamily: 'monospace', textAlign: 'left', padding: '10px', border: '1px solid #333', background: '#000', borderRadius: 10, width: '100%', lineHeight: 1.5 }}>
             <div style={{
               height: 480,
               width: 480,
               margin: 'auto',
               marginBottom: 20,
               border: '1px solid #333',
+              backgroundColor: '#000',
               backgroundImage: `url(${getDataURI(sensationalizedText)})`,
               backgroundRepeat: 'repeat',
               backgroundSize: '50px 50px',
               borderRadius: 10,
               marginBottom: '10px',
-            }}>
+            }} id="bg-pattern">
             </div>
             <span style={{
               display: 'flex',
@@ -93,24 +94,40 @@ export default function Home() {
               borderRadius: 10,
               padding: 20
             }}>
-            {sensationalizedText}
+              {sensationalizedText}
             </span>
           </div>
         )}
-        <div style={{ marginTop: '20px' }}>
+        <div style={{ marginTop: '20px', display: 'flex', gap: 20 }}>
+          <button onClick={() => {
+            // download svg
+            html2canvas(document.getElementById('bg-pattern'), {
+              allowTaint: true,
+              useCORS: true,
+            }).then(canvas => {
+              const dataURL = canvas.toDataURL('image/png')
+              const a = document.createElement('a')
+              a.href = dataURL
+              a.download = 'pattern.png'
+              a.click()
+            })
+          }} className={styles.button}>
+            Download Image
+          </button>
+
           <button onClick={() => {
             // download svg
             const svg = sensationalizedText
-            const blob = new Blob([svg], {type: 'image/svg+xml'})
+            const blob = new Blob([svg], { type: 'image/svg+xml' })
             const url = URL.createObjectURL(blob)
             const a = document.createElement('a')
             a.href = url
             a.download = 'pattern.svg'
             a.click()
           }} className={styles.button}>
-            Download SVG
-            </button>
-          </div>
+            Download Pattern
+          </button>
+        </div>
       </main>
     </>
   )
