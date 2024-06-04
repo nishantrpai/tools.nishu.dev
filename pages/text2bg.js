@@ -118,7 +118,10 @@ export default function Home() {
             canvas.height = 500
             const ctx = canvas.getContext('2d')
             // add border radius 10
-
+            canvas.style.borderRadius = '10px'
+            // add rectangle with #000
+            ctx.fillStyle = '#000'
+            ctx.fillRect(0, 0, 500, 500)
             const img = new Image()
             img.src = getDataURI(sensationalizedText)
             // with repeat pattern and background size 50x50
