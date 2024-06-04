@@ -433,6 +433,12 @@ export const tools = [
     description: 'What stocks would be affected by current news',
     publishDate: '3rd June 2024',
     url: '/greed',
+  },
+  {
+    title: 'Text to SVG Pattern',
+    description: 'Convert text to SVG background pattern',
+    publishDate: '4th June 2024',
+    url: '/text2svgpattern',
   }
   // {
   //   title: 'Best Time',
