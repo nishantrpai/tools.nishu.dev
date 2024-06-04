@@ -98,7 +98,10 @@ export default function Home() {
             }}>
               {sensationalizedText}
               <br/>
+              <br/>
+              <b>
               Data (double click to select, use as background image):
+                </b>
               <br/>
               {getDataURI(sensationalizedText)}`
             </span>
