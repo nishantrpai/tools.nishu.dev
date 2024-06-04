@@ -101,16 +101,29 @@ export default function Home() {
         <div style={{ marginTop: '20px', display: 'flex', gap: 20 }}>
           <button onClick={() => {
             // download svg
-            html2canvas(document.getElementById('bg-pattern'), {
-              allowTaint: true,
-              useCORS: true,
-            }).then(canvas => {
-              const dataURL = canvas.toDataURL('image/png')
+            // create canvas
+            const canvas = document.createElement('canvas')
+            canvas.width = 500
+            canvas.height = 500
+            const ctx = canvas.getContext('2d')
+            // add border radius 10
+
+            const img = new Image()
+            img.src = getDataURI(sensationalizedText)
+            // with repeat pattern and background size 50x50
+            img.onload = () => {
+              for (let x = 0; x < 480; x += 50) {
+                for (let y = 0; y < 480; y += 50) {
+                  ctx.drawImage(img, x, y, 50, 50)
+                }
+              }
               const a = document.createElement('a')
-              a.href = dataURL
+              a.href = canvas.toDataURL('image/png')
               a.download = 'pattern.png'
               a.click()
-            })
+            }
+            
+            // remove canvas
           }} className={styles.button}>
             Download Image
           </button>
