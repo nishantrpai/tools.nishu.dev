@@ -92,9 +92,15 @@ export default function Home() {
               marginTop: 20,
               border: '1px solid #333',
               borderRadius: 10,
-              padding: 20
+              padding: 20,
+              flexWrap: 'wrap',
+              overflow: 'auto',
             }}>
               {sensationalizedText}
+              <br/>
+              Data (double click to select, use as background image):
+              <br/>
+              {getDataURI(sensationalizedText)}`
             </span>
           </div>
         )}
