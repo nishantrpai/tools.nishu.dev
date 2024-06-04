@@ -20,7 +20,7 @@ export default function Home() {
   const sensationalize = async () => {
     // make api call to /api/gpt?prompt
     setLoading(true)
-    let prompt = `given the prompt: \n\n${text}\n\n, generate svg text that matches prompt. It will be used as background pattern. Keep it beautiful and clean. Use minimal colors. For some cases like spheres, you can create the illusion of 3d by using gradients and differnt opacity etc, similar for cubes, etc. For some cases you maye need to apply varying opacity to create the shape. Don't add any other text or html tags. SVG should be 480x480px. All renders should be symmetrical and not have any text or html tags. Transparent background. Don't render other shapes or objects. Don't fragment the elements, or disjointed or disconnected elements. Keep it simple and beautiful. Strokes shouldn't be black as the background is black. Don't add backticks or other characters, only the svg text.\n\n`
+    let prompt = `given the prompt: \n\n${text}\n\n, generate svg text that matches prompt. It will be used as background pattern. Keep it beautiful and clean. Use minimal colors. For some cases like spheres, you can create the illusion of 3d by using gradients and differnt opacity etc, similar for cubes, etc. For some cases you maye need to apply varying opacity to create the shape. Don't add any other text or html tags. SVG should be 480x480px. All renders should be symmetrical and not have any text or html tags. The background is #000 so be careful. Don't render other shapes or objects. Don't fragment the elements, or disjointed or disconnected elements. Keep it simple and beautiful. Strokes shouldn't be black as the background is black. Don't add backticks or other characters, only the svg text.\n\n`
     const res = await fetch(`/api/gpt?prompt`, {
       method: 'POST',
       headers: {
@@ -123,7 +123,7 @@ export default function Home() {
             ctx.fillStyle = '#000'
             ctx.fillRect(0, 0, 1000, 1000)
             const img = new Image()
-            img.src = getDataURI(sensationalizedText)
+            img.src = bg
             // with repeat pattern and background size 100px 100px
             img.onload = () => {
               for (let x = 0; x < 1000; x += 100) {
