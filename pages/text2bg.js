@@ -35,17 +35,17 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Text to SVG Pattern</title>
+        <title>Text to Bg Pattern</title>
         <meta name="description" content="Convert text to svg pattern" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <main className={styles.container}>
         <h1 className={styles.title}>
-          Text to SVG pattern
+          Text to Bg pattern
         </h1>
         <span style={{ color: '#777', fontSize: '14px', marginBottom: '20px', display: 'block' }}>
-          Convert text to SVG pattern
+          Convert text to Bg pattern
         </span>
 
 
