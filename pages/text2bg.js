@@ -114,8 +114,8 @@ export default function Home() {
             // download svg
             // create canvas
             const canvas = document.createElement('canvas')
-            canvas.width = 500
-            canvas.height = 500
+            canvas.width = 1000
+            canvas.height = 1000
             const ctx = canvas.getContext('2d')
             // add border radius 10
             canvas.style.borderRadius = '10px'
@@ -124,13 +124,14 @@ export default function Home() {
             ctx.fillRect(0, 0, 500, 500)
             const img = new Image()
             img.src = getDataURI(sensationalizedText)
-            // with repeat pattern and background size 50x50
+            // with repeat pattern and background size 100px 100px
             img.onload = () => {
-              for (let x = 0; x < 480; x += 50) {
-                for (let y = 0; y < 480; y += 50) {
-                  ctx.drawImage(img, x, y, 50, 50)
+              for (let x = 0; x < 500; x += 100) {
+                for (let y = 0; y < 500; y += 100) {
+                  ctx.drawImage(img, x, y, 100, 100)
                 }
               }
+              
               const a = document.createElement('a')
               a.href = canvas.toDataURL('image/png')
               a.download = 'pattern.png'
