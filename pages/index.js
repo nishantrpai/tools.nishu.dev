@@ -439,6 +439,12 @@ export const tools = [
     description: 'Convert text to SVG background pattern',
     publishDate: '4th June 2024',
     url: '/text2bg',
+  },
+  {
+    title: 'Text to Zorbit',
+    description: 'Convert text to zorbit',
+    publishDate: '5th June 2024',
+    url: '/text2zorbit',
   }
   // {
   //   title: 'Best Time',
