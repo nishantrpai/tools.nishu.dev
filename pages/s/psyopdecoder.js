@@ -61,6 +61,8 @@ export default function Home() {
       'https://www.youtube.com/feeds/videos.xml?channel_id=UCvixJtaXuNdMPUGdOPcY8Ag',
       // johny harris
       'https://www.youtube.com/feeds/videos.xml?channel_id=UC0d5EaW4e0fA6LYu9vN8ymg',
+      // daily mail
+      'https://www.dailymail.co.uk/articles.rss'
     ]
 
     let promises = feeds.map(feed => fetch(`${proxy}${feed}`).then(res => res.text()))
