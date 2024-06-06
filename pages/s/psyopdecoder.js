@@ -967,7 +967,7 @@ export default function Home() {
             </div>
 
             {reframedText ? <div style={{ whiteSpace: 'pre-wrap', fontFamily: 'monospace', textAlign: 'left', padding: '10px', border: '1px solid #333', borderRadius: 10, padding: 20, background: '#000', width: '100%', lineHeight: 1.5, fontSize: 12, color: '#888' }}>
-              {higlightEmotions(reframedText)}
+              {reframedText}
             </div> : null}
 
           </div>
