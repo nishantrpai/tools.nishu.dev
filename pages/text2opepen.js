@@ -237,7 +237,7 @@ export default function Home() {
     Pattern will never be empty, it will always have a pattern tag with some content inside it.
     Pattern will never have image or external link, it will always have some svg tags inside it.
     Pattern can use all svg tags and attributes.
-    Background and pattern will never be same color, hopefully they will be contrasting.
+    Background and pattern will never be same color.
     Pattern will have a width and height > 0.
     Together with the background and pattern it will create a beautiful svg that matches the text.
     The id of pattern will be "pattern" at all times.
