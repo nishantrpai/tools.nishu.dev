@@ -120,7 +120,7 @@ export default function Home() {
       .then(res => res.json())
       .then(data => {
         console.log(data)
-        setReframedText(prev => `${prev} ${data.response}\n`)
+        setReframedText(prev => `${prev} \n\nBatch:\n\n ${data.response}\n`)
         setLoading(false)
       })
   }
