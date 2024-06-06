@@ -445,6 +445,12 @@ export const tools = [
     description: 'Convert text to zorbit',
     publishDate: '5th June 2024',
     url: '/text2zorbit',
+  },
+  {
+    title: 'Text to Opepen',
+    description: 'Convert text to opepen',
+    publishDate: '6th June 2024',
+    url: '/text2opepen',
   }
   // {
   //   title: 'Best Time',
