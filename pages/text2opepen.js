@@ -239,6 +239,7 @@ export default function Home() {
     Pattern can use all svg tags and attributes.
     Background and pattern will never be same color.
     Pattern will have a width and height > 0.
+    Patterns can be animated or static, it can have multiple shapes or a single shape.
     Together with the background and pattern it will create a beautiful svg that matches the text.
     The id of pattern will be "pattern" at all times.
     Don't send incomplete or incorrect data or empty values for the pattern.
