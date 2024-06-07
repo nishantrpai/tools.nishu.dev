@@ -451,6 +451,18 @@ export const tools = [
     description: 'Convert text to opepen',
     publishDate: '6th June 2024',
     url: '/text2opepen',
+  },
+  {
+    title: 'Text to 8pepen',
+    description: 'Convert text to 8pepen',
+    publishDate: '7th June 2024',
+    url: '/text28pepen',
+  },
+  {
+    title: 'Text to Checks',
+    description: 'Convert text to checks',
+    publishDate: '8th June 2024',
+    url: '/text2checks',
   }
   // {
   //   title: 'Best Time',
