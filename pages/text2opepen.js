@@ -236,9 +236,9 @@ export default function Home() {
     Send an array of 2 values, 1st value is the background and 2nd value is the svg pattern for e.g this format: ["#000", "<defs><pattern></pattern></defs>"] (pattern won't ever be empty).
     Pattern will never be empty, it will always have a pattern tag with some content inside it.
     Pattern will never have image or external link, it will always have some svg tags inside it.
-    Pattern can use all svg tags and attributes.
     Background and pattern will never be same color.
     Pattern will have a width and height > 0.
+    Patterns can be gradients. Background can be a gradient.
     Patterns can be animated or static, it can have multiple shapes or a single shape.
     Together with the background and pattern it will create a beautiful svg that matches the text.
     The id of pattern will be "pattern" at all times.
@@ -300,7 +300,7 @@ export default function Home() {
         <div style={{ whiteSpace: 'pre-wrap', fontFamily: 'monospace', textAlign: 'left', padding: '10px', border: '1px solid #333', background: '#000', borderRadius: 10, width: '100%', lineHeight: 1.5 }}>
           {/* {zorbitSvg()} */}
           <img src={getDataURI(opepenSVG)} alt="Opepen" style={{ width: 500, height: 500, borderRadius: 10 }} />
-          {/* <span style={{
+           <span style={{
               display: 'flex',
               maxWidth: 500,
               margin: '20px auto',
@@ -312,7 +312,7 @@ export default function Home() {
               overflow: 'auto',
             }}>
               {sensationalizedText}
-            </span> */}
+            </span> 
         </div>
 
         <div style={{ marginTop: '20px', display: 'flex', gap: 20 }}>
