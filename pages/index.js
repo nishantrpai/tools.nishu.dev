@@ -306,7 +306,7 @@ export const tools = [
     title: 'NFT Tier List',
     description: 'Create a tier list of NFTs',
     publishDate: '10th May 2024',
-    url: '/nfttierlist',
+    url: '/nfttier',
   },
   {
     title: 'Lovecaster',
