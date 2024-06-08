@@ -459,11 +459,12 @@ export const tools = [
     url: '/text28pepen',
   },
   {
-    title: 'Text to Checks',
-    description: 'Convert text to checks',
+    title: 'Text to 8bit art',
+    description: 'Convert text to 8bit art',
     publishDate: '8th June 2024',
-    url: '/text2checks',
-  }
+    url: '/text28bit',
+  },
+  
   // {
   //   title: 'Best Time',
   //   description: 'Pick the best time for you and your friends across timezones',
