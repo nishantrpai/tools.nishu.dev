@@ -117,7 +117,7 @@ export default function Home() {
           type="text"
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="Enter the text to generate 8bit"
+          placeholder="Enter the text to generate background"
           style={{
             width: '100%',
             border: '1px solid #333',
