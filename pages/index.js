@@ -462,7 +462,7 @@ export const tools = [
     title: 'Text to 8bit art',
     description: 'Convert text to 8bit art',
     publishDate: '8th June 2024',
-    url: '/text28bit',
+    url: '/8bitcanvas',
   },
   
   // {
