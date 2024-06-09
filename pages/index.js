@@ -464,6 +464,12 @@ export const tools = [
     publishDate: '8th June 2024',
     url: '/8bitcanvas',
   },
+  {
+    title: 'Text to Pepe Mandorian',
+    description: 'Convert text to pepe mandorian',
+    publishDate: '9th June 2024',
+    url: '/text2pepe',
+  }
   
   // {
   //   title: 'Best Time',
