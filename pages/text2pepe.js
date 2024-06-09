@@ -31,10 +31,10 @@ export default function Home() {
    - Each smaller area should be filled with a unique color.
    - Lines should not go outside the boundaries of the main square.
    - Colors shouldn't spill outside the boundaries of the main square.
+   - Lines should be white with a stroke width of 4.
 5. Ensure that no colors or lines spill outside the boundaries of the main square.
 6. Output should be in SVG format.
-7. Choose the colors of rectangles and lines to match ${text} don't spill outside the main square.
-8. 
+7. Choose the colors of rectangles and lines to match ${text}, don't spill outside the boundaries of the main square.
 
 Here's an example of how the SVG should look like, maintaining these constraints:
 
