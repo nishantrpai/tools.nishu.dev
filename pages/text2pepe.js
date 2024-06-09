@@ -166,7 +166,7 @@ Make sure to randomize the positions of the lines while maintaining the constrai
               a.click()
             }
             img.src = getDataURI(svg)
-gs          }} className={styles.button}>
+          }} className={styles.button}>
             Download PNG
           </button>
         </div>
