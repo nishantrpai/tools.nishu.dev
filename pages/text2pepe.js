@@ -137,7 +137,7 @@ Make sure to randomize the positions of the lines while maintaining the constrai
             {sensationalizedText}
           </div>
         )}
-        <div style={{ marginTop: '20px' }}>
+        <div style={{ marginTop: '20px', display: 'flex', gap: 20 }}>
           <button onClick={() => {
             // download svg
             const svg = sensationalizedText
@@ -145,10 +145,29 @@ Make sure to randomize the positions of the lines while maintaining the constrai
             const url = URL.createObjectURL(blob)
             const a = document.createElement('a')
             a.href = url
-            a.download = 'gradient.svg'
+            a.download = 'pepe.svg'
             a.click()
           }} className={styles.button}>
             Download SVG
+          </button>
+          <button onClick={() => {
+            // svg to canvas to png
+            const svg = sensationalizedText
+            const canvas = document.createElement('canvas')
+            canvas.width = 500
+            canvas.height = 500
+            const ctx = canvas.getContext('2d')
+            const img = new Image()
+            img.onload = () => {
+              ctx.drawImage(img, 0, 0)
+              const a = document.createElement('a')
+              a.href = canvas.toDataURL('image/png')
+              a.download = 'pepe.png'
+              a.click()
+            }
+            img.src = getDataURI(svg)
+gs          }} className={styles.button}>
+            Download PNG
           </button>
         </div>
       </main>
