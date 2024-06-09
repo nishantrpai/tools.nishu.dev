@@ -27,13 +27,13 @@ export default function Home() {
 4. Divide the main square into 6 or 10 smaller non-intersecting areas using horizontal and vertical lines. Ensure that:
    - The divisions create distinct subsquares or rectangles within the main square.
    - The lines will be around each division, not inside them or between them.
-   - The divisions are primarily vertical, with fewer horizontal divisions.
+   - The divisions are primarily horizontal, with fewer vertical divisions.
    - Each smaller area should be filled with a unique color.
    - Lines should not go outside the boundaries of the main square.
    - Colors shouldn't spill outside the boundaries of the main square.
 5. Ensure that no colors or lines spill outside the boundaries of the main square.
 6. Output should be in SVG format.
-7. Choose the colors of rectangles and lines to match ${text}.
+7. Choose the colors of rectangles and lines to match ${text} don't spill outside the main square.
 8. 
 
 Here's an example of how the SVG should look like, maintaining these constraints:
