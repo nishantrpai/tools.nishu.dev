@@ -21,9 +21,9 @@ export default function Home() {
     setLoading(true)
     let prompt = `Generate an SVG based on the following specifications:
 
-1. The SVG should have a black background with dimensions of 480x480.
+1. The SVG should have a white background with dimensions of 480x480.
 2. Inside the SVG, there should be a main square with dimensions 240x240, positioned at coordinates (120, 120).
-3. This main square should have a white border with a stroke width of 4.
+3. This main square should have a black border with a stroke width of 4.
 4. Divide the main square into 6 or 10 smaller non-intersecting areas using horizontal and vertical lines. Ensure that:
    - The divisions create distinct subsquares or rectangles within the main square.
    - The lines will be around each division, not inside them or between them.
@@ -31,7 +31,7 @@ export default function Home() {
    - Each smaller area should be filled with a unique color.
    - Lines should not go outside the boundaries of the main square.
    - Colors shouldn't spill outside the boundaries of the main square.
-   - Lines should be white with a stroke width of 4.
+   - Lines should be black with a stroke width of 4.
 5. Ensure that no colors or lines spill outside the boundaries of the main square.
 6. Output should be in SVG format.
 7. Choose the colors of rectangles and lines to match ${text}, don't spill colors outside the boundaries, don't leave empty squares or forget lines.
