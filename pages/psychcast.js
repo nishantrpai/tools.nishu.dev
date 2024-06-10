@@ -69,7 +69,7 @@ export default function Home() {
   }
 
   const summarize = (casts, username) => {
-    let prompt = `give a json of their personality on the dimensions of openess, conscientiousness, extraversion, agreeableness, and neuroticism based on their tweets: ${casts.join(' ')}\n\n`
+    let prompt = `give a json of the personality on the dimensions of openess, conscientiousness, extraversion, agreeableness, and neuroticism, judge based on their tweets (between 0 and 1): ${casts.join(' ')}\n\n`
     fetch(`/api/gpt?prompt`, {
       method: 'POST',
       body: JSON.stringify({ prompt }),
