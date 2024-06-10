@@ -469,6 +469,12 @@ export const tools = [
     description: 'Convert text to pepe mandorian',
     publishDate: '9th June 2024',
     url: '/text2pepe',
+  },
+  {
+    title: 'Warpcast Psychographics',
+    description: 'Warpcast psychographics',
+    publishDate: '10th June 2024',
+    url: '/psychcast',
   }
   
   // {

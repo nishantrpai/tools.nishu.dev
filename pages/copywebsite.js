@@ -5,20 +5,21 @@ import { useState, useEffect } from 'react'
 
 const CopyWebsite = () => {
   const [url, setUrl] = useState('')
-  const [html, setHtml] = useState('')
+  const [htmlContent, setHtml] = useState('')
   async function fetchAndInlineAll(url) {
     try {
       // Fetch the initial HTML
-      const response = await fetch(url, {
+      let proxy = 'https://api.codetabs.com/v1/proxy/?quest='
+      const response = await fetch(proxy + url, {
         headers: {
           'Accept': 'text/html',
           'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
           'Origin': 'https://www.google.com', 
         }
       });
-      const html = await response.text();
-      const dom = new JSDOM(html);
-      const { document } = dom.window;
+      const res = await response.text();
+      console.log(res)
+      setHtml(res)
   
       // Inline CSS
       const styleSheets = document.querySelectorAll('link[rel="stylesheet"]');
@@ -43,7 +44,7 @@ const CopyWebsite = () => {
       }
   
       // Output the modified HTML as a single file
-      return dom.serialize();
+      // return dom.serialize();
     } catch (error) {
       console.error('Something went wrong:', error);
     }
@@ -75,7 +76,10 @@ const CopyWebsite = () => {
       }} onChange={e => {
         setUrl(e.target.value)
       }} />
-      <div dangerouslySetInnerHTML={{ __html: html }} />
+      <span>
+        {JSON.stringify(htmlContent)}
+      </span>
+      {/* <div dangerouslySetInnerHTML={{ __html: htmlContent }} /> */}
       </main>
       
     </>
