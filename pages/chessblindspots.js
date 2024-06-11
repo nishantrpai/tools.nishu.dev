@@ -74,7 +74,7 @@ width=600 height=397 frameborder=0></iframe>
     // make api call to /api/gpt?prompt
     setLoadingText(true)
     setSensationalizedText('Fetching games...')
-    fetch(`https://lichess.org/api/games/user/${text}?max=50`)
+    fetch(`https://lichess.org/api/games/user/${text}?max=20`)
       .then(res => res.body)
       .then(body => {
         // get text and return a promise
