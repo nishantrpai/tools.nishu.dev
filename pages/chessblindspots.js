@@ -173,7 +173,7 @@ width=600 height=397 frameborder=0></iframe>
         />
 
         <button onClick={sensationalize} className={styles.button}>
-          {loading ? 'Compressing...' : 'Compress'}
+          {loading ? 'Analyzing...' : 'Analyze'}
         </button>
 
         {sensationalizedText && (
