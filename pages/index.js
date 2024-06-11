@@ -475,6 +475,12 @@ export const tools = [
     description: 'Warpcast psychographics',
     publishDate: '10th June 2024',
     url: '/psychcast',
+  },
+  {
+    title: 'Chess Blindspots',
+    description: 'Find blindspots in your chess game',
+    publishDate: '11th June 2024',
+    url: '/chessblindspots',
   }
   
   // {
