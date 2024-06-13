@@ -481,6 +481,12 @@ export const tools = [
     description: 'Find blindspots in your chess game',
     publishDate: '11th June 2024',
     url: '/chessblindspots',
+  },
+  {
+    title: 'Pixelate Image',
+    description: 'Pixelate an image',
+    publishDate: '12th June 2024',
+    url: '/pixelate',
   }
   
   // {
