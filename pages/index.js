@@ -485,8 +485,14 @@ export const tools = [
   {
     title: 'Pixelate Image',
     description: 'Pixelate an image',
-    publishDate: '12th June 2024',
+    publishDate: '13th June 2024',
     url: '/pixelate',
+  },
+  {
+    title: 'Text to Glass Punk',
+    description: 'Convert text to glass punk',
+    publishDate: '14th June 2024',
+    url: '/text2glasspunk',
   }
   
   // {
