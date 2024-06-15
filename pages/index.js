@@ -493,6 +493,12 @@ export const tools = [
     description: 'Convert text to glass punk',
     publishDate: '14th June 2024',
     url: '/text2glasspunk',
+  },
+  {
+    title: 'Text to RGB Punk',
+    description: 'Convert text to RGB punk',
+    publishDate: '15th June 2024',
+    url: '/text2rgbpunk',
   }
   
   // {
