@@ -499,6 +499,12 @@ export const tools = [
     description: 'Convert text to RGB punk',
     publishDate: '15th June 2024',
     url: '/text2rgbpunk',
+  },
+  {
+    title: 'Text to Checks',
+    description: 'Convert text to checks',
+    publishDate: '15th June 2024',
+    url: '/text2checks',
   }
   
   // {
