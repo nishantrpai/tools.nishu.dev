@@ -78,7 +78,7 @@ export default function Higher() {
             setImage(URL.createObjectURL(e.target.files[0]))
           }} placeholder='Choose your file' />
         </form>
-        <canvas id="canvas" width="300" height="300"></canvas>
+        <canvas id="canvas" width="300" height="300" style={{width: 500}}></canvas>
         {image && <button style={{
           padding: '10px',
           backgroundColor: '#111',
