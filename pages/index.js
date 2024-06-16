@@ -505,6 +505,12 @@ export const tools = [
     description: 'Convert text to checks',
     publishDate: '15th June 2024',
     url: '/text2checks',
+  },
+  {
+    title: 'Text to Apepepen',
+    description: 'Convert text to apepepen',
+    publishDate: '16th June 2024',
+    url: '/text2apepepen',
   }
   
   // {
