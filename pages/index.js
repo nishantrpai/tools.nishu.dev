@@ -510,7 +510,7 @@ export const tools = [
     title: 'Text to Apepepen',
     description: 'Convert text to apepepen',
     publishDate: '16th June 2024',
-    url: '/text2apepepen',
+    url: '/text2apepen',
   }
   
   // {
