@@ -511,6 +511,12 @@ export const tools = [
     description: 'Convert text to apepepen',
     publishDate: '16th June 2024',
     url: '/text2apepen',
+  },
+  {
+    title: 'Scapes',
+    description: 'Use scapes to create beautiful thumbnails for your videos/podcasts/articles',
+    publishDate: '17th June 2024',
+    url: '/scapes',
   }
   
   // {
