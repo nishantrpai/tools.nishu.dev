@@ -517,6 +517,12 @@ export const tools = [
     description: 'Use scapes to create beautiful thumbnails for your videos/podcasts/articles',
     publishDate: '17th June 2024',
     url: '/scapes',
+  },
+  {
+    title: 'Punkscapes',
+    description: 'Merge punks and scapes',
+    publishDate: '18th June 2024',
+    url: '/punkscapes',
   }
   
   // {
