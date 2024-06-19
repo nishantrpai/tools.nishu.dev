@@ -519,11 +519,17 @@ export const tools = [
     url: '/scapes',
   },
   {
+    title: 'Text to Scapepe',
+    description: 'Convert text to scapepe',
+    publishDate: '18th June 2024',
+    url: '/text2scapepe',
+  },
+  {
     title: 'Punkscapes',
     description: 'Merge punks and scapes',
-    publishDate: '18th June 2024',
+    publishDate: '19th June 2024',
     url: '/punkscapes',
-  }
+  },
   
   // {
   //   title: 'Best Time',
