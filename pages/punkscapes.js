@@ -235,7 +235,7 @@ export default function Home() {
             <label>
               Scape Scale
             </label>
-            <input type="range" min="0" max="10" step="0.01" value={scapeScale} onChange={(e) => setScapeScale(e.target.value)} />
+            <input type='number' value={scapeScale} onChange={(e) => setScapeScale(e.target.value)} />
           </div>
           <span style={{
             height: 10,
