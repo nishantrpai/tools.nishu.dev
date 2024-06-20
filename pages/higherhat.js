@@ -60,6 +60,9 @@ export default function HigherHat() {
             const img = new Image()
             img.src = reader.result
             img.onload = () => {
+              setOffsetX(38)
+              setOffsetY(60)
+              setScale(0.8)
               setImgWidth(img.width)
               setImgHeight(img.height)
               setImage(img)
