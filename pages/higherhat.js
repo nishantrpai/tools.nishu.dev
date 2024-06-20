@@ -25,9 +25,9 @@ export default function HigherHat() {
       hat.src = higherHat
       hat.onload = () => {
         context.drawImage(hat, offsetX, offsetY, hat.width * scale, hat.height * scale)
+        context.closePath()
       }
     }
-    context.closePath()
   }, [image, offsetX, offsetY, scale])
 
   return (
@@ -74,11 +74,11 @@ export default function HigherHat() {
           <label>
             Offset X
           </label>
-          <input type="range" min={0} max={imgWidth} value={offsetX} onChange={(e) => setOffsetX(e.target.value)} />
+          <input type="range" min={-1000} max={1000} value={offsetX} onChange={(e) => setOffsetX(e.target.value)} />
           <label>
             Offset Y
           </label>
-          <input type="range" min={0} max={imgHeight} value={offsetY} onChange={(e) => setOffsetY(e.target.value)} />
+          <input type="range" min={-1000} max={1000} value={offsetY} onChange={(e) => setOffsetY(e.target.value)} />
           <label>
             Scale
           </label>
