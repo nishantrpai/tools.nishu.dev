@@ -19,6 +19,8 @@ export default function HigherHat() {
     const context = canvas.getContext('2d')
     context.beginPath()
     if (image) {
+      canvas.width = imgWidth
+      canvas.height = imgHeight
       context.clearRect(0, 0, canvas.width, canvas.height)
       context.drawImage(image, 0, 0, image.width, image.height)
       const hat = new Image()
@@ -65,9 +67,11 @@ export default function HigherHat() {
           }
           reader.readAsDataURL(file)
         }} />
-        <canvas id="canvas" width="500" height="500" style={{
+        <canvas id="canvas" width="800" height="800" style={{
           border: '1px solid #333',
           borderRadius: 10,
+          width: 500,
+          height: 'auto',
           margin: '20px 0'
         }}></canvas>
         <div style={{ display: 'flex', gap: 20, flexDirection: 'column', width: '50%' }}>
