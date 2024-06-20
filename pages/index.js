@@ -535,6 +535,12 @@ export const tools = [
     description: 'Add "↑" hat on any image',
     publishDate: '20th June 2024',
     url: '/higherhat',
+  },
+  {
+    title: 'Intl Meme Fund Hats',
+    description: 'Add Meme Fund hats on any image',
+    publishDate: '20th June 2024',
+    url: '/intlmemefundhat',
   }
   
   // {
