@@ -530,6 +530,12 @@ export const tools = [
     publishDate: '19th June 2024',
     url: '/punkscapes',
   },
+  {
+    title: 'Higher Hat',
+    description: 'Add "↑" hat on any image',
+    publishDate: '20th June 2024',
+    url: '/higherhat',
+  }
   
   // {
   //   title: 'Best Time',
