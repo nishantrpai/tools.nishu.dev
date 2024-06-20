@@ -78,11 +78,11 @@ export default function HigherHat() {
           <label>
             Offset X
           </label>
-          <input type="range" min={-(imgWidth + 500)} max={(imgWidth + 500)} value={offsetX} onChange={(e) => setOffsetX(e.target.value)} />
+          <input type="range" min={-(imgWidth * 1.5)} max={(imgWidth * 1.5)} value={offsetX} onChange={(e) => setOffsetX(e.target.value)} />
           <label>
             Offset Y
           </label>
-          <input type="range" min={-(imgHeight + 500)} max={(imgHeight + 500)} value={offsetY} onChange={(e) => setOffsetY(e.target.value)} />
+          <input type="range" min={-(imgHeight * 1.5)} max={(imgHeight * 1.5)} value={offsetY} onChange={(e) => setOffsetY(e.target.value)} />
           <label>
             Scale
           </label>
