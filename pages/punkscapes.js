@@ -228,14 +228,23 @@ export default function Home() {
               Scape Offset X
             </label>
             <input type="range" min={-1000} max={1000} step={0.01} value={scapeOffsetX} onChange={(e) => setScapeOffsetX(e.target.value)} />
+            <input type='number' value={scapeOffsetX} onChange={(e) => setScapeOffsetX(e.target.value)} style={{
+              border: '1px solid #333', width: '100%', fontSize: 16, borderRadius: 10, padding: 5
+            }} />
             <label>
               Scape Offset Y
             </label>
             <input type="range" min="-500" max="500" value={scapeOffsetY} onChange={(e) => setScapeOffsetY(e.target.value)} />
+            <input type='number' value={scapeOffsetY} onChange={(e) => setScapeOffsetY(e.target.value)} style={{
+              border: '1px solid #333', width: '100%', fontSize: 16, borderRadius: 10, padding: 5
+            }} />
             <label>
               Scape Scale
             </label>
-            <input type='number' value={scapeScale} onChange={(e) => setScapeScale(e.target.value)} />
+            <input type="range" min="0" max="2" step="0.01" value={scapeScale} onChange={(e) => setScapeScale(e.target.value)} />
+            <input type='number' value={scapeScale} onChange={(e) => setScapeScale(e.target.value)} style={{
+              border: '1px solid #333', width: '100%', fontSize: 16, borderRadius: 10, padding: 5
+            }} />
           </div>
           <span style={{
             height: 10,
