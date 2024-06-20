@@ -40,7 +40,7 @@ export default function HigherHat() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-      <h1 className={styles.title}>
+        <h1 className={styles.title}>
           Higher Hat
         </h1>
         <span style={{
@@ -78,11 +78,11 @@ export default function HigherHat() {
           <label>
             Offset X
           </label>
-          <input type="range" min={-1000} max={1000} value={offsetX} onChange={(e) => setOffsetX(e.target.value)} />
+          <input type="range" min={-(imgWidth + 500)} max={(imgWidth + 500)} value={offsetX} onChange={(e) => setOffsetX(e.target.value)} />
           <label>
             Offset Y
           </label>
-          <input type="range" min={-1000} max={1000} value={offsetY} onChange={(e) => setOffsetY(e.target.value)} />
+          <input type="range" min={-(imgHeight + 500)} max={(imgHeight + 500)} value={offsetY} onChange={(e) => setOffsetY(e.target.value)} />
           <label>
             Scale
           </label>
