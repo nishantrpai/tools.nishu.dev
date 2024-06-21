@@ -541,6 +541,12 @@ export const tools = [
     description: 'Add Meme Fund hats on any image',
     publishDate: '20th June 2024',
     url: '/intlmemefundhat',
+  },
+  {
+    title: 'Oviators',
+    description: 'Add oviators on any image',
+    publishDate: '21st June 2024',
+    url: '/oviators',
   }
   
   // {
