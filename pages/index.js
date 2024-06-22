@@ -547,6 +547,12 @@ export const tools = [
     description: 'Add oviators on any image',
     publishDate: '21st June 2024',
     url: '/oviators',
+  },
+  {
+    title: 'Text to Opepixel',
+    description: 'Convert text to opepixel',
+    publishDate: '22nd June 2024',
+    url: '/text2opepixel',
   }
   
   // {
