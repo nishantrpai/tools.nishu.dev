@@ -8,6 +8,7 @@ export default function HigherHat() {
   const [offsetX, setOffsetX] = useState(38)
   const [offsetY, setOffsetY] = useState(60)
   const [scale, setScale] = useState(0.8)
+  const [offsetTheta, setOffsetTheta] = useState(0)
   const [imgWidth, setImgWidth] = useState(0)
   const [imgHeight, setImgHeight] = useState(0)
 
@@ -26,11 +27,13 @@ export default function HigherHat() {
       const hat = new Image()
       hat.src = higherHat
       hat.onload = () => {
+        context.translate(offsetX, offsetY)
+        context.rotate(offsetTheta * Math.PI / 180)
         context.drawImage(hat, offsetX, offsetY, hat.width * scale, hat.height * scale)
         context.closePath()
       }
     }
-  }, [image, offsetX, offsetY, scale])
+  }, [image, offsetX, offsetY, scale, offsetTheta])
 
   return (
     <>
@@ -63,6 +66,7 @@ export default function HigherHat() {
               setOffsetX(38)
               setOffsetY(60)
               setScale(0.8)
+            setOffsetTheta(0)
               setImgWidth(img.width)
               setImgHeight(img.height)
               setImage(img)
@@ -89,7 +93,11 @@ export default function HigherHat() {
           <label>
             Scale
           </label>
-          <input type="range" min={0} max={2} step={0.01} value={scale} onChange={(e) => setScale(e.target.value)} />
+          <input type="range" min={0} max={10} step={0.01} value={scale} onChange={(e) => setScale(e.target.value)} />
+          <label>
+            Rotate
+          </label>
+          <input type="range" min={-360} max={360} value={offsetTheta} onChange={(e) => setOffsetTheta(e.target.value)} />
         </div>
 
         <button onClick={() => {
