@@ -553,6 +553,12 @@ export const tools = [
     description: 'Convert text to opepixel',
     publishDate: '22nd June 2024',
     url: '/text2opepixel',
+  },
+  {
+    title: 'Boys Club World',
+    description: 'Add boys club hat on any image',
+    publishDate: '23rd June 2024',
+    url: '/boysclub',
   }
   
   // {
