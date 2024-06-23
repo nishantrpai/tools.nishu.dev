@@ -39,7 +39,7 @@ export default function HigherHat() {
     <>
       <Head>
         <title>Boys Club hat</title>
-        <meta name="description" content="Boys Club hat" />
+        <meta name="description" content="Add boys club hat on any image" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
