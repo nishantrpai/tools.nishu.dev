@@ -559,6 +559,18 @@ export const tools = [
     description: 'Add boys club hat on any image',
     publishDate: '23rd June 2024',
     url: '/boysclub',
+  },
+  {
+    title: 'Mog',
+    description: 'Add pit viper glasses on any image',
+    publishDate: '24th June 2024',
+    url: '/mog',
+  },
+  {
+    title: 'Polymarket Intern Hat',
+    description: 'Add Polymarket intern hat on any image',
+    publishDate: '24th June 2024',
+    url: '/polymarketintern',
   }
   
   // {
