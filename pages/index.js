@@ -571,6 +571,12 @@ export const tools = [
     description: 'Add Polymarket intern hat on any image',
     publishDate: '24th June 2024',
     url: '/polymarketintern',
+  },
+  {
+    title: '8pepen x Scapes',
+    description: 'Merge 8pepen and scapes',
+    publishDate: '25th June 2024',
+    url: '/8scapepe',
   }
   
   // {

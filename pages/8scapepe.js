@@ -23,7 +23,7 @@ export default function Home() {
   const [scapeID, setScapesId] = useState(1)
   const [punkID, setPunkId] = useState(1)
   const [scapeImg, setScapeImg] = useState('')
-  const [punkImg, setPunkImg] = useState('')
+  const [punkImg, setPunkImg] = useState('/8pepen.png')
   const [chain, setChain] = useState('ETHEREUM')
   const [status, setStatus] = useState('')
   const [scapeOffsetX, setScapeOffsetX] = useState(0)
@@ -134,9 +134,6 @@ export default function Home() {
           console.log('clearing canvas')
           ctx.beginPath()
           ctx.clearRect(0, 0, canvas.width, canvas.height)
-          ctx.fillStyle = 'black'
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
-
 
           console.log('draw image1')
           ctx.drawImage(img1, 0, 0, canvas.width, canvas.height)
@@ -170,16 +167,6 @@ export default function Home() {
     });
   }, [scapeID])
 
-  useEffect(() => {
-    if (!punkID) return
-
-    setStatus('fetching punk...')
-    getNFTData(punkContract, punkID).then(punk => {
-      if (punk.image)
-        setPunkImg(punk.image)
-    });
-
-  }, [punkID])
 
   useEffect(() => {
     if (!scapeID) return
@@ -193,19 +180,19 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Punkscapes</title>
-        <meta name="description" content="Punkscapes" />
+        <title>8scapepe</title>
+        <meta name="description" content="8scapepe" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
         <h1>
-          Punkscapes
+          8scapepe
         </h1>
         <h2 style={{
           color: '#333',
           fontSize: 12
         }}>
-          Merge Punks and Scapes
+          Merge 8pepen and Scapes
         </h2>
         <canvas id="canvas" width="500" height="500"
           style={{
@@ -215,15 +202,7 @@ export default function Home() {
             marginTop: 20
           }}
         ></canvas>
-
         <div style={{ margin: 0, marginBottom: 20, display: 'flex', flexDirection: 'column', gap: 20, width: '50%' }}>
-          <label>
-            Enter Punk Id
-          </label>
-          <input type="text" value={punkID} onChange={(e) => setPunkId(e.target.value)} style={{
-            border: '1px solid #333', width: '100%', fontSize: 16, borderRadius: 10, padding: 5
-          }}
-            placeholder='Enter Punk ID' />
           <label>
             Enter Scapes ID
           </label>
@@ -270,12 +249,13 @@ export default function Home() {
             color: '#eee'
           }}>{status}</span>
         </div>
+        
         <button onClick={() => {
           const canvas = document.getElementById('canvas')
           const dataURL = canvas.toDataURL('image/png')
           const a = document.createElement('a')
           a.href = dataURL
-          a.download = 'punkscapes.png'
+          a.download = '8scapepe.png'
           a.click()
         }}>
           Download Image
