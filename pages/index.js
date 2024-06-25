@@ -577,6 +577,12 @@ export const tools = [
     description: 'Merge 8pepen and scapes',
     publishDate: '25th June 2024',
     url: '/8scapepe',
+  },
+  {
+    title: 'Grainy',
+    description: 'Add grainy effect to your image',
+    publishDate: '25th June 2024',
+    url: '/grainy'
   }
   
   // {

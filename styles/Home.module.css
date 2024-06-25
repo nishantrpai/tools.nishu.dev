@@ -3,6 +3,7 @@
   justify-content: inherit;
   align-items: inherit;
   font-size: 0.85rem;
+  font-weight: normal;
   max-width: var(--max-width);
   width: 100%;
   z-index: 2;
