@@ -594,7 +594,7 @@ export const tools = [
     title: 'Hat Protocol',
     description: 'Add hat protocol hats on any image',
     publishDate: '26th June 2024',
-    url: '/hatprotocol'
+    url: '/hatsprotocol'
   }
   
   // {

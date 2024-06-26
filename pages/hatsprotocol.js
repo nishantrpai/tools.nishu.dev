@@ -1,4 +1,4 @@
-// add Hat Protocol on any image
+// add Hats Protocol on any image
 import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { useState, useEffect } from 'react'
@@ -38,13 +38,13 @@ export default function HigherHat() {
   return (
     <>
       <Head>
-        <title>Hat Protocol</title>
-        <meta name="description" content="Hat Protocol" />
+        <title>Hats Protocol</title>
+        <meta name="description" content="Hats Protocol" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
         <h1 className={styles.title}>
-          Hat Protocol
+          Hats Protocol
         </h1>
         <span style={{
           width: '100%',
@@ -52,7 +52,7 @@ export default function HigherHat() {
           color: '#666',
           fontSize: '14px'
         }}>
-          Add Hat Protocol hat on any image
+          Add Hats Protocol hat on any image
         </span>
 
         {/* upload photo */}
