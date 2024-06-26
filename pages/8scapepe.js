@@ -199,7 +199,8 @@ export default function Home() {
             border: '1px solid #333',
             borderRadius: 10,
             marginBottom: 20,
-            marginTop: 20
+            marginTop: 20,
+            width: '100%'
           }}
         ></canvas>
         <div style={{ margin: 0, marginBottom: 20, display: 'flex', flexDirection: 'column', gap: 20, width: '50%' }}>

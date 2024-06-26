@@ -156,7 +156,7 @@ export default function Home() {
         <div style={{ whiteSpace: 'pre-wrap', fontFamily: 'monospace', textAlign: 'left', padding: '10px', border: '1px solid #333', background: '#000', borderRadius: 10, width: '100%', lineHeight: 1.5 }}>
 
           {/* {zorbitSvg()} */}
-          <img src={getDataURI(opepenSVG)} alt="Checks" style={{ width: 500, height: 500, borderRadius: 10 }} />
+          <img src={getDataURI(opepenSVG)} alt="Checks" style={{ width: '100%',  borderRadius: 10 }} />
           {/* <span style={{
               display: 'flex',
               maxWidth: 500,

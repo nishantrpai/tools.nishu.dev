@@ -77,7 +77,7 @@ export default function HigherHat() {
         <canvas id="canvas" width="800" height="800" style={{
           border: '1px solid #333',
           borderRadius: 10,
-          width: 500,
+          width: '100%',
           height: 'auto',
           margin: '20px 0'
         }}></canvas>
