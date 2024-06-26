@@ -583,6 +583,18 @@ export const tools = [
     description: 'Add grainy effect to your image',
     publishDate: '25th June 2024',
     url: '/grainy'
+  },
+  {
+    title: 'Noggles',
+    description: 'Add Noggles on any image',
+    publishDate: '26th June 2024',
+    url: '/noggles'
+  }, 
+  {
+    title: 'Hat Protocol',
+    description: 'Add hat protocol hats on any image',
+    publishDate: '26th June 2024',
+    url: '/hatprotocol'
   }
   
   // {
