@@ -11,8 +11,11 @@ export default function HigherHat() {
   const [offsetTheta, setOffsetTheta] = useState(0)
   const [imgWidth, setImgWidth] = useState(0)
   const [imgHeight, setImgHeight] = useState(0)
+  const [hatType, setHatType] = useState(0)
 
   const higherHat = '/higherhat.png'
+  const higherHat2 = '/higherhat2.png'
+  const higherHat3 = '/higherhat3.png'
 
   useEffect(() => {
     // draw image on canvas
@@ -25,7 +28,13 @@ export default function HigherHat() {
       context.clearRect(0, 0, canvas.width, canvas.height)
       context.drawImage(image, 0, 0, image.width, image.height)
       const hat = new Image()
-      hat.src = higherHat
+      if (hatType === 0)
+        hat.src = higherHat
+      else if (hatType === 1)
+        hat.src = higherHat2
+      else if (hatType === 2)
+        hat.src = higherHat3
+
       hat.onload = () => {
         context.translate(offsetX, offsetY)
         context.rotate(offsetTheta * Math.PI / 180)
@@ -33,7 +42,7 @@ export default function HigherHat() {
         context.closePath()
       }
     }
-  }, [image, offsetX, offsetY, scale, offsetTheta])
+  }, [image, offsetX, offsetY, scale, offsetTheta, hatType])
 
   return (
     <>
@@ -66,7 +75,7 @@ export default function HigherHat() {
               setOffsetX(38)
               setOffsetY(60)
               setScale(0.8)
-            setOffsetTheta(0)
+              setOffsetTheta(0)
               setImgWidth(img.width)
               setImgHeight(img.height)
               setImage(img)
@@ -82,6 +91,41 @@ export default function HigherHat() {
           margin: '20px 0'
         }}></canvas>
         <div style={{ display: 'flex', gap: 20, flexDirection: 'column', width: '50%' }}>
+          <div style={{ display: 'flex', gap: 20, justifyContent: 'space-between', margin: 'auto' }}>
+            <div style={{
+              width: 100,
+              height: 100,
+              border: hatType === 0 ? '2px solid #333' : '2px solid #111',
+              borderRadius: 10,
+              padding: 10
+            }}>
+              <img src={higherHat} alt="Higher Hat" style={{
+                height: 'auto', width: 70,
+                margin: 'auto',
+                marginTop: 20,
+              }} onClick={() => setHatType(0)} />
+            </div>
+            <div style={{
+              width: 100,
+              height: 100,
+              border: hatType === 1 ? '2px solid #333' : '2px solid #111',
+              borderRadius: 10
+            }}>
+              <img src={higherHat2} alt="Higher Hat 2" style={{
+                width: 100, height: 'auto',
+              }} onClick={() => setHatType(1)} />
+            </div>
+            <div style={{
+              width: 100,
+              height: 100,
+              border: hatType === 2 ? '2px solid #333' : '2px solid #111',
+              borderRadius: 10
+            }}>
+              <img src={higherHat3} alt="Higher Hat 3" style={{
+                width: 100, height: 'auto',
+              }} onClick={() => setHatType(2)} />
+            </div>
+          </div>
           <label>
             Offset X
           </label>
