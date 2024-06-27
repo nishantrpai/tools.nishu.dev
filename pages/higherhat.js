@@ -112,7 +112,10 @@ export default function HigherHat() {
               borderRadius: 10
             }}>
               <img src={higherHat2} alt="Higher Hat 2" style={{
-                width: 100, height: 'auto',
+                width: '80%', height: 'auto',
+                margin: 'auto',
+                marginTop: 30,
+                marginLeft: 10
               }} onClick={() => setHatType(1)} />
             </div>
             <div style={{
@@ -123,6 +126,7 @@ export default function HigherHat() {
             }}>
               <img src={higherHat3} alt="Higher Hat 3" style={{
                 width: 100, height: 'auto',
+                marginTop: 20,
               }} onClick={() => setHatType(2)} />
             </div>
           </div>
