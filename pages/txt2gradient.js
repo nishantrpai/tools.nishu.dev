@@ -57,8 +57,8 @@ export default function Home() {
           <div style={{ whiteSpace: 'pre-wrap', fontFamily: 'monospace', textAlign: 'left', padding: '10px', border: '1px solid #333', background: '#000', borderRadius: 10, width: '100%', lineHeight: 1.5}}>
             <div style={{
               background: sensationalizedText,
-              height: '500px',
-              width: '500px',
+              height: '55vh',
+              width: '100%',
               borderRadius: 10,
             }} id="gradient-square">
             </div>

@@ -595,6 +595,12 @@ export const tools = [
     description: 'Add hat protocol hats on any image',
     publishDate: '26th June 2024',
     url: '/hatsprotocol'
+  },
+  {
+    title: 'Color Profile',
+    description: 'Get color profile of any hex code',
+    publishDate: '27th June 2024',
+    url: '/colorprofile'
   }
   
   // {
