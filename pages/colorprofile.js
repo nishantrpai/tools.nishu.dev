@@ -74,14 +74,13 @@ export default function ColorProfile() {
           <div style={{ whiteSpace: 'pre-wrap', textAlign: 'left', padding: '1px', border: '1px solid #333', background: '#000', borderRadius: 10, width: '100%', lineHeight: 1.5 }}>
             <div style={{
               background: rgb,
-              height: '500px',
+              height: '520px',
               width: '100%',
               borderRadius: 10,
-            }}
-              id="color-square"
-            >
+              position: 'relative',
+            }} id="color-square">
               <div style={{
-                bottom: 120,
+                bottom: 10,
                 position: 'absolute',
                 padding: 10,
                 color: isLightColor(hex) ? '#000' : '#fff',
