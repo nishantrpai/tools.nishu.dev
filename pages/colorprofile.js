@@ -25,10 +25,12 @@ export default function ColorProfile() {
   // make prompt to /api/gpt asking for color profile of the hex as json
   const getColorProfile = async () => {
     setLoading(true)
+    let prompt = `given a color: ${color}, provide the color profile as json including hex, rgb, hsl, cmyk, and color name. Keys should be hex, rgb, hsl, cmyk, and colorName. Provide valid hex, will be used as bg. Only 1 level json, don't make sub keys. Rgb should be rgb() or rgba(). E.g., of response {"hex": "#000000", "rgb": "rgb(0,0,0)", "hsl": "hsl(0,0%,0%)", "cmyk": "cmyk(0,0,0,100)", "colorName": "black"}`;
+
     const res = await fetch(`/api/gpt?prompt`, {
       method: 'POST',
       body: JSON.stringify({
-        prompt: `given a color: ${color}, provide the color profile as json including hex, rgb, hsl, cmyk, and color name. Keys should be hex, rgb, hsl, cmyk, and colorName. Provide valid hex, will be used as bg. Only 1 level json, don't make sub keys. Rgb should be rgb() or rgba(). E.g., of response {"hex": "#000000", "rgb": "rgb(0,0,0)", "hsl": "hsl(0,0%,0%)", "cmyk": "cmyk(0,0,0,100)", "colorName": "black"}`,
+        prompt
       })
     })
     let { response: data } = await res.json()

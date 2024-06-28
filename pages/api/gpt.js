@@ -11,7 +11,10 @@ export default async function handler(req, res) {
   // if request is a GET request
   if (req.method !== 'GET') {
     // check body for prompt
-    let { prompt, model = 'gpt-3.5-turbo' } = JSON.parse(req.body);
+    let { prompt, model = 'gpt-3.5-turbo' } = req.body;
+    if(!prompt) {
+      prompt = JSON.parse(req.body).prompt;
+    }
     const chatCompletion = await openai.chat.completions.create({
       messages: [{ role: 'user', content: prompt }],
       model
