@@ -92,7 +92,7 @@ export default function ColorProfile() {
     <>
       <Head>
         <title>Color Profile</title>
-        <meta name="description" content="Get color profile of any color" />
+        <meta name="description" content="Get color profile of any image" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.container}>
@@ -100,7 +100,7 @@ export default function ColorProfile() {
           Color Profile
         </h1>
         <span style={{ color: '#777', fontSize: '14px', marginBottom: '20px', display: 'block' }}>
-          Get color profile of any color
+          Get color profile of any image
         </span>
         <input type="file" onChange={(e) => {
           const file = e.target.files[0];
