@@ -601,6 +601,12 @@ export const tools = [
     description: 'Get color profile of any hex code',
     publishDate: '27th June 2024',
     url: '/colorprofile'
+  },
+  {
+    title: 'Image Profile',
+    description: 'Get image profile of any image',
+    publishDate: '28th June 2024',
+    url: '/imgprofile'
   }
   
   // {
