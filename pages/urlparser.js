@@ -73,14 +73,16 @@ export default function UrlParser() {
                     color: '#888',
                     padding: '5px'
                   }}>{key}</td>
-                  <td style={{
+                  <input style={{
                     // truncate long text
                     whiteSpace: 'nowrap',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     maxWidth: '200px',
                     color: '#ccc'
-                  }}>{queryParams[key]}</td>
+                  }}
+                  defaultValue={queryParams[key]}
+                  />
                 </tr>
               ))}
             </tbody>

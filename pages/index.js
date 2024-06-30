@@ -603,9 +603,21 @@ export const tools = [
     url: '/colorprofile'
   },
   {
+    title: 'VVR x Scape',
+    description: 'Merge VVR and scapes',
+    publishDate: '28th June 2024',
+    url: '/vvrscape'
+  },
+  {
+    title: 'VVR x pepe',
+    description: 'Merge VVR and pepe',
+    publishDate: '28th June 2024',
+    url: '/vvrpepe'
+  },
+  {
     title: 'Image Profile',
     description: 'Get image profile of any image',
-    publishDate: '28th June 2024',
+    publishDate: '29th June 2024',
     url: '/imgprofile'
   }
   
