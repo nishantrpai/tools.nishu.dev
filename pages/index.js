@@ -619,6 +619,12 @@ export const tools = [
     description: 'Get image profile of any image',
     publishDate: '29th June 2024',
     url: '/imgprofile'
+  },
+  {
+    title: 'Thug Life',
+    description: 'Add thug life glasses on any image',
+    publishDate: '30th June 2024',
+    url: '/thuglife'
   }
   
   // {
