@@ -630,7 +630,7 @@ export const tools = [
     title: 'Pepe',
     description: 'Fill any image with pepe color',
     publishDate: '1st July 2024',
-    url: '/pepe'
+    url: '/pepefy'
   }
   
   // {
