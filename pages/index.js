@@ -625,6 +625,12 @@ export const tools = [
     description: 'Add thug life glasses on any image',
     publishDate: '30th June 2024',
     url: '/thuglife'
+  },
+  {
+    title: 'Pepe',
+    description: 'Fill any image with pepe color',
+    publishDate: '1st July 2024',
+    url: '/pepe'
   }
   
   // {
