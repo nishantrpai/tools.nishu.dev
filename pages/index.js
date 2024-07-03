@@ -631,6 +631,12 @@ export const tools = [
     description: 'Fill any image with pepe color',
     publishDate: '1st July 2024',
     url: '/pepefy'
+  },
+  {
+    title: 'NFT Sonification',
+    description: 'Sonify NFTs',
+    publishDate: '2nd July 2024',
+    url: '/nftsonify'
   }
   
   // {

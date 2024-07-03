@@ -101,6 +101,14 @@ export default function Pepe() {
           reader.readAsDataURL(file)
         }} />
         <canvas id="canvas" style={{ border: '1px solid black' }}></canvas>
+        <div>
+          {pepeShades.map((shade, index) => (
+            <button key={index} style={{ backgroundColor: shade, color: 'white' }} onClick={() => setPepeShade(shade)}>
+              {shade}
+            </button>
+          ))}
+        </div>
+        
         {/* reset */}
         <button onClick={() => {
           const canvas = document.getElementById('canvas')
