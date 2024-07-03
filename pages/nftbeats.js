@@ -379,7 +379,9 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Music Visualizer</title>
+        <title>NFT Beats</title>
+        <meta name="description" content="Turn your NFTs into music" />
+        <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
         <h1>
