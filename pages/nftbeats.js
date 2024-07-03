@@ -406,6 +406,7 @@ export default function Home() {
           <canvas id="canvas" ref={canvasRef} width="600" height="400" style={{
             border: '1px solid #333',
             marginBottom: '1rem',
+            width: 600
           }}></canvas>
           <canvas id="highResCanvas" ref={highResCanvasRef} style={{ display: 'none' }}></canvas>
 
