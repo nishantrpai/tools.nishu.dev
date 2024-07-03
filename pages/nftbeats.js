@@ -515,7 +515,7 @@ export default function Home() {
               marginTop: '0.5rem',
               marginBottom: '1rem',
             }}
-            onChange={(e) => setMinFreq(e.target.value)}
+            onChange={(e) => setMaxFreq(e.target.value)}
             />
 
           <br />
