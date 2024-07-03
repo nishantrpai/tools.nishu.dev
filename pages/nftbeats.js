@@ -508,7 +508,7 @@ export default function Home() {
             type="range"
             id="minFreqSlider"
             min="30"
-            max="240"
+            max="1200"
             value={maxFreq}
             style={{
               width: '100%',
