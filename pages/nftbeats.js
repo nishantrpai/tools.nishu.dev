@@ -79,6 +79,7 @@ export default function Home() {
 
   const [tempo, setTempo] = useState(80);
   const [minFreq, setMinFreq] = useState(65);
+  const [maxFreq, setMaxFreq] = useState(900);
   const [beat, setBeat] = useState('kick, null, snare, null, kick, clap, snare, closedHat');
   const [isRecording, setIsRecording] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState(null);
@@ -172,7 +173,7 @@ export default function Home() {
     const minBrightness = 0;
     const maxBrightness = 255;
     const minFrequency = minFreq;
-    const maxFrequency = 900.00;
+    const maxFrequency = maxFreq;
     const cappedMaxFrequency = 1200; // Capping the maximum frequency to avoid harsh sounds
     const frequency = ((brightness - minBrightness) / (maxBrightness - minBrightness)) * (maxFrequency - minFrequency) + minFrequency;
     return Math.min(frequency, cappedMaxFrequency);
@@ -493,6 +494,22 @@ export default function Home() {
             min="30"
             max="240"
             value={minFreq}
+            style={{
+              width: '100%',
+              marginTop: '0.5rem',
+              marginBottom: '1rem',
+            }}
+            onChange={(e) => setMinFreq(e.target.value)}
+            />
+
+          <br />
+          <label htmlFor="minFreqSlider">Minimum Frequency: {maxFreq} Hz</label>
+          <input
+            type="range"
+            id="minFreqSlider"
+            min="30"
+            max="240"
+            value={maxFreq}
             style={{
               width: '100%',
               marginTop: '0.5rem',
