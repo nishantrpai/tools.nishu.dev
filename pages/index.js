@@ -633,10 +633,10 @@ export const tools = [
     url: '/pepefy'
   },
   {
-    title: 'NFT Sonification',
-    description: 'Sonify NFTs',
+    title: 'NFT Beats',
+    description: 'Play beats from NFTs',
     publishDate: '2nd July 2024',
-    url: '/nftsonify'
+    url: '/nftbeats'
   }
   
   // {

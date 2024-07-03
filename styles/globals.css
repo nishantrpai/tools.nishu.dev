@@ -97,8 +97,8 @@ button {
   padding: 0.25rem 0.75rem;
   color: #fff;
   background-color: #222;
-  border: none !important;
-  outline: none !important;
+  border: none;
+  outline: none;
   border-radius: 5px;
   font-size: 1rem;
 }
