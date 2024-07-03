@@ -66,6 +66,11 @@ export default function Home() {
         ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
         setImage(image);
         currentYRef.current = 0; // Reset currentY to 0
+        
+        const highResCanvas = highResCanvasRef.current;
+        highResCanvas.width = image.width * 2;
+        highResCanvas.height = image.height * 2;
+
       }
     })
   }, [token1, collectionAddress])
@@ -73,6 +78,7 @@ export default function Home() {
 
 
   const [tempo, setTempo] = useState(80);
+  const [minFreq, setMinFreq] = useState(65);
   const [beat, setBeat] = useState('kick, null, snare, null, kick, clap, snare, closedHat');
   const [isRecording, setIsRecording] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState(null);
@@ -80,6 +86,7 @@ export default function Home() {
   const [image, setImage] = useState(null);
 
   const canvasRef = useRef(null);
+  const highResCanvasRef = useRef(null);
   const synthRef = useRef(null);
   const kickSynthRef = useRef(null);
   const snareSynthRef = useRef(null);
@@ -93,7 +100,7 @@ export default function Home() {
   useEffect(() => {
     synthRef.current = new Tone.PolySynth(Tone.Synth, {
       oscillator: { type: "sine" },
-      envelope: { attack: 0.01, decay: 0.3, sustain: 0.5, release: 1 },
+      envelope: { attack: 0.1, decay: 0.3, sustain: 0.5, release: 1 },
       volume: -20,
     }).toDestination();
 
@@ -164,7 +171,7 @@ export default function Home() {
   const brightnessToFrequency = (brightness) => {
     const minBrightness = 0;
     const maxBrightness = 255;
-    const minFrequency = 65.41;
+    const minFrequency = minFreq;
     const maxFrequency = 900.00;
     const cappedMaxFrequency = 1200; // Capping the maximum frequency to avoid harsh sounds
     const frequency = ((brightness - minBrightness) / (maxBrightness - minBrightness)) * (maxFrequency - minFrequency) + minFrequency;
@@ -186,6 +193,11 @@ export default function Home() {
         ctx.drawImage(img, 0, 0);
         setImage(img);
         currentYRef.current = 0; // Reset currentY to 0
+        // Set high resolution canvas size
+        const highResCanvas = highResCanvasRef.current;
+        highResCanvas.width = img.width * 2;
+        highResCanvas.height = img.height * 2;
+
       }
       img.src = e.target.result;
     }
@@ -240,12 +252,12 @@ export default function Home() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(image, 0, 0);
     ctx.beginPath();
-    
-    if(direction === 'horizontal') {
+
+    if (direction === 'horizontal') {
       ctx.moveTo(0, currentYRef.current);
       ctx.lineTo(canvas.width, currentYRef.current);
     }
-    if(direction === 'vertical') {
+    if (direction === 'vertical') {
       ctx.moveTo(currentYRef.current, 0);
       ctx.lineTo(currentYRef.current, canvas.height);
     }
@@ -262,9 +274,9 @@ export default function Home() {
 
     const sequences = [
       beat.split(',').map(val => val.trim() === 'null' ? null : val.trim()), // Beat
-      [60, 70, 80, 90, 100], // Strings
-      [55, 65, 75, 85, 95], // Brass
-      [60, 70, 80, 90, 100] // Woodwinds
+      // [60, 70, 80, 90, 100], // Strings
+      // [55, 65, 75, 85, 95], // Brass
+      // [60, 70, 80, 90, 100] // Woodwinds
     ];
 
     const [beatSequence, strings, brass, woodwinds] = sequences;
@@ -395,6 +407,8 @@ export default function Home() {
             border: '1px solid #333',
             marginBottom: '1rem',
           }}></canvas>
+          <canvas id="highResCanvas" ref={highResCanvasRef} style={{ display: 'none' }}></canvas>
+
           <br />
           <div style={{ display: 'flex', flexDirection: 'column', gap: 15, width: '100%' }}>
             <label style={{ fontWeight: 'bold' }}>Collection Address</label>
@@ -470,6 +484,21 @@ export default function Home() {
               Tone.Transport.bpm.value = e.target.value;
             }}
           />
+
+          <label htmlFor="minFreqSlider">Minimum Frequency: {minFreq} Hz</label>
+          <input
+            type="range"
+            id="minFreqSlider"
+            min="30"
+            max="240"
+            value={minFreq}
+            style={{
+              width: '100%',
+              marginTop: '0.5rem',
+              marginBottom: '1rem',
+            }}
+            onChange={(e) => setMinFreq(e.target.value)}
+            />
 
           <br />
           <div style={{
