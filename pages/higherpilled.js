@@ -100,7 +100,7 @@ export default function HigherHat() {
           <label>
             Scale
           </label>
-          <input type="range" min={-10} max={10} step={0.01} value={scale} onChange={(e) => setScale(e.target.value)} />
+          <input type="range" min={-10} max={10} step={0.001} value={scale} onChange={(e) => setScale(e.target.value)} />
           <label>
             Rotate
           </label>
