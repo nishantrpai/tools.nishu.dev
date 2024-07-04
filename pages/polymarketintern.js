@@ -8,7 +8,7 @@ export default function HigherHat() {
   const [offsetX, setOffsetX] = useState(71)
   const [offsetY, setOffsetY] = useState(-22)
   const [scale, setScale] = useState(0.8)
-  const [offsetTheta, setOffsetTheta] = useState(23)
+  const [offsetTheta, setOffsetTheta] = useState(0)
   const [imgWidth, setImgWidth] = useState(0)
   const [imgHeight, setImgHeight] = useState(0)
 
@@ -27,7 +27,7 @@ export default function HigherHat() {
       const hat = new Image()
       hat.src = higherHat
       hat.onload = () => {
-        // context.translate(offsetX, offsetY)
+        context.translate(offsetX, offsetY)
         context.rotate(offsetTheta * Math.PI / 180)
         context.drawImage(hat, offsetX, offsetY, hat.width * scale, hat.height * scale)
         context.closePath()
@@ -66,7 +66,7 @@ export default function HigherHat() {
               setOffsetX(71)
               setOffsetY(-22)
               setScale(0.8)
-            setOffsetTheta(23)
+            setOffsetTheta(0)
               setImgWidth(img.width)
               setImgHeight(img.height)
               setImage(img)
