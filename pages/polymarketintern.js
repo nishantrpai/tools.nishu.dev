@@ -27,7 +27,7 @@ export default function HigherHat() {
       const hat = new Image()
       hat.src = higherHat
       hat.onload = () => {
-        context.translate(offsetX, offsetY)
+        // context.translate(offsetX, offsetY)
         context.rotate(offsetTheta * Math.PI / 180)
         context.drawImage(hat, offsetX, offsetY, hat.width * scale, hat.height * scale)
         context.closePath()
