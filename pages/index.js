@@ -637,8 +637,13 @@ export const tools = [
     description: 'Play beats from NFTs',
     publishDate: '2nd July 2024',
     url: '/nftbeats'
+  },
+  {
+    title: 'Higher Pilled',
+    description: 'Add higher eyes on any image',
+    publishDate: '3rd July 2024',
+    url: '/higherpilled'
   }
-  
   // {
   //   title: 'Best Time',
   //   description: 'Pick the best time for you and your friends across timezones',
