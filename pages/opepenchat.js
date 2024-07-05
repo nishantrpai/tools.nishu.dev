@@ -172,6 +172,18 @@ export default function OpepenChat() {
             font: '16px',
             width:'100%'
           }}/>
+          <input type="file" accept="image/*" onChange={(event) => {
+            const file = event.target.files[0]
+            const reader = new FileReader()
+            reader.onload = () => {
+              const img = new Image()
+              img.src = reader.result
+              img.onload = () => {
+                setOpepen(img.src)
+              }
+            }
+            reader.readAsDataURL(file)
+          }} />
           <button onClick={() => {
             getNFTData(collectionAddress, token1).then((data) => {
               if (!data) return;
