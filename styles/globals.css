@@ -43,6 +43,13 @@
   margin: 0;
 }
 
+@font-face {
+  font-family: "opepen";
+  src: url('/fonts/opepenfont.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 html,
 body {
   max-width: 100vw;

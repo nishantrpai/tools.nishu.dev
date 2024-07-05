@@ -641,8 +641,14 @@ export const tools = [
   {
     title: 'Higher Pilled',
     description: 'Add higher eyes on any image',
-    publishDate: '3rd July 2024',
+    publishDate: '4th July 2024',
     url: '/higherpilled'
+  },
+  {
+    title: 'Opepen Chat Cover',
+    description: 'Create a cover for Opepen Chat',
+    publishDate: '5th July 2024',
+    url: '/opepenchat'
   }
   // {
   //   title: 'Best Time',
