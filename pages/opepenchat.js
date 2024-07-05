@@ -149,7 +149,7 @@ export default function OpepenChat() {
           }}>
             {title}
           </span>
-          <canvas ref={canvasRef} id="canvas" width={1024} height={700} style={{ border: '1px solid #333' }}></canvas>
+          <canvas ref={canvasRef} id="canvas" width={1024} height={700} style={{ border: '1px solid #111' }}></canvas>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20, justifyContent: 'center', marginTop: '20px', width: '100%' }}>
