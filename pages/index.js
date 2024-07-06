@@ -649,14 +649,13 @@ export const tools = [
     description: 'Create a cover for Opepen Chat',
     publishDate: '5th July 2024',
     url: '/opepenchat'
+  },
+  {
+    title: 'Paradox',
+    description: 'Generate paradoxes',
+    publishDate: '6th July 2024',
+    url: '/paradox'
   }
-  // {
-  //   title: 'Best Time',
-  //   description: 'Pick the best time for you and your friends across timezones',
-  //   publishDate: '3rd May 2024',
-  //   url: '/besttime',
-  //   icon: '🕒',
-  // }
   // {
   //   title: 'Face Swap',
   //   description: 'Swap faces in gifs',
