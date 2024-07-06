@@ -12,7 +12,7 @@ export default function Home() {
   const sensationalize = async () => {
     // make api call to /api/gpt?prompt
     setLoading(true)
-    const res = await fetch(`/api/gpt?prompt="List all possible variations of word:${text} that are paradoxical (atleast 10, should include the word). If the word is focus It would be in this format: 'The distractions will continue until focus improves.'. Format is "X will continue until Y ...". Don't repeat the prompt in the variations. Use the text in the sentence,don't use synonyms or antonyms, it should be paradoxical in the format of the example."`)
+    const res = await fetch(`/api/gpt?prompt="List all possible variations of word:${text} that are paradoxical (atleast 10, should include the word). If the word is focus It would be in this format: 'The distractions will continue until focus improves.'. Format is "X will continue until Y ...". Don't repeat the prompt in the variations. Use the text in the sentence,don't use synonyms or antonyms, it should be paradoxical exactly the format of the example."`)
     const data = await res.json()
     setSensationalizedText(data.response)
     setLoading(false)
