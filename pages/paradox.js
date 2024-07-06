@@ -35,7 +35,7 @@ export default function Home() {
           type="text"
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="Enter your text"
+          placeholder="Enter your topic to generate paradox for"
           style={{
             width: '100%',
             border: '1px solid #333',
