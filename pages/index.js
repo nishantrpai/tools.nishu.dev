@@ -660,7 +660,7 @@ export const tools = [
     title: 'Based Hat',
     description: 'Add Based Hat on any image',
     publishDate: '7th July 2024',
-    url: '/basehat' 
+    url: '/basedhat' 
   }
   // {
   //   title: 'Face Swap',
