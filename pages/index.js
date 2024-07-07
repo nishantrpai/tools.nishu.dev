@@ -657,10 +657,10 @@ export const tools = [
     url: '/paradox'
   },
   {
-    title: 'Based Cap',
-    description: 'Add Based cap on any image',
+    title: 'Based Hat',
+    description: 'Add Based Hat on any image',
     publishDate: '7th July 2024',
-    url: '/basedcap' 
+    url: '/basehat' 
   }
   // {
   //   title: 'Face Swap',
