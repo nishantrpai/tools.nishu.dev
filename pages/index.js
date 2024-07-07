@@ -655,6 +655,12 @@ export const tools = [
     description: 'Generate paradoxes',
     publishDate: '6th July 2024',
     url: '/paradox'
+  },
+  {
+    title: 'Based Cap',
+    description: 'Add Based cap on any image',
+    publishDate: '7th July 2024',
+    url: '/basedcap' 
   }
   // {
   //   title: 'Face Swap',
