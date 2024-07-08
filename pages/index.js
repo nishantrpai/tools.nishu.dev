@@ -661,6 +661,12 @@ export const tools = [
     description: 'Add Based Hat on any image',
     publishDate: '7th July 2024',
     url: '/basedhat' 
+  },
+  {
+    title: 'Higher Scanner',
+    description: 'Add Higher Scanner on any image',
+    publishDate: '8th July 2024',
+    url: '/higherscanner'
   }
   // {
   //   title: 'Face Swap',
