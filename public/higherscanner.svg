@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="-10 -20 150 150" fill="#fff">
+<g>
+    <rect x="-1" y="-14" width="45" height="15" fill="#35EB43"/>
+
+  <text x="1" y="-4" font-family="Helvetica" font-size="10" fill="black" font-weight="bold">HIGHER</text>
+</g>
+  <rect x="0" y="0" width="124" height="124" fill="none" stroke-width="2" stroke="#35EB43"/>
+  /&gt;
+  <rect x="0" y="0" width="124" height="124" fill="#35EB43" opacity="0.25"/>
+</svg>
