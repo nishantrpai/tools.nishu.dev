@@ -160,6 +160,9 @@ export default function HigherHat() {
         }}>
           Download Image
         </button>
+        <div style={{ textAlign: 'center', marginTop: 20, color: '#777', fontSize: 12 }}>
+          Higher hat and smiley hat by  <a href="https://warpcast.com/clfx.eth" style={{ color: '#fff', textDecoration: 'underline'}} target='_blank'>clfx</a>, pixel hat by <a href="https://warpcast.com/catra.eth" style={{ color: '#fff', textDecoration: 'underline'}} target='_blank'>catra</a>,
+        </div>
       </main>
     </>
   )
