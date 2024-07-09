@@ -141,7 +141,7 @@ export default function Home() {
           // draw punk
           ctx.globalAlpha = 1
           ctx.globalCompositeOperation = 'darken'
-          let scaleFactor = canvas.width / img2.width
+          let scaleFactor = 1;
           const scaledHeight = img2.height * scaleFactor
           const center = (canvas.height - scaledHeight) / 2
 
@@ -226,7 +226,7 @@ export default function Home() {
               Offset Y
             </label>
             <div style={{display: 'flex', gap: 20, width: '100%'}}>
-            <input type="range" min="-500" max="500" value={scapeOffsetY} onChange={(e) => setScapeOffsetY(e.target.value)} />
+            <input type="range" min="-800" max="800" value={scapeOffsetY} onChange={(e) => setScapeOffsetY(e.target.value)} />
             <input type='number' value={scapeOffsetY} onChange={(e) => setScapeOffsetY(e.target.value)} style={{
               border: '1px solid #333', width: '30%', fontSize: 16, borderRadius: 10, padding: 5
             }} />
