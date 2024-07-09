@@ -29,6 +29,7 @@ export default function Home() {
   const [scapeOffsetX, setScapeOffsetX] = useState(0)
   const [scapeOffsetY, setScapeOffsetY] = useState(0)
   const [scapeScale, setScapeScale] = useState(1)
+  const [invert, setInvert] = useState(false)
   const punkContract = '0x5537d90a4a2dc9d9b37bab49b490cf67d4c54e91'
   const scapeContract = '0xb7def63a9040ad5dc431aff79045617922f4023a'
 
@@ -137,10 +138,20 @@ export default function Home() {
 
           console.log('draw image1')
           ctx.drawImage(img1, 0, 0, canvas.width, canvas.height)
-
+          // if invert is true, invert color of 
+          if(invert){
+            const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+            for (let i = 0; i < imgData.data.length; i += 4) {
+              imgData.data[i] = 255 - imgData.data[i]
+              imgData.data[i + 1] = 255 - imgData.data[i + 1]
+              imgData.data[i + 2] = 255 - imgData.data[i + 2]
+            }
+            ctx.putImageData(imgData, 0, 0)
+          }
+          
           // draw punk
           ctx.globalAlpha = 1
-          ctx.globalCompositeOperation = 'darken'
+          ctx.globalCompositeOperation = invert ? 'lighten' : 'darken';
           let scaleFactor = 1;
           const scaledHeight = img2.height * scaleFactor
           const center = (canvas.height - scaledHeight) / 2
@@ -171,7 +182,7 @@ export default function Home() {
     setStatus('blending...')
 
     blendUpdateCanvas(punkImg, scapeImg)
-  }, [scapeImg, punkImg, scapeOffsetX, scapeOffsetY, scapeScale])
+  }, [scapeImg, punkImg, scapeOffsetX, scapeOffsetY, scapeScale, invert])
 
   return (
     <>
@@ -212,6 +223,10 @@ export default function Home() {
           <div style={{
             display: 'flex', gap: 20, margin: 'auto', justifyContent: 'flex-start', alignItems: 'center', flexDirection: 'column'
           }}>
+          <div style={{display: 'flex', gap: 20, width: '100%'}}>
+            <label>Invert</label>
+            <input type="checkbox" checked={invert} onChange={(e) => setInvert(e.target.checked)} />
+            </div>
             <label>
               Offset X
             </label>
@@ -237,7 +252,7 @@ export default function Home() {
             </label>
             <div style={{display: 'flex', gap: 20, width: '100%'}}>
             
-            <input type="range" min="0" max="2" step="0.01" value={scapeScale} onChange={(e) => setScapeScale(e.target.value)} />
+            <input type="range" min="0" max="10" step="0.01" value={scapeScale} onChange={(e) => setScapeScale(e.target.value)} />
             <input type='number' value={scapeScale} onChange={(e) => setScapeScale(e.target.value)} style={{
               border: '1px solid #333', width: '30%', fontSize: 16, borderRadius: 10, padding: 5
             }} />
