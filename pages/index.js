@@ -667,7 +667,19 @@ export const tools = [
     description: 'Add Higher Scanner on any image',
     publishDate: '8th July 2024',
     url: '/higherscanner'
+  },
+  {
+    title: '8pepeblend',
+    description: 'Blend 8pepen and any image',
+    publishDate: '9th July 2024',
+    url: '/8pepeblend'
   }
+  // {
+  //   title: 'Warp Quote',
+  //   description: 'Turn a cast into a quote',
+  //   publishDate: '10th July 2024',
+  //   url: '/warpquote'
+  // }
   // {
   //   title: 'Face Swap',
   //   description: 'Swap faces in gifs',
