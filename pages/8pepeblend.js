@@ -187,7 +187,7 @@ export default function Home() {
         <h2 className={styles.description}>
           Blend 8pepen with any image
         </h2>
-        <canvas id="canvas" width="500" height="500"
+        <canvas id="canvas" width="800" height="800"
           style={{
             border: '1px solid #333',
             borderRadius: 10,
