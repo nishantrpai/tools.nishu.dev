@@ -250,7 +250,7 @@ export default function Home() {
           const dataURL = canvas.toDataURL('image/png')
           const a = document.createElement('a')
           a.href = dataURL
-          a.download = '8scapepe.png'
+          a.download = '8pepe-blend.png'
           a.click()
         }}>
           Download Image
