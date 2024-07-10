@@ -57,7 +57,7 @@ export default function ColorProfile() {
       }
       console.log(dominantColor);
       setColor(dominantColor);
-      
+
     }
   }
 
@@ -111,23 +111,25 @@ export default function ColorProfile() {
           }
           reader.readAsDataURL(file);
         }} />
-        <div style={{ marginTop: 20, display: 'flex', gap: 20, flexDirection: 'row', justifyContent: 'space-between', width: '1000px' }}>
-          <div style={{
-            borderRadius: 10, flexBasis: '50%', border: '1px solid #333', maxWidth: '500px', height: '520px',
-            backgroundImage: `url(${image})`,
-            backgroundSize: 'cover',
-          }} />
+        <div style={{ marginTop: 20, display: 'flex', gap: 0, flexDirection: 'row', justifyContent: 'space-between', width: '1000px' }} id="color-square">
 
           {hex && (
-            <div style={{ whiteSpace: 'pre-wrap', flexBasis: '50%', textAlign: 'left', border: '1px solid #333', background: '#000', borderRadius: 10, width: '100%', lineHeight: 1.5 }}>
+            <div style={{
+              whiteSpace: 'pre-wrap',
+              flexBasis: '50%',
+              textAlign: 'left',
+              background: '#000',
+              width: '100%',
+              lineHeight: 1.5
+            }}>
               <div style={{
                 width: '100%',
                 height: '520px',
-                borderRadius: 10,
+                borderRadius: '10px 0 0px 10px',
                 position: 'relative',
-                backgroundImage: `url(${image})`,
+                background: hex,
                 backgroundSize: 'cover',
-              }} id="color-square">
+              }}>
                 <div style={{
                   bottom: 10,
                   position: 'absolute',
@@ -146,6 +148,14 @@ export default function ColorProfile() {
               </div>
             </div>
           )}
+          <div style={{
+            borderRadius: '0 10px 10px 0',
+            flexBasis: '50%',
+            maxWidth: '500px', height: '520px',
+            backgroundImage: `url(${image})`,
+            backgroundSize: 'cover',
+          }} />
+
 
         </div>
         {/* download */}
