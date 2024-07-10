@@ -162,7 +162,7 @@ export default function ColorProfile() {
         {hex && (
           <button onClick={() => {
             html2canvas(document.getElementById('color-square'), {
-              backgroundColor: 'transparent'
+              backgroundColor: '#000'
             }).then(function (canvas) {
               var a = document.createElement('a');
               a.href = canvas.toDataURL("image/png");
