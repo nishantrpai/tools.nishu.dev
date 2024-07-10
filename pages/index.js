@@ -673,6 +673,12 @@ export const tools = [
     description: 'Blend 8pepen and any image',
     publishDate: '9th July 2024',
     url: '/8pepeblend'
+  },
+  {
+    title: 'Black and White Filter',
+    description: 'Add black and white filter on any image',
+    publishDate: '10th July 2024',
+    url: '/bwfilter'
   }
   // {
   //   title: 'Warp Quote',
