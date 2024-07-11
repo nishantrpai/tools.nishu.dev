@@ -76,6 +76,7 @@ export default function OpepenChat() {
         context.drawImage(image, x, y, image.width * scale, image.height * scale);
         context.fillStyle = 'rgba(0, 0, 0, 0.5)';
         context.fillRect(0, 0, canvas.width, canvas.height);
+
         context.closePath();
       }
     }
@@ -129,22 +130,43 @@ export default function OpepenChat() {
             top: 0,
             left: 0,
             color: '#fff',
-            opacity: 0.75,
+            opacity: 0.95,
             padding: '10px',
             fontFamily: 'opepen',
             fontSize: '2em',
             whiteSpace: 'pre',
           }}>
             Opepen Chat
+            {/* add hosts */}
+            <div style={{ display: 'flex', gap: 20, justifyContent: 'center', marginTop: '20px' }}>
+              <div style={{ position: 'relative' }}>
+                <img src="/opepen_hosts/boredopepen.jpg" style={{ width: 100, height: 100, borderRadius: 50, border: '1px solid #333' }} />
+                {/* add a green circle for online */}
+                <div style={{ width: 15, height: 15, backgroundColor: 'green', borderRadius: 100, position: 'absolute', bottom: 0, right: 15 }}></div>
+              </div>
+              <div style={{ position: 'relative' }}>
+                <img src="/opepen_hosts/akin.jpg" style={{ width: 100, height: 100, borderRadius: 50, border: '1px solid #333' }} />
+                {/* add a green circle for online */}
+                <div style={{ width: 15, height: 15, backgroundColor: 'green', borderRadius: 100, position: 'absolute', bottom: 0, right: 15 }}></div>
+              </div>
+              <div style={{ position: 'relative' }}>
+                <img src="/opepen_hosts/ljw.jpg" style={{ width: 100, height: 100, borderRadius: 50, border: '1px solid #333' }} />
+                {/* add a green circle for online */}
+                <div style={{ width: 15, height: 15, backgroundColor: 'green', borderRadius: 100, position: 'absolute', bottom: 0, right: 15 }}></div>
+              </div>
+
+            </div>
+
           </span>
+
           <span style={{
             position: 'absolute',
-            top: 60,
+            top: 200,
             left: 0,
             color: '#fff',
             padding: '10px',
             fontFamily: 'opepen',
-            fontSize: '8em',
+            fontSize: '7em',
             whiteSpace: 'pre',
           }}>
             {title}
@@ -153,25 +175,25 @@ export default function OpepenChat() {
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20, justifyContent: 'center', marginTop: '20px', width: '100%' }}>
-          <textarea placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)}  style={{
+          <textarea placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} style={{
             backgroundColor: '#000',
             color: '#fff',
             border: '1px solid #333',
             borderRadius: 10,
             padding: '10px',
             font: '16px',
-            width:'100%', height: '200px'
+            width: '100%', height: '200px'
           }}></textarea>
-          <input type="text" 
-          placeholder="Token ID" value={token1} onChange={(e) => setToken1(e.target.value)} style={{
-            backgroundColor: '#000',
-            color: '#fff',
-            border: '1px solid #333',
-            borderRadius: 10,
-            padding: '10px',
-            font: '16px',
-            width:'100%'
-          }}/>
+          <input type="text"
+            placeholder="Token ID" value={token1} onChange={(e) => setToken1(e.target.value)} style={{
+              backgroundColor: '#000',
+              color: '#fff',
+              border: '1px solid #333',
+              borderRadius: 10,
+              padding: '10px',
+              font: '16px',
+              width: '100%'
+            }} />
           <input type="file" accept="image/*" onChange={(event) => {
             const file = event.target.files[0]
             const reader = new FileReader()
