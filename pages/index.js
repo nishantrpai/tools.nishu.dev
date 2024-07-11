@@ -679,13 +679,8 @@ export const tools = [
     description: 'Add black and white filter on any image',
     publishDate: '10th July 2024',
     url: '/bwfilter'
-  }
-  // {
-  //   title: 'Warp Quote',
-  //   description: 'Turn a cast into a quote',
-  //   publishDate: '10th July 2024',
-  //   url: '/warpquote'
-  // }
+  },
+  
   // {
   //   title: 'Face Swap',
   //   description: 'Swap faces in gifs',

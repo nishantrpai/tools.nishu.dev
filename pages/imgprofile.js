@@ -23,6 +23,11 @@ export default function ColorProfile() {
     return luma > 200
   }
 
+
+  const colorDistance = (c1, c2) => {
+    return Math.sqrt((c1[0] - c2[0]) ** 2 + (c1[1] - c2[1]) ** 2 + (c1[2] - c2[2]) ** 2)
+  }
+
   const getColorProfileFromImage = async (image) => {
     let dominantColor = '';
     let img = new Image();
@@ -41,20 +46,15 @@ export default function ColorProfile() {
         let g = imageData[i + 1];
         let b = imageData[i + 2];
         let rgb = `rgb(${r},${g},${b})`;
+        // if there exists a color that is
         if (color[rgb]) {
           color[rgb]++;
         } else {
           color[rgb] = 1;
         }
       }
-      let max = 0;
-      for (let key in color) {
-        console.log(key, color[key]);
-        if (color[key] > max && key !== 'rgb(0,0,0)') {
-          max = color[key];
-          dominantColor = key;
-        }
-      }
+      
+
       console.log(dominantColor);
       setColor(dominantColor);
 
