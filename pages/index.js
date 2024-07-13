@@ -680,6 +680,24 @@ export const tools = [
     publishDate: '10th July 2024',
     url: '/bwfilter'
   },
+  {
+    title: 'Text 2 Base',
+    description: 'Convert text to base logo',
+    publishDate: '11th July 2024',
+    url: '/text2base'
+  },
+  {
+    title: 'Text 2 Alien Toadz',
+    description: 'Convert text to alien toadz',
+    publishDate: '12th July 2024',
+    url: '/text2alientoadz'
+  }, 
+  {
+    title: 'Regulatoor',
+    description: 'Add regulatoor on any image',
+    publishDate: '12th July 2024',
+    url: '/regulatoor'
+  }
   
   // {
   //   title: 'Face Swap',
