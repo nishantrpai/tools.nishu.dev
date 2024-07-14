@@ -921,18 +921,18 @@ export default function Home() {
   return (
     <div className={styles.container}>
       <Head>
-        <title>Decode the Psyop</title>
-        <meta name="description" content="Decode the Psyop (bears no resemblance to reality, just a game)" />
+        <title>Telech</title>
+        <meta name="description" content="Telech like news" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <main className={styles.main}>
         <h1 className={styles.title}>
-          Decode the Psyop
+          Telech
         </h1>
 
         <p className={styles.description} style={{ width: '100%', textAlign: 'center' }}>
-          Decode the Psyop (bears no resemblance to reality, just a game)
+          Telech like news
         </p>
 
         <div style={{ width: '100%' }}>
