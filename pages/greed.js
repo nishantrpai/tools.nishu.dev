@@ -98,6 +98,8 @@ export default function Home() {
     Don't add "news headlines" or any prefixes.
     Be specific on what exchange and which stock is going up or down.
     If no stocks are affected N/A.
+    You can list multiple stocks.
+    You can speculate what related stocks would be affected.
     
     
     Respond in this format:
