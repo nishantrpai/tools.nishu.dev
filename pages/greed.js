@@ -104,11 +104,10 @@ export default function Home() {
     
     Format:
     • XYZ headline
-    - 📈 Apple (AAPL) 
-    - 📉 Tesla (TSLA)
+    - 📈 NASDAQ: APPL
+    - 📉 NASDAQ: TSLA
     
-    Decode each headline individually (as bullet points), don't skip any. Don't add "potential impact" or anything like that only list.
-    `; 
+    Decode each headline individually (as bullet points), don't skip any. Don't add "potential impact" or anything like that only list.`; 
 
 
     fetch(`/api/gpt?prompt`, {
