@@ -94,9 +94,10 @@ export default function Home() {
     
     This is the News\n\n: ${news.map(item => item.title).join('\n')}\n\n\n\n
 
-    List all possible specific stocks would be affected by this news.
+    List specific stocks that would be affected by this news.
     Don't add "news headlines" or any prefixes.
     Be specific on what exchange and which stock is going up or down.
+    If no stocks are affected N/A.
     
     
     Respond in this format:
