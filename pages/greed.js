@@ -100,7 +100,7 @@ export default function Home() {
     If no stocks are affected N/A.
     You can list multiple stocks.
     You can speculate what related stocks would be affected.
-    
+    You can also speculate on commodities.
     
     Respond in this format:
     If xyz news is about Apple and Tesla, then the response would be and apple is going up and tesla is going down.
