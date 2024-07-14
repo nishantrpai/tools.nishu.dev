@@ -251,6 +251,14 @@ export default function America() {
                 }}
                 value={token1}></input>
             </div>
+            <button style={{border: '1px solid #333'}} onClick={() => {
+              let canvas = document.getElementById('canvas')
+              let a = document.createElement('a')
+              a.href = canvas.toDataURL('image/png')
+              a.download = 'america.png'
+              a.click()
+            }}>Download</button>
+
           </div>
         </div>
       </main>

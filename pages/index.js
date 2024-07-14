@@ -695,8 +695,14 @@ export const tools = [
   {
     title: 'Regulatoor',
     description: 'Add regulatoor on any image',
-    publishDate: '12th July 2024',
+    publishDate: '13th July 2024',
     url: '/regulatoor'
+  },
+  {
+    title: 'America',
+    description: 'Add American flag to any nft or image',
+    publishDate: '14th July 2024',
+    url: '/america'
   }
   
   // {
