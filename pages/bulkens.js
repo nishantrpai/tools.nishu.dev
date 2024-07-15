@@ -96,7 +96,8 @@ export default function BulkENS() {
           padding: '10px',
           margin: '10px 0',
           border: '1px solid #333',
-          width: '100%'
+          width: '100%',
+          borderRadius: 5
         }}>
           <option value="ens">ENS to Address</option>
           <option value="address">Address to ENS</option>
