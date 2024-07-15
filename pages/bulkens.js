@@ -81,7 +81,7 @@ export default function BulkENS() {
         <h1 className={styles.title}>
           Bulk ENS Resolver
         </h1>
-        <p className={styles.description}>Enter ENS names separated by new line</p>
+        <p className={styles.description}>Enter ENS names/address separated by new line</p>
         <textarea onChange={(e) => setEnsAddresses(e.target.value.trim().split('\n'))}
           style={{
             width: '100%',
