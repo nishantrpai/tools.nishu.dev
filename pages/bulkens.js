@@ -106,8 +106,8 @@ export default function BulkENS() {
         {loading && <p>Loading...</p>}
         {error && <p>{error}</p>}
         {/* show as table and ability to copy paste addresses as string */}
-        <table style={{
-          width: '500px',
+        {ethAddresses.length ? <table style={{
+          width: '100%',
           borderCollapse: 'collapse',
           border: '1px solid #333',
           marginTop: '10px',
@@ -168,7 +168,7 @@ export default function BulkENS() {
               </tr>
             ))}
           </tbody>
-        </table>
+        </table> : null}
       </main>
     </div>
   )
