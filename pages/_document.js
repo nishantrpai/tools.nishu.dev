@@ -18,9 +18,26 @@ export default function Document() {
           borderRadius: '5px 0px 0px 0px',
           background: '#000',
           padding: '10px 20px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 20
         }}>
+          <a href="https://warpcast.com/nishu" target="_blank">
+            <span style={{
+              background: '#333',
+              padding: '5px',
+              fontWeight: 'bold',
+              borderRadius: '5px'
+            }}>W</span>: @nishu
+          </a>
+
           <a href="https://twitter.com/PaiNishant" target="_blank">
-            @PaiNishant
+          <span style={{
+              background: '#333',
+              padding: '5px 7px',
+              fontWeight: 'bold',
+              borderRadius: '5px'
+            }}>X</span>: @PaiNishant
           </a>
         </div>
       </body>
