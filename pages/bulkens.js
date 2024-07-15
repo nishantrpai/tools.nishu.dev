@@ -35,7 +35,7 @@ export default function BulkENS() {
       const ens = await provider.lookupAddress(address)
       return ens
     } catch (e) {
-      return ''
+      return 'N/A'
     }
   }
 
@@ -45,7 +45,7 @@ export default function BulkENS() {
       const address = await provider.resolveName(ens)
       return address
     } catch (e) {
-      return ''
+      return 'N/A'
     }
   }
 
