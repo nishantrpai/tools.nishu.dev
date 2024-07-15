@@ -22,13 +22,14 @@ export default function Document() {
           flexDirection: 'column',
           gap: 20
         }}>
-          <a href="https://warpcast.com/nishu" target="_blank">
-          • @nishu
+          <a href="https://twitter.com/PaiNishant" target="_blank">
+            • @PaiNishant
           </a>
 
-          <a href="https://twitter.com/PaiNishant" target="_blank">
-          • @PaiNishant
+          <a href="https://warpcast.com/nishu" target="_blank">
+            • @nishu
           </a>
+
         </div>
       </body>
     </Html>
