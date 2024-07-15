@@ -90,6 +90,7 @@ export default function BulkENS() {
             outline: 'none',
             height: '300px'
           }}
+          placeholder='Enter ENS names or addresses separated by new line'
           ></textarea>
         <select onChange={(e) => setConvertType(e.target.value)} style={{
           padding: '10px',
