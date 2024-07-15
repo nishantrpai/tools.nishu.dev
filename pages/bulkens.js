@@ -86,6 +86,7 @@ export default function BulkENS() {
           style={{
             width: '100%',
             border: '1px solid #333',
+            borderRadius: 5,
             padding: '10px',
             outline: 'none',
             height: '300px'
@@ -108,12 +109,17 @@ export default function BulkENS() {
         {/* show as table and ability to copy paste addresses as string */}
         {ethAddresses.length ? <table style={{
           width: '100%',
-          borderCollapse: 'collapse',
           border: '1px solid #333',
           marginTop: '10px',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          borderRadius: 5,
+          padding: '10px'
         }}>
-          <thead>
+          <thead style={{
+            border: '1px solid #333',
+            gap: '5px',
+            padding: '5px 15px'
+          }}>
             <tr>
               <th>ENS</th>
               <th>Address</th>
