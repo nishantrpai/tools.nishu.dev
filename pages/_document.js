@@ -13,7 +13,7 @@ export default function Document() {
           bottom: '0px',
           right: '0px',
           color: '#888',
-          fontSize: '18px',
+          fontSize: '14px',
           border: '1px solid #333',
           borderRadius: '5px 0px 0px 0px',
           background: '#000',
@@ -23,21 +23,11 @@ export default function Document() {
           gap: 20
         }}>
           <a href="https://warpcast.com/nishu" target="_blank">
-            <span style={{
-              background: '#333',
-              padding: '5px',
-              fontWeight: 'bold',
-              borderRadius: '5px'
-            }}>W</span>: @nishu
+          • @nishu
           </a>
 
           <a href="https://twitter.com/PaiNishant" target="_blank">
-          <span style={{
-              background: '#333',
-              padding: '5px 7px',
-              fontWeight: 'bold',
-              borderRadius: '5px'
-            }}>X</span>: @PaiNishant
+          • @PaiNishant
           </a>
         </div>
       </body>
