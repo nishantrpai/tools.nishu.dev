@@ -703,6 +703,12 @@ export const tools = [
     description: 'Add American flag to any nft or image',
     publishDate: '14th July 2024',
     url: '/america'
+  },
+  {
+    title: 'Bulk Ens Resolver',
+    description: 'Resolve multiple ENS names at once',
+    publishDate: '15th July 2024',
+    url: '/bulkens'
   }
   
   // {
