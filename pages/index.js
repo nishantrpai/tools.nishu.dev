@@ -709,6 +709,12 @@ export const tools = [
     description: 'Resolve multiple ENS names at once',
     publishDate: '15th July 2024',
     url: '/bulkens'
+  },
+  {
+    title: 'Higher TM',
+    description: 'Add Higher TM on any image',
+    publishDate: '16th July 2024',
+    url: '/highertm'
   }
   
   // {
