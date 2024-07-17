@@ -1,5 +1,3 @@
-// one column that'll be 100% height but 200px width and will have a input at top and a list of results below
-
 import { useEffect, useState } from "react";
 
 const Deck = () => {
@@ -7,6 +5,7 @@ const Deck = () => {
   const [results, setResults] = useState([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [typingTimeout, setTypingTimeout] = useState(0);
 
   const loadMore = () => {
     setPage(page + 1);
@@ -14,68 +13,97 @@ const Deck = () => {
     fetch(`https://searchcaster.xyz/api/search?text=${query}&page=${page}&engagement=reactions`)
       .then(response => response.json())
       .then(data => {
-        setResults([...results, ...data.casts])
+        setResults([...results, ...data.casts]);
+        setLoading(false);
       });
-  }
+  };
 
   useEffect(() => {
     if (!query) return;
-    let params = ''
+    setLoading(true);
+    let params = '';
     if (query.includes('from:')) {
-      params = `q=${query.split('from:')[0]}&username=${query.split('from:')[1]}`
+      params = `q=${query.split('from:')[0]}&username=${query.split('from:')[1]}`;
     } else {
-      params = `q=${query}`
+      params = `q=${query}`;
     }
 
     fetch(`https://searchcaster.xyz/api/search?${params}`)
       .then(response => response.json())
       .then(data => {
-        setResults([...results, ...data.casts])
-      })
+        setResults(data.casts);
+        setLoading(false);
+      });
   }, [query]);
+
+  const handleInputChange = (e) => {
+    if (typingTimeout) {
+      clearTimeout(typingTimeout);
+    }
+
+    const newQuery = e.target.value;
+    setTypingTimeout(setTimeout(() => {
+      setQuery(newQuery);
+      setPage(1);
+      setResults([]);
+    }, 2000));
+  };
+
   return (
     <div style={{
       height: 'max-content',
       minHeight: '100vh',
-      width: '400px',
+      width: '200px',
       border: '1px solid #333',
       padding: '20px',
     }}>
-      <input type="text" placeholder="Enter query" style={{
-        width: '100%',
-        padding: '5px 5px',
-        marginBottom: '20px',
-        border: 'none',
-        outline: 'none',
-        borderRadius: '5px',
-        backgroundColor: '#222',
-      }} onChange={e => {
-        // wait for user to stop typing
-        setTimeout(() => {
-          setQuery(e.target.value)
-        }, 1000)
-      }} />
-      {(loading && !results.length) ? <p>Loading...</p> : null}
-      {results.map((result, index) => (
-        <a key={index} style={{
-          border: '1px solid #222',
-          padding: '10px',
-          marginBottom: '10px',
-          display: 'flex',
-          flexDirection: 'column',
-          flexWrap: 'wrap',
-          whiteSpace: 'wrap',
-          overflow: 'hidden',
-          cursor: 'pointer',
+      <input
+        type="text"
+        placeholder="Enter query"
+        style={{
+          width: '100%',
+          padding: '5px 5px',
+          marginBottom: '20px',
+          border: 'none',
+          outline: 'none',
+          borderRadius: '5px',
+          backgroundColor: '#222',
         }}
-        href={`https://warpcast.com/${result.body.username}/${result.merkleRoot.slice(0, 10)}`}
-        target="_blank"
+        onChange={handleInputChange}
+      />
+      {(loading && !results.length) ? <p
+        style={{
+          fontSize: '12px',
+          fontWeight: '400',
+          color: '#888',
+          display: 'flex',
+          flexWrap: 'wrap',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >Loading...</p> : null}
+      {results.map((result, index) => (
+        <a
+          key={index}
+          style={{
+            border: '1px solid #222',
+            padding: '10px',
+            marginBottom: '10px',
+            display: 'flex',
+            flexDirection: 'column',
+            flexWrap: 'wrap',
+            whiteSpace: 'wrap',
+            overflow: 'hidden',
+            cursor: 'pointer',
+          }}
+          href={`https://warpcast.com/${result.body.username}/${result.merkleRoot.slice(0, 10)}`}
+          target="_blank"
         >
           <h2 style={{
             fontSize: '12px',
             marginBottom: '5px',
             fontWeight: '400',
-            color: '#666'
+            color: '#666',
           }}>{result.body.username}</h2>
           <span style={{
             fontSize: '10px',
@@ -92,28 +120,32 @@ const Deck = () => {
             color: '#888',
             display: 'flex',
             flexWrap: 'wrap',
-          }}
-          >{result.body.data.text}</p>
-          
+          }}>
+            {result.body.data.text}
+          </p>
         </a>
-
       ))}
-      {results.length > 0 && 
-      <div>
-        <button onClick={loadMore} style={{
-          width: '100%',
-          padding: '10px',
-          backgroundColor: '#111',
-          color: '#fff',
-          border: 'none',
-          borderRadius: '5px',
-          cursor: 'pointer',
-          fontSize: '12px',
-        }}>{loading ? 'Loading...' : 'Load more'}</button>
-      </div>
-      }
+      {results.length > 0 && (
+        <div>
+          <button
+            onClick={loadMore}
+            style={{
+              width: '100%',
+              padding: '10px',
+              backgroundColor: '#111',
+              color: '#333',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer',
+              fontSize: '10px',
+            }}
+          >
+            {loading ? 'Loading...' : 'Load more'}
+          </button>
+        </div>
+      )}
     </div>
-  )
+  );
 };
 
 export default Deck;
