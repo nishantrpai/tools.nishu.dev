@@ -20,7 +20,14 @@ const Deck = () => {
 
   useEffect(() => {
     if (!query) return;
-    fetch(`https://searchcaster.xyz/api/search?text=${query}&max=200&engagement=reactions`)
+    let params = ''
+    if (query.includes('from:')) {
+      params = `q=${query.split('from:')[0]}&username=${query.split('from:')[1]}`
+    } else {
+      params = `q=${query}`
+    }
+
+    fetch(`https://searchcaster.xyz/api/search?${params}`)
       .then(response => response.json())
       .then(data => {
         setResults([...results, ...data.casts])

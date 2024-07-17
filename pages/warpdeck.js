@@ -18,7 +18,7 @@ export default function WarpDeck() {
       } else {
         params = `q=${query}`
       }
-      fetch(`https://searchcaster.xyz/api/search?q=${params}`)
+      fetch(`https://searchcaster.xyz/api/search?${params}`)
         .then(response => response.json())
         .then(data => {
           setResults([...results, data])
