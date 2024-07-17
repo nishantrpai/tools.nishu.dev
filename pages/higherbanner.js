@@ -104,10 +104,6 @@ export default function HigherHat() {
             Scale
           </label>
           <input type="range" min={0} max={10} step={0.01} value={scale} onChange={(e) => setScale(e.target.value)} />
-          <label>
-            Rotate
-          </label>
-          <input type="range" min={-360} max={360} value={offsetTheta} onChange={(e) => setOffsetTheta(e.target.value)} />
         </div>
 
         <button onClick={() => {
