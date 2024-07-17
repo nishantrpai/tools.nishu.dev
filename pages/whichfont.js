@@ -21,7 +21,13 @@ export default function WhichFont() {
   const getFont = async () => {
     // get canvas as data url send to gpt as req body
     const canvas = document.getElementById('canvas');
-    const dataURL = canvas.toDataURL('image/png');
+    // reduce the size of the image to 500x500
+    let tempCanvas = document.createElement('canvas');
+    let tempCtx = tempCanvas.getContext('2d');
+    tempCanvas.width = 500;
+    tempCanvas.height = 500;
+    tempCtx.drawImage(canvas, 0, 0, 500, 500);
+const dataURL = tempCanvas.toDataURL();
     setFont('Detecting Font...');
     const response = await fetch('/api/gpt', {
       method: 'POST',
