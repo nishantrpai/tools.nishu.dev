@@ -715,6 +715,18 @@ export const tools = [
     description: 'Add Higher TM on any image',
     publishDate: '16th July 2024',
     url: '/highertm'
+  },
+  {
+    title: 'Higher Banner',
+    description: 'Make your own higher banner',
+    publishDate: '17th July 2024',
+    url: '/higherbanner'
+  },
+  {
+    title: 'ELI5',
+    description: 'Explain like I am 5',
+    publishDate: '18th July 2024',
+    url: '/eli5'
   }
   
   // {
