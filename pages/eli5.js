@@ -12,7 +12,7 @@ export default function Home() {
   const sensationalize = async () => {
     // make api call to /api/gpt?prompt
     setLoading(true)
-    const res = await fetch(`/api/gpt?prompt='text: "${text}"\n\nexplain this to me like I'm five.'`)
+    const res = await fetch(`/api/gpt?prompt='text: "${text}"\n\eli5'`)
     const data = await res.json()
     setSensationalizedText(data.response)
     setLoading(false)
