@@ -22,6 +22,8 @@ export default function HigherHat() {
     context.beginPath()
     if (image) {
       context.clearRect(0, 0, canvas.width, canvas.height)
+      context.fillStyle = '#000'
+      context.fillRect(0, 0, canvas.width, canvas.height)
       context.drawImage(image, offsetX, offsetY, imgWidth * scale, imgHeight * scale)
       const higher = new Image()
       higher.src = higherHat
