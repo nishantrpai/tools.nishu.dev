@@ -59,6 +59,7 @@ export default function WhichFont() {
       <button onClick={getFont}>Detect Font</button>
       <span style={{
         fontSize: '3rem',
+        fontWeight: 'bold',
         padding: '1rem',
         display: 'block',
         textAlign: 'center',
