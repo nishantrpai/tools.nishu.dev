@@ -11,7 +11,14 @@ export default function WarpDeck() {
   const [decks, setDecks] = useState([1])
   useEffect(() => {
     queries.forEach(query => {
-      fetch(`https://searchcaster.xyz/api/search?q=${query}`)
+      // if query has username from:username add that in params
+      let params = ''
+      if (query.includes('from:')) {
+        params = `q=${query.split('from:')[0]}&username=${query.split('from:')[1]}`
+      } else {
+        params = `q=${query}`
+      }
+      fetch(`https://searchcaster.xyz/api/search?q=${params}`)
         .then(response => response.json())
         .then(data => {
           setResults([...results, data])
@@ -42,7 +49,7 @@ export default function WarpDeck() {
         }} href='/' className={styles.home}>🏠</a>
         <h1 style={{
           fontSize: '1rem',
-          fontWeight: '100'
+          fontWeight: 'bold'
         }}>WarpDeck</h1>
       </div>
       <main style={{
