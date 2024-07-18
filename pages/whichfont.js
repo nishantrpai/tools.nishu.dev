@@ -33,7 +33,7 @@ const dataURL = tempCanvas.toDataURL();
       method: 'POST',
       body: JSON.stringify({
         prompt: 'What font is this? Only respond with font name, nothing else. Most likely. If you think it is multiple send a list', image_url: dataURL,
-        model: 'gpt-4o'
+        model: 'gpt-4o-mini'
       }),
     });
     const data = await response.json();
