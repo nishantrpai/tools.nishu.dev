@@ -12,7 +12,7 @@ export default function Document() {
           position: 'fixed',
           bottom: '0px',
           right: '0px',
-          color: '#888',
+          color: '#eee',
           fontSize: '14px',
           border: '1px solid #333',
           borderRadius: '5px 0px 0px 0px',
