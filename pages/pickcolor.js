@@ -125,6 +125,7 @@ export default function NaturalGradient() {
         <div id="palette-card" style={{
           width: '100%',
           height: '100%',
+          padding: '10px',
         }}>
 
         <div style={{
