@@ -725,8 +725,20 @@ export const tools = [
   {
     title: 'ELI5',
     description: 'Explain like I am 5',
-    publishDate: '18th July 2024',
+    publishDate: '17th July 2024',
     url: '/eli5'
+  },
+  {
+    title: 'Which Font',
+    description: 'Detect the font in the image',
+    publishDate: '18th July 2024',
+    url: '/whichfont'
+  },
+  {
+    title: 'Pick Color',
+    description: 'Pick colors from any image',
+    publishDate: '19th July 2024',
+    url: '/pickcolor'
   }
   
   // {
