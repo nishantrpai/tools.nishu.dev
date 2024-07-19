@@ -109,6 +109,7 @@ export default function NaturalGradient() {
     <div className={styles.container}>
       <Head>
         <title>Pick Colors</title>
+        <meta name="description" content="Pick colors from an image" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
