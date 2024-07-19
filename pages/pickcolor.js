@@ -108,16 +108,16 @@ export default function NaturalGradient() {
   return (
     <div className={styles.container}>
       <Head>
-        <title>Natural Gradient</title>
+        <title>Pick Colors</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <main className={styles.main}>
         <h1 className={styles.title}>
-          Natural Gradient
+          Pick colors
         </h1>
         <h2 className={styles.description}>
-          Pick natural colors from an image
+          Pick colors from an image
         </h2>
 
 
