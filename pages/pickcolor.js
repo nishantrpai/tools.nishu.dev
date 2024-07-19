@@ -129,7 +129,7 @@ export default function NaturalGradient() {
 
         <div style={{
           display: 'flex',
-          border: '1px solid #222',
+          border: '1px solid #111',
           borderRadius: '10px',
           width: '100%',
           height: '100%',
@@ -158,7 +158,7 @@ export default function NaturalGradient() {
           <canvas
             id="canvas"
             style={{
-              border: '1px solid #222',
+              border: '1px solid #0e0e0e',
               width: '100%',
               boxShadow: '0 0 5px rgba(0,0,0,0.5)',
               borderRadius: '10px',
@@ -175,7 +175,6 @@ export default function NaturalGradient() {
           height: '100%',
           borderRadius: '10px',
           padding:2,
-          marginTop: -2,
         }}>
           {palette.map((color, index) => (
             <div style={{
@@ -200,7 +199,7 @@ export default function NaturalGradient() {
               color: '#888',
               fontSize: '12px'
             }}>
-              {rgbToHex(color.replace('rgb(', '').replace(')', '').split(',').map((x) => parseInt(x)))} 
+              {!color.startsWith('#') ? rgbToHex(color.replace('rgb(', '').replace(')', '').split(',').map((x) => parseInt(x))) : color} 
             </span>
             </div>
           ))}
