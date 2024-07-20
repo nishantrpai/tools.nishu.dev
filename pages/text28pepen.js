@@ -24,6 +24,7 @@ export default function Home() {
     setLoading(true)
     let prompt = `Given the prompt:${text}.\n\n
     I have a svg, want to fill it with colors and patterns.
+    Respond only as array.
     Send an array of 2 values, 1st value is the background and 2nd value is the svg pattern for e.g this format: ["#000", "<defs><pattern patternUnits='userSpaceOnUse' width="10" height="10"></pattern></defs>"] (pattern won't ever be empty).
     Pattern will never be empty, it will always have a pattern tag with some content inside it.
     Pattern will never have image or external link, it will always have some svg tags inside it.
@@ -36,7 +37,7 @@ export default function Home() {
     The id of pattern will be "pattern" at all times.
     Don't send incomplete or incorrect data or empty values for the pattern.
     Keep it minimal.`;
-    const res = await fetch(`/api/gpt?prompt`, {
+    const res = await fetch(`/api/gpt`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

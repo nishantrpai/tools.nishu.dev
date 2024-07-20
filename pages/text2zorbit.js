@@ -231,6 +231,7 @@ export default function Home() {
     setLoading(true)
     let prompt = `given the prompt:${text}.
     I have a svg, want to paint with colors from the prompt text.
+    Respond only as array.
     Send an array of colors, for e.g., ["#000", "#fff", "#f00", "#0f0", "#00f", "#ff0", "#f0f", "#0ff"]. 
     There will be 2 colors, one for the background and one for the foreground. Don't send incomplete or incorrect data.
     Keep it minimal. Prefer darker colors for the background and lighter colors for the foreground.
