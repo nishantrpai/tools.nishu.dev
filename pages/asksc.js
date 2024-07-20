@@ -69,7 +69,7 @@ export default function AskSC() {
       </Head>
       <main style={{ maxWidth: 1200 }}>
         <h1>Ask Smart Contract</h1>
-        <p style={{ color: '#333', fontSize: 12 }}>
+        <p className={styles.description}>
           Ask any question to a smart contract.
         </p>
         <div style={{ display: 'flex', width: '100%', border: '1px solid #333', borderRadius: '5px' }}>
@@ -100,9 +100,10 @@ export default function AskSC() {
                 </div>
               ))}
             </div>
-            <div style={{ flexBasis: '8%', width: '100%', display: 'flex', fontSize: '12px' , boxShadow: '0px -1px 0px #333'
-          }}>
-              <input style={{ flexBasis: '85%', width: '100%', height: '100%', background: '#111', border: 'none', outline: 'none', padding: '10px', fontSize: '12px' }} type="text" placeholder="Enter your question" value={question} onChange={(e) => setQuestion(e.target.value)} onKeyDown={(e) => {
+            <div style={{
+              flexBasis: '8%', width: '100%', display: 'flex', fontSize: '12px', boxShadow: '0px -1px 0px #333'
+            }}>
+              <input id='ask-qs' style={{ flexBasis: '85%', width: '100%', height: '100%', background: '#111', border: 'none', outline: 'none', padding: '10px', fontSize: '12px' }} type="text" placeholder="Enter your question" value={question} onChange={(e) => setQuestion(e.target.value)} onKeyDown={(e) => {
                 if (e.key === 'Enter') {
                   // if shift + enter then add new line else send message
                   if (e.shiftKey) {
@@ -110,9 +111,10 @@ export default function AskSC() {
                     return;
                   }
                   getAnswer();
+
                 }
               }} />
-              <button style={{borderLeft: '1px solid #333 !important', flexBasis: '15%', width: '100%', height: '100%', background: '#111', outline: 'none', padding: '10px', fontSize: '12px' }} onClick={getAnswer}>Ask</button>
+              <button style={{ borderLeft: '1px solid #333 !important', flexBasis: '15%', width: '100%', height: '100%', background: '#111', outline: 'none', padding: '10px', fontSize: '12px' }} onClick={getAnswer}>Ask</button>
             </div>
           </div>
 
