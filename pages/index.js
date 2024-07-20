@@ -745,6 +745,12 @@ export const tools = [
     description: 'Ask any questions to a smart contract',
     publishDate: '20th July 2024',
     url: '/asksc'
+  },
+  {
+   title: 'Youtube Quotes',
+    description: 'Get quotes from youtube videos',
+    publishDate: '20th July 2024',
+    url: '/youtubequotes' 
   }
   
   // {

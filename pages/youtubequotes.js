@@ -75,11 +75,11 @@ export default function AskYT() {
         </div>
         <div className={styles.row} style={{ gap: '20px', width: '100%' }}>
           {/* youtube video on one side and chat on other */}
-          <div style={{ flexBasis: '60%', border: '1px solid #333', height: '500px' }}>
+          <div style={{ flexBasis: '100%', border: '1px solid #333', height: '500px' }}>
             {/* embed video */}
             <iframe width="100%" height="100%" src={`https://www.youtube.com/embed/${url.split('v=')[1]}`} title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
           </div>
-          <div style={{ flexBasis: '40%', border: '1px solid #333', height: '500px', display: 'flex', flexDirection: 'column' }}>
+          {/* <div style={{ flexBasis: '40%', border: '1px solid #333', height: '500px', display: 'flex', flexDirection: 'column' }}>
             <div style={{ flexBasis: '92%', height: '400px', padding: '10px', overflow: 'auto' }}>
               {chat.map((item, index) => (
                 <div key={index} style={{ padding: '20px 0px', borderBottom: '1px solid #333' }}>
@@ -114,7 +114,7 @@ export default function AskYT() {
               }} />
               <button style={{borderLeft: '1px solid #333 !important', flexBasis: '15%', width: '100%', height: '100%', background: '#111', outline: 'none', padding: '10px', fontSize: '12px' }} onClick={getAnswer}>Ask</button>
             </div>
-          </div>
+          </div> */}
         </div>
       </main>
     </>
