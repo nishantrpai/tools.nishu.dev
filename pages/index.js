@@ -739,6 +739,12 @@ export const tools = [
     description: 'Pick colors from any image',
     publishDate: '19th July 2024',
     url: '/pickcolor'
+  },
+  {
+    title: 'Ask a smart contract',
+    description: 'Ask any questions to a smart contract',
+    publishDate: '20th July 2024',
+    url: '/asksc'
   }
   
   // {
