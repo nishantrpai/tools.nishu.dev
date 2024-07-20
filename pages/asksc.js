@@ -64,12 +64,14 @@ export default function AskSC() {
   return (
     <>
       <Head>
-        <title>Read Smart Contract</title>
-        <meta name="description" content="Read Smart Contract, regardless whether it is verified or not" />
+        <title>Ask Smart Contract</title>
+        <meta name="description" content="Ask any question you have to a smart contract" />
       </Head>
       <main style={{ maxWidth: 1200 }}>
-        <h1>Read Smart Contract</h1>
-        <p style={{ color: '#333', fontSize: 12 }}>Enter the contract address to read the smart contract</p>
+        <h1>Ask Smart Contract</h1>
+        <p style={{ color: '#333', fontSize: 12 }}>
+          Ask any question to a smart contract.
+        </p>
         <div style={{ display: 'flex', width: '100%', border: '1px solid #333', borderRadius: '5px' }}>
           <input type="text" style={{ flexBasis: '100%', padding: '10px', border: 'none', outline: 'none', background: 'none', color: '#fff' }} placeholder="Paste youtube video url" value={address} onChange={(e) => setAddress(e.target.value)} />
         </div>
