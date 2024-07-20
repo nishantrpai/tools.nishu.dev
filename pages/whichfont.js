@@ -32,7 +32,7 @@ const dataURL = tempCanvas.toDataURL();
     const response = await fetch('/api/gpt', {
       method: 'POST',
       body: JSON.stringify({
-        prompt: 'What font is this? Only respond with font name, nothing else. Most likely. If you think it is multiple send a list', image_url: dataURL,
+        prompt: 'What font is this? Only respond with font name, nothing else.\n\nIf you think it is multiple send a list', image_url: dataURL,
         model: 'gpt-4o-mini'
       }),
     });
