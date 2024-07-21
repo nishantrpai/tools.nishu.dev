@@ -6,7 +6,7 @@ import html2canvas from 'html2canvas';
 
 export default function AskYT() {
   const [timeStamp, setTimeStamp] = useState('0');
-  const [url, setUrl] = useState('');
+  const [url, setUrl] = useState('https://www.youtube.com/watch?v=pwLergHG81c');
   const [transcript, setTranscript] = useState('');
   const [frame, setFrame] = useState('');
   const [quote, setQuote] = useState('');
@@ -22,6 +22,7 @@ export default function AskYT() {
   const getQuote = (time) => {
     let lines = transcript.split('\n');
     let quote = '';
+    console.log(lines);
     for (let i = 0; i < lines.length; i++) {
       if (lines[i].includes('-->')) {
         console.log(lines[i]);
@@ -34,6 +35,7 @@ export default function AskYT() {
       }
     }
     setQuote(quote);
+    return quote;
   };
 
 
@@ -78,72 +80,49 @@ export default function AskYT() {
   };
 
   const captureFrame = () => {
-    const player = playerRef.current;
-    const currentTime = formatTime(`${player.getCurrentTime()}`);
-    console.log(currentTime, 'current time');
-    setTimeStamp(currentTime);
-    getQuote(currentTime);
-
-    html2canvas(document.querySelector('#player'), {
-      onclone: (document) => {
-        document.getElementById('player').style.width = '1500px';
-        document.getElementById('player').style.height = '1200px';
-      },
-      width: 1500,
-      height: 1200,
-      useCORS: true,
-      allowTaint: true,
-
-    }).then(cv => {
-      const img = cv.toDataURL('image/png');
-      console.log(img);
-      setFrame(img);
-    
-
+    let video = videoRef.current;
+    video.crossOrigin = 'anonymous';
+    // get current time from video
+    const currentTime = video.currentTime;
+    setTimeStamp(formatTime(currentTime.toString()));
+    let cq = getQuote(formatTime(currentTime.toString()));
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    // draw img on canvas
-    const image = new Image();
-    image.src = img;
-    image.onload = () => {
-      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-    };
-    const videoElement = player.getIframe();
     canvas.width = 1500;
-    canvas.height = 1200;
-    // draw a rectangle covering the entire canvas
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    // ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
-
-    // const quote = getQuote(currentTime);
-    ctx.font = '30px Arial';
+    canvas.height = video.videoHeight * (canvas.width / video.videoWidth);
+    // set crossOrigin to anonymous to avoid tainted canvas
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    ctx.font = 'bold 50px Helvetica';
     ctx.fillStyle = 'white';
-    // draw the quote at the bottom of the canvas
-    ctx.fillText(quote, canvas.width/2 - 500, canvas.height - 100);
-    });
+    console.log(cq);
+    ctx.fillText(cq.toUpperCase(), 100, canvas.height - 100);
+    // ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // // draw img on canvas
+    // const image = new Image();
+    // image.src = img;
+    // image.onload = () => {
+    //   ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+    // };
+    // const videoElement = player.getIframe();
+    // canvas.width = 1500;
+    // canvas.height = 1200;
+    // // draw a rectangle covering the entire canvas
+    // ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // // ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+
+    // // const quote = getQuote(currentTime);
+    // ctx.font = '30px Arial';
+    // ctx.fillStyle = 'white';
+    // // draw the quote at the bottom of the canvas
+    // ctx.fillText(quote, canvas.width/2 - 500, canvas.height - 100);
+    // });
   };
 
   useEffect(() => {
     if (!url) return;
 
-    const tag = document.createElement('script');
-    tag.src = "https://www.youtube.com/player_api";
-    const firstScriptTag = document.getElementsByTagName('script')[0];
-    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
-    window.onYouTubeIframeAPIReady = () => {
-      playerRef.current = new YT.Player('player', {
-        height: '500',
-        width: '500',
-        videoId: getYoutubeId(url),
-        events: {
-          onReady: () => {
-            getTranscript(url);
-          }
-        }
-      });
-    };
+    getTranscript(url);
   }, [url]);
 
   return (
@@ -161,7 +140,17 @@ export default function AskYT() {
         </div>
         <div className={styles.col} style={{display: 'flex', flexDirection: 'column', gap: '20px', width: '100%' }}>
           <div style={{ flexBasis: '100%', border: '1px solid #333', height: '500px' }}>
-            <div id="player"></div>
+            <video
+            src={`https://invidious.fdn.fr/latest_version?id=${getYoutubeId(url)}&itag=18`}
+            width="1500px"
+            height="100%"
+            controls
+            style={{
+              width: '100%',
+            }}
+            ref={videoRef}
+            
+            />
           </div>
           <canvas id="canvas" ref={canvasRef} style={{
             width: '100%',
@@ -170,8 +159,24 @@ export default function AskYT() {
             display: 'block',
             margin: '0 auto'
           }}/>
-          <input type="text" value={timeStamp} onChange={(e) => setTimeStamp(e.target.value)} />
+          {/* <input type="text" value={timeStamp} onChange={(e) => setTimeStamp(e.target.value)} /> */}
           <button onClick={captureFrame}>Capture Frame</button>
+          <button onClick={() => {
+            // allow cors for the image
+            const canvas = canvasRef.current;
+            html2canvas(canvas, {
+              allowTaint: true,
+              useCORS: true,
+            }).then((canvas) => {
+              const img = canvas.toDataURL('image/png');
+              const a = document.createElement('a');
+              a.href = img;
+              a.download = 'image.png';
+              a.click();
+            });
+          }}>
+            Download Image
+          </button>
         </div>
       </main>
     </>
