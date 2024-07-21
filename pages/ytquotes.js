@@ -39,6 +39,7 @@ export default function AskYT() {
 
 
   const getYoutubeId = (url) => {
+    if(!url) return ''; 
     return url.split(/(v=|vi=|\/v\/|\/vi\/|\/embed\/|youtu.be\/|\/user\/\S+\/\S+\/)/)[2].split(/[?&\/]/)[0];
   }
 
