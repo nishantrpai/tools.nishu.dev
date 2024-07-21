@@ -175,7 +175,7 @@ export default function AskYT() {
         <div className={styles.col} style={{display: 'flex', flexDirection: 'column', gap: '20px', width: '100%' }}>
           <div style={{ flexBasis: '100%', border: '1px solid #333', height: '500px' }}>
             <video
-            src={`https://invidious.fdn.fr/latest_version?id=${getYoutubeId(url)}&itag=18`}
+            src={`https://invidious.materialio.us/latest_version?id=${getYoutubeId(url)}&itag=18`}
             width="1500px"
             height="100%"
             controls
