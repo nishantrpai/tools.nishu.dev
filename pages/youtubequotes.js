@@ -133,8 +133,10 @@ export default function AskYT() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main style={{ margin: '0 auto' }}>
-        <h1 style={{ display: 'flex', gap: '20px', justifyContent: 'center', alignContent: 'center', fontFamily: 'monospace' }}><FiYoutube /> Ask YT</h1>
-        <h2 style={{ fontFamily: 'monospace', fontSize: 12, fontWeight: 200, color: '#888', marginBottom: '20px' }}>Ask a youtube video any question you have</h2>
+        <h1 style={{ display: 'flex', gap: '20px', justifyContent: 'center', alignContent: 'center'}}>Youtube Quotes</h1>
+        <h2 style={{ fontFamily: 'monospace', fontSize: 12, fontWeight: 200, color: '#888', marginBottom: '20px' }}>
+          Generate quotes from youtube videos
+        </h2>
         <div style={{ display: 'flex', width: '100%', border: '1px solid #333', borderRadius: '5px' }}>
           <input type="text" style={{ flexBasis: '100%', padding: '10px', border: 'none', outline: 'none', background: 'none', color: '#fff' }} placeholder="Paste youtube video url" value={url} onChange={(e) => setUrl(e.target.value)} />
         </div>
@@ -161,22 +163,14 @@ export default function AskYT() {
           }}/>
           {/* <input type="text" value={timeStamp} onChange={(e) => setTimeStamp(e.target.value)} /> */}
           <button onClick={captureFrame}>Capture Frame</button>
-          <button onClick={() => {
-            // allow cors for the image
-            const canvas = canvasRef.current;
-            html2canvas(canvas, {
-              allowTaint: true,
-              useCORS: true,
-            }).then((canvas) => {
-              const img = canvas.toDataURL('image/png');
-              const a = document.createElement('a');
-              a.href = img;
-              a.download = 'image.png';
-              a.click();
-            });
+          <span style={{
+            color: '#fff',
+            fontSize: 12,
+            fontWeight: 200
           }}>
-            Download Image
-          </button>
+            Right click, save image as to download the frame
+          </span>
+          
         </div>
       </main>
     </>
