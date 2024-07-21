@@ -1,61 +1,150 @@
-// ask youtube video any question you have
 import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
-import { useState, useEffect } from 'react'
-import { FiPlus, FiYoutube } from 'react-icons/fi';
-
+import { useState, useEffect, useRef } from 'react'
+import { FiYoutube } from 'react-icons/fi';
+import html2canvas from 'html2canvas';
 
 export default function AskYT() {
-  const [question, setQuestion] = useState('');
-  const [chat, setChat] = useState([]);
+  const [timeStamp, setTimeStamp] = useState('0');
   const [url, setUrl] = useState('');
   const [transcript, setTranscript] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
+  const [frame, setFrame] = useState('');
+  const [quote, setQuote] = useState('');
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+  const playerRef = useRef(null);
+
+  const parseTime = (timeStr) => {
+    const [minutes, seconds] = timeStr.split(':');
+    return parseFloat(minutes) * 60 + parseFloat(seconds);
+  };
+
+  const getQuote = (time) => {
+    let lines = transcript.split('\n');
+    let quote = '';
+    for (let i = 0; i < lines.length; i++) {
+      if (lines[i].includes('-->')) {
+        console.log(lines[i]);
+        const [start, end] = lines[i].split(' --> ');
+        console.log(start, end, time);
+        if (compareTime(time, start) >= 0 && compareTime(time, end) <= 0) {
+          quote = lines[i + 1];
+          break;
+        }
+      }
+    }
+    setQuote(quote);
+  };
 
 
-  const getAnswer = () => {
-    // get answer from youtube video transcript
-
-    // 4 characters is 1 token, max limit is 16k tokens
-    // 16k / 4 = 4000 characters
-    let tmptranscript = transcript.slice(0, 3000);
-    setChat([...chat, { question, answer: 'loading...' }]);
-    fetch('/api/gpt', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        prompt: `I will send you a transcript please respond on the basis of that transcript. Keep the answers concise and to the point. Only answer on the transcript provided. This is the transcript of the youtube video: \n\n${tmptranscript}. \n\Based on the transcript and your understanding: ${question}.`,
-        model: `gpt-3.5-turbo`
-      })
-    }).then(res => res.json())
-      .then(data => {
-        console.log(data);
-        // remove loading and replace with answer
-        setChat(chat.slice(0, chat.length - 1));
-        setChat([...chat, { question, answer: data.response }]);
-      })
+  const getYoutubeId = (url) => {
+    return url.split(/(v=|vi=|\/v\/|\/vi\/|\/embed\/|youtu.be\/|\/user\/\S+\/\S+\/)/)[2].split(/[?&\/]/)[0];
   }
 
-  const getYoutubeVideo = (url) => {
-    // could be v= or si= or be= or e= or list=
-    const videoId = url.split(/(v=|si=|be=|e=|list=)/)[2].split('&')[0];
-    // get youtube video transcript 
-    fetch(`https://invidious.fdn.fr/api/v1/captions/${videoId}?label=English%20(auto-generated)`)
+  const getTranscript = (url) => {
+    const videoId = url.split(/(v=|vi=|\/v\/|\/vi\/|\/embed\/|youtu.be\/|\/user\/\S+\/\S+\/)/)[2].split(/[?&\/]/)[0];
+    fetch(`https://invidious.fdn.fr/api/v1/captions/${videoId}?label=English`)
       .then(res => res.text())
       .then(data => {
-        console.log(data);
         setTranscript(data);
       })
-  }
+      .catch(err => console.log(err));
+
+    return videoId;
+  };
+
+  const compareTime = (time1, time2) => {
+    // compare time 00:00:17 and 00:00:18
+    const time1Parts = time1.toString().split(':');
+    const time2Parts = time2.toString().split(':');
+    for (let i = 0; i < time1Parts.length; i++) {
+      if (parseInt(time1Parts[i]) > parseInt(time2Parts[i])) {
+        return 1;
+      } else if (parseInt(time1Parts[i]) < parseInt(time2Parts[i])) {
+        return -1;
+      }
+    }
+    return 0;
+  };
+
+  const formatTime = (timeStr) => {
+    // format time from 17.5 to 00:00:17
+    
+    const parts = timeStr.split('.');
+    const seconds = parseInt(parts[0]);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  };
+
+  const captureFrame = () => {
+    const player = playerRef.current;
+    const currentTime = formatTime(`${player.getCurrentTime()}`);
+    console.log(currentTime, 'current time');
+    setTimeStamp(currentTime);
+    getQuote(currentTime);
+
+    html2canvas(document.querySelector('#player'), {
+      onclone: (document) => {
+        document.getElementById('player').style.width = '1500px';
+        document.getElementById('player').style.height = '1200px';
+      },
+      width: 1500,
+      height: 1200,
+      useCORS: true,
+      allowTaint: true,
+
+    }).then(cv => {
+      const img = cv.toDataURL('image/png');
+      console.log(img);
+      setFrame(img);
+    
+
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // draw img on canvas
+    const image = new Image();
+    image.src = img;
+    image.onload = () => {
+      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+    };
+    const videoElement = player.getIframe();
+    canvas.width = 1500;
+    canvas.height = 1200;
+    // draw a rectangle covering the entire canvas
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+
+    // const quote = getQuote(currentTime);
+    ctx.font = '30px Arial';
+    ctx.fillStyle = 'white';
+    // draw the quote at the bottom of the canvas
+    ctx.fillText(quote, canvas.width/2 - 500, canvas.height - 100);
+    });
+  };
 
   useEffect(() => {
-    if(!url) return;
-    console.log('getting transcript')
-    getYoutubeVideo(url)
-  }, [url])
+    if (!url) return;
+
+    const tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/player_api";
+    const firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+    window.onYouTubeIframeAPIReady = () => {
+      playerRef.current = new YT.Player('player', {
+        height: '500',
+        width: '500',
+        videoId: getYoutubeId(url),
+        events: {
+          onReady: () => {
+            getTranscript(url);
+          }
+        }
+      });
+    };
+  }, [url]);
 
   return (
     <>
@@ -64,59 +153,27 @@ export default function AskYT() {
         <meta name="description" content="Ask a youtube video any question you have" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main style={{ maxWidth: '1200px', margin: '0 auto' }}>
+      <main style={{ margin: '0 auto' }}>
         <h1 style={{ display: 'flex', gap: '20px', justifyContent: 'center', alignContent: 'center', fontFamily: 'monospace' }}><FiYoutube /> Ask YT</h1>
         <h2 style={{ fontFamily: 'monospace', fontSize: 12, fontWeight: 200, color: '#888', marginBottom: '20px' }}>Ask a youtube video any question you have</h2>
         <div style={{ display: 'flex', width: '100%', border: '1px solid #333', borderRadius: '5px' }}>
           <input type="text" style={{ flexBasis: '100%', padding: '10px', border: 'none', outline: 'none', background: 'none', color: '#fff' }} placeholder="Paste youtube video url" value={url} onChange={(e) => setUrl(e.target.value)} />
-          {/* <button style={{ borderLeft: '1px solid #333 !important', background: 'none', borderRadius: 'initial', flexBasis: '5%' }} onClick={() => getYoutubeVideo(url)}>
-            <FiPlus />
-          </button> */}
         </div>
-        <div className={styles.row} style={{ gap: '20px', width: '100%' }}>
-          {/* youtube video on one side and chat on other */}
+        <div className={styles.col} style={{display: 'flex', flexDirection: 'column', gap: '20px', width: '100%' }}>
           <div style={{ flexBasis: '100%', border: '1px solid #333', height: '500px' }}>
-            {/* embed video */}
-            <iframe width="100%" height="100%" src={`https://www.youtube.com/embed/${url.split('v=')[1]}`} title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
+            <div id="player"></div>
           </div>
-          {/* <div style={{ flexBasis: '40%', border: '1px solid #333', height: '500px', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ flexBasis: '92%', height: '400px', padding: '10px', overflow: 'auto' }}>
-              {chat.map((item, index) => (
-                <div key={index} style={{ padding: '20px 0px', borderBottom: '1px solid #333' }}>
-                  <p style={{
-                    color: '#ccc',
-                    fontFamily: 'monospace',
-                    fontSize: '12px',
-                    marginBottom: '5px',
-                    whiteSpace: 'pre-wrap'
-                  }}>Q: {item.question}</p>
-                  <p style={{
-                    color: '#fff',
-                    fontFamily: 'monospace',
-                    fontSize: '12px',
-                    whiteSpace: 'pre-wrap'
-                  }}
-                  >A: {item.answer}</p>
-                </div>
-              ))}
-            </div>
-            <div style={{ flexBasis: '8%', width: '100%', display: 'flex', fontSize: '12px' , boxShadow: '0px -1px 0px #333'
-          }}>
-              <input style={{ flexBasis: '85%', width: '100%', height: '100%', background: '#111', border: 'none', outline: 'none', padding: '10px', fontSize: '12px' }} type="text" placeholder="Enter your question" value={question} onChange={(e) => setQuestion(e.target.value)} onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  // if shift + enter then add new line else send message
-                  if (e.shiftKey) {
-                    setQuestion(question + '\n');
-                    return;
-                  }
-                  getAnswer();
-                }
-              }} />
-              <button style={{borderLeft: '1px solid #333 !important', flexBasis: '15%', width: '100%', height: '100%', background: '#111', outline: 'none', padding: '10px', fontSize: '12px' }} onClick={getAnswer}>Ask</button>
-            </div>
-          </div> */}
+          <canvas id="canvas" ref={canvasRef} style={{
+            width: '100%',
+            border: '1px solid #333',
+            borderRadius: '5px',
+            display: 'block',
+            margin: '0 auto'
+          }}/>
+          <input type="text" value={timeStamp} onChange={(e) => setTimeStamp(e.target.value)} />
+          <button onClick={captureFrame}>Capture Frame</button>
         </div>
       </main>
     </>
-  )
+  );
 }
