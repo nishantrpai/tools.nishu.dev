@@ -750,7 +750,7 @@ export const tools = [
    title: 'Youtube Quotes',
     description: 'Get quotes from youtube videos',
     publishDate: '20th July 2024',
-    url: '/youtubequotes' 
+    url: '/ytquotes' 
   }
   
   // {
