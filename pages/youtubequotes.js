@@ -128,8 +128,8 @@ export default function AskYT() {
   return (
     <>
       <Head>
-        <title>Ask a youtube video any question you have</title>
-        <meta name="description" content="Ask a youtube video any question you have" />
+        <title>Youtube Quotes</title>
+        <meta name="description" content="Generate quotes from youtube videos" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main style={{ margin: '0 auto' }}>
