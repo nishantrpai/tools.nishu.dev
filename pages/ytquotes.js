@@ -34,7 +34,6 @@ export default function AskYT() {
         }
       }
     }
-    setQuote(quote);
     return quote;
   };
 
@@ -43,17 +42,32 @@ export default function AskYT() {
     return url.split(/(v=|vi=|\/v\/|\/vi\/|\/embed\/|youtu.be\/|\/user\/\S+\/\S+\/)/)[2].split(/[?&\/]/)[0];
   }
 
-  const getTranscript = (url) => {
-    const videoId = url.split(/(v=|vi=|\/v\/|\/vi\/|\/embed\/|youtu.be\/|\/user\/\S+\/\S+\/)/)[2].split(/[?&\/]/)[0];
-    fetch(`https://invidious.fdn.fr/api/v1/captions/${videoId}?label=English`)
-      .then(res => res.text())
-      .then(data => {
+  const getTranscript = async (url) => {
+    const videoId = getYoutubeId(url);
+  
+    const fetchTranscript = async (captionUrl) => {
+      try {
+        const res = await fetch(captionUrl);
+        if (!res.ok) throw new Error('Network response was not ok');
+        const data = await res.text();
         setTranscript(data);
-      })
-      .catch(err => console.log(err));
-
-    return videoId;
+      } catch (err) {
+        console.error(err);
+        throw err;
+      }
+    };
+  
+    try {
+      await fetchTranscript(`https://invidious.fdn.fr/api/v1/captions/${videoId}?label=English`);
+    } catch (err) {
+      try {
+        await fetchTranscript(`https://invidious.fdn.fr/api/v1/captions/${videoId}?label=English%20(auto-generated)`);
+      } catch (err) {
+        console.error('Failed to fetch transcript from both URLs', err);
+      }
+    }
   };
+  
 
   const compareTime = (time1, time2) => {
     // compare time 00:00:17 and 00:00:18
@@ -86,6 +100,12 @@ export default function AskYT() {
     const currentTime = video.currentTime;
     setTimeStamp(formatTime(currentTime.toString()));
     let cq = getQuote(formatTime(currentTime.toString()));
+    setQuote(cq);
+    // breakdown text into lines if it's too long
+    let lines = [];
+    for (let i = 0; i < cq.length; i += 50) {
+      lines.push(cq.substring(i, i + 50));
+    }
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -93,10 +113,18 @@ export default function AskYT() {
     canvas.height = video.videoHeight * (canvas.width / video.videoWidth);
     // set crossOrigin to anonymous to avoid tainted canvas
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    // draw a rectangle of canvas width with 0.5 opacity
+    ctx.globalAlpha = 0.25;
+    ctx.fillStyle = 'black';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // draw text on canvas
+    ctx.globalAlpha = 1;
     ctx.font = 'bold 50px Helvetica';
     ctx.fillStyle = 'white';
-    console.log(cq);
-    ctx.fillText(cq.toUpperCase(), 100, canvas.height - 100);
+    
+    for(let i = 0; i < lines.length; i++) {
+      ctx.fillText(lines[i], 100, canvas.height - 200 + i * 50);
+    }
     // ctx.clearRect(0, 0, canvas.width, canvas.height);
     // // draw img on canvas
     // const image = new Image();
@@ -121,9 +149,13 @@ export default function AskYT() {
 
   useEffect(() => {
     if (!url) return;
-
+    console.log(url);
     getTranscript(url);
   }, [url]);
+
+  useEffect(() => {
+    captureFrame();
+  }, [quote]);
 
   return (
     <>
