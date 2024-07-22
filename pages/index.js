@@ -757,6 +757,12 @@ export const tools = [
     description: 'Make your own checks banner',
     publishDate: '22nd July 2024',
     url: '/checksbanner'
+  },
+  {
+    title: 'Check Facts',
+    description: 'Check facts that are outdated or need to be updated since your high school graduation',
+    publishDate: '22nd July 2024',
+    url: '/checkfacts'
   }
   
   // {
