@@ -749,8 +749,14 @@ export const tools = [
   {
    title: 'Youtube Quotes',
     description: 'Get quotes from youtube videos',
-    publishDate: '20th July 2024',
+    publishDate: '21st July 2024',
     url: '/ytquotes' 
+  },
+  {
+    title: 'Checks Banner',
+    description: 'Make your own checks banner',
+    publishDate: '22nd July 2024',
+    url: '/checksbanner'
   }
   
   // {
