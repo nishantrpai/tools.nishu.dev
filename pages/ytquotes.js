@@ -96,7 +96,6 @@ export default function AskYT() {
 
   const captureFrame = () => {
     let video = videoRef.current;
-    video.crossOrigin = 'anonymous';
     // get current time from video
     const currentTime = video.currentTime;
     setTimeStamp(formatTime(currentTime.toString()));
