@@ -150,7 +150,7 @@ export default function AskYT() {
       let x = 100 + parseFloat(offsetX);
       let y = canvas.height - (200) + i * spacing + parseFloat(offsetY);
       console.log('x', x, 'y', y);
-      ctx.fillText(lines[i], x, y);
+      ctx.fillText(lines[i].toUpperCase(), x, y);
     }
   };
 
