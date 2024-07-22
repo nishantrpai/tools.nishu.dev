@@ -12,7 +12,7 @@ export default function Home() {
   const sensationalize = async () => {
     // make api call to /api/gpt?prompt
     setLoading(true)
-    const res = await fetch(`/api/gpt?prompt='"${text}" list facts that are outdated or need to be updated since this year that I should know about, that were taught in high school. Limit information to what I learnt in school. Keep readability grade as low as possible. For e.g., "Before 2010, the world was flat and now it is round." List all such facts that are outdated or need to be updated since the year mentioned. Only things that have changed since graduating.'`)
+    const res = await fetch(`/api/gpt?prompt='"${text}" list facts and concepts that are outdated or need to be updated since this year that I should know about, that were taught in high school. Limit information to what I learnt in school. Keep readability grade as low as possible. For e.g., "Before 2010, the world was flat and now it is round." List all such facts that are outdated or need to be updated since the year mentioned. Only things that have changed since graduating.'`)
     const data = await res.json()
     setSensationalizedText(data.response)
     setLoading(false)
