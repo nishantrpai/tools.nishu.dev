@@ -85,7 +85,7 @@ export default function HigherHat() {
           context.lineWidth = 5
           context.strokeRect(500 + parseFloat(offsetX) + (index * ((img.width * scale) + parseInt(gap))), 50 + parseFloat(offsetY), img.width * scale, img.height * scale)
 
-          context.shadowColor = 'rgba(255, 255, 255, 0.25)'
+          context.shadowColor = 'rgba(255, 255, 255, 0.0125)'
           context.shadowBlur = 1
           context.shadowOffsetX = 1
           context.shadowOffsetY = 1
