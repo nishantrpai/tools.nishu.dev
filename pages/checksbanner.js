@@ -180,7 +180,7 @@ export default function HigherHat() {
           const dataURL = canvas.toDataURL('image/png')
           const a = document.createElement('a')
           a.href = dataURL
-          a.download = `higherbanner-${Date.now()}.png`
+          a.download = `checksbanner-${Date.now()}.png`
           a.click()
         }} style={{
           marginTop: 20
