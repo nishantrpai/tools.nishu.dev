@@ -136,7 +136,7 @@ export default function AskYT() {
     // set crossOrigin to anonymous to avoid tainted canvas
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
     // draw a rectangle of canvas width with 0.5 opacity
-    ctx.globalAlpha = 0.25;
+    ctx.globalAlpha = 0.125;
     ctx.fillStyle = 'black';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     // draw text on canvas
