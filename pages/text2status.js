@@ -59,7 +59,7 @@ export default function Text2Status() {
       console.log('background', background, 'color', color)
       context.fillStyle = background
       context.fillRect(0, 0, canvas.width, canvas.height)
-      context.font = '80px Arial'
+      context.font = 'bold 80px Helvetica'
       context.fillStyle = color
       context.textAlign = 'left'
       context.textBaseline = 'top'
@@ -72,7 +72,7 @@ export default function Text2Status() {
         let newLines = []
         let newLine = ''
         words.forEach((word) => {
-          if (newLine.length + word.length < 30) {
+          if (newLine.length + word.length < 25) {
             newLine += word + ' '
           } else {
             newLines.push(newLine)
@@ -86,7 +86,7 @@ export default function Text2Status() {
 
       let y = 200
       // draw text from center
-      let x = 50
+      let x = 30
       for (let i = 0; i < lines.length; i++) {
         // draw each line on the canvas
         context.fillText(lines[i], x, y)
