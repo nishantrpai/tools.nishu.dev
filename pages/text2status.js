@@ -3,6 +3,7 @@
 import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { useState, useEffect } from 'react'
+import JSZip from 'jszip'
 
 export default function Text2Status() {
   const [text, setText] = useState('')
@@ -133,10 +134,14 @@ export default function Text2Status() {
 
         <button onClick={() => {
           // download the images
-          statuses.forEach((status, index) => {
+          let zip = new JSZip()
+          statuses.forEach((status) => {
+            zip.file(`status-${status.index}.png`, status.dataURL.split('base64,')[1], { base64: true })
+          })
+          zip.generateAsync({ type: 'blob' }).then((content) => {
             let a = document.createElement('a')
-            a.href = status.dataURL
-            a.download = `status-${index}.png`
+            a.href = URL.createObjectURL(content)
+            a.download = 'statuses.zip'
             a.click()
           })
         }}>
