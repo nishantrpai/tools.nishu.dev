@@ -764,6 +764,12 @@ export const tools = [
     publishDate: '22nd July 2024',
     url: '/checkfacts'
   },
+  {
+    title: 'Short Status',
+    description: 'Turn large text into short status',
+    publishDate: '23rd July 2024',
+    url: '/text2status'
+  }
   // {
   // better as a chrome extension
   //   title: 'Content Diet',
