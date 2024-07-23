@@ -42,7 +42,7 @@ export default function Text2Status() {
       images: statuses.map(status => status.dataURL),
       gifWidth: 1080,
       gifHeight: 1920,
-      interval: 2
+      interval: 5
     }, function (obj) {
       if (!obj.error) {
         let a = document.createElement('a')
@@ -102,7 +102,7 @@ export default function Text2Status() {
       }
       ).flat()
 
-      let y = 200
+      let y = 420
       // draw text from center
       let x = 30
       for (let i = 0; i < lines.length; i++) {
