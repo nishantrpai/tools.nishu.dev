@@ -4,6 +4,7 @@ import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { useState, useEffect } from 'react'
 import JSZip from 'jszip'
+import gifshot from 'gifshot'
 
 export default function Text2Status() {
   const [text, setText] = useState('')
@@ -35,6 +36,23 @@ export default function Text2Status() {
     data = await res.json()
     return JSON.parse(data.response)
   }
+
+  const downloadAsGif = () => {
+    gifshot.createGIF({
+      images: statuses.map(status => status.dataURL),
+      gifWidth: 1080,
+      gifHeight: 1920,
+      interval: 2
+    }, function (obj) {
+      if (!obj.error) {
+        let a = document.createElement('a')
+        a.href = obj.image
+        a.download = 'statuses.gif'
+        a.click()
+      }
+    })
+  }
+
 
   useEffect(() => {
     // breakdown the text for each status, don't break the word
@@ -146,6 +164,10 @@ export default function Text2Status() {
           })
         }}>
           Download
+        </button>
+        {/* download as gif */}
+        <button onClick={downloadAsGif}>
+          Download as gif
         </button>
       </main>
     </>
