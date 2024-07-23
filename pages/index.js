@@ -763,7 +763,14 @@ export const tools = [
     description: 'Check facts that are outdated or need to be updated since your high school graduation',
     publishDate: '22nd July 2024',
     url: '/checkfacts'
-  }
+  },
+  // {
+  // better as a chrome extension
+  //   title: 'Content Diet',
+  //   description: 'Log your content diet',
+  //   publishDate: '23rd July 2024',
+  //   url: '/contentdiet'
+  // }
   
   // {
   //   title: 'Face Swap',
