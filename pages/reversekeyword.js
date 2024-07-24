@@ -12,7 +12,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false)
 
   const getMetadata = async (url) => {
-    let proxy = 'https://cors-proxy-production-a6e6.up.railway.app/?url='
+    let proxy = 'https://api.codetabs.com/v1/proxy/?quest='
     let res = await fetch(`${proxy}${url}`)
     let html = await res.text()
     let parser = new DOMParser()

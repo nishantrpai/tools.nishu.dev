@@ -9,7 +9,7 @@ export default function NFTHolders() {
   const [holders, setHolders] = useState([]);
 
   function getPageURL(contract, page) {
-    // let proxy = 'https://cors-proxy-production-a6e6.up.railway.app/?url=';
+    // let proxy = 'https://api.codetabs.com/v1/proxy/?quest=';
     let url = `https://etherscan.io/token/generic-tokenholders2?m=light&a=${contract}&s=5147&sid=0aa60146f4a6765e6bfcdfcee5e02a2a&p=${page}`;
     // return `${proxy}${url}`
   }

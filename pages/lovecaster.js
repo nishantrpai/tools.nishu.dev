@@ -92,7 +92,7 @@ export default function LoveCaster() {
           let profile = data[0].body
           let url = encodeURIComponent(`https://client.warpcast.com/v2/casts?fid=${fid}&limit=30`)
 
-          fetch(`https://cors-proxy-production-a6e6.up.railway.app/?url=${url}`).then(res => res.json()).then(data => {
+          fetch(`https://api.codetabs.com/v1/proxy/?quest=${url}`).then(res => res.json()).then(data => {
             let casts = data.result.casts
             casts = casts.filter(cast => cast.author.fid === fid)
             casts = casts.map(cast => cast.text)
