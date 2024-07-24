@@ -16,8 +16,10 @@ export default function SeoKeywords() {
     let prompt = `This is the idea: ${idea}.\n\n
     This is the keyword I want to use: ${keyword}.\n\n
     List all possibilities you would make to the idea to make it match those keywords.\n\n
+    The possibilities must use the keyword in a way that makes sense.\n\n
     Keep it concise and very specific for e.g., "overlay vide on image" or "add a call to action button".\n\n
     Keep suggestions concise and specific.
+    Make it compelling and interesting.\n\n
     Don't add any extra information.
     List will be in numbered format.`
     const res = await fetch(`/api/gpt?prompt`, {
