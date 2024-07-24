@@ -57,7 +57,7 @@ export default function SeoKeywords() {
   <>
     <Head>
       <title>Suggest slug</title>
-      <meta name="description" content="Suggest slug" />
+      <meta name="description" content="Suggest slug for your idea" />
     </Head>
     <main>
       <h1 className={styles.title}>
