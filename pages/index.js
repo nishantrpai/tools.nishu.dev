@@ -769,6 +769,12 @@ export const tools = [
     description: 'Turn large text into short status',
     publishDate: '23rd July 2024',
     url: '/text2status'
+  },
+  {
+    title: 'SEO Keywords',
+    description: 'Get SEO keywords for your idea',
+    publishDate: '24th July 2024',
+    url: '/seokeywords'
   }
   // {
   // better as a chrome extension
