@@ -63,7 +63,7 @@ export default function SeoKeywords() {
         Suggest slug
       </h1>
       <h2 className={styles.description}>
-        Suggest a slug for the idea
+        Suggest a slug for your idea
       </h2>
       <div style={{
         display: 'flex',
