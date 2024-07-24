@@ -775,6 +775,12 @@ export const tools = [
     description: 'Get SEO keywords for your idea',
     publishDate: '24th July 2024',
     url: '/seokeywords'
+  },
+  {
+    title: 'Suggest Slug or domain for idea',
+    description: 'Suggest a slug or domain for your idea',
+    publishDate: '24th July 2024',
+    url: '/suggestslugordomain'
   }
   // {
   // better as a chrome extension
