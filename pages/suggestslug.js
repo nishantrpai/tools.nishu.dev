@@ -36,6 +36,7 @@ export default function SeoKeywords() {
     Keep it in the format of "/slug" (use the prefixes).
     Keep it minimal and few syllables.
     Please don't use '-' or '_' in the slugs.
+    Don't use "slug", unless it's part of the idea.
     Don't make it too jargon or technical.
     Don't use spammy or promotional slugs.
     Suggest atleast 20 slugs.
