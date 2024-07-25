@@ -6,6 +6,7 @@ import { decompressFrames, parseGIF } from 'gifuct-js'
 import gifshot from 'gifshot'
 
 export default function HigherHat() {
+  // if you are here to copy the code, here is how i did it https://www.youtube.com/watch?v=dQw4w9WgXcQ
   const [gifFrames, setGifFrames] = useState([])
   const [image, setImage] = useState(null)
   const [offsetX, setOffsetX] = useState(38)
