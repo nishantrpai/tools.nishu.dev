@@ -1,4 +1,3 @@
-// add higher hat on any image
 import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { useState, useEffect } from 'react'
@@ -6,7 +5,6 @@ import { decompressFrames, parseGIF } from 'gifuct-js'
 import gifshot from 'gifshot'
 
 export default function HigherHat() {
-  // if you are here to copy the code, here is how i did it https://www.youtube.com/watch?v=dQw4w9WgXcQ
   const [gifFrames, setGifFrames] = useState([])
   const [image, setImage] = useState(null)
   const [offsetX, setOffsetX] = useState(38)
@@ -18,11 +16,11 @@ export default function HigherHat() {
   const [imgHeight, setImgHeight] = useState(0)
   const [hatType, setHatType] = useState(0)
   const [processing, setProcessing] = useState(false)
+  const [gifUrl, setGifUrl] = useState('')
 
   const higherHat = '/highertm.svg'
 
   useEffect(() => {
-    // draw image on canvas
     const canvas = document.getElementById('canvas')
     const context = canvas.getContext('2d')
     context.beginPath()
@@ -101,6 +99,71 @@ export default function HigherHat() {
     })
   }
 
+  const handleGifLoad = (gifData) => {
+    fetch(`https://api.codetabs.com/v1/proxy/?quest=${gifData}`).then((res) => res.arrayBuffer()).then((buffer) => {
+      const gif = parseGIF(buffer);
+      console.log(gif);
+      const frames = decompressFrames(gif, true);
+      console.log(frames);
+
+      const gifCanvas = document.createElement('canvas');
+      gifCanvas.width = gif.lsd.width;
+      gifCanvas.height = gif.lsd.height;
+      const gifContext = gifCanvas.getContext('2d');
+
+      frames.forEach((frame, frameIndex) => {
+        const { patch, dims, disposalType } = frame;
+        console.log('patch []', patch);
+        if (frameIndex > 0 && disposalType === 2) {
+          gifContext.clearRect(dims.left, dims.top, dims.width, dims.height);
+        }
+
+        const imageData = gifContext.createImageData(dims.width, dims.height);
+        imageData.data.set(patch);
+
+        gifContext.putImageData(imageData, dims.left, dims.top);
+        frame.url = gifCanvas.toDataURL('image/png');
+      });
+
+      console.log('frames []', frames);
+      setGifFrames(frames);
+    });
+  }
+
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    reader.onload = () => {
+      handleGifLoad(reader.result);
+      const img = new Image();
+      img.src = reader.result;
+      img.onload = () => {
+        setOffsetX(0);
+        setOffsetY(104);
+        setScale(2.4);
+        setOffsetTheta(0);
+        setImgWidth(img.width);
+        setImgHeight(img.height);
+        setImage(img);
+      };
+    };
+    reader.readAsDataURL(file);
+  }
+
+  const handleUrlInput = () => {
+    handleGifLoad(gifUrl);
+    const img = new Image();
+    img.src = gifUrl;
+    img.onload = () => {
+      setOffsetX(0);
+      setOffsetY(104);
+      setScale(2.4);
+      setOffsetTheta(0);
+      setImgWidth(img.width);
+      setImgHeight(img.height);
+      setImage(img);
+    };
+  }
 
   return (
     <>
@@ -123,57 +186,7 @@ export default function HigherHat() {
         </span>
 
         {/* upload photo */}
-        <input type="file" accept="image/*" onChange={(event) => {
-          const file = event.target.files[0]
-          const reader = new FileReader()
-          reader.onload = () => {
-            const gifData = reader.result
-            fetch(gifData).then((res) => res.arrayBuffer()).then((buffer) => {
-              const gif = parseGIF(buffer);
-              console.log(gif);
-              const frames = decompressFrames(gif, true); // ensure buildPatch is true
-              console.log(frames);
-
-              // create a canvas for the full gif dimensions
-              const gifCanvas = document.createElement('canvas');
-              gifCanvas.width = gif.lsd.width;
-              gifCanvas.height = gif.lsd.height;
-              const gifContext = gifCanvas.getContext('2d');
-
-              frames.forEach((frame, frameIndex) => {
-                const { patch, dims, disposalType } = frame;
-                console.log('patch []', patch);
-                // handle disposal
-                if (frameIndex > 0 && disposalType === 2) { // restore to background color
-                  gifContext.clearRect(dims.left, dims.top, dims.width, dims.height);
-                }
-
-                const imageData = gifContext.createImageData(dims.width, dims.height);
-                imageData.data.set(patch);
-
-                gifContext.putImageData(imageData, dims.left, dims.top);
-                frame.url = gifCanvas.toDataURL('image/png');
-              });
-
-              console.log('frames []', frames);
-              setGifFrames(frames);
-            });
-
-
-            const img = new Image()
-            img.src = reader.result
-            img.onload = () => {
-              setOffsetX(0)
-              setOffsetY(104)
-              setScale(2.4)
-              setOffsetTheta(0)
-              setImgWidth(img.width)
-              setImgHeight(img.height)
-              setImage(img)
-            }
-          }
-          reader.readAsDataURL(file)
-        }} />
+        
         <canvas id="canvas" width="800" height="800" style={{
           border: '1px solid #333',
           borderRadius: 10,
@@ -182,6 +195,19 @@ export default function HigherHat() {
           margin: '20px 0'
         }}></canvas>
         <div style={{ display: 'flex', gap: 20, flexDirection: 'column', width: '50%' }}>
+        <input type="file" accept="image/*" onChange={handleFileUpload} />
+        <div style={{display: 'flex', gap: 20}}>
+        <input type="text" placeholder="Enter GIF URL" value={gifUrl} onChange={(e) => setGifUrl(e.target.value)} style={{
+          width: '100%',
+          borderRadius: 10,
+          padding: 10,
+          border: '1px solid #333',
+          outline: 'none',
+          backgroundColor: '#000',
+          color: '#fff'
+        }}/>
+        <button onClick={handleUrlInput}>Load</button>
+        </div>
           <label>
             Offset X
           </label>
