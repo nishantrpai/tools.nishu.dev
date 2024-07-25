@@ -781,6 +781,13 @@ export const tools = [
     description: 'Suggest a slug or domain for your idea',
     publishDate: '24th July 2024',
     url: '/suggestslugordomain'
+  },
+  {
+    title: 'Embed gif in image',
+    description: 'Embedd gif in an image and download it',
+    publishDate: '25th July 2024',
+    url: '/embedgif'
+
   }
   // {
   // better as a chrome extension

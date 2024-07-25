@@ -19,7 +19,9 @@
     "frames.js": "^0.15.2",
     "fs": "^0.0.1-security",
     "get-browser-fingerprint": "^3.2.0",
+    "gif.js.optimized": "^1.0.1",
     "gifshot": "^0.4.5",
+    "gifuct-js": "^2.1.2",
     "html2canvas": "^1.4.1",
     "jszip": "^3.10.1",
     "moment": "^2.30.1",
@@ -42,6 +44,7 @@
     "socket.io-client": "^4.7.5",
     "tone": "^15.0.4",
     "viem": "^2.9.16",
+    "whammy": "^0.0.1",
     "youtube-transcript": "^1.2.1"
   }
 }
