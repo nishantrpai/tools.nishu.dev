@@ -54,7 +54,7 @@ export default function HigherHat() {
     const context = canvas.getContext('2d')
     const hat = new Image()
     hat.src = higherHat
-  
+
     const loadImage = (src) => {
       return new Promise((resolve) => {
         const img = new Image()
@@ -62,11 +62,11 @@ export default function HigherHat() {
         img.onload = () => resolve(img)
       })
     }
-  
+
     await new Promise((resolve) => {
       hat.onload = resolve
     })
-  
+
     const drawFrame = async (frame) => {
       const img = await loadImage(frame)
       const tempCanvas = document.createElement('canvas')
@@ -80,9 +80,9 @@ export default function HigherHat() {
       tempContext.drawImage(hat, offsetX, offsetY, hat.width * scale, hat.height * scale)
       return tempCanvas.toDataURL('image/png')
     }
-  
+
     const gifFramesWithImages = await Promise.all(gifFrames.map((frame) => drawFrame(frame.url)))
-  
+
     gifshot.createGIF({
       gifWidth: imgWidth,
       gifHeight: imgHeight,
@@ -100,7 +100,7 @@ export default function HigherHat() {
       }
     })
   }
-  
+
 
   return (
     <>
@@ -129,31 +129,36 @@ export default function HigherHat() {
           reader.onload = () => {
             const gifData = reader.result
             fetch(gifData).then((res) => res.arrayBuffer()).then((buffer) => {
-              const gif = parseGIF(buffer)
-              const frames = decompressFrames(gif, true)
-              // for each frame, get url from pixels
-              frames.forEach((frame) => {
-                const { pixels, colorTable } = frame
-                const canvas = document.createElement('canvas')
-                canvas.width = gif.lsd.width
-                canvas.height = gif.lsd.height
-                const context = canvas.getContext('2d')
-                const imageData = context.createImageData(gif.lsd.width, gif.lsd.height)
-                for (let i = 0; i < pixels.length; i++) {
-                  const index = i * 4
-                  const colorIndex = pixels[i]
-                  const color = colorTable[colorIndex]
-                  imageData.data[index] = color[0] // red
-                  imageData.data[index + 1] = color[1] // green
-                  imageData.data[index + 2] = color[2] // blue
-                  imageData.data[index + 3] = 255 // fully opaque
+              const gif = parseGIF(buffer);
+              console.log(gif);
+              const frames = decompressFrames(gif, true); // ensure buildPatch is true
+              console.log(frames);
+
+              // create a canvas for the full gif dimensions
+              const gifCanvas = document.createElement('canvas');
+              gifCanvas.width = gif.lsd.width;
+              gifCanvas.height = gif.lsd.height;
+              const gifContext = gifCanvas.getContext('2d');
+
+              frames.forEach((frame, frameIndex) => {
+                const { patch, dims, disposalType } = frame;
+                console.log('patch []', patch);
+                // handle disposal
+                if (frameIndex > 0 && disposalType === 2) { // restore to background color
+                  gifContext.clearRect(dims.left, dims.top, dims.width, dims.height);
                 }
-                context.putImageData(imageData, 0, 0)
-                frame.url = canvas.toDataURL('image/png')
-              })
-                    
-              setGifFrames(frames)
-            })
+
+                const imageData = gifContext.createImageData(dims.width, dims.height);
+                imageData.data.set(patch);
+
+                gifContext.putImageData(imageData, dims.left, dims.top);
+                frame.url = gifCanvas.toDataURL('image/png');
+              });
+
+              console.log('frames []', frames);
+              setGifFrames(frames);
+            });
+
 
             const img = new Image()
             img.src = reader.result
