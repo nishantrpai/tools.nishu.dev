@@ -104,13 +104,13 @@ export default function HigherHat() {
   return (
     <>
       <Head>
-        <title>Higher TM</title>
-        <meta name="description" content="Higher TM" />
+        <title>Higher Gifs</title>
+        <meta name="description" content="Higher Gifs" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
         <h1 className={styles.title}>
-          Higher TM
+          Higher Gifs
         </h1>
         <span style={{
           width: '100%',
@@ -118,7 +118,7 @@ export default function HigherHat() {
           color: '#666',
           fontSize: '14px'
         }}>
-          Add higher tm on any image
+          Add higher tm to your gifs
         </span>
 
         {/* upload photo */}
