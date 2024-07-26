@@ -48,7 +48,7 @@ const sensationalize = async () => {
   Don't use numbers please, format it correctly so each block is readable.
   Mention ways to monetize them in every block.
   Here are some examples for reference on how to respond:
-  ${DATASET.map((d, i) => `${i + 1}. ${d.IS}\n${d.Response}`).join('\n\n')}
+  ${DATASET.map((d, i) => `- ${d.IS}\n${d.Response}`).join('\n\n')}
   `
 
   const res = await fetch(`/api/gpt?prompt`, {
