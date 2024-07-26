@@ -1,3 +1,4 @@
+// here is how i made this https://www.youtube.com/watch?v=dQw4w9WgXcQ
 import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { useState, useEffect } from 'react'
