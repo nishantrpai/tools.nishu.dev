@@ -47,7 +47,7 @@ const sensationalize = async () => {
   Keep readability grade as low as possible.
   Don't use numbers please, format it correctly so each block is readable.
   Mention ways to monetize them in every block.
-  Here are some examples of suggestions for permissionless apprenticeship:
+  Here are some examples for reference on how to respond:
   ${DATASET.map((d, i) => `${i + 1}. ${d.IS}\n${d.Response}`).join('\n\n')}
   `
 
