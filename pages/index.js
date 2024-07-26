@@ -783,11 +783,16 @@ export const tools = [
     url: '/suggestslugordomain'
   },
   {
-    title: 'Embed gif in image',
-    description: 'Embedd gif in an image and download it',
+    title: 'Higher Gifs',
+    description: 'Make your gifs higher',
     publishDate: '25th July 2024',
-    url: '/embedgif'
-
+    url: '/highergifs'
+  },
+  {
+    title: 'Permissionless Ideas',
+    description: 'Get permissionless ideas and ways to monetize them from Jack Butcher',
+    publishDate: '26th July 2024',
+    url: '/permissionlessideas'
   }
   // {
   // better as a chrome extension
