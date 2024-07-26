@@ -25,16 +25,8 @@ const DATASET = [
     {
         "IS": "Skill: Video Editing\n\nInterest: How companies have gone from Seed to IPO\n",
         "Response": "Make video trailers/timelines that document the journey for companies that have already been through the process.\n\nPull comments/tweets from founders, interview early team members, grab press coverage/milestones.\n\n90/120 second format that you can repeat for different businesses.\n"
-    },
-    {
-        "IS": "Skill: Design\nInterest: Helping people\n",
-        "Response": "The answer lies in what people need help with.\n\nDesign as a tool for:\n\nCommunicating more clearly\nAccomplishing something faster\nPreventing someone from worrying about something\nAnd a million other things\n\nThe more obvious the ROI, the easier it will be to monetize.\n"
-    },
-    {
-        "IS": "Skill: Event Planning:\n\nPersonal Interest: Cannabis, Crypto, Budding Generational Wealth\n",
-        "Response": "Can you start organizing digital events around some of the above?\n\n'Generational Wealth in Crypto'\n\nBuild an agenda, find speakers, manage signups & marketing, etc.\n\nDo a few for free, invite people who would be potential future clients.\n"
     }
-]
+  ]
 const [text, setText] = useState('')
 const [sensationalizedText, setSensationalizedText] = useState('')
 const [loading, setLoading] = useState(false)
@@ -42,13 +34,13 @@ const [loading, setLoading] = useState(false)
 const sensationalize = async () => {
   // make api call to /api/gpt?prompt
   setLoading(true)
-  let prompt = `Given this skill, interests ${text}, list atleast 20-30 (bullet points) ideas for permissionless apprenticeship and ways to monetize them.
+  let prompt = `Given this skill, interests ${text}, list atleast 10-20 (bullet points) ideas for permissionless apprenticeship and ways to monetize them.
   Only limit to skills, interests provided.
   Keep readability grade as low as possible.
   Don't use numbers please, format it correctly so each block is readable.
   Mention ways to monetize them in every block.
-  Here are some examples for reference on how to respond:
-  ${DATASET.map((d, i) => `- Skills & Interests: ${d.IS}\nSuggestion: ${d.Response}`).join('\n\n\n')}
+  Here are some examples for reference on how to respond (include skills and interests relevant to the user):
+  ${DATASET.map((d, i) => `- Skills & Interests: ${d.IS}\n\n Suggestion: ${d.Response}`).join('\n\n\n\n')}
   `
 
   const res = await fetch(`/api/gpt?prompt`, {
