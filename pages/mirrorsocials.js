@@ -77,7 +77,7 @@ export default function MirrorPreview() {
           Mirror Preview for Socials
         </h1>
         <p className={styles.description}>
-          Create image previews from mirror  posts for socials
+          Create previews from mirror  posts for socials
         </p>
         <div className={styles.searchContainer} style={{ marginTop: 0, marginBottom: 1 }}>
           <input className={styles.search} type="text" value={link} onChange={(e) => setLink(e.target.value)} placeholder='Enter link' />
