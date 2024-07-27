@@ -83,9 +83,9 @@ export default function MirrorPreview() {
           <input className={styles.search} type="text" value={link} onChange={(e) => setLink(e.target.value)} placeholder='Enter link' />
         </div>
         {/* div will have divs and elements stacked over each at different z indices */}
-        {!preview ? <div style={{ width: '100%', height: 500, borderRadius: 0, border: '1px solid #222', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>Add mirror link to preview</div> :
+        {!preview ? <div style={{ width: '100%', height: 500, borderRadius: 0, border: '1px solid transparent', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>Add mirror link to preview</div> :
 
-          <div style={{ position: 'relative', width: '100%', height: 500, borderRadius: 0, overflow: 'hidden', border: '1px solid #111' }} id="preview">
+          <div style={{ position: 'relative', width: '100%', height: 500, borderRadius: 0, overflow: 'hidden', border: '1px solid transparent' }} id="preview">
             {/* <img src={preview?.ogImage} style={{ width: '100%', height: 'auto', borderRadius: 0 }} /> */}
             {/* make a div with background ogImage of 100% 100% width no repeat cover */}
             <div style={{ width: '100%', height: '100%', background: `url(${preview?.ogImage}) no-repeat center center`, backgroundSize: backgroundType, borderRadius: 0 }}></div>
@@ -135,7 +135,7 @@ export default function MirrorPreview() {
             <button onClick={() => {
               html2canvas(document.getElementById('preview'), {
                 allowTaint: true,
-                backgroundColor: '#000',
+                backgroundColor: 'transparent',
                 useCORS: true,
                 scale: 4
               }).then(canvas => {
@@ -152,7 +152,7 @@ export default function MirrorPreview() {
               }, 2000)
               html2canvas(document.getElementById('preview'), {
                 allowTaint: true,
-                backgroundColor: '#000',
+                backgroundColor: 'transparent',
                 useCORS: true,
                 scale: 4
               }).then(canvas => {
