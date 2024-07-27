@@ -50,7 +50,7 @@ export default function MirrorPreview() {
   const [preview, setPreview] = useState(null)
 
   useEffect(() => {
-    if (!link) return;
+    if (link === '') return
     parseLink(link).then(data => {
       console.log(data)
       // for each link add proxy https://api.codetabs.com/v1/proxy/?quest=
