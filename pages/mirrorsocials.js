@@ -50,19 +50,19 @@ export default function MirrorPreview() {
   const [preview, setPreview] = useState(null)
 
   useEffect(() => {
-    if (link) {
-      parseLink(link).then(data => {
-        console.log(data)
-        // for each link add proxy https://api.codetabs.com/v1/proxy/?quest=
-        let proxy = `https://api.codetabs.com/v1/proxy/?quest=`
-        Object.keys(data).forEach(key => {
-          if (data[key].startsWith('http')) {
-            data[key] = `${proxy}${data[key]}`
-          }
-        })
-        setPreview(data)
+    if (!link) return;
+    parseLink(link).then(data => {
+      console.log(data)
+      // for each link add proxy https://api.codetabs.com/v1/proxy/?quest=
+      let proxy = `https://api.codetabs.com/v1/proxy/?quest=`
+      Object.keys(data).forEach(key => {
+        if (data[key].startsWith('http')) {
+          data[key] = `${proxy}${data[key]}`
+        }
       })
-    }
+      setPreview(data)
+    })
+
   }, [link])
 
   return (
@@ -88,7 +88,7 @@ export default function MirrorPreview() {
           <div style={{ position: 'relative', width: '100%', height: 500, borderRadius: 0, overflow: 'hidden', border: '1px solid #111' }} id="preview">
             {/* <img src={preview?.ogImage} style={{ width: '100%', height: 'auto', borderRadius: 0 }} /> */}
             {/* make a div with background ogImage of 100% 100% width no repeat cover */}
-            <div style={{ width: '100%', height: '100%', background: `url(${preview?.ogImage}) no-repeat center center`, backgroundSize: backgroundType, borderRadius: 10 }}></div>
+            <div style={{ width: '100%', height: '100%', background: `url(${preview?.ogImage}) no-repeat center center`, backgroundSize: backgroundType, borderRadius: 0 }}></div>
             {/* make a div with transparent black but the transparency decreases as we reach bottom */}
             <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(rgba(0,0,0,0.05), rgba(0,0,0,1))', borderRadius: 10 }}></div>
             {/* make a div with text and title */}
