@@ -799,6 +799,12 @@ export const tools = [
     description: 'Visualize fear and greed',
     publishDate: '27th July 2024',
     url: '/feargreed'
+  },
+  {
+    title: 'Mirror Socials',
+    description: 'Create image previews from @viamirror  posts for socials',
+    publishDate: '27th July 2024',
+    url: '/mirrorsocials'
   }
   // {
   // better as a chrome extension
