@@ -85,7 +85,7 @@ export default function MirrorPreview() {
         {/* div will have divs and elements stacked over each at different z indices */}
         {!preview ? <div style={{ width: '100%', height: 500, borderRadius: 10, border: '1px solid #222', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>Add mirror link to preview</div> :
 
-          <div style={{ position: 'relative', width: '100%', height: 500, borderRadius: 10, overflow: 'hidden', border: '1px solid #000' }} id="preview">
+          <div style={{ position: 'relative', width: '100%', height: 500, borderRadius: 10, overflow: 'hidden', border: '1px solid #111' }} id="preview">
             {/* <img src={preview?.ogImage} style={{ width: '100%', height: 'auto', borderRadius: 0 }} /> */}
             {/* make a div with background ogImage of 100% 100% width no repeat cover */}
             <div style={{ width: '100%', height: '100%', background: `url(${preview?.ogImage}) no-repeat center center`, backgroundSize: backgroundType, borderRadius: 10 }}></div>
@@ -93,17 +93,17 @@ export default function MirrorPreview() {
             <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(rgba(0,0,0,0.05), rgba(0,0,0,1))', borderRadius: 10 }}></div>
             {/* make a div with text and title */}
             {/* draw favicon on top left  */}
-            <img src={preview?.author} style={{ position: 'absolute', top: 10, left: 10, width: 30, height: 30, borderRadius: 5 }} />
+            <img src={preview?.author} style={{ position: 'absolute', top: 20, left: 20, width: 30, height: 30, borderRadius: 5 }} />
             {/* next to image 10px away add domain in uppercase helvetic bold */}
-            <div style={{ position: 'absolute', top: 15, left: 50, color: 'white', fontFamily: 'Helvetica', fontWeight: '100', textTransform: 'uppercase' }}>{new URL(link).hostname}</div>
+            <div style={{ position: 'absolute', top: 25, left: 60, color: 'white', fontFamily: 'Helvetica', fontWeight: '100', textTransform: 'uppercase' }}>{new URL(link).hostname}</div>
             {/* add title 20px away from top */}
             {/* on top right similar distance as author we'll draw favicon with grayscale filter */}
-            <img src={preview?.favicon} style={{ position: 'absolute', top: 10, right: 20, width: 40, height: 40, borderRadius: 5, filter: 'opacity(0.5)' }} />
+            <img src={preview?.favicon} style={{ position: 'absolute', top: 20, right: 20, width: 30, height: 30, borderRadius: 5, filter: 'opacity(0.85)' }} />
             {/* add title 20px away from top */}
             {/* below author image 50px atleast we'll in bold have the title */}
-            <div style={{ position: 'absolute', top: 80, left: 10, color: 'white', fontFamily: 'Helvetica', fontWeight: 'bold', fontSize: '3.5rem' }}>{preview?.ogTitle.toUpperCase()}</div>
+            <div style={{ position: 'absolute', top: 80, left: 20, color: 'white', fontFamily: 'Helvetica', fontWeight: 'bold', fontSize: '2.5rem' }}>{preview?.ogTitle.toUpperCase()}</div>
             {/* add description 50px below the title in normal font */}
-            <div style={{ position: 'absolute', top: 350, left: 10, color: '#fff', opacity: 0.9, fontFamily: 'Helvetica', fontSize: '1.25rem', fontWeight: '100', lineHeight: 2 }}>{preview?.ogDescription}</div>
+            <div style={{ position: 'absolute', top: 350, left: 20, color: '#fff', opacity: 0.8, fontFamily: 'Helvetica', fontSize: '1.2rem', fontWeight: '100', lineHeight: 2 }}>{preview?.ogDescription}</div>
 
           </div>}
 
