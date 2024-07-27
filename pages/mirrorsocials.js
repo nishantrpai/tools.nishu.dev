@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react'
 import html2canvas from 'html2canvas'
 
 export default function MirrorPreview() {
-  const [backgroundType, setBackgroundType] = useState('contain')
+  const [backgroundType, setBackgroundType] = useState('cover')
   async function parseLink(link) {
     // fetch link parse og:image, og:title, og:description
     return new Promise((resolve, reject) => {
