@@ -101,9 +101,9 @@ export default function MirrorPreview() {
             <img src={preview?.favicon} style={{ position: 'absolute', top: 20, right: 20, width: 30, height: 30, borderRadius: 5, filter: 'opacity(0.85)' }} />
             {/* add title 20px away from top */}
             {/* below author image 50px atleast we'll in bold have the title */}
-            <div style={{ position: 'absolute', top: 80, left: 20, color: 'white', fontFamily: 'Helvetica', fontWeight: 'bold', fontSize: '2.5rem' }}>{preview?.ogTitle.toUpperCase()}</div>
+            <div style={{ position: 'absolute', top: 80, left: 20, color: 'white', fontFamily: 'Helvetica', fontWeight: 'bold', fontSize: '2rem' }}>{preview?.ogTitle.toUpperCase()}</div>
             {/* add description 50px below the title in normal font */}
-            <div style={{ position: 'absolute', top: 350, left: 20, color: '#fff', opacity: 0.8, fontFamily: 'Helvetica', fontSize: '1.2rem', fontWeight: '100', lineHeight: 2 }}>{preview?.ogDescription}</div>
+            <div style={{ position: 'absolute', top: 350, left: 20, color: '#fff', opacity: 0.8, fontFamily: 'Helvetica', fontSize: '1.1rem', fontWeight: '100', lineHeight: 2 }}>{preview?.ogDescription}</div>
 
           </div>}
 
@@ -135,7 +135,7 @@ export default function MirrorPreview() {
             <button onClick={() => {
               html2canvas(document.getElementById('preview'), {
                 allowTaint: true,
-                backgroundColor: 'transparent',
+                backgroundColor: '#000',
                 useCORS: true,
                 scale: 4
               }).then(canvas => {
@@ -152,7 +152,7 @@ export default function MirrorPreview() {
               }, 2000)
               html2canvas(document.getElementById('preview'), {
                 allowTaint: true,
-                backgroundColor: 'transparent',
+                backgroundColor: '#000',
                 useCORS: true,
                 scale: 4
               }).then(canvas => {
