@@ -793,6 +793,12 @@ export const tools = [
     description: 'Get permissionless ideas and ways to monetize them from Jack Butcher',
     publishDate: '26th July 2024',
     url: '/permissionlessideas'
+  },
+  {
+    title: 'Fear Greed',
+    description: 'Visualize fear and greed',
+    publishDate: '27th July 2024',
+    url: '/feargreed'
   }
   // {
   // better as a chrome extension
