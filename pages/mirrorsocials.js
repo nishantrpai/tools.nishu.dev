@@ -135,7 +135,7 @@ export default function MirrorPreview() {
             <button onClick={() => {
               html2canvas(document.getElementById('preview'), {
                 allowTaint: true,
-                backgroundColor: 'transparent',
+                backgroundColor: '#000',
                 useCORS: true,
                 scale: 4
               }).then(canvas => {
@@ -152,7 +152,7 @@ export default function MirrorPreview() {
               }, 2000)
               html2canvas(document.getElementById('preview'), {
                 allowTaint: true,
-                backgroundColor: 'transparent',
+                backgroundColor: '#000',
                 useCORS: true,
                 scale: 4
               }).then(canvas => {
