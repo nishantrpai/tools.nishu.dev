@@ -90,7 +90,7 @@ export default function MirrorPreview() {
             {/* make a div with background ogImage of 100% 100% width no repeat cover */}
             <div style={{ width: '100%', height: '100%', background: `url(${preview?.ogImage}) no-repeat center center`, backgroundSize: backgroundType, borderRadius: 0 }}></div>
             {/* make a div with transparent black but the transparency decreases as we reach bottom */}
-            <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(rgba(0,0,0,0.05), rgba(0,0,0,1))', borderRadius: 10 }}></div>
+            <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(rgba(0,0,0,0.05), rgba(0,0,0,1))', borderRadius: 0 }}></div>
             {/* make a div with text and title */}
             {/* draw favicon on top left  */}
             <img src={preview?.author} style={{ position: 'absolute', top: 20, left: 20, width: 30, height: 30, borderRadius: 5 }} />
