@@ -10,8 +10,8 @@ export default function HigherHat() {
   const [image, setImage] = useState(null)
   const [offsetX, setOffsetX] = useState(38)
   const [gif, setGif] = useState(null)
-  const [offsetY, setOffsetY] = useState(104)
-  const [scale, setScale] = useState(2.4)
+  const [offsetY, setOffsetY] = useState(-49)
+  const [scale, setScale] = useState(1.4)
   const [offsetTheta, setOffsetTheta] = useState(0)
   const [imgWidth, setImgWidth] = useState(0)
   const [imgHeight, setImgHeight] = useState(0)
@@ -140,8 +140,8 @@ export default function HigherHat() {
       img.src = reader.result;
       img.onload = () => {
         setOffsetX(0);
-        setOffsetY(104);
-        setScale(2.4);
+        setOffsetY(-49);
+        setScale(1.4);
         setOffsetTheta(0);
         setImgWidth(img.width);
         setImgHeight(img.height);
@@ -158,7 +158,7 @@ export default function HigherHat() {
     img.onload = () => {
       setOffsetX(0);
       setOffsetY(104);
-      setScale(2.4);
+      setScale(1.4);
       setOffsetTheta(0);
       setImgWidth(img.width);
       setImgHeight(img.height);
