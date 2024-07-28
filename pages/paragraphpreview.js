@@ -76,7 +76,7 @@ export default function MirrorPreview() {
           <input className={styles.search} type="text" value={link} onChange={(e) => setLink(e.target.value)} placeholder='Enter link' />
         </div>
         {/* div will have divs and elements stacked over each at different z indices */}
-        {!preview ? <div style={{ width: '100%', height: 500, borderRadius: 0, border: '1px solid transparent', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>Add mirror link to preview</div> :
+        {!preview ? <div style={{ width: '100%', height: 500, borderRadius: 0, border: '1px solid transparent', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>Add paragraph link to preview</div> :
 
           <div style={{ position: 'relative', width: '100%', height: 500, borderRadius: 0, overflow: 'hidden', border: '1px solid transparent' }} id="preview">
             {/* <img src={preview?.ogImage} style={{ width: '100%', height: 'auto', borderRadius: 0 }} /> */}
