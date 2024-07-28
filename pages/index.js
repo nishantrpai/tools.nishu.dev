@@ -805,6 +805,12 @@ export const tools = [
     description: 'Create image previews from @viamirror  posts for socials',
     publishDate: '27th July 2024',
     url: '/mirrorsocials'
+  },
+  {
+    title: 'Paragraph Preview',
+    description: 'Create a preview of for paragraph.xyz post',
+    publishDate: '28th July 2024',
+    url: '/paragraphpreview'
   }
   // {
   // better as a chrome extension
