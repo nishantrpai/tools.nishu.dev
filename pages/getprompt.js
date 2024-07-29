@@ -43,13 +43,13 @@ export default function WhichFont() {
   return (
     <>
       <Head>
-        <title>Image2Prompt</title>
+        <title>Get Prompt</title>
         <meta name="description" content="Get prompt from image" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       {/* input to upload, canvas to render and prompt to detect the font */}
       <main>
-        <h1 className={styles.title}>Image 2 Prompt</h1>
+        <h1 className={styles.title}>Get Prompt</h1>
         <h2 className={styles.description}>
           Get prompt from image
         </h2>
