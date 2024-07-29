@@ -811,6 +811,12 @@ export const tools = [
     description: 'Create a preview of for paragraph.xyz post',
     publishDate: '28th July 2024',
     url: '/paragraphpreview'
+  },
+  {
+    title: 'Get prompt from image',
+    description: 'Get prompt from an image',
+    publishDate: '29th July 2024',
+    url: '/image2prompt'
   }
   // {
   // better as a chrome extension
