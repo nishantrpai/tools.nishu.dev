@@ -817,6 +817,12 @@ export const tools = [
     description: 'Get prompt from an image',
     publishDate: '29th July 2024',
     url: '/getprompt'
+  },
+  {
+    title: 'Extract Text from Image',
+    description: 'Extract text from an image',
+    publishDate: '29th July 2024',
+    url: '/extracttext'
   }
   // {
   //   title: 'Resale value',
