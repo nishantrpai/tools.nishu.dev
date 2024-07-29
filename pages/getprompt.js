@@ -40,6 +40,33 @@ export default function WhichFont() {
     const data = await response.json();
     setFont(data.response);
   }
+
+  useEffect(() => {
+    // when pasting image add it to canvas
+    window.addEventListener('paste', async (event) => {
+      const items = (event.clipboardData || event.originalEvent.clipboardData).items;
+      for (const item of items) {
+        if (item.kind === 'file') {
+          const blob = item.getAsFile();
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            img.onload = () => {
+              canvas.width = img.width;
+              canvas.height = img.height;
+              ctx.drawImage(img, 0, 0);
+            }
+            img.src = event.target.result;
+          }
+          reader.readAsDataURL(blob);
+        }
+      }
+    });
+  }, [])
+
+  
   return (
     <>
       <Head>
