@@ -27,7 +27,7 @@ export default function WhichFont() {
     tempCanvas.width = 500;
     tempCanvas.height = 500;
     tempCtx.drawImage(canvas, 0, 0, 500, 500);
-const dataURL = tempCanvas.toDataURL();
+    const dataURL = tempCanvas.toDataURL();
     setFont('Detecting Font...');
     const response = await fetch('/api/gpt', {
       method: 'POST',
@@ -50,31 +50,31 @@ const dataURL = tempCanvas.toDataURL();
       <main>
         <h1 className={styles.title}>Which Font</h1>
         <h2 className={styles.description}>Detect the font in the image</h2>
-      <canvas id="canvas"
-      width={500}
-      height={500}
-      style={{
-        border: '1px solid #333',
-        borderRadius: '5px',
-        width: '100%',
-        height: 'auto'
+        <canvas id="canvas"
+          width={500}
+          height={500}
+          style={{
+            border: '1px solid #333',
+            borderRadius: '5px',
+            width: '100%',
+            height: 'auto'
 
-      }}
-      ></canvas>
-      <input type="file" accept="image/*" onChange={detectFont} />
-      <button onClick={getFont}>Detect Font</button>
-      <span style={{
-        fontSize: '3rem',
-        fontWeight: 'bold',
-        padding: '1rem',
-        display: 'block',
-        textAlign: 'center',
-        whiteSpace: 'pre-wrap',
-        marginTop: '1rem'
-      }}>
-      {font}
-      </span>
-        
+          }}
+        ></canvas>
+        <input type="file" accept="image/*" onChange={detectFont} />
+        <button onClick={getFont}>Detect Font</button>
+        <span style={{
+          fontSize: '3rem',
+          fontWeight: 'bold',
+          padding: '1rem',
+          display: 'block',
+          textAlign: 'center',
+          whiteSpace: 'pre-wrap',
+          marginTop: '1rem'
+        }}>
+          {font}
+        </span>
+
       </main>
     </>
   )

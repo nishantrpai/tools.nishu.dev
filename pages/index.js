@@ -816,7 +816,13 @@ export const tools = [
     title: 'Get prompt from image',
     description: 'Get prompt from an image',
     publishDate: '29th July 2024',
-    url: '/image2prompt'
+    url: '/getprompt'
+  },
+  {
+    title: 'Resale value',
+    description: 'Check the resale value of a product',
+    publishDate: '29th July 2024',
+    url: '/resalevalue'
   }
   // {
   // better as a chrome extension
