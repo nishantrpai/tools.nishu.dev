@@ -32,7 +32,7 @@ export default function WhichFont() {
     const response = await fetch('/api/gpt', {
       method: 'POST',
       body: JSON.stringify({
-        prompt: 'please provide a detailed midjourney level prompt that describes the given image, including the scene, setting, colors, and any specific elements, in a way that can be used to generate a similar image. do not add prefix or suffixes. \n\nPrompt:',
+        prompt: 'please provide a detailed midjourney level prompt that describes the given image, including the scene (include aesthetics like impressionst or hyperrealistic), setting, colors, and any specific elements, in a way that can be used to generate a similar image. do not add prefix or suffixes. \n\nPrompt:',
         image_url: dataURL,
         model: 'gpt-4o-mini'
       }),
