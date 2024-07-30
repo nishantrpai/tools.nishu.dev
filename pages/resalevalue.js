@@ -118,7 +118,7 @@ export default function WhichFont() {
         </div>
         <button onClick={getFont} style={{ marginTop: 20 }}>Get</button>
         <span style={{
-          fontSize: '1rem',
+          fontSize: '2rem',
           padding: '1rem',
           display: 'block',
           textAlign: 'left',
