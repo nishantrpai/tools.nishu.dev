@@ -71,15 +71,17 @@ export default function WhichFont() {
   return (
     <>
       <Head>
-        <title>Get Prompt</title>
-        <meta name="description" content="Get prompt from image" />
+        <title>Resale value</title>
+        <meta name="description" content="Get resale value from image" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       {/* input to upload, canvas to render and prompt to detect the font */}
       <main>
-        <h1 className={styles.title}>Get Prompt</h1>
+        <h1 className={styles.title}>
+          Resale Value
+        </h1>
         <h2 className={styles.description}>
-          Get prompt from image
+          Get resale value for the product
         </h2>
         <canvas id="canvas"
           width={500}
