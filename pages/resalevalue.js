@@ -72,7 +72,7 @@ export default function WhichFont() {
     <>
       <Head>
         <title>Resale value</title>
-        <meta name="description" content="Get resale value from image" />
+        <meta name="description" content="Get resale value from your items" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       {/* input to upload, canvas to render and prompt to detect the font */}
