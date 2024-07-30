@@ -116,7 +116,7 @@ export default function WhichFont() {
             <input id="file-camera" type="file" accept="image/*" onChange={detectFont} capture="environment" style={{ display: 'none' }} />
           </div>
         </div>
-        <button onClick={getFont} style={{ marginTop: 20 }}>Get</button>
+        <button onClick={getFont} style={{ marginTop: 20, fontSize: '1.25rem' }}>Get</button>
         <span style={{
           fontSize: '2rem',
           padding: '1rem',
