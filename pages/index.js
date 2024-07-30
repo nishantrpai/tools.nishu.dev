@@ -589,7 +589,7 @@ export const tools = [
     description: 'Add Noggles on any image',
     publishDate: '26th June 2024',
     url: '/noggles'
-  }, 
+  },
   {
     title: 'Hat Protocol',
     description: 'Add hat protocol hats on any image',
@@ -660,7 +660,7 @@ export const tools = [
     title: 'Based Hat',
     description: 'Add Based Hat on any image',
     publishDate: '7th July 2024',
-    url: '/basedhat' 
+    url: '/basedhat'
   },
   {
     title: 'Higher Scanner',
@@ -691,7 +691,7 @@ export const tools = [
     description: 'Convert text to alien toadz',
     publishDate: '12th July 2024',
     url: '/text2alientoadz'
-  }, 
+  },
   {
     title: 'Regulatoor',
     description: 'Add regulatoor on any image',
@@ -747,10 +747,10 @@ export const tools = [
     url: '/asksc'
   },
   {
-   title: 'Youtube Quotes',
+    title: 'Youtube Quotes',
     description: 'Get quotes from youtube videos',
     publishDate: '21st July 2024',
-    url: '/ytquotes' 
+    url: '/ytquotes'
   },
   {
     title: 'Checks Banner',
@@ -823,13 +823,18 @@ export const tools = [
     description: 'Extract text from an image',
     publishDate: '29th July 2024',
     url: '/extracttext'
+  },
+  {
+    title: 'Resale value',
+    description: 'Check the resale value of a product',
+    publishDate: '29th July 2024',
+    url: '/resalevalue'
   }
   // {
-  //   title: 'Resale value',
-  //   description: 'Check the resale value of a product',
-  //   publishDate: '29th July 2024',
-  //   url: '/resalevalue'
+  //   title: 'Atomic Breakdown',
+
   // }
+
   // {
   // better as a chrome extension
   //   title: 'Content Diet',
@@ -837,7 +842,7 @@ export const tools = [
   //   publishDate: '23rd July 2024',
   //   url: '/contentdiet'
   // }
-  
+
   // {
   //   title: 'Face Swap',
   //   description: 'Swap faces in gifs',
@@ -889,7 +894,7 @@ export default function Home() {
           <FiSearch className={styles.searchIcon} />
           <input className={styles.search} onChange={(e) => {
             setSearch(e.target.value)
-          }} placeholder="Search for tools... for e.g., 'nft'"/>
+          }} placeholder="Search for tools... for e.g., 'nft'" />
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', width: '100%', gap: '20px', marginBottom: 30 }}>
           {filteredTools.map((tool, index) => (
