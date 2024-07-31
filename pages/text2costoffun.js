@@ -53,12 +53,13 @@ export default function Home() {
   let opepenSVG = `<svg class="border rounded-md aspect-auto border-white/10" viewBox="0 -500 1000 2031" style="background:${bg}" fill="none" width="400" height="400" xmlns="http://www.w3.org/2000/svg">
   ${pattern}
   <g fill="url(#pattern)">
-    <path class="cursor-pointer" d="M 0.363 0.156 H 255.402 C 348.418 10.434 383.844 18.184 470.28 96.802 C 521.119 173.172 516.691 217.455 522.226 260.63 c 0 70.354 6.643 158.31 -93.962 241.504 C 322.955 517.468 254.773 509.703 254.773 509.703 C 72.759 515.254 0.363 395.637 0.363 254.93 z"/>
-    <rect class="cursor-pointer" x="511.211" y=".156" width="508.254" height="508.254" rx="254.127"/>
-    <g transform="translate(-12,-55)">
+      <g transform="translate(-10,-55)">
       <path transform="scale(1.1) rotate(1)" class="cursor-pointer" d="M 2.477 513.133 A 0 20 1 1 0 985.41 490.674 L 972.403 747.792 L 955.912 820.821 L 77.21 976.302
 "/>
     </g>
+    <path class="cursor-pointer" d="M 0.363 0.156 H 255.402 C 348.418 10.434 383.844 18.184 470.28 96.802 C 521.119 173.172 516.691 217.455 522.226 260.63 c 0 70.354 6.643 158.31 -93.962 241.504 C 322.955 517.468 254.773 509.703 254.773 509.703 C 72.759 515.254 0.363 395.637 0.363 254.93 z"/>
+    <rect class="cursor-pointer" x="511.211" y=".156" width="508.254" height="508.254" rx="254.127"/>
+
   </g>
 </svg>
 `
