@@ -827,8 +827,14 @@ export const tools = [
   {
     title: 'Resale value',
     description: 'Check the resale value of a product',
-    publishDate: '29th July 2024',
+    publishDate: '30th July 2024',
     url: '/resalevalue'
+  },
+  {
+    title: 'Text to Cost of Fun',
+    description: 'Convert text to cost of fun',
+    publishDate: '31st July 2024',
+    url: '/text2costoffun'
   }
   // {
   //   title: 'Atomic Breakdown',
