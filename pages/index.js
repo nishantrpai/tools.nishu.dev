@@ -841,6 +841,12 @@ export const tools = [
     description: 'Add paris 2024 eye patch to your pfp',
     publishDate: '1st Aug 2024',
     url: '/paris2024'
+  },
+  {
+    title: 'Check your image',
+    description: 'Add a check to your image',
+    publishDate: '2nd Aug 2024',
+    url: '/addcheck'
   }
   // {
   //   title: 'Atomic Breakdown',
