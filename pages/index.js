@@ -835,6 +835,12 @@ export const tools = [
     description: 'Convert text to cost of fun',
     publishDate: '31st July 2024',
     url: '/text2costoffun'
+  },
+  {
+    title: 'Paris 2024',
+    description: 'Add paris 2024 eye patch to your pfp',
+    publishDate: '1st Aug 2024',
+    url: '/paris2024'
   }
   // {
   //   title: 'Atomic Breakdown',
