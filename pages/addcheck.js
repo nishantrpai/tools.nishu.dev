@@ -49,7 +49,14 @@ export default function AddCheck() {
 
         </canvas>
         <input type="file" id="file" onChange={onFileChange} />
-
+        <button onClick={() => {
+          const canvas = document.getElementById('canvas')
+          const dataURL = canvas.toDataURL()
+          const a = document.createElement('a')
+          a.href = dataURL
+          a.download = `check-${Date.now()}.png`
+          a.click()
+        }}>Download</button>
       </main>
     </>
   )
