@@ -15,8 +15,13 @@ export default function AddCheck() {
       img.onload = () => {
         const canvas = document.getElementById('canvas')
         const context = canvas.getContext('2d')
+        // clear canvas
+        context.clearRect(0, 0, canvas.width, canvas.height)
+        // draw black rectangle
         canvas.width = img.width
         canvas.height = img.height
+        context.fillStyle = 'black'
+        context.fillRect(0, 0, canvas.width, canvas.height)
         // draw 50% smaller image in the middle of the canvas
         context.drawImage(img, canvas.width / 4, canvas.height / 4 + 30, canvas.width / 2, canvas.height / 2)
         // draw check a lil above the image to the right
