@@ -41,6 +41,12 @@ export default function AddCheck() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
+        <h1 className={styles.title}>
+          Add check
+        </h1> 
+        <h2 className={styles.description}>
+          Add check to any image
+        </h2>
         <canvas id="canvas" width="800" height="800" style={{
           border: '1px solid #333',
           borderRadius: '5px',
