@@ -324,7 +324,7 @@ export const tools = [
     title: 'Get ideas from subreddit',
     description: 'Get frequently asked questions from a subreddit',
     publishDate: '14th May 2024',
-    url: '/subredditideas',
+    url: '/subredditfaq',
   },
   {
     title: 'Is there a tool for that',
