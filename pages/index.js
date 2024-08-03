@@ -847,6 +847,18 @@ export const tools = [
     description: 'Add a check to your image',
     publishDate: '2nd Aug 2024',
     url: '/addcheck'
+  },
+  {
+    title: 'Scape Bubble',
+    description: 'Create a scape bubble',
+    publishDate: '3rd Aug 2024',
+    url: '/scapebubble'
+  },
+  {
+    title: 'Story Engineering',
+    description: 'Engineer your story',
+    publishDate: '4th Aug 2024',
+    url: '/storyengineering'
   }
   // {
   //   title: 'Atomic Breakdown',
