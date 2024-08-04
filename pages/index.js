@@ -853,6 +853,12 @@ export const tools = [
     description: 'Engineer your story',
     publishDate: '3rd Aug 2024',
     url: '/storyengineering'
+  },
+  {
+    title: 'No Punk Glasses',
+    description: 'Add no punk glasses on any image',
+    publishDate: '4th Aug 2024',
+    url: '/nopunkglasses'
   }
   // {
   //   title: 'Atomic Breakdown',
