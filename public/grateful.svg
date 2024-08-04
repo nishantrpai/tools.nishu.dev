@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="400" viewBox="-10 -50 220 150" fill="#fff">
+  <defs>
+    <style type="text/css">
+      @font-face {
+        font-family: 'HelveticaBold';
+        src: url('fonts/helvetica-bold.ttf') format('truetype');
+        font-weight: bold;
+      }
+    </style>
+  </defs>
+  <g>
+    <text x="1" y="-4" font-size="40" font-family="HelveticaBold, Helvetica, sans-serif" fill="#fff" font-weight="bold" letter-spacing="-3">GRATEFUL</text>
+  </g>
+</svg>
