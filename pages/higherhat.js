@@ -94,6 +94,7 @@ export default function HigherHat() {
             border: '1px solid #333',
             borderRadius: 10,
             width: '100%',
+            maxHeight: 500,
             height: 'auto',
             flexBasis: '95%'
           }}></canvas>
