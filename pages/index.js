@@ -859,6 +859,12 @@ export const tools = [
     description: 'Add no punk glasses on any image',
     publishDate: '4th Aug 2024',
     url: '/nopunkglasses'
+  },
+  {
+    title: 'Blood Bath',
+    description: 'Add red filter to your image',
+    publishDate: '5th Aug 2024',
+    url: '/bloodbath'
   }
   // {
   //   title: 'Atomic Breakdown',
