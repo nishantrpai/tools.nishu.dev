@@ -74,7 +74,7 @@ export default function BWFilter() {
             const dataURL = canvas.toDataURL('image/png')
             const a = document.createElement('a')
             a.href = dataURL
-            a.download = 'bw.png'
+            a.download = 'bb.png'
             a.click()
           }} style={{
             marginTop: 20,
