@@ -865,6 +865,12 @@ export const tools = [
     description: 'Add red filter to your image',
     publishDate: '5th Aug 2024',
     url: '/bloodbath'
+  },
+  {
+    title: 'Opt Out',
+    description: 'Add opt out filter to your image',
+    publishDate: '6th Aug 2024',
+    url: '/optout'
   }
   // {
   //   title: 'Atomic Breakdown',
