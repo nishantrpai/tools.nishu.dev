@@ -82,23 +82,24 @@ const BlendLayer = () => {
   return (
     <>
       <Head>
-        <title>Blend Layer</title>
-        <meta name="description" content="Blend two images together using canvas in the browser" />
+        <title>
+          Opt Out
+        </title>
+        <meta name="description" content="Add opt out filter on any image" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <main className={styles.main}>
         <h1 className={styles.title}>
-          Blend Layer
+          Opt Out
         </h1>
 
         <p className={styles.description}>
-          Blend two images together
+          Add opt out filter on any image
         </p>
         
         <div style={{ display: 'flex', flexDirection: 'column', maxWidth: '500px', width: '100%'}}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px'}}>
-            <input type="file" onChange={handleImage1} />
             {/* <input type="file" onChange={handleImage2} /> */}
             {/* <select onChange={handleBlendMode}>
               <option value="normal">Normal</option>
@@ -119,9 +120,13 @@ const BlendLayer = () => {
               <option value="luminosity">Luminosity</option>
             </select> */}
             {/* <input type="range" min="0" max="1" step="0.01" value={opacity} onChange={handleOpacity} /> */}
-            <canvas id="canvas" width={image1?.width || 500} height={image1?.height || 500}></canvas>
+            <canvas id="canvas" width={image1?.width || 500} height={image1?.height || 500} style={{
+              width: '100%',
+              border: '1px solid #333',
+            }}></canvas>
+            <input type="file" onChange={handleImage1} />
 
-            <button style={{border: '1px solid #333'}} onClick={downloadImage}>Download</button>
+            <button style={{margin: 'auto', marginTop: 20}} onClick={downloadImage}>Download</button>
           </div>
         </div>
       </main>
