@@ -54,7 +54,7 @@ const BlendLayer = () => {
     const dataURL = canvas.toDataURL('image/png')
     const a = document.createElement('a')
     a.href = dataURL
-    a.download = `blended-image-${new Date().getTime()}.png`
+    a.download = `optout-image-${new Date().getTime()}.png`
     a.click()
   }
 
