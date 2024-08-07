@@ -40,7 +40,10 @@ export default function Home() {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ prompt })
+      body: JSON.stringify({ 
+        prompt,
+        model: 'gpt-4o-mini'
+      })
     })
     const data = await res.json()
     setSensationalizedText(data.response)
