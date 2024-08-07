@@ -871,6 +871,12 @@ export const tools = [
     description: 'Add opt out filter to your image',
     publishDate: '6th Aug 2024',
     url: '/optout'
+  },
+  {
+    title: 'Pdf to Audio',
+    description: 'Convert pdf to audio',
+    publishDate: '7th Aug 2024',
+    url: '/pdf2audio'
   }
   // {
   //   title: 'Atomic Breakdown',
