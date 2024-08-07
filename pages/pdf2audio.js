@@ -245,12 +245,11 @@ export default function Home() {
   async function extractTextFromPDF(pdf) {
     let text = '';
     const numPages = pdf.numPages;
-
-    for (let i = 2; i <= numPages; i++) {
+    for (let i = 1; i <= numPages; i++) {
       const page = await pdf.getPage(i);
       const content = await page.getTextContent();
       const strings = content.items.map((item) => item.str);
-      text += strings.join(' ');
+      text += strings.join(' ').trim();
     }
 
     // format text to remove extra spaces
