@@ -34,6 +34,7 @@ export default function Home() {
     Together with the background and pattern it will create a beautiful svg that matches the text.
     The id of pattern will be "pattern" at all times.
     Don't send incomplete or incorrect data or empty values for the pattern.
+    Only respond in array, no prefix or suffix.
     Keep it minimal.`;
     const res = await fetch(`/api/gpt?prompt`, {
       method: 'POST',
