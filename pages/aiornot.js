@@ -29,7 +29,6 @@ export default function WhichFont() {
     tempCanvas.height = 500;
     tempCtx.drawImage(canvas, 0, 0, 500, 500);
     const dataURL = tempCanvas.toDataURL();
-    console.log(dataURL);
     setFont('Checking...');
     const response = await fetch('/api/gpt', {
       method: 'POST',
