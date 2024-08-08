@@ -114,9 +114,7 @@ export default function Scapes() {
   }, [token1, collectionAddress]);
 
   const handleKeyDown = useCallback((e) => {
-    console.log(e.key, selectedToken);
-    if ((e.key === 'Delete' || e.key === 'Backspace')
-      && selectedToken !== null) {
+    if (e.key === 'Delete' && selectedToken !== null) {
       setTokens(prev => prev.filter((_, idx) => idx !== selectedToken));
       setSelectedToken(null);
     }
@@ -128,6 +126,45 @@ export default function Scapes() {
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [handleKeyDown]);
+
+  const downloadImage = () => {
+    const scapesBg = document.getElementById('scapes-bg');
+    const width = scapesBg.offsetWidth;
+    const height = scapesBg.offsetHeight;
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+
+    const bgImg = new Image();
+    bgImg.src = bg;
+    bgImg.crossOrigin = 'Anonymous';
+    bgImg.onload = () => {
+      ctx.drawImage(bgImg, 0, 0, width, height);
+      const promises = tokens.map((token, index) => {
+        return new Promise((resolve) => {
+          const tokenImg = document.getElementById(`token-${index}`).querySelector('img');
+          const img = new Image();
+          img.src = tokenImg.src;
+          img.crossOrigin = 'Anonymous';
+          img.onload = () => {
+            const rect = tokenImg.getBoundingClientRect();
+            const x = rect.left - scapesBg.getBoundingClientRect().left;
+            const y = rect.top - scapesBg.getBoundingClientRect().top;
+            ctx.drawImage(img, x, y, rect.width, rect.height);
+            resolve();
+          };
+        });
+      });
+
+      Promise.all(promises).then(() => {
+        const a = document.createElement('a');
+        a.href = canvas.toDataURL();
+        a.download = 'scapes.png';
+        a.click();
+      });
+    };
+  };
 
   return (
     <>
@@ -199,7 +236,7 @@ export default function Scapes() {
                   <img
                     crossOrigin="anonymous"
                     src={token}
-                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                    style={{ width: 'auto', height: '100%', objectFit: 'contain' }}
                   />
                 </ResizableBox>
               </div>
@@ -237,23 +274,7 @@ export default function Scapes() {
           />
         </div>
 
-        <button
-          onClick={() => {
-            let canvas = document.createElement('canvas');
-            canvas.width = 1000;
-            canvas.height = 380;
-            let ctx = canvas.getContext('2d');
-            let img = new Image();
-            img.src = assetImg;
-            img.onload = () => {
-              ctx.drawImage(img, 0, 0, 1000, 400);
-              let a = document.createElement('a');
-              a.href = canvas.toDataURL();
-              a.download = 'scapes.png';
-              a.click();
-            };
-          }}
-        >
+        <button onClick={downloadImage}>
           Download
         </button>
       </main>
