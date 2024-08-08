@@ -66,7 +66,6 @@ export default function Scapes() {
 
   const getNFTData = async (collection_address, id) => {
     try {
-      console.log(chain);
       const provider = new ethers.JsonRpcProvider(RPC_CHAINS[chain].rpc);
       const contract = new ethers.Contract(collection_address, ['function tokenURI(uint256) view returns (string)'], provider);
       const tokenURI = await contract.tokenURI(id);
@@ -112,7 +111,6 @@ export default function Scapes() {
   }, [scapesId]);
 
   useEffect(() => {
-    console.log(collectionAddress, token1);
     if (!collectionAddress || !token1) return;
     getNFTData(collectionAddress, token1).then((data) => {
       if (!data) return;
@@ -223,7 +221,6 @@ export default function Scapes() {
                   scale: 1
                 }).then(canvas => {
                   let img = canvas.toDataURL();
-                  console.log(img);
                   setAssetImage(img);
                 });
               }}
