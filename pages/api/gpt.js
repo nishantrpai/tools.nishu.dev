@@ -11,11 +11,12 @@ export default async function handler(req, res) {
   // if request is a GET request
   if (req.method !== 'GET') {
     // check body for prompt
-    let prompt, model, image_url;
+    let prompt, model, image_url, image_urls;
     if (typeof req.body === 'string') {
       prompt = JSON.parse(req.body).prompt;
       model = JSON.parse(req.body).model;
       image_url = JSON.parse(req.body).image_url;
+      image_urls = JSON.parse(req.body).image_urls || '';
     }
     if (typeof req.body === 'object') {
       prompt = req.body.prompt;
@@ -30,7 +31,7 @@ export default async function handler(req, res) {
       prompt = JSON.parse(req.body).prompt;
     }
     if (image_url) {
-      const chatCompletion = await openai.chat.completions.create({
+      let chatinput = {
         model,
         messages: [{
           role: 'user', content: [
@@ -41,9 +42,19 @@ export default async function handler(req, res) {
               }
             }
           ]
-        }],
-      });
-      console.log('image here')
+        }]
+      };
+      if(image_urls) {
+        image_urls.forEach((url) => {
+          chatinput.messages[0].content.push({
+            type: 'image_url', image_url: {
+              url: url
+            }
+          });
+        });
+      }
+      console.log(chatinput);
+      const chatCompletion = await openai.chat.completions.create(chatinput);
       res.status(200).json({ response: chatCompletion.choices[0].message.content });
       return;
     }
