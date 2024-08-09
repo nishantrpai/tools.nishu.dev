@@ -78,7 +78,7 @@ export default function BWFilter() {
             <canvas id="canvas" style={{ width: '100%', height: '100%', border: '1px solid #333', borderRadius: 10 }} />
             <div style={{ display: 'flex', flexDirection: 'column', width: '50%', margin: 'auto', gap: 20 }}>
               <label>Blur</label>
-              <input type="range" min="0" max="100" value={blur} onChange={(e) => setBlur(e.target.value)} />
+              <input type="range" min="0" max="200" value={blur} onChange={(e) => setBlur(e.target.value)} />
               <label>Brightness</label>
               <input type="range" min="0" max="500" value={brightness} onChange={(e) => setBrightness(e.target.value)} />
             </div>
