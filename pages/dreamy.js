@@ -1,40 +1,52 @@
+// add black and white filter on any image
 import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { useState, useEffect } from 'react'
 
-export default function LensFlareEffect() {
+export default function BWFilter() {
   const [image, setImage] = useState(null)
   const [blur, setBlur] = useState(0)
   const [brightness, setBrightness] = useState(100)
   const [flareX, setFlareX] = useState(50) // percentage of canvas width
   const [flareY, setFlareY] = useState(50) // percentage of canvas height
   const [flareBrightness, setFlareBrightness] = useState(50) // opacity of lens flare
+  const [flareRadius, setFlareRadius] = useState(50) // radius of lens flare
+
 
   useEffect(() => {
+    // draw image on canvas
     const canvas = document.getElementById('canvas')
     const context = canvas.getContext('2d')
-
+    context.beginPath()
     if (image) {
       canvas.width = image.width
       canvas.height = image.height
       context.clearRect(0, 0, canvas.width, canvas.height)
       context.drawImage(image, 0, 0, image.width, image.height)
-      
-      // Apply initial filters
+      const imageData = context.getImageData(0, 0, canvas.width, canvas.height)
+      const data = imageData.data
+      for (let i = 0; i < data.length; i += 4) {
+        data[i] = data[i] * (brightness / brightness)
+        data[i + 1] = data[i + 1] * (brightness / brightness)
+        data[i + 2] = data[i + 2] * (brightness / brightness)
+      }
+      // apply gaussian blur using canvas filter
       context.filter = `blur(${blur}px) brightness(${brightness}%)`
-      context.drawImage(image, 0, 0, image.width, image.height)
+      context.putImageData(imageData, 0, 0)
 
-      // Create glow effect by adding more blur and blending with the original image
+      // create glow effect by adding more blur and blending with the original image
       context.globalAlpha = 0.6
       context.drawImage(canvas, 0, 0)
       context.filter = 'blur(5px)'
       context.drawImage(canvas, 0, 0)
+
 
       // Create lens flare effect
       context.globalAlpha = 1.0 // Reset alpha to full opacity for the lens flare
       context.globalCompositeOperation = 'lighter'
       const x = (flareX / 100) * canvas.width
       const y = (flareY / 100) * canvas.height
+      const radius = (flareRadius / 100) * (canvas.width / 2)
 
       const gradient = context.createRadialGradient(
         x,              // x position
@@ -42,7 +54,7 @@ export default function LensFlareEffect() {
         0,              // inner radius
         x,              // x position
         y,              // y position
-        canvas.width / 2 // outer radius
+        radius          // outer radius
       )
 
       const opacity = flareBrightness / 100;
@@ -53,25 +65,27 @@ export default function LensFlareEffect() {
 
       context.fillStyle = gradient
       context.beginPath()
-      context.arc(x, y, canvas.width / 2, 0, Math.PI * 2, false)
+      context.arc(x, y, radius, 0, Math.PI * 2, false)
       context.fill()
       context.globalCompositeOperation = 'source-over'
+
+      context.closePath()
     }
-  }, [image, blur, brightness, flareX, flareY, flareBrightness])
+  }, [image, blur, brightness, flareX, flareY, flareBrightness, flareRadius])
 
   return (
     <>
       <Head>
-        <title>Lens Flare Effect</title>
-        <meta name="description" content="Lens Flare Effect" />
+        <title>Dreamy Effect</title>
+        <meta name="description" content="Dreamy Effect" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
         <h1 className={styles.title}>
-          Lens Flare Effect
+          Dreamy Effect
         </h1>
         <h2 className={styles.description}>
-          Add lens flare effect to any image
+          Add dreamy effect on any image
         </h2>
         <span style={{
           width: '100%',
@@ -97,7 +111,7 @@ export default function LensFlareEffect() {
             <canvas id="canvas" style={{ width: '100%', height: '100%', border: '1px solid #333', borderRadius: 10 }} />
             <div style={{ display: 'flex', flexDirection: 'column', width: '50%', margin: 'auto', gap: 20 }}>
               <label>Blur</label>
-              <input type="range" min="0" max="50" step={0.5} value={blur} onChange={(e) => setBlur(e.target.value)} />
+              <input type="range" min="0" max="200" value={blur} onChange={(e) => setBlur(e.target.value)} />
               <label>Brightness</label>
               <input type="range" min="0" max="500" value={brightness} onChange={(e) => setBrightness(e.target.value)} />
               <label>Flare X Position</label>
@@ -105,14 +119,16 @@ export default function LensFlareEffect() {
               <label>Flare Y Position</label>
               <input type="range" min="0" max="100" value={flareY} onChange={(e) => setFlareY(e.target.value)} />
               <label>Flare Brightness</label>
-              <input type="range" min="0" max="100" value={flareBrightness} onChange={(e) => setFlareBrightness(e.target.value)} />
+              <input type="range" min="0" max="500" value={flareBrightness} onChange={(e) => setFlareBrightness(e.target.value)} />
+              <label>Flare Radius</label>
+              <input type="range" min="0" max="100" value={flareRadius} onChange={(e) => setFlareRadius(e.target.value)} />
             </div>
           </div>
           <button onClick={() => {
             const dataURL = canvas.toDataURL('image/png')
             const a = document.createElement('a')
             a.href = dataURL
-            a.download = `lens-flare-${Date.now()}.png`
+            a.download = `dreamy-${Date.now()}.png`
             a.click()
           }} style={{
             marginTop: 20,
