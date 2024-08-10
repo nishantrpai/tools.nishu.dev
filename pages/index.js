@@ -889,6 +889,12 @@ export const tools = [
     description: 'Dreamy your image',
     publishDate: '9th Aug 2024',
     url: '/dreamy'
+  },
+  {
+    title: 'Get Filters',
+    description: 'Get filters applied to an image',
+    publishDate: '10th Aug 2024',
+    url: '/getfilters'
   }
   // {
   //   title: 'Atomic Breakdown',
