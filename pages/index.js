@@ -888,7 +888,7 @@ export const tools = [
     title: 'Dreamy',
     description: 'Dreamy your image',
     publishDate: '9th Aug 2024',
-    url: '/dreamify'
+    url: '/dreamy'
   }
   // {
   //   title: 'Atomic Breakdown',
