@@ -920,7 +920,7 @@ export default function Home() {
   const [filteredTools, setFilteredTools] = useState(tools)
 
   useEffect(() => {
-    setFilteredTools(tools.filter(tool => tool.title.toLowerCase().includes(search.toLowerCase()) || tool.description.toLowerCase().includes(search.toLowerCase())))
+    setFilteredTools(tools.filter(tool => tool.title.toLowerCase().includes(search.toLowerCase()) || tool.description.toLowerCase().includes(search.toLowerCase())).reverse())  // reverse to show latest first
   }, [search])
 
   return (
@@ -963,7 +963,7 @@ export default function Home() {
                 fontSize: '1rem',
                 color: '#eee',
                 marginBottom: '10px',
-              }}>{index + 1}. {tool.title}</p>
+              }}>{filteredTools.length - (index + 1)}. {tool.title}</p>
               <p style={{
                 fontSize: '0.8rem',
                 display: 'flex',
