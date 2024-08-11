@@ -895,6 +895,12 @@ export const tools = [
     description: 'Get filters applied to an image',
     publishDate: '10th Aug 2024',
     url: '/getfilters'
+  },
+  {
+    title: 'Floor plan from image',
+    description: 'Get floor plan from an image',
+    publishDate: '11th Aug 2024',
+    url: '/floorplan'
   }
   // {
   //   title: 'Atomic Breakdown',
