@@ -61,7 +61,7 @@ export default function WhichFont() {
       // create a rectangle for the room with black stroke and white fill
       svgContent += `
         <rect x="${x * scale}" y="${y * scale}" width="${width * scale}" height="${height * scale}" fill="#fff" stroke="#000" />
-        <text x="${(x * scale) + 10}" y="${(y * scale) + 20}" font-family="Arial" font-size="12" fill="#000">${name}</text>`;
+        <text x="${(x * scale) + 10}" y="${(y * scale) + 20}" font-family="Arial" font-size="10" font-weight="bold" fill="#000">${name.toUpperCase()}</text>`;
     });
 
     svgContent += `</svg>`;
