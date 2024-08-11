@@ -901,6 +901,12 @@ export const tools = [
     description: 'Get floor plan from an image',
     publishDate: '11th Aug 2024',
     url: '/floorplan'
+  },
+  {
+    title: 'V',
+    description: 'V',
+    publishDate: '12th Aug 2024',
+    url: '/v'
   }
   // {
   //   title: 'Atomic Breakdown',
