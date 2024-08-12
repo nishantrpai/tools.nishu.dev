@@ -907,6 +907,12 @@ export const tools = [
     description: 'V',
     publishDate: '12th Aug 2024',
     url: '/v'
+  },
+  {
+    title: 'Text to Emoji',
+    description: 'Text to emoji',
+    publishDate: '13th Aug 2024',
+    url: '/text2emoji'
   }
   // {
   //   title: 'Atomic Breakdown',
