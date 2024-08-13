@@ -21,6 +21,32 @@ export default function NaturalGradient() {
     setContext(context)
   }, [])
 
+  // add copy paste functionality
+  useEffect(() => {
+    window.addEventListener('paste', async (event) => {
+      const items = (event.clipboardData || event.originalEvent.clipboardData).items
+      for (const item of items) {
+        if (item.kind === 'file') {
+          const blob = item.getAsFile()
+          const reader = new FileReader()
+          reader.onload = (event) => {
+            const img = new Image()
+            img.src = event.target.result
+            img.onload = () => {
+              canvas.width = img.width
+              canvas.height = img.height
+              context.clearRect(0, 0, canvas.width, canvas.height) // clear canvas before drawing new image
+              context.drawImage(img, 0, 0)
+              setImage(img)
+            }
+          }
+          reader.readAsDataURL(blob)
+        }
+      }
+    })
+  }
+  , [canvas, context])
+
   const handleImage = (event) => {
     const file = event.target.files[0]
     const reader = new FileReader()
