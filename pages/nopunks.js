@@ -33,6 +33,7 @@ const BlendLayer = () => {
   const [opacity, setOpacity] = useState(1)
   const [canvas, setCanvas] = useState(null)
   const [ctx, setCtx] = useState(null)
+  const [borders, setBorders] = useState(false)
   const [offsetX, setOffsetX] = useState(38)
   const [offsetY, setOffsetY] = useState(60)
   const [scale, setScale] = useState(0.8)
@@ -83,7 +84,6 @@ const BlendLayer = () => {
       image.src = reader.result
       image.onload = () => {
         setImage1(image)
-        console.log(getImageData(image))  
       }
     }
     reader.readAsDataURL(file)
@@ -112,7 +112,7 @@ const BlendLayer = () => {
 
   const getImageData = (image1) => {
     let image = image1;
-    return {width: image.width, height: image.height}
+    return { width: image.width, height: image.height }
   }
 
   const downloadImage = () => {
@@ -137,31 +137,32 @@ const BlendLayer = () => {
       // draw image1 onto the main canvas
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(image1, 0, 0, canvas.width, canvas.height);
-    
+
       // create an offscreen canvas to manipulate image2
       const offCanvas = document.createElement('canvas');
       const offCtx = offCanvas.getContext('2d');
       offCanvas.width = image2.width;
       offCanvas.height = image2.height;
-    
+
       // draw image2 onto the offscreen canvas
       offCtx.drawImage(image2, 0, 0);
-    
+
       // get image data from the offscreen canvas
       const imageData = offCtx.getImageData(0, 0, offCanvas.width, offCanvas.height);
       const data = imageData.data;
-    
+
       // loop through the pixels and make #000 (black) fully transparent
       for (let i = 0; i < data.length; i += 4) {
-        if ((data[i] === 0 && data[i + 1] === 0 && data[i + 2] === 0) 
-      ) {
+        if ((data[i] === 0 && data[i + 1] === 0 && data[i + 2] === 0) ||
+          (borders && (data[i] === 4 && data[i + 1] === 4 && data[i + 2] === 4))
+        ) {
           data[i + 3] = 0; // set alpha to 0 (transparent)
         }
       }
-    
+
       // put the modified image data back onto the offscreen canvas
       offCtx.putImageData(imageData, 0, 0);
-    
+
       // draw the modified image2 onto the main canvas at the specified offset
       ctx.drawImage(offCanvas, offsetX, offsetY, image2.width * scale, image2.height * scale);
     }
@@ -182,7 +183,7 @@ const BlendLayer = () => {
     <>
       <Head>
         <title>Add no punks</title>
-        <meta name="description" content="Add no punks to any image" /> 
+        <meta name="description" content="Add no punks to any image" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -194,55 +195,59 @@ const BlendLayer = () => {
         <p className={styles.description}>
           Add no punks to any image
         </p>
-        
-        <div style={{ display: 'flex', flexDirection: 'column', maxWidth: '500px', width: '100%'}}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px'}}>
-            <div style={{display: 'flex', gap: '20px'}}>
-          <canvas id="canvas" width={image1?.width || 500} height={image1?.height || 500} style={{width: '100%'}}></canvas>
-                  <div style={{ display: 'flex', gap: 20, flexDirection: 'column', width: '100%', justifyContent: 'center', alignItems: 'center' }}>
-          <label>
-            Offset X
-          </label>
-          <input type="range" min={-500} max={500} value={offsetX} onChange={(e) => setOffsetX(e.target.value)} />
-          <label>
-            Offset Y
-          </label>
-          <input type="range" min={-500} max={500} value={offsetY} onChange={(e) => setOffsetY(e.target.value)} />
-          <label>
-            Scale
-          </label>
-          <input type="range" min={0} max={10} step={0.01} value={scale} onChange={(e) => setScale(e.target.value)} />
-        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', maxWidth: '500px', width: '100%' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <div style={{ display: 'flex', gap: '20px' }}>
+              <canvas id="canvas" width={image1?.width || 500} height={image1?.height || 500} style={{ width: '100%' }}></canvas>
+              <div style={{ display: 'flex', gap: 20, flexDirection: 'column', width: '100%', justifyContent: 'center', alignItems: 'center' }}>
+                <label>
+                  Borders
+                </label>
+                <input type="checkbox" checked={borders} onChange={(e) => setBorders(e.target.checked)} />
+                <label>
+                  Offset X
+                </label>
+                <input type="range" min={-500} max={500} value={offsetX} onChange={(e) => setOffsetX(e.target.value)} />
+                <label>
+                  Offset Y
+                </label>
+                <input type="range" min={-500} max={500} value={offsetY} onChange={(e) => setOffsetY(e.target.value)} />
+                <label>
+                  Scale
+                </label>
+                <input type="range" min={0} max={10} step={0.01} value={scale} onChange={(e) => setScale(e.target.value)} />
+              </div>
 
 
-          </div>
-          <input type="file" onChange={handleImage1} />
-          <div className={styles.searchContainer} style={{ margin: 0, marginBottom: 20 }}>
-          <input
-            type="number"
-            defaultValue={tokenId}
-            onChange={(e) => {
-              // wait 2 seconds before fetching the new image
-              setTimeout(() => {
-                setTokenId(e.target.value);
-                getNFTData(contract, e.target.value).then((data) => {
-                  let image = new Image();
-                  image.src = data.image;
-                  image.crossOrigin = 'Anonymous';  
-                  image.onload = () => {
-                    setImage2(image);
-                  };
-                });
-  
-              }, 2000);
-            }}
-            className={styles.search}
-            placeholder='Enter nopunk ID'
-          />
-        </div>
-        {/*  */}
+            </div>
+            <input type="file" onChange={handleImage1} />
+            <div className={styles.searchContainer} style={{ margin: 0, marginBottom: 20 }}>
+              <input
+                type="number"
+                defaultValue={tokenId}
+                onChange={(e) => {
+                  // wait 2 seconds before fetching the new image
+                  setTimeout(() => {
+                    setTokenId(e.target.value);
+                    getNFTData(contract, e.target.value).then((data) => {
+                      let image = new Image();
+                      image.src = data.image;
+                      image.crossOrigin = 'Anonymous';
+                      image.onload = () => {
+                        setImage2(image);
+                      };
+                    });
 
-            <button style={{border: '1px solid #333'}} onClick={downloadImage}>Download</button>
+                  }, 2000);
+                }}
+                className={styles.search}
+                placeholder='Enter nopunk ID'
+              />
+            </div>
+            {/*  */}
+
+            <button style={{ border: '1px solid #333' }} onClick={downloadImage}>Download</button>
           </div>
         </div>
       </main>
