@@ -913,6 +913,12 @@ export const tools = [
     description: 'Text to emoji',
     publishDate: '13th Aug 2024',
     url: '/text2emoji'
+  },
+  {
+    title: 'Add no punks',
+    description: 'Add no punks on any image',
+    publishDate: '14th Aug 2024',
+    url: '/nopunks'
   }
   // {
   //   title: 'Atomic Breakdown',
