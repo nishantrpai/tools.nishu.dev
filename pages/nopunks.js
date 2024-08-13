@@ -121,7 +121,7 @@ const BlendLayer = () => {
     const dataURL = canvas.toDataURL('image/png')
     const a = document.createElement('a')
     a.href = dataURL
-    a.download = `nopunk-image-${new Date().getTime()}.png`
+    a.download = `blended-image-${new Date().getTime()}.png`
     a.click()
   }
 
@@ -198,7 +198,7 @@ const BlendLayer = () => {
         <div style={{ display: 'flex', flexDirection: 'column', maxWidth: '500px', width: '100%'}}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px'}}>
             <div style={{display: 'flex', gap: '20px'}}>
-          <canvas id="canvas" width={image1?.width || 500} height={image1?.height || 500}></canvas>
+          <canvas id="canvas" width={image1?.width || 500} height={image1?.height || 500} style={{width: '100%'}}></canvas>
                   <div style={{ display: 'flex', gap: 20, flexDirection: 'column', width: '100%', justifyContent: 'center', alignItems: 'center' }}>
           <label>
             Offset X
