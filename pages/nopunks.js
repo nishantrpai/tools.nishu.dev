@@ -201,10 +201,10 @@ const BlendLayer = () => {
             <div style={{ display: 'flex', gap: '20px' }}>
               <canvas id="canvas" width={image1?.width || 500} height={image1?.height || 500} style={{ width: '100%' }}></canvas>
               <div style={{ display: 'flex', gap: 20, flexDirection: 'column', width: '100%', justifyContent: 'center', alignItems: 'center' }}>
-                <label>
+                <label style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                <input type="checkbox" checked={borders} onChange={(e) => setBorders(e.target.checked)} />
                   Borders
                 </label>
-                <input type="checkbox" checked={borders} onChange={(e) => setBorders(e.target.checked)} />
                 <label>
                   Offset X
                 </label>
