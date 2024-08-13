@@ -237,7 +237,7 @@ const BlendLayer = () => {
               }, 2000);
             }}
             className={styles.search}
-            placeholder='Enter Scapes ID'
+            placeholder='Enter nopunk ID'
           />
         </div>
         {/*  */}
