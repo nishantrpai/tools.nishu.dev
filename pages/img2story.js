@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react'
 
 export default function WhichFont() {
   const [font, setFont] = useState(null);
+  const [storyType, setStoryType] = useState('140 character story');
   const detectFont = async (event) => {
     const file = event.target.files[0];
     const canvas = document.getElementById('canvas');
@@ -32,7 +33,7 @@ export default function WhichFont() {
     const response = await fetch('/api/gpt', {
       method: 'POST',
       body: JSON.stringify({
-        prompt: `Given this image, please provide a one 120 character story to describe it (don't add any prefix or suffix text). \n\nStory:`,
+        prompt: `Given this image, please provide a ${storyType} to describe it (don't add any prefix or suffix text). \n\nStory:`,
         image_url: dataURL,
         model: 'gpt-4o-mini'
       }),
@@ -96,7 +97,24 @@ export default function WhichFont() {
           }}
         ></canvas>
         <input type="file" accept="image/*" onChange={detectFont} />
+        {/* 140, paragraph, short, tale */}
+        <select onChange={(e) => setStoryType(e.target.value)} style={{ 
+          marginTop: 20,
+          width: '100%',
+          padding: '10px',
+          borderRadius: '5px',
+          border: '1px solid #333',
+          backgroundColor: '#000',
+          color: '#fff'
+
+          }}>
+          <option value="140 character story">140 character story</option>
+          <option value="paragraph">Paragraph</option>
+          <option value="short story">Short story</option>
+          <option value="tale">Tale</option>
+        </select>
         <button onClick={getFont} style={{ marginTop: 20}}>Get</button>
+
         <span style={{
           fontSize: '1rem',
           color: '#fff',
