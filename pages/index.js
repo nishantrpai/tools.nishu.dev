@@ -905,20 +905,26 @@ export const tools = [
   {
     title: 'V',
     description: 'V',
-    publishDate: '12th Aug 2024',
+    publishDate: '11th Aug 2024',
     url: '/v'
   },
   {
     title: 'Text to Emoji',
     description: 'Text to emoji',
-    publishDate: '13th Aug 2024',
+    publishDate: '12th Aug 2024',
     url: '/text2emoji'
   },
   {
     title: 'Add no punks',
     description: 'Add no punks on any image',
-    publishDate: '14th Aug 2024',
+    publishDate: '13th Aug 2024',
     url: '/nopunks'
+  },
+  {
+    title: 'Image to story',
+    description: 'Generate image from story',
+    publishDate: '14th Aug 2024',
+    url: '/img2story'
   }
   // {
   //   title: 'Atomic Breakdown',
