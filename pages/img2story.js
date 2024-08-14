@@ -32,7 +32,7 @@ export default function WhichFont() {
     const response = await fetch('/api/gpt', {
       method: 'POST',
       body: JSON.stringify({
-        prompt: `Given this image, please provide a one paragraph story to describe it (don't add any prefix or suffix text). \n\nStory:`,
+        prompt: `Given this image, please provide a one 120 character story to describe it (don't add any prefix or suffix text). \n\nStory:`,
         image_url: dataURL,
         model: 'gpt-4o-mini'
       }),
