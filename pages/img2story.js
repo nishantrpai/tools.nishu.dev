@@ -2,6 +2,7 @@
 import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { useState, useEffect } from 'react'
+import html2canvas from 'html2canvas'
 
 export default function WhichFont() {
   const [font, setFont] = useState(null);
@@ -67,7 +68,7 @@ export default function WhichFont() {
     });
   }, [])
 
-  
+
   return (
     <>
       <Head>
@@ -85,6 +86,14 @@ export default function WhichFont() {
         <h2 className={styles.description}>
           Image to story
         </h2>
+        <div id="story-card" style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '20px',
+          border: '1px solid #333',
+          borderRadius: '5px',
+          padding: 20
+        }}>
         <canvas id="canvas"
           width={500}
           height={500}
@@ -93,28 +102,8 @@ export default function WhichFont() {
             borderRadius: '5px',
             width: '100%',
             height: 'auto'
-
           }}
         ></canvas>
-        <input type="file" accept="image/*" onChange={detectFont} />
-        {/* 140, paragraph, short, tale */}
-        <select onChange={(e) => setStoryType(e.target.value)} style={{ 
-          marginTop: 20,
-          width: '100%',
-          padding: '10px',
-          borderRadius: '5px',
-          border: '1px solid #333',
-          backgroundColor: '#000',
-          color: '#fff'
-
-          }}>
-          <option value="140 character story">140 character story</option>
-          <option value="paragraph">Paragraph</option>
-          <option value="short story">Short story</option>
-          <option value="tale">Tale</option>
-        </select>
-        <button onClick={getFont} style={{ marginTop: 20}}>Get</button>
-
         <span style={{
           fontSize: '1rem',
           color: '#fff',
@@ -128,7 +117,40 @@ export default function WhichFont() {
         }}>
           {font}
         </span>
+        </div>
+        <input type="file" accept="image/*" onChange={detectFont} />
+        {/* 140, paragraph, short, tale */}
+        <select onChange={(e) => setStoryType(e.target.value)} style={{
+          marginTop: 20,
+          width: '100%',
+          padding: '10px',
+          borderRadius: '5px',
+          border: '1px solid #333',
+          backgroundColor: '#000',
+          color: '#fff'
 
+        }}>
+          <option value="140 character story">140 character story</option>
+          <option value="paragraph">Paragraph</option>
+          <option value="short story">Short story</option>
+          <option value="tale">Tale</option>
+        </select>
+        <button onClick={getFont} style={{ marginTop: 20 }}>Get</button>
+
+        <button onClick={() => {
+          // download image and add text below it
+          html2canvas(document.getElementById('story-card'), {
+            backgroundColor: '#000',
+            scale: 2
+          }).then((canvas) => {
+            const a = document.createElement('a');
+            a.href = canvas.toDataURL();
+            a.download = 'story.png';
+            a.click();
+          });
+        }} >
+          Download
+        </button>
       </main>
     </>
   )
