@@ -254,7 +254,7 @@ export default function America() {
               let canvas = document.getElementById('canvas')
               let a = document.createElement('a')
               a.href = canvas.toDataURL('image/png')
-              a.download = 'america.png'
+              a.download = 'india.png'
               a.click()
             }}>Download</button>
 
