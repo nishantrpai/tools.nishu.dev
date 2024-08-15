@@ -925,6 +925,12 @@ export const tools = [
     description: 'Generate image from story',
     publishDate: '14th Aug 2024',
     url: '/img2story'
+  },
+  {
+    title: 'Higher Athletics',
+    description: 'Create higher athletics poster',
+    publishDate: '15th Aug 2024',
+    url: '/higherathletics'
   }
   // {
   //   title: 'Atomic Breakdown',
