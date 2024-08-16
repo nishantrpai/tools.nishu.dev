@@ -59,7 +59,7 @@ export default function HigherHat() {
           color: '#666',
           fontSize: '14px'
         }}>
-          Add coby on any image
+          Add coby on any image 
         </span>
 
         {/* upload photo */}
@@ -106,6 +106,16 @@ export default function HigherHat() {
           </label>
           <input type="range" min={-360} max={360} value={offsetTheta} onChange={(e) => setOffsetTheta(e.target.value)} />
         </div>
+
+        <span style={{
+          width: '100%',
+          textAlign: 'center',
+          color: '#888',
+          fontSize: '14px',
+          marginTop: 20
+        }}>
+          sol: 9dPN7gdN9cyGhjiQn5gBU9DQDBxUJafvS873BcW3mpFT
+        </span>
 
         <button onClick={() => {
           const canvas = document.getElementById('canvas')
