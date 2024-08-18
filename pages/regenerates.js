@@ -77,9 +77,7 @@ export default function Regenerates() {
         {loading ? 'removing bg...' : 'Upload image'}
           </span>
 
-        <label>
-          Offset X
-          </label> 
+        
         <input
           type="file"
           onChange={(e) => {
@@ -88,7 +86,7 @@ export default function Regenerates() {
           }}
         />
         <label>
-          Offset Y
+          Offset X
           </label>
         <input
           type="range"
