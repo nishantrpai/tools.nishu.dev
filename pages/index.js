@@ -931,6 +931,24 @@ export const tools = [
     description: 'Create higher athletics poster',
     publishDate: '15th Aug 2024',
     url: '/higherathletics'
+  },
+  {
+    title: 'Coby',
+    description: 'Add coby to your image',
+    publishDate: '16th Aug 2024',
+    url: '/coby'
+  },
+  {
+    title: 'fwog',
+    description: 'Add fwog to your image',
+    publishSate: '17th Aug 2024',
+    url: '/fwog'
+  },
+  {
+    title: 'Regenerates',
+    description: 'Add regenerate bg to your image',
+    publishDate: '18th Aug 2024',
+    url: '/regenerates'
   }
   // {
   //   title: 'Atomic Breakdown',
