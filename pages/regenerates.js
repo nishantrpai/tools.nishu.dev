@@ -14,11 +14,7 @@ export default function Regenerates() {
   const removeBg = async (imageSrc) => {
     try {
       setLoading(true)
-      const blob = await removeBackground(imageSrc, {
-        progress: (current, total) => {
-          console.log('Progress:', current, total)
-        },
-      })
+      const blob = await removeBackground(imageSrc)
       const url = URL.createObjectURL(blob)
       setLoading(false)
       return url
