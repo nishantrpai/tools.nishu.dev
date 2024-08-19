@@ -186,7 +186,7 @@ export default function Home() {
                 ctx.drawImage(img, 0, 0, 800, 1200)
                 const a = document.createElement('a')
                 a.href = canvas.toDataURL('image/png')
-                a.download = `scape-${scapeID}.png`
+                a.download = `scape-${scapeID}:${scapeOffsetX}-${scapeOffsetY}.png`
                 a.click()
               }
               img.src = url
