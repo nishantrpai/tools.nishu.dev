@@ -949,6 +949,12 @@ export const tools = [
     description: 'Add regenerate bg to your image',
     publishDate: '18th Aug 2024',
     url: '/regenerates'
+  },
+  {
+    title: 'Opepen Scapes',
+    description: 'Create opepen scapes',
+    publishDate: '19th Aug 2024',
+    url: '/opepenscapes'
   }
   // {
   //   title: 'Atomic Breakdown',
