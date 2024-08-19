@@ -152,7 +152,7 @@ export default function Home() {
               Scape Offset X
             </label>
             <div style={{ display: 'flex', gap: 20, width: '100%' }}>
-              <input type="range" min={-1000} max={1000} step={0.01} value={scapeOffsetX} onChange={(e) => setScapeOffsetX(e.target.value)} />
+              <input type="range" min={0} max={1500} step={1} value={scapeOffsetX} onChange={(e) => setScapeOffsetX(e.target.value)} />
               <input type='number' value={scapeOffsetX} onChange={(e) => setScapeOffsetX(e.target.value)} style={{
                 border: '1px solid #333', width: '30%', fontSize: 16, borderRadius: 10, padding: 5
               }} />
@@ -162,21 +162,12 @@ export default function Home() {
               Scape Offset Y
             </label>
             <div style={{ display: 'flex', gap: 20, width: '100%' }}>
-              <input type="range" min="-500" max="500" value={scapeOffsetY} onChange={(e) => setScapeOffsetY(e.target.value)} />
+              <input type="range" min="0" max="1500" step={1} value={scapeOffsetY}   onChange={(e) => setScapeOffsetY(e.target.value)} />
               <input type='number' value={scapeOffsetY} onChange={(e) => setScapeOffsetY(e.target.value)} style={{
                 border: '1px solid #333', width: '30%', fontSize: 16, borderRadius: 10, padding: 5
               }} />
             </div>
 
-            <label>
-              Scape Scale
-            </label>
-            <div style={{ display: 'flex', gap: 20, width: '100%' }}>
-              <input type="range" min="1" max="10" step="0.01" value={scapeScale} onChange={(e) => setScapeScale(e.target.value)} />
-              <input type='number' value={scapeScale} onChange={(e) => setScapeScale(e.target.value)} style={{
-                border: '1px solid #333', width: '30%', fontSize: 16, borderRadius: 10, padding: 5
-              }} />
-            </div>
 
             {/* download button */}
             <button onClick={() => {
