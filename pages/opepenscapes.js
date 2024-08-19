@@ -183,7 +183,7 @@ export default function Home() {
               const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' })
               const url = URL.createObjectURL(svgBlob)
               img.onload = () => {
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+                ctx.drawImage(img, 0, 0, 800, 1200) 
                 const a = document.createElement('a')
                 a.href = canvas.toDataURL('image/png')
                 a.download = `scape-${scapeID}:${scapeOffsetX}-${scapeOffsetY}.png`
