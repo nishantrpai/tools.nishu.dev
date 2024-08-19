@@ -196,7 +196,7 @@ export default function Home() {
             }} style={{
               marginTop: 20
             }}>
-              Download SVG
+              Download
             </button>
 
           </div>
