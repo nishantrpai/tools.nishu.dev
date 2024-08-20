@@ -955,6 +955,12 @@ export const tools = [
     description: 'Create opepen scapes',
     publishDate: '19th Aug 2024',
     url: '/opepenscapes'
+  },
+  {
+    title: 'Get ipfs link',
+    description: 'Get ipfs link for a file on browser',
+    publishDate: '20th Aug 2024',
+    url: '/getipfs'
   }
   // {
   //   title: 'Atomic Breakdown',
