@@ -28,7 +28,7 @@ export default function Home() {
         <title>
           Get IPFS Link
         </title>
-        <meta name="description" content="Get IPFS link" />
+        <meta name="description" content="Turn ipfs:// link to viewable ipfs link" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -37,7 +37,7 @@ export default function Home() {
           Get IPFS Link
         </h1>
         <span style={{ color: '#777', fontSize: '14px', marginBottom: '20px', display: 'block' }}>
-          Get browser viewable IPFS link
+          Turn ipfs:// link to viewable ipfs link
         </span>
 
 
