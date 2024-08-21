@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from 'react'
 import dynamic from 'next/dynamic'
 import { FiX, FiPlus, FiHome, FiNavigation, FiFilePlus } from 'react-icons/fi'
 import Draggable from 'react-draggable'
+import { ResizableBox } from 'react-resizable'
+import 'react-resizable/css/styles.css'
 
 class StickyNote {
   constructor(note, x, y, z = 1, width = 200, height = 200) {
@@ -136,6 +138,19 @@ function InfiniteCanvas() {
     globalThis.window.localStorage.setItem('canvas', JSON.stringify(newCanvas));
   }
 
+  const handleResize = (size, idx, type) => {
+    const newCanvas = { ...canvas };
+    if (type === 'note') {
+      newCanvas.notes[idx].width = size.width;
+      newCanvas.notes[idx].height = size.height;
+    } else if (type === 'window') {
+      newCanvas.windows[idx].width = size.width;
+      newCanvas.windows[idx].height = size.height;
+    }
+    setCanvas(newCanvas);
+    globalThis.window.localStorage.setItem('canvas', JSON.stringify(newCanvas));
+  }
+
   return (
     <>
       <Head>
@@ -168,68 +183,74 @@ function InfiniteCanvas() {
               position={{x: calculateX(note.x), y: calculateY(note.y)}}
               onDrag={(e, ui) => handleDrag(e, ui, idx, 'note')}
             >
-              <div style={{
-                width: `${note.width}px`,
-                minHeight: `${note.height}px`,
-                height: 'max-content',
-                zIndex: `${note.z}`,
-                position: 'absolute',
-                background: '#FDD173',
-                border: '3px solid #9A6601',
-                color: '#000',
-                borderRadius: '10px 2px 10px 10px',
-                padding: '5px',
-                overflow: 'hidden'
-              }}
-                onClick={() => {
-                  setCurrentNoteIdx(idx)
-                  setCurrentWindow(null)
-                  note.z = currentTop;
-                  setCurrentTop(currentTop + 1);
-                  setCanvas({ ...canvas });
-                }}
+              <ResizableBox
+                width={note.width}
+                height={note.height}
+                onResize={(e, {size}) => handleResize(size, idx, 'note')}
+                minConstraints={[100, 100]}
+                maxConstraints={[500, 500]}
               >
-                {/* add close button to the top right */}
-                <button style={{
-                  cursor: 'pointer',
-                  padding: '3px',
-                  paddingTop: '4px',
-                  height: 'max-content',
-                  fontSize: '10px',
-                  background: '#FDD173',
-                  border: 'none',
-                  outline: 'none',
-                  position: 'absolute',
-                  color: '#9A6601',
-                  fontSize: '14px',
-                  fontWeight: 'bold',
-                  right: '0',
-                }}>
-                  <FiX onClick={() => {
-                    canvas.notes.splice(idx, 1)
-                    setCanvas({ ...canvas })
-                    globalThis.window.localStorage.setItem('canvas', JSON.stringify(canvas))
-                  }} />
-                </button>
-                <textarea style={{
+                <div style={{
                   width: '100%',
-                  minHeight: `${note.height - 30}px`,
                   height: '100%',
-                  background: 'transparent',
-                  border: 'none',
-                  outline: 'none',
-                  resize: 'none',
+                  zIndex: `${note.z}`,
+                  position: 'absolute',
+                  background: '#FDD173',
+                  border: '3px solid #9A6601',
                   color: '#000',
-                  fontSize: '14px',
+                  borderRadius: '10px 2px 10px 10px',
+                  padding: '5px',
+                  overflow: 'hidden'
                 }}
-                  value={note.note}
-                  onChange={(e) => {
-                    canvas.notes[idx].note = e.target.value
-                    setCanvas({ ...canvas })
-                    globalThis.window.localStorage.setItem('canvas', JSON.stringify(canvas))
+                  onClick={() => {
+                    setCurrentNoteIdx(idx)
+                    setCurrentWindow(null)
+                    note.z = currentTop;
+                    setCurrentTop(currentTop + 1);
+                    setCanvas({ ...canvas });
                   }}
-                />
-              </div>
+                >
+                  {/* add close button to the top right */}
+                  <button style={{
+                    cursor: 'pointer',
+                    padding: '3px',
+                    paddingTop: '4px',
+                    height: 'max-content',
+                    fontSize: '10px',
+                    background: '#FDD173',
+                    border: 'none',
+                    outline: 'none',
+                    position: 'absolute',
+                    color: '#9A6601',
+                    fontSize: '14px',
+                    fontWeight: 'bold',
+                    right: '0',
+                  }}>
+                    <FiX onClick={() => {
+                      canvas.notes.splice(idx, 1)
+                      setCanvas({ ...canvas })
+                      globalThis.window.localStorage.setItem('canvas', JSON.stringify(canvas))
+                    }} />
+                  </button>
+                  <textarea style={{
+                    width: '100%',
+                    height: 'calc(100% - 30px)',
+                    background: 'transparent',
+                    border: 'none',
+                    outline: 'none',
+                    resize: 'none',
+                    color: '#000',
+                    fontSize: '14px',
+                  }}
+                    value={note.note}
+                    onChange={(e) => {
+                      canvas.notes[idx].note = e.target.value
+                      setCanvas({ ...canvas })
+                      globalThis.window.localStorage.setItem('canvas', JSON.stringify(canvas))
+                    }}
+                  />
+                </div>
+              </ResizableBox>
             </Draggable>
           ))}
 
@@ -241,65 +262,73 @@ function InfiniteCanvas() {
               onDrag={(e, ui) => handleDrag(e, ui, idx, 'window')}
               handle=".window-handle"
             >
-              <div style={{
-                width: `${window.width}px`,
-                height: `${window.height}px`,
-                zIndex: `${window.z}`,
-                position: 'absolute',
-                border: '5px solid #333',
-                borderRadius: '10px',
-                overflow: 'hidden',
-              }}
-                onClick={() => {
-                  setCurrentTop(currentTop + 1)
-                  window.z = currentTop + 1;
-                  setCanvas({ ...canvas })
-                }}
+              <ResizableBox
+                width={window.width}
+                height={window.height}
+                onResize={(e, {size}) => handleResize(size, idx, 'window')}
+                minConstraints={[200, 200]}
+                maxConstraints={[800, 800]}
               >
-                <div className="window-handle" style={{
-                  display: 'flex',
+                <div style={{
                   width: '100%',
-                  height: '30px',
-                  padding: '2px',
-                  background: '#000',
-                  borderRadius: '7px 7px 0 0',
-                  cursor: 'move',
-                }}>
-                  <button style={{
-                    cursor: 'pointer',
-                    padding: '3px',
-                    paddingTop: '4px',
-                    height: 'max-content',
-                    fontSize: '10px',
-                    background: '#000'
-                  }}>
-                    <FiX onClick={() => {
-                      canvas.windows.splice(idx, 1)
-                      setCanvas({ ...canvas })
-                      if (globalThis.window.localStorage.getItem('canvas')) {
-                        globalThis.window.localStorage.setItem('canvas', JSON.stringify(canvas))
-                      }
-                    }} />
-                  </button>
-                  {/* window nav bar */}
-                </div>
-                <iframe is="x-frame-bypass" src={window.url} style={{
-                  width: '100%',
-                  height: `${window.height - 35}px`,
-                  borderRadius: '0 0 10px 10px',
-                  outline: 'none',
-                  userSelect: 'none',
+                  height: '100%',
+                  zIndex: `${window.z}`,
+                  position: 'absolute',
+                  border: '5px solid #333',
+                  borderRadius: '10px',
+                  overflow: 'hidden',
                 }}
-                  frameBorder={0}
-                  onLoad={(e) => {
-                    // get the title and favicon 
-                    canvas.windows[idx].title = e.target.contentDocument.title
-                    canvas.windows[idx].description = e.target.contentDocument.querySelector('meta[name="description"]')?.content
+                  onClick={() => {
+                    setCurrentTop(currentTop + 1)
+                    window.z = currentTop + 1;
                     setCanvas({ ...canvas })
-                    globalThis.window.localStorage.setItem('canvas', JSON.stringify(canvas))
                   }}
-                />
-              </div>
+                >
+                  <div className="window-handle" style={{
+                    display: 'flex',
+                    width: '100%',
+                    height: '30px',
+                    padding: '2px',
+                    background: '#000',
+                    borderRadius: '7px 7px 0 0',
+                    cursor: 'move',
+                  }}>
+                    <button style={{
+                      cursor: 'pointer',
+                      padding: '3px',
+                      paddingTop: '4px',
+                      height: 'max-content',
+                      fontSize: '10px',
+                      background: '#000'
+                    }}>
+                      <FiX onClick={() => {
+                        canvas.windows.splice(idx, 1)
+                        setCanvas({ ...canvas })
+                        if (globalThis.window.localStorage.getItem('canvas')) {
+                          globalThis.window.localStorage.setItem('canvas', JSON.stringify(canvas))
+                        }
+                      }} />
+                    </button>
+                    {/* window nav bar */}
+                  </div>
+                  <iframe is="x-frame-bypass" src={window.url} style={{
+                    width: '100%',
+                    height: 'calc(100% - 35px)',
+                    borderRadius: '0 0 10px 10px',
+                    outline: 'none',
+                    userSelect: 'none',
+                  }}
+                    frameBorder={0}
+                    onLoad={(e) => {
+                      // get the title and favicon 
+                      canvas.windows[idx].title = e.target.contentDocument.title
+                      canvas.windows[idx].description = e.target.contentDocument.querySelector('meta[name="description"]')?.content
+                      setCanvas({ ...canvas })
+                      globalThis.window.localStorage.setItem('canvas', JSON.stringify(canvas))
+                    }}
+                  />
+                </div>
+              </ResizableBox>
             </Draggable>
           ))}
 
