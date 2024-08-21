@@ -1,8 +1,9 @@
 // infinite canvas with iframes for viewing all links in one place
 import Head from 'next/head'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import dynamic from 'next/dynamic'
 import { FiX, FiPlus, FiHome, FiNavigation, FiFilePlus } from 'react-icons/fi'
+import Draggable from 'react-draggable'
 
 class StickyNote {
   constructor(note, x, y, z = 1, width = 200, height = 200) {
@@ -13,8 +14,8 @@ class StickyNote {
     this.height = height
     this.note = note
   }
-
 }
+
 class Window {
   constructor(url, width, height, x, y, z = 1) {
     this.url = url
@@ -38,9 +39,7 @@ class Canvas {
   }
 }
 
-
 function InfiniteCanvas() {
-
   const [canvas, setCanvas] = useState(new Canvas())
   const [currentWindow, setCurrentWindow] = useState(null)
   const [currentNoteIdx, setCurrentNoteIdx] = useState(null)
@@ -48,12 +47,9 @@ function InfiniteCanvas() {
   const [newURL, setNewURL] = useState('')
   const [searchMode, setSearchMode] = useState(true)
   const [searchResults, setSearchResults] = useState([])
-  const [startX, setStartX] = useState(0)
-  const [startY, setStartY] = useState(0)
-
+  const canvasRef = useRef(null)
 
   const wheelListener = (e) => {
-    // // console.log('wheel listener')
     let friction = 1;
     let deltaX = e.deltaX * friction
     let deltaY = e.deltaY * friction
@@ -69,34 +65,6 @@ function InfiniteCanvas() {
       setCanvas({ ...canvas })
       globalThis.window.localStorage.setItem('canvas', JSON.stringify(canvas))
     }
-  }
-
-  const pointerMoveListener = (e) => {
-    if (document.body.style.cursor === 'nwse-resize' && currentWindow !== null && e.buttons === 1) {
-      canvas.windows[currentWindow].width += (e.movementX)
-      canvas.windows[currentWindow].height += (e.movementY)
-      canvas.windows[currentWindow].z = currentTop
-      setCurrentTop(currentTop + 1)
-    }
-    if (document.body.style.cursor === 'move' && currentWindow !== null && e.buttons === 1) {
-      // console.log('current window', canvas.windows[currentWindow].z, canvas.windows[currentWindow].x, canvas.windows[currentWindow].y, canvas.windows[currentWindow].width, canvas.windows[currentWindow].height)
-      canvas.windows[currentWindow].x += (e.movementX)
-      canvas.windows[currentWindow].y += (e.movementY)
-      canvas.windows[currentWindow].z = currentTop
-      setCurrentTop(currentTop + 1)
-    }
-    if (e.buttons === 1 && document.body.style.cursor === 'default' && currentNoteIdx == null && currentWindow == null) {
-      canvas.cameraX += (e.movementX) * -1
-      canvas.cameraY += (e.movementY) * -1
-    } 
-    if (document.body.style.cursor === 'move' && currentNoteIdx !== null && e.buttons === 1) {
-      canvas.notes[currentNoteIdx].x += (e.movementX)
-      canvas.notes[currentNoteIdx].y += (e.movementY)
-      canvas.notes[currentNoteIdx].z = currentTop
-      setCurrentTop(currentTop + 1)
-    }
-    setCanvas({ ...canvas })
-    globalThis.window.localStorage.setItem('canvas', JSON.stringify(canvas))
   }
 
   useEffect(() => {
@@ -120,10 +88,9 @@ function InfiniteCanvas() {
         setCanvas({ ...canvas })
       }
     }
-    document.body.style.cursor = 'default'
     document.body.style.overflow = 'hidden'
     document.body.style.position = 'fixed'
-  }, [])
+  }, [canvas])
 
   const calculateX = (x) => {
     // compute the x position based on the camera position
@@ -155,6 +122,19 @@ function InfiniteCanvas() {
     globalThis.window.localStorage.setItem('canvas', JSON.stringify(canvas))
   }
 
+  const handleDrag = (e, ui, idx, type) => {
+    const { x, y } = ui;
+    const newCanvas = { ...canvas };
+    if (type === 'note') {
+      newCanvas.notes[idx].x = x;
+      newCanvas.notes[idx].y = y;
+    } else if (type === 'window') {
+      newCanvas.windows[idx].x = x;
+      newCanvas.windows[idx].y = y;
+    }
+    setCanvas(newCanvas);
+    globalThis.window.localStorage.setItem('canvas', JSON.stringify(newCanvas));
+  }
 
   return (
     <>
@@ -164,19 +144,14 @@ function InfiniteCanvas() {
         <link rel="icon" href="/favicon.ico" />
         <script type="module" src="/xframebypass.js"></script>
       </Head>
-      <div style={{ width: '100vw', height: '100vh', overflow: 'hidden !important' }} onWheel={wheelListener} onPointerMove={pointerMoveListener}
+      <div 
+        ref={canvasRef}
+        style={{ width: '100vw', height: '100vh', overflow: 'hidden !important' }} 
+        onWheel={wheelListener}
         onKeyDown={(e) => {
           if (e.key === 'Escape') {
-            document.body.style.cursor = 'default'
             setSearchResults([])
           }
-        }}
-        onMouseDown={(e) => {
-          setStartX(e.clientX)
-          setStartY(e.clientY)
-        }}
-        onMouseUp={() => {
-          document.body.style.cursor = 'default'
         }}
       >
         <div style={{
@@ -187,14 +162,16 @@ function InfiniteCanvas() {
         }}>
 
           {/* render notes  */}
-          {canvas.notes?.map((note, idx) => {
-            return (
+          {canvas.notes?.map((note, idx) => (
+            <Draggable
+              key={idx}
+              position={{x: calculateX(note.x), y: calculateY(note.y)}}
+              onDrag={(e, ui) => handleDrag(e, ui, idx, 'note')}
+            >
               <div style={{
                 width: `${note.width}px`,
                 minHeight: `${note.height}px`,
                 height: 'max-content',
-                left: `${calculateX(note.x)}px`,
-                top: `${calculateY(note.y)}px`,
                 zIndex: `${note.z}`,
                 position: 'absolute',
                 background: '#FDD173',
@@ -204,17 +181,13 @@ function InfiniteCanvas() {
                 padding: '5px',
                 overflow: 'hidden'
               }}
-                onMouseEnter={() => {
-                  document.body.style.cursor = 'move'
-                }}
-                onMouseDown={() => {
+                onClick={() => {
                   setCurrentNoteIdx(idx)
                   setCurrentWindow(null)
+                  note.z = currentTop;
+                  setCurrentTop(currentTop + 1);
+                  setCanvas({ ...canvas });
                 }}
-                onMouseUp={(() => {
-                  setCurrentNoteIdx(null)
-                  setCurrentWindow(null)
-                })}
               >
                 {/* add close button to the top right */}
                 <button style={{
@@ -257,18 +230,20 @@ function InfiniteCanvas() {
                   }}
                 />
               </div>
-            )
-          })}
-
+            </Draggable>
+          ))}
 
           {/* render links */}
-          {canvas.windows.map((window, idx) => {
-            return (
+          {canvas.windows.map((window, idx) => (
+            <Draggable
+              key={idx}
+              position={{x: calculateX(window.x), y: calculateY(window.y)}}
+              onDrag={(e, ui) => handleDrag(e, ui, idx, 'window')}
+              handle=".window-handle"
+            >
               <div style={{
                 width: `${window.width}px`,
                 height: `${window.height}px`,
-                left: `${calculateX(window.x)}px`,
-                top: `${calculateY(window.y)}px`,
                 zIndex: `${window.z}`,
                 position: 'absolute',
                 border: '5px solid #333',
@@ -277,43 +252,19 @@ function InfiniteCanvas() {
               }}
                 onClick={() => {
                   setCurrentTop(currentTop + 1)
+                  window.z = currentTop + 1;
                   setCanvas({ ...canvas })
                 }}
-                onMouseEnter={() => {
-                  document.body.style.cursor = 'nwse-resize'
-                }}
-                onMouseDown={() => {
-                  setCurrentWindow(idx)
-                }}
-                onMouseUp={() => {
-                  setCurrentWindow(null)
-                  // // console.log('mouseup')
-                }}
               >
-                <div style={{
+                <div className="window-handle" style={{
                   display: 'flex',
                   width: '100%',
                   height: '30px',
                   padding: '2px',
                   background: '#000',
                   borderRadius: '7px 7px 0 0',
-                }}
-                  onMouseEnter={() => {
-                    document.body.style.cursor = 'move'
-                  }}
-
-                  onMouseDown={() => {
-                    setCurrentWindow(idx)
-                  }}
-                  onMouseUp={() => {
-                    // console.log('mouseup')
-                    setCurrentWindow(null)
-                  }}
-                  onMouseLeave={() => {
-                    // console.log('leaving window')
-                    document.body.style.cursor = 'default'
-                  }}
-                >
+                  cursor: 'move',
+                }}>
                   <button style={{
                     cursor: 'pointer',
                     padding: '3px',
@@ -323,7 +274,6 @@ function InfiniteCanvas() {
                     background: '#000'
                   }}>
                     <FiX onClick={() => {
-                      // console.log('clicked close')
                       canvas.windows.splice(idx, 1)
                       setCanvas({ ...canvas })
                       if (globalThis.window.localStorage.getItem('canvas')) {
@@ -341,15 +291,6 @@ function InfiniteCanvas() {
                   userSelect: 'none',
                 }}
                   frameBorder={0}
-                  onClick={() => {
-                    // console.log('clicked iframe')
-                    window.z = currentTop
-                  }}
-                  onMouseEnter={() => {
-                    // console.log('entered iframe')
-                    // remove mouse resize
-                    // document.body.style.cursor = 'default'
-                  }}
                   onLoad={(e) => {
                     // get the title and favicon 
                     canvas.windows[idx].title = e.target.contentDocument.title
@@ -359,9 +300,8 @@ function InfiniteCanvas() {
                   }}
                 />
               </div>
-            )
-          })}
-
+            </Draggable>
+          ))}
 
         </div>
         {/* at the bottom the a url window to add links */}
@@ -392,7 +332,7 @@ function InfiniteCanvas() {
                 background: '#000'
               }}>
                 {searchResults.map((result, idx) => (
-                  <div style={{
+                  <div key={idx} style={{
                     cursor: 'pointer',
                     display: 'flex',
                     flexDirection: 'column',
@@ -463,8 +403,6 @@ function InfiniteCanvas() {
                 if (!searchMode) {
                   setNewURL(e.target.value)
                 } else {
-                  // console.log('searching')
-                  // search for the url, title and description in the windows
                   setSearchResults([])
                   if(e.target.value === '') return;
                   let results = []
@@ -473,7 +411,6 @@ function InfiniteCanvas() {
                       results.push(w)
                     }
                   })
-                  // console.log('search results', results)
                   setSearchResults(results)
                 }
               }} />
