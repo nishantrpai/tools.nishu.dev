@@ -961,6 +961,12 @@ export const tools = [
     description: 'Get ipfs link for a file on browser',
     publishDate: '20th Aug 2024',
     url: '/getipfs'
+  },
+  {
+    title: 'Zorbs',
+    description: 'Get gradient zorb',
+    publishDate: '21st Aug 2024',
+    url: '/text2zorb'
   }
   // {
   //   title: 'Atomic Breakdown',
