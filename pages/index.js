@@ -967,6 +967,12 @@ export const tools = [
     description: 'Get gradient zorb',
     publishDate: '21st Aug 2024',
     url: '/text2zorb'
+  },
+  {
+    title: 'Possibilities',
+    description: 'Get possibilities for your future',
+    publishDate: '23rd Aug 2024',
+    url: '/possibilities'
   }
   // {
   //   title: 'Atomic Breakdown',
