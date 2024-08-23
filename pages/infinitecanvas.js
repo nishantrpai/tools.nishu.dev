@@ -1,6 +1,6 @@
 // infinite canvas with iframes for viewing all links in one place
 import Head from 'next/head'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import dynamic from 'next/dynamic'
 import { FiX, FiPlus, FiHome, FiNavigation, FiFilePlus } from 'react-icons/fi'
 
@@ -13,8 +13,8 @@ class StickyNote {
     this.height = height
     this.note = note
   }
-
 }
+
 class Window {
   constructor(url, width, height, x, y, z = 1) {
     this.url = url
@@ -38,9 +38,7 @@ class Canvas {
   }
 }
 
-
 function InfiniteCanvas() {
-
   const [canvas, setCanvas] = useState(new Canvas())
   const [currentWindow, setCurrentWindow] = useState(null)
   const [currentNoteIdx, setCurrentNoteIdx] = useState(null)
@@ -48,52 +46,50 @@ function InfiniteCanvas() {
   const [newURL, setNewURL] = useState('')
   const [searchMode, setSearchMode] = useState(true)
   const [searchResults, setSearchResults] = useState([])
+  const [isDragging, setIsDragging] = useState(false)
+  const [isResizing, setIsResizing] = useState(false)
   const [startX, setStartX] = useState(0)
   const [startY, setStartY] = useState(0)
-
+  const canvasRef = useRef(null)
 
   const wheelListener = (e) => {
-    // // console.log('wheel listener')
     let friction = 1;
     let deltaX = e.deltaX * friction
     let deltaY = e.deltaY * friction
     if (e.ctrlKey) {
-      // zoom in and out
       canvas.zoom += (deltaY / 1000) * -1
       setCanvas({ ...canvas })
-      globalThis.window.localStorage.setItem('canvas', JSON.stringify(canvas))
     } else {
-      // scroll set the camera position
       canvas.cameraX += (deltaX * 2)
       canvas.cameraY += (deltaY * 2)
       setCanvas({ ...canvas })
-      globalThis.window.localStorage.setItem('canvas', JSON.stringify(canvas))
     }
+    globalThis.window.localStorage.setItem('canvas', JSON.stringify(canvas))
   }
 
   const pointerMoveListener = (e) => {
-    if (document.body.style.cursor === 'nwse-resize' && currentWindow !== null && e.buttons === 1) {
-      canvas.windows[currentWindow].width += (e.movementX)
-      canvas.windows[currentWindow].height += (e.movementY)
+    if (isResizing && currentWindow !== null) {
+      const newWidth = canvas.windows[currentWindow].width + e.movementX
+      const newHeight = canvas.windows[currentWindow].height + e.movementY
+      canvas.windows[currentWindow].width = Math.max(100, newWidth)
+      canvas.windows[currentWindow].height = Math.max(100, newHeight)
       canvas.windows[currentWindow].z = currentTop
       setCurrentTop(currentTop + 1)
-    }
-    if (document.body.style.cursor === 'move' && currentWindow !== null && e.buttons === 1) {
-      // console.log('current window', canvas.windows[currentWindow].z, canvas.windows[currentWindow].x, canvas.windows[currentWindow].y, canvas.windows[currentWindow].width, canvas.windows[currentWindow].height)
-      canvas.windows[currentWindow].x += (e.movementX)
-      canvas.windows[currentWindow].y += (e.movementY)
-      canvas.windows[currentWindow].z = currentTop
-      setCurrentTop(currentTop + 1)
-    }
-    if (e.buttons === 1 && document.body.style.cursor === 'default' && currentNoteIdx == null && currentWindow == null) {
-      canvas.cameraX += (e.movementX) * -1
-      canvas.cameraY += (e.movementY) * -1
-    } 
-    if (document.body.style.cursor === 'move' && currentNoteIdx !== null && e.buttons === 1) {
-      canvas.notes[currentNoteIdx].x += (e.movementX)
-      canvas.notes[currentNoteIdx].y += (e.movementY)
-      canvas.notes[currentNoteIdx].z = currentTop
-      setCurrentTop(currentTop + 1)
+    } else if (isDragging) {
+      if (currentWindow !== null) {
+        canvas.windows[currentWindow].x += e.movementX / canvas.zoom
+        canvas.windows[currentWindow].y += e.movementY / canvas.zoom
+        canvas.windows[currentWindow].z = currentTop
+        setCurrentTop(currentTop + 1)
+      } else if (currentNoteIdx !== null) {
+        canvas.notes[currentNoteIdx].x += e.movementX / canvas.zoom
+        canvas.notes[currentNoteIdx].y += e.movementY / canvas.zoom
+        canvas.notes[currentNoteIdx].z = currentTop
+        setCurrentTop(currentTop + 1)
+      } else {
+        canvas.cameraX -= e.movementX / canvas.zoom
+        canvas.cameraY -= e.movementY / canvas.zoom
+      }
     }
     setCanvas({ ...canvas })
     globalThis.window.localStorage.setItem('canvas', JSON.stringify(canvas))
@@ -101,22 +97,15 @@ function InfiniteCanvas() {
 
   useEffect(() => {
     if (canvas.windows.length == 0) {
-      // open in the middle of the screen
       if (window.localStorage.getItem('canvas')) {
         setCanvas(JSON.parse(window.localStorage.getItem('canvas')))
-        // go through each window z and set the current top
-        let maxZ = 0
-        canvas.windows.forEach(window => {
-          if (window.z > maxZ) {
-            maxZ = window.z
-          }
-        })
-        setCurrentTop(maxZ)
+        let maxZ = Math.max(...canvas.windows.map(window => window.z), 0)
+        setCurrentTop(maxZ + 1)
       } else {
-        canvas.windows.push(new Window('https://news.ycombinator.com/item?id=36504661', 300, 300, window.innerWidth / 2 - 100, window.innerHeight / 2 - 150, canvas.windows.length + 1))
-        canvas.windows.push(new Window('https://en.wikipedia.org/wiki/Vincent_van_Gogh', 300, 400, window.innerWidth / 2 + 120, window.innerHeight / 2 - 150, canvas.windows.length + 1))
-        canvas.windows.push(new Window('https://www.webexhibits.org/vangogh/letter/2/025.htm?qp=attitude.death', 300, 500, window.innerWidth / 2 - 150, window.innerHeight / 2 - 150, canvas.windows.length + 1))
-        setCurrentTop(3)
+        canvas.windows.push(new Window('https://news.ycombinator.com/item?id=36504661', 300, 300, window.innerWidth / 2 - 100, window.innerHeight / 2 - 150, 1))
+        canvas.windows.push(new Window('https://en.wikipedia.org/wiki/Vincent_van_Gogh', 300, 400, window.innerWidth / 2 + 120, window.innerHeight / 2 - 150, 2))
+        canvas.windows.push(new Window('https://www.webexhibits.org/vangogh/letter/2/025.htm?qp=attitude.death', 300, 500, window.innerWidth / 2 - 150, window.innerHeight / 2 - 150, 3))
+        setCurrentTop(4)
         setCanvas({ ...canvas })
       }
     }
@@ -126,17 +115,14 @@ function InfiniteCanvas() {
   }, [])
 
   const calculateX = (x) => {
-    // compute the x position based on the camera position
     return x - canvas.cameraX + window.innerWidth / 2
   }
 
   const calculateY = (y) => {
-    // compute the y position based on the camera position
     return y - canvas.cameraY + window.innerHeight / 2
   }
 
   const smoothScroll = (x, y) => {
-    // smooth scroll the camera to the x and y position
     let deltaX = x - canvas.cameraX
     let deltaY = y - canvas.cameraY
     let stepX = deltaX / 100
@@ -155,7 +141,6 @@ function InfiniteCanvas() {
     globalThis.window.localStorage.setItem('canvas', JSON.stringify(canvas))
   }
 
-
   return (
     <>
       <Head>
@@ -164,19 +149,26 @@ function InfiniteCanvas() {
         <link rel="icon" href="/favicon.ico" />
         <script type="module" src="/xframebypass.js"></script>
       </Head>
-      <div style={{ width: '100vw', height: '100vh', overflow: 'hidden !important' }} onWheel={wheelListener} onPointerMove={pointerMoveListener}
+      <div 
+        ref={canvasRef}
+        style={{ width: '100vw', height: '100vh', overflow: 'hidden !important' }} 
+        onWheel={wheelListener} 
+        onPointerMove={pointerMoveListener}
+        onPointerUp={() => {
+          setIsDragging(false)
+          setIsResizing(false)
+          document.body.style.cursor = 'default'
+        }}
+        onPointerDown={(e) => {
+          setStartX(e.clientX)
+          setStartY(e.clientY)
+          setIsDragging(true)
+        }}
         onKeyDown={(e) => {
           if (e.key === 'Escape') {
             document.body.style.cursor = 'default'
             setSearchResults([])
           }
-        }}
-        onMouseDown={(e) => {
-          setStartX(e.clientX)
-          setStartY(e.clientY)
-        }}
-        onMouseUp={() => {
-          document.body.style.cursor = 'default'
         }}
       >
         <div style={{
@@ -189,7 +181,7 @@ function InfiniteCanvas() {
           {/* render notes  */}
           {canvas.notes?.map((note, idx) => {
             return (
-              <div style={{
+              <div key={idx} style={{
                 width: `${note.width}px`,
                 minHeight: `${note.height}px`,
                 height: 'max-content',
@@ -207,16 +199,15 @@ function InfiniteCanvas() {
                 onMouseEnter={() => {
                   document.body.style.cursor = 'move'
                 }}
-                onMouseDown={() => {
+                onPointerDown={() => {
                   setCurrentNoteIdx(idx)
                   setCurrentWindow(null)
                 }}
-                onMouseUp={(() => {
+                onPointerUp={() => {
                   setCurrentNoteIdx(null)
                   setCurrentWindow(null)
-                })}
+                }}
               >
-                {/* add close button to the top right */}
                 <button style={{
                   cursor: 'pointer',
                   padding: '3px',
@@ -260,11 +251,10 @@ function InfiniteCanvas() {
             )
           })}
 
-
           {/* render links */}
           {canvas.windows.map((window, idx) => {
             return (
-              <div style={{
+              <div key={idx} style={{
                 width: `${window.width}px`,
                 height: `${window.height}px`,
                 left: `${calculateX(window.x)}px`,
@@ -282,12 +272,15 @@ function InfiniteCanvas() {
                 onMouseEnter={() => {
                   document.body.style.cursor = 'nwse-resize'
                 }}
-                onMouseDown={() => {
+                onPointerDown={(e) => {
                   setCurrentWindow(idx)
+                  if (e.target.tagName === 'DIV') {
+                    setIsResizing(true)
+                  }
                 }}
-                onMouseUp={() => {
+                onPointerUp={() => {
                   setCurrentWindow(null)
-                  // // console.log('mouseup')
+                  setIsResizing(false)
                 }}
               >
                 <div style={{
@@ -301,16 +294,15 @@ function InfiniteCanvas() {
                   onMouseEnter={() => {
                     document.body.style.cursor = 'move'
                   }}
-
-                  onMouseDown={() => {
+                  onPointerDown={() => {
                     setCurrentWindow(idx)
+                    setIsDragging(true)
                   }}
-                  onMouseUp={() => {
-                    // console.log('mouseup')
+                  onPointerUp={() => {
                     setCurrentWindow(null)
+                    setIsDragging(false)
                   }}
                   onMouseLeave={() => {
-                    // console.log('leaving window')
                     document.body.style.cursor = 'default'
                   }}
                 >
@@ -323,7 +315,6 @@ function InfiniteCanvas() {
                     background: '#000'
                   }}>
                     <FiX onClick={() => {
-                      // console.log('clicked close')
                       canvas.windows.splice(idx, 1)
                       setCanvas({ ...canvas })
                       if (globalThis.window.localStorage.getItem('canvas')) {
@@ -331,7 +322,6 @@ function InfiniteCanvas() {
                       }
                     }} />
                   </button>
-                  {/* window nav bar */}
                 </div>
                 <iframe is="x-frame-bypass" src={window.url} style={{
                   width: '100%',
@@ -342,16 +332,9 @@ function InfiniteCanvas() {
                 }}
                   frameBorder={0}
                   onClick={() => {
-                    // console.log('clicked iframe')
                     window.z = currentTop
                   }}
-                  onMouseEnter={() => {
-                    // console.log('entered iframe')
-                    // remove mouse resize
-                    // document.body.style.cursor = 'default'
-                  }}
                   onLoad={(e) => {
-                    // get the title and favicon 
                     canvas.windows[idx].title = e.target.contentDocument.title
                     canvas.windows[idx].description = e.target.contentDocument.querySelector('meta[name="description"]')?.content
                     setCanvas({ ...canvas })
@@ -361,7 +344,6 @@ function InfiniteCanvas() {
               </div>
             )
           })}
-
 
         </div>
         {/* at the bottom the a url window to add links */}
@@ -392,7 +374,7 @@ function InfiniteCanvas() {
                 background: '#000'
               }}>
                 {searchResults.map((result, idx) => (
-                  <div style={{
+                  <div key={idx} style={{
                     cursor: 'pointer',
                     display: 'flex',
                     flexDirection: 'column',
@@ -400,7 +382,6 @@ function InfiniteCanvas() {
                     borderBottom: '1px solid #333',
                   }}
                     onClick={() => {
-                      // scroll to the window and set the z index
                       canvas.zoom = 1
                       smoothScroll((result.x), result.y + 300)
                       setCanvas({ ...canvas })
