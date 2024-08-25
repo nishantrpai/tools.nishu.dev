@@ -4,6 +4,7 @@ import styles from '@/styles/Home.module.css'
 import { useState, useEffect } from 'react'
 import html2canvas from 'html2canvas'
 import { SketchPicker } from 'react-color'
+import {analytics} from '@/utils/analytics'
 
 
 export default function Home() {
@@ -76,6 +77,7 @@ export default function Home() {
 
   const sensationalize = async () => {
     // make api call to /api/gpt?prompt
+    analytics('8bitcanvas', { text })
     setLoading(true)
     console.log(text)
     let prompt = `Given the prompt:${text}.\n\n

@@ -1,6 +1,7 @@
 import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { useState, useEffect } from 'react'
+import { analytics } from '@/utils/analytics'
 
 export default function AddCheck() {
   // add check to any image
@@ -90,6 +91,13 @@ export default function AddCheck() {
         </div>
 
         <button onClick={() => {
+          analytics({
+            event: 'download',
+            metadata: {
+              type: 'image',
+              name: 'check',
+            }
+          })
           const canvas = document.getElementById('canvas')
           const dataURL = canvas.toDataURL()
           const a = document.createElement('a')

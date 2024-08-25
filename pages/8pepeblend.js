@@ -3,6 +3,7 @@ import Head from 'next/head'
 import { ethers } from 'ethers'
 import { useState, useEffect } from 'react'
 import styles from '@/styles/Home.module.css'
+import {analytics} from '@/utils/analytics'
 
 
 export default function Home() {
@@ -261,6 +262,13 @@ export default function Home() {
         </div>
         
         <button onClick={() => {
+          analytics({
+            event: 'download',
+            metadata: {
+              type: 'image',
+              name: '8pepe-blend'
+            }
+          })
           const canvas = document.getElementById('canvas')
           const dataURL = canvas.toDataURL('image/png')
           const a = document.createElement('a')

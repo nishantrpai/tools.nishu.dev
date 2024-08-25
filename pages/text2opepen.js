@@ -3,6 +3,7 @@ import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { useState, useEffect } from 'react'
 import html2canvas from 'html2canvas'
+import {analytics} from '@/utils/analytics'
 
 
 export default function Home() {
@@ -21,6 +22,7 @@ export default function Home() {
 
   const sensationalize = async () => {
     // make api call to /api/gpt?prompt
+    analytics('text2opepen', { text })
     setLoading(true)
     let prompt = `Given the prompt:${text}.\n\n
     I have a svg, want to fill it with colors and patterns.
