@@ -973,6 +973,12 @@ export const tools = [
     description: 'Get possibilities for your future',
     publishDate: '23rd Aug 2024',
     url: '/possibilities'
+  },
+  {
+    title: 'Download all images',
+    description: 'Download all images from a website',
+    publishDate: '26th Aug 2024',
+    url: '/downloadimages'
   }
   // {
   //   title: 'Atomic Breakdown',
