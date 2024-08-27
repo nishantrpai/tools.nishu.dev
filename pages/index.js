@@ -979,6 +979,12 @@ export const tools = [
     description: 'Download all images from a website',
     publishDate: '26th Aug 2024',
     url: '/downloadimages'
+  },
+  {
+    title: 'Remove BG',
+    description: 'Remove background from an image',
+    publishDate: '27th Aug 2024',
+    url: '/removebg'
   }
   // {
   //   title: 'Atomic Breakdown',
