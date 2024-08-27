@@ -2,6 +2,8 @@
 import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { useState, useEffect } from 'react'
+import { ethers } from 'ethers';
+
 
 export default function HigherHat() {
   const [image, setImage] = useState(null)
@@ -12,6 +14,66 @@ export default function HigherHat() {
   const [imgWidth, setImgWidth] = useState(0)
   const [imgHeight, setImgHeight] = useState(0)
   const [hatType, setHatType] = useState(0)
+
+  let RPC_CHAINS = {
+    'ETHEREUM': {
+      'rpc': 'https://rpc.eth.gateway.fm',
+      'chainId': 1,
+      'network': 'mainnet',
+    },
+    'ZORA': {
+      'rpc': 'https://rpc.zora.energy',
+      'chainId': 1,
+      'network': 'mainnet',
+    },
+    'BASE': {
+      'rpc': 'https://base.api.onfinality.io/public	',
+      'chainId': 8453,
+      'network': 'base',
+    }
+  };
+
+  const getNFTData = async (collection_address, id) => {
+    try {
+      const provider = new ethers.JsonRpcProvider(RPC_CHAINS[chain].rpc);
+      const contract = new ethers.Contract(collection_address, ['function tokenURI(uint256) view returns (string)'], provider);
+      const tokenURI = await contract.tokenURI(id);
+      if (tokenURI.startsWith('data:')) {
+        const metadata = JSON.parse(atob(tokenURI.split('data:application/json;base64,')[1]));
+        if (metadata.image) {
+          metadata.image = await changeSVG2PNG(metadata.image);
+        }
+        if (metadata.image.startsWith('ipfs://')) {
+          metadata.image = `https://ipfs.io/ipfs/${metadata.image.split('ipfs://')[1]}`;
+        }
+        return metadata;
+      } else if (tokenURI.startsWith('http')) {
+        const response = await fetch(tokenURI);
+        const metadata = await response.json();
+        if (metadata.image.startsWith('ipfs://')) {
+          metadata.image = `https://ipfs.io/ipfs/${metadata.image.split('ipfs://')[1]}`;
+        }
+        return metadata;
+      } else {
+        const ipfsHash = tokenURI.split('ipfs://')[1];
+        const ipfsUrl = `https://ipfs.io/ipfs/${ipfsHash}`;
+        const response = await fetch(ipfsUrl);
+        const metadata = await response.json();
+        if (metadata.image.startsWith('ipfs://')) {
+          metadata.image = `https://ipfs.io/ipfs/${metadata.image.split('ipfs://')[1]}`;
+        }
+        return metadata;
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+
+  const [chain, setChain] = useState('BASE');
+  const [contract, setContract] = useState('0x307038E518CE52e62c4C8c662e6BA04719C9B219');
+  const [tokenId, setTokenId] = useState(1);
+  const [higherHat4, setHigherHat4] = useState(null)
 
   const higherHat = '/higherhat.png'
   const higherHat2 = '/higherhat2.png'
@@ -37,15 +99,30 @@ export default function HigherHat() {
         hat.src = higherHat3
       else if (hatType === 3)
         hat.src = higherCrown
+      else if (hatType === 4)
+        hat.src = higherHat4
 
       hat.onload = () => {
+        console.log('hat', hat)
         context.translate(offsetX, offsetY)
         context.rotate(offsetTheta * Math.PI / 180)
         context.drawImage(hat, offsetX, offsetY, hat.width * scale, hat.height * scale)
         context.closePath()
       }
     }
-  }, [image, offsetX, offsetY, scale, offsetTheta, hatType])
+  }, [image, offsetX, offsetY, scale, offsetTheta, hatType, higherHat4])
+
+  useEffect(() => {
+    getNFTData(contract, tokenId).then(data => {
+      // set image higherhat4 
+      const img = new Image()
+      img.src = data.image
+      setHigherHat4(data.image)
+      // img.onload = () => {
+      //   setHigherHat4(img)
+      // }
+    })
+  }, [chain, contract, tokenId])
 
   return (
     <>
@@ -93,7 +170,6 @@ export default function HigherHat() {
           <canvas id="canvas" width="800" height="800" style={{
             border: '1px solid #333',
             borderRadius: 10,
-            width: '100%',
             maxHeight: 500,
             height: 'auto',
             flexBasis: '95%'
@@ -151,6 +227,30 @@ export default function HigherHat() {
               }} onClick={() => setHatType(3)} />
             </div>
 
+            <div style={{
+              width: 100,
+              height: 100,
+              border: hatType === 4 ? '2px solid #333' : '2px solid #111',
+              borderRadius: 10
+            }}>
+              <img src={higherHat4} alt="Higher Hat 4" style={{
+                width: 100, height: 'auto',
+                marginTop: 20,
+              }} onClick={() => { setHatType(4)
+              setScale(0.25)
+              }} />
+              <input type="number" value={tokenId} onChange={(e) => {
+                setTokenId(e.target.value)
+              }} style={{
+                width: 100,
+                marginTop: 10,
+                borderRadius: 5,
+                backgroundColor: '#000',
+                border: '1px solid #333',
+                padding: 5,
+              }} />
+            </div>
+
 
           </div>
         </div>
@@ -161,18 +261,22 @@ export default function HigherHat() {
             Offset X
           </label>
           <input type="range" min={-(imgWidth * 1.5)} max={(imgWidth * 1.5)} value={offsetX} onChange={(e) => setOffsetX(e.target.value)} />
+          <input type="number" value={offsetX} onChange={(e) => setOffsetX(e.target.value)} />
           <label>
             Offset Y
           </label>
           <input type="range" min={-(imgHeight * 1.5)} max={(imgHeight * 1.5)} value={offsetY} onChange={(e) => setOffsetY(e.target.value)} />
+          <input type="number" value={offsetY} onChange={(e) => setOffsetY(e.target.value)} />
           <label>
             Scale
           </label>
-          <input type="range" min={0} max={10} step={0.01} value={scale} onChange={(e) => setScale(e.target.value)} />
+          <input type="range" min={0} max={10} step={0.0001} value={scale} onChange={(e) => setScale(e.target.value)} />
+          <input type="number" value={scale} onChange={(e) => setScale(e.target.value)} />
           <label>
             Rotate
           </label>
           <input type="range" min={-360} max={360} value={offsetTheta} onChange={(e) => setOffsetTheta(e.target.value)} />
+          <input type="number" value={offsetTheta} onChange={(e) => setOffsetTheta(e.target.value)} />
         </div>
 
         <button onClick={() => {
