@@ -102,6 +102,8 @@ export default function HigherHat() {
       else if (hatType === 4)
         hat.src = higherHat4
 
+      hat.crossOrigin = 'anonymous'
+
       hat.onload = () => {
         console.log('hat', hat)
         context.translate(offsetX, offsetY)
