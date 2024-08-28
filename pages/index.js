@@ -985,6 +985,12 @@ export const tools = [
     description: 'Remove background from an image',
     publishDate: '27th Aug 2024',
     url: '/removebg'
+  },
+  {
+    title: 'Remove watermark',
+    description: 'Remove watermark from an image',
+    publishDate: '28th Aug 2024',
+    url: '/removewatermark'
   }
   // {
   //   title: 'Atomic Breakdown',
