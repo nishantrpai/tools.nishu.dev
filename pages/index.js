@@ -991,6 +991,12 @@ export const tools = [
     description: 'Remove watermark from an image',
     publishDate: '28th Aug 2024',
     url: '/removewatermark'
+  },
+  {
+    title: 'Brainlet',
+    description: 'Turn any image into brainlet',
+    publishDate: '28th Aug 2024',
+    url: '/brainlet'
   }
   // {
   //   title: 'Atomic Breakdown',
