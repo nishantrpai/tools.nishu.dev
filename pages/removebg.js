@@ -28,12 +28,45 @@ export default function RemoveBg() {
     })
   }, [img])
 
+  const handlePaste = async (e) => {
+    const items = e.clipboardData.items;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf('image') !== -1) {
+        const blob = items[i].getAsFile();
+        setImg(URL.createObjectURL(blob));
+        break;
+      }
+    }
+  }
+
+  useEffect(() => {
+    window.addEventListener('paste', handlePaste);
+    return () => {
+      window.removeEventListener('paste', handlePaste);
+    };
+  }, []);
+
   return (
     <>
       <Head>
         <title>Remove Background</title>
         <meta name="description" content="Remove background from any image" />
         <link rel="icon" href="/favicon.ico" />
+        <style>{`
+          @keyframes spin {
+            0%, 10% { rotate: 0deg; }
+            30%, 100% { rotate: -360deg; }
+          }
+          .loader {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #3a0ca3;
+            border-bottom-color: #4361ee;
+            border-radius: 50%;
+            display: inline-block;
+            animation: spin 1.5s linear infinite;
+          }
+        `}</style>
       </Head>
       <main>
         <h1 className={styles.title}>
@@ -46,7 +79,12 @@ export default function RemoveBg() {
           <img src={processedImg} alt="Processed image" style={{ maxWidth: '100%', border: '1px solid #333', borderRadius: 10 }} />
         )}
         <span>
-          {loading ? 'Removing background...' : 'Upload image'}
+          {loading ? (
+            <>
+              Removing background...
+              <div className="loader"></div>
+            </>
+          ) : 'Upload image or paste from clipboard'}
         </span>
         
         <input
