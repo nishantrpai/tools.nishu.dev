@@ -997,6 +997,12 @@ export const tools = [
     description: 'Turn any image into brainlet',
     publishDate: '28th Aug 2024',
     url: '/brainlet'
+  },
+  {
+    title: 'Spongebob Text',
+    description: 'Convert text to spongebob text',
+    publishDate: '29th Aug 2024',
+    url: '/spongebobtext'
   }
   // {
   //   title: 'Atomic Breakdown',
