@@ -52,7 +52,7 @@ export default function Home() {
         </button>
 
         {spongebobTexts.length > 0 && (
-          <div style={{ whiteSpace: 'pre-wrap', fontFamily: 'monospace', textAlign: 'left', padding: '10px', border: '1px solid #333', background: '#333', width: '100%', lineHeight: 1.5}}>
+          <div style={{ whiteSpace: 'pre-wrap', fontFamily: 'monospace', textAlign: 'left', padding: '10px', border: '1px solid #333', borderRadius: 10, background: '#000', width: '100%', lineHeight: 1.5, fontSize: 32}}>
             {spongebobTexts.map((text, index) => (
               <div key={index}>{text}</div>
             ))}
