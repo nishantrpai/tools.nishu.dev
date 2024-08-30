@@ -1017,6 +1017,12 @@ export const tools = [
     url: '/unexcuse'
   },
   {
+    title: 'Feedback loop',
+    description: 'Get feedback loop from from any entity',
+    publishDate: '31st Aug 2024',
+    url: '/feedbackloop'
+  }
+  {
     title: 'Glitch gif',
     description: 'Add glitch effect to your gif',
     publishDate: '31st Aug 2024',
