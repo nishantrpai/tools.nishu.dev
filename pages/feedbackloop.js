@@ -174,7 +174,7 @@ export default function FeedbackLoop() {
               <svg ref={svgRef} width="500" height="500" viewBox="0 0 500 500"  style={{ backgroundColor: '#000', width: '100%', height: '100%', overflow: 'visible' }} />
             </div>
             <button onClick={downloadPNG} className={styles.button} style={{ marginTop: '10px' }}>
-              Download SVG
+              Download
             </button>
           </>
         )}
