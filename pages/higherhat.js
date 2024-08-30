@@ -231,7 +231,6 @@ export default function HigherHat() {
 
             <div style={{
               width: 100,
-              height: 100,
               border: hatType === 4 ? '2px solid #333' : '2px solid #111',
               borderRadius: 10
             }}>
