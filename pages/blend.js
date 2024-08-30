@@ -62,6 +62,22 @@ const BlendLayer = () => {
     a.click()
   }
 
+  const copyImage = async () => {
+    const canvas = document.getElementById('canvas')
+    const dataURL = canvas.toDataURL('image/png')
+    try {
+      const blob = await (await fetch(dataURL)).blob()
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          [blob.type]: blob
+        })
+      ])
+      alert('Blended image copied to clipboard!')
+    } catch (err) {
+      console.error('Failed to copy image: ', err)
+    }
+  }
+
   const downloadComposite = () => {
     const compositeCanvas = document.createElement('canvas');
     const compositeCtx = compositeCanvas.getContext('2d');
@@ -101,6 +117,54 @@ const BlendLayer = () => {
     a.download = `blended-composite-${new Date().getTime()}.png`;
     a.click();
   }
+
+  const copyComposite = async () => {
+    const compositeCanvas = document.createElement('canvas');
+    const compositeCtx = compositeCanvas.getContext('2d');
+  
+    const minWidth = Math.min(image1.width, image2.width, canvas.width);
+    
+    // Calculate heights while maintaining aspect ratios
+    const image1Height = (image1.height / image1.width) * minWidth;
+    const image2Height = (image2.height / image2.width) * minWidth;
+    const canvasHeight = (canvas.height / canvas.width) * minWidth;
+    
+    const totalHeight = image1Height + image2Height + canvasHeight;
+    
+    compositeCanvas.width = minWidth;
+    compositeCanvas.height = totalHeight;
+  
+    // Draw image1
+    compositeCtx.drawImage(image1, 0, 0, minWidth, image1Height);
+  
+    // Draw image2
+    compositeCtx.drawImage(image2, 0, image1Height, minWidth, image2Height);
+  
+    // Draw the blended canvas (image3)
+    compositeCtx.drawImage(canvas, 0, image1Height + image2Height, minWidth, canvasHeight);
+  
+    // Draw the '+' signs
+    compositeCtx.font = '48px Arial';
+    compositeCtx.fillStyle = 'white';
+    compositeCtx.textAlign = 'center';
+    compositeCtx.textBaseline = 'middle';
+    compositeCtx.fillText('+', minWidth / 2, image1Height + 24);
+    compositeCtx.fillText('=', minWidth / 2, image1Height + image2Height + 24);
+  
+    const dataURL = compositeCanvas.toDataURL('image/png');
+    try {
+      const blob = await (await fetch(dataURL)).blob()
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          [blob.type]: blob
+        })
+      ])
+      alert('Composite image copied to clipboard!')
+    } catch (err) {
+      console.error('Failed to copy composite image: ', err)
+    }
+  }
+
   useEffect(() => {
     const canvas = document.getElementById('canvas')
     const ctx = canvas.getContext('2d')
@@ -164,7 +228,9 @@ const BlendLayer = () => {
             <canvas id="canvas" width={image1?.width || 500} height={image1?.height || 500}></canvas>
 
             <button style={{border: '1px solid #333'}} onClick={downloadImage}>Download Blended Image</button>
+            <button style={{border: '1px solid #333'}} onClick={copyImage}>Copy Blended Image</button>
             <button style={{border: '1px solid #333'}} onClick={downloadComposite}>Download Composite</button>
+            <button style={{border: '1px solid #333'}} onClick={copyComposite}>Copy Composite</button>
           </div>
         </div>
       </main>
