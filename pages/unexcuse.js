@@ -39,6 +39,10 @@ export default function Home() {
             border: '1px solid #333',
             padding: '10px',
             outline: 'none',
+            fontSize: 20,
+            borderRadius: 10,
+            background: '#000',
+            color: '#fff'
           }}
         />
 
