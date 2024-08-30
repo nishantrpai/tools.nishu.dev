@@ -1009,6 +1009,12 @@ export const tools = [
     description: 'Add grainy effect to your gif',
     publishDate: '30th Aug 2024',
     url: '/grainygifs'
+  },
+  {
+    title: 'Glitch gif',
+    description: 'Add glitch effect to your gif',
+    publishDate: '31st Aug 2024',
+    url: '/glitchgifs'
   }
   // {
   //   title: 'Atomic Breakdown',
