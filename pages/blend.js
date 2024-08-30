@@ -62,6 +62,32 @@ const BlendLayer = () => {
     a.click()
   }
 
+  const downloadComposite = () => {
+    const compositeCanvas = document.createElement('canvas')
+    const compositeCtx = compositeCanvas.getContext('2d')
+    
+    const maxWidth = Math.max(image1.width, image2.width)
+    const totalHeight = image1.height + image2.height + canvas.height
+    compositeCanvas.width = maxWidth
+    compositeCanvas.height = totalHeight
+    
+    compositeCtx.drawImage(image1, 0, 0, maxWidth, image1.height)
+    compositeCtx.drawImage(image2, 0, image1.height, maxWidth, image2.height)
+    compositeCtx.drawImage(canvas, 0, image1.height + image2.height, maxWidth, canvas.height)
+    
+    compositeCtx.font = '48px Arial'
+    compositeCtx.fillStyle = 'white'
+    compositeCtx.textAlign = 'center'
+    compositeCtx.textBaseline = 'middle'
+    compositeCtx.fillText('+', maxWidth / 2, image1.height + image2.height / 2)
+    
+    const dataURL = compositeCanvas.toDataURL('image/png')
+    const a = document.createElement('a')
+    a.href = dataURL
+    a.download = `blended-composite-${new Date().getTime()}.png`
+    a.click()
+  }
+
   useEffect(() => {
     const canvas = document.getElementById('canvas')
     const ctx = canvas.getContext('2d')
@@ -124,7 +150,8 @@ const BlendLayer = () => {
             <input type="range" min="0" max="1" step="0.01" value={opacity} onChange={handleOpacity} />
             <canvas id="canvas" width={image1?.width || 500} height={image1?.height || 500}></canvas>
 
-            <button style={{border: '1px solid #333'}} onClick={downloadImage}>Download</button>
+            <button style={{border: '1px solid #333'}} onClick={downloadImage}>Download Blended Image</button>
+            <button style={{border: '1px solid #333'}} onClick={downloadComposite}>Download Composite</button>
           </div>
         </div>
       </main>
