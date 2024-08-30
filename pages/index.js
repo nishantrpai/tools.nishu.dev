@@ -1011,11 +1011,18 @@ export const tools = [
     url: '/grainygifs'
   },
   {
+    title: 'Unexcuse',
+    description: 'Unexcuse your excuse for e.g., "I am too busy" -> "BS this is not a priority"',
+    publishDate: '30th Aug 2024',
+    url: '/unexcuse'
+  },
+  {
     title: 'Glitch gif',
     description: 'Add glitch effect to your gif',
     publishDate: '31st Aug 2024',
     url: '/glitchgifs'
-  }
+  },
+
   // {
   //   title: 'Atomic Breakdown',
 
