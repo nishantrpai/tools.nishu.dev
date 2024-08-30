@@ -1003,6 +1003,12 @@ export const tools = [
     description: 'Convert text to spongebob text',
     publishDate: '29th Aug 2024',
     url: '/spongebobtext'
+  },
+  {
+    title: 'Grainy gif',
+    description: 'Add grainy effect to your gif',
+    publishDate: '30th Aug 2024',
+    url: '/grainygifs'
   }
   // {
   //   title: 'Atomic Breakdown',
