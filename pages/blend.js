@@ -63,31 +63,44 @@ const BlendLayer = () => {
   }
 
   const downloadComposite = () => {
-    const compositeCanvas = document.createElement('canvas')
-    const compositeCtx = compositeCanvas.getContext('2d')
+    const compositeCanvas = document.createElement('canvas');
+    const compositeCtx = compositeCanvas.getContext('2d');
+  
+    const minWidth = Math.min(image1.width, image2.width, canvas.width);
     
-    const maxWidth = Math.max(image1.width, image2.width)
-    const totalHeight = image1.height + image2.height + canvas.height
-    compositeCanvas.width = maxWidth
-    compositeCanvas.height = totalHeight
+    // Calculate heights while maintaining aspect ratios
+    const image1Height = (image1.height / image1.width) * minWidth;
+    const image2Height = (image2.height / image2.width) * minWidth;
+    const canvasHeight = (canvas.height / canvas.width) * minWidth;
     
-    compositeCtx.drawImage(image1, 0, 0, maxWidth, image1.height)
-    compositeCtx.drawImage(image2, 0, image1.height, maxWidth, image2.height)
-    compositeCtx.drawImage(canvas, 0, image1.height + image2.height, maxWidth, canvas.height)
+    const totalHeight = image1Height + image2Height + canvasHeight;
     
-    compositeCtx.font = '48px Arial'
-    compositeCtx.fillStyle = 'white'
-    compositeCtx.textAlign = 'center'
-    compositeCtx.textBaseline = 'middle'
-    compositeCtx.fillText('+', maxWidth / 2, image1.height + image2.height / 2)
-    
-    const dataURL = compositeCanvas.toDataURL('image/png')
-    const a = document.createElement('a')
-    a.href = dataURL
-    a.download = `blended-composite-${new Date().getTime()}.png`
-    a.click()
+    compositeCanvas.width = minWidth;
+    compositeCanvas.height = totalHeight;
+  
+    // Draw image1
+    compositeCtx.drawImage(image1, 0, 0, minWidth, image1Height);
+  
+    // Draw image2
+    compositeCtx.drawImage(image2, 0, image1Height, minWidth, image2Height);
+  
+    // Draw the blended canvas (image3)
+    compositeCtx.drawImage(canvas, 0, image1Height + image2Height, minWidth, canvasHeight);
+  
+    // Draw the '+' signs
+    compositeCtx.font = '48px Arial';
+    compositeCtx.fillStyle = 'white';
+    compositeCtx.textAlign = 'center';
+    compositeCtx.textBaseline = 'middle';
+    compositeCtx.fillText('+', minWidth / 2, image1Height + 24);
+    compositeCtx.fillText('=', minWidth / 2, image1Height + image2Height + 24);
+  
+    const dataURL = compositeCanvas.toDataURL('image/png');
+    const a = document.createElement('a');
+    a.href = dataURL;
+    a.download = `blended-composite-${new Date().getTime()}.png`;
+    a.click();
   }
-
   useEffect(() => {
     const canvas = document.getElementById('canvas')
     const ctx = canvas.getContext('2d')
