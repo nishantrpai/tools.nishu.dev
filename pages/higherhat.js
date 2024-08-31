@@ -1,7 +1,7 @@
 // add higher hat on any image
 import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { ethers } from 'ethers';
 
 
@@ -14,6 +14,7 @@ export default function HigherHat() {
   const [imgWidth, setImgWidth] = useState(0)
   const [imgHeight, setImgHeight] = useState(0)
   const [hatType, setHatType] = useState(0)
+  const canvasRef = useRef(null)
 
   let RPC_CHAINS = {
     'ETHEREUM': {
@@ -82,7 +83,7 @@ export default function HigherHat() {
 
   useEffect(() => {
     // draw image on canvas
-    const canvas = document.getElementById('canvas')
+    const canvas = canvasRef.current
     const context = canvas.getContext('2d')
     context.beginPath()
     if (image) {
@@ -126,6 +127,37 @@ export default function HigherHat() {
     })
   }, [chain, contract, tokenId])
 
+  const handlePaste = (e) => {
+    const items = e.clipboardData.items;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf('image') !== -1) {
+        const blob = items[i].getAsFile();
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const img = new Image();
+          img.src = event.target.result;
+          img.onload = () => {
+            setOffsetX(38);
+            setOffsetY(60);
+            setScale(0.8);
+            setOffsetTheta(0);
+            setImgWidth(img.width);
+            setImgHeight(img.height);
+            setImage(img);
+          };
+        };
+        reader.readAsDataURL(blob);
+      }
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener('paste', handlePaste);
+    return () => {
+      window.removeEventListener('paste', handlePaste);
+    };
+  }, []);
+
   return (
     <>
       <Head>
@@ -165,11 +197,8 @@ export default function HigherHat() {
           }
           reader.readAsDataURL(file)
         }} />
-        <div style={{ display: 'flex', gap: 20,             margin: '20px 0',
- }}>
-
-
-          <canvas id="canvas" width="800" height="800" style={{
+        <div style={{ display: 'flex', gap: 20, margin: '20px 0' }}>
+          <canvas ref={canvasRef} id="canvas" width="800" height="800" style={{
             border: '1px solid #333',
             borderRadius: 10,
             maxHeight: 500,
@@ -281,7 +310,7 @@ export default function HigherHat() {
         </div>
 
         <button onClick={() => {
-          const canvas = document.getElementById('canvas')
+          const canvas = canvasRef.current
           const dataURL = canvas.toDataURL('image/png')
           const a = document.createElement('a')
           a.href = dataURL
