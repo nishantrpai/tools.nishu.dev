@@ -12,7 +12,6 @@ export default function BWFilter() {
   const [flareBrightness, setFlareBrightness] = useState(50) // opacity of lens flare
   const [flareRadius, setFlareRadius] = useState(50) // radius of lens flare
 
-
   useEffect(() => {
     // draw image on canvas
     const canvas = document.getElementById('canvas')
@@ -39,7 +38,6 @@ export default function BWFilter() {
       context.drawImage(canvas, 0, 0)
       context.filter = 'blur(5px)'
       context.drawImage(canvas, 0, 0)
-
 
       // Create lens flare effect
       context.globalAlpha = 1.0 // Reset alpha to full opacity for the lens flare
@@ -72,6 +70,32 @@ export default function BWFilter() {
       context.closePath()
     }
   }, [image, blur, brightness, flareX, flareY, flareBrightness, flareRadius])
+
+  const handlePaste = (event) => {
+    const items = event.clipboardData.items;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf('image') !== -1) {
+        const blob = items[i].getAsFile();
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.src = e.target.result;
+          img.onload = () => {
+            setImage(img);
+          };
+        };
+        reader.readAsDataURL(blob);
+        break;
+      }
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener('paste', handlePaste);
+    return () => {
+      window.removeEventListener('paste', handlePaste);
+    };
+  }, []);
 
   return (
     <>
@@ -107,6 +131,7 @@ export default function BWFilter() {
             }
             reader.readAsDataURL(file)
           }} />
+          <p>Or paste an image (Ctrl+V)</p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20, marginTop: 20 }}>
             <canvas id="canvas" style={{ width: '100%', height: '100%', border: '1px solid #333', borderRadius: 10 }} />
             <div style={{ display: 'flex', flexDirection: 'column', width: '50%', margin: 'auto', gap: 20 }}>
