@@ -18,7 +18,6 @@ export default function FeedbackLoop() {
         },
         body: JSON.stringify({
           prompt: `Generate a concise JSON (don't add prefixes/suffixes or codeblocks) string representation of a simple feedback loop for the system involving: "${entity}". The loop should be circular, not forming multiple loops or a star shape. Include the environment and relevant phenomena or elements as variables. The JSON string should represent an array of 3-4 objects, each with 'name', 'description', and 'connects_to' properties. 'connects_to' should be an array with a single index pointing to the next entity in the loop. Include both positive and negative feedback mechanisms where applicable.`,
-          model: 'gpt-4o-mini'
         }),
       })
       const data = await response.json()
