@@ -64,6 +64,32 @@ export default function ProgressiveBlur() {
     }
   }, [blurAmount, direction, linePosition]) // Added blurAmount
 
+  useEffect(() => {
+    const handlePaste = (event) => {
+      const items = event.clipboardData.items;
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf('image') !== -1) {
+          const blob = items[i].getAsFile();
+          const img = new Image();
+          img.src = URL.createObjectURL(blob);
+          img.onload = () => {
+            const canvas = canvasRef.current;
+            const ctx = canvas.getContext('2d');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+            applyBlur(ctx, img, blurAmount, direction, linePosition);
+          };
+        }
+      }
+    };
+
+    window.addEventListener('paste', handlePaste);
+    return () => {
+      window.removeEventListener('paste', handlePaste);
+    };
+  }, [blurAmount, direction, linePosition]);
+
   return (
     <>
       <Head>
@@ -76,7 +102,7 @@ export default function ProgressiveBlur() {
         <h2 className={styles.description}>Add progressive blur to your image</h2>
         <input type="file" onChange={(e) => setImage(e.target.files[0])} />
         <label>Blur Amount: {blurAmount}</label> {/* Added blur amount input */}
-        <input type="range" min={0} max={20} value={blurAmount} onChange={(e) => setBlurAmount(e.target.value)} /> {/* Added blur amount input */}
+        <input type="range" min={0} max={100} value={blurAmount} onChange={(e) => setBlurAmount(e.target.value)} /> {/* Added blur amount input */}
         <label>Direction: </label>
         <select value={direction} onChange={(e) => setDirection(e.target.value)}>
           <option value="top">Top</option>
@@ -95,6 +121,14 @@ export default function ProgressiveBlur() {
           a.download = 'progressive_blur.png'
           a.click()
         }}>Download
+        </button>
+        <button onClick={() => {
+          const canvas = canvasRef.current
+          canvas.toBlob(blob => {
+            const item = new ClipboardItem({ 'image/png': blob })
+            navigator.clipboard.write([item])
+          })
+        }}>Copy to Clipboard
         </button>
       </main>
     </>
