@@ -1028,6 +1028,12 @@ export const tools = [
     publishDate: '31st Aug 2024',
     url: '/glitchgifs'
   },
+  {
+    title: 'Progressive Blur',
+    description: 'Add progressive blur to your image',
+    publishDate: '1st Sep 2024',
+    url: '/progressiveblur'
+  }
 
   // {
   //   title: 'Atomic Breakdown',
