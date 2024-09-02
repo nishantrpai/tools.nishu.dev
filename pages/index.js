@@ -1033,6 +1033,12 @@ export const tools = [
     description: 'Add progressive blur to your image',
     publishDate: '1st Sep 2024',
     url: '/progressiveblur'
+  },
+  {
+    title: 'Liquify',
+    description: 'Liquify your image',
+    publishDate: '2nd Sep 2024',
+    url: '/liquify'
   }
 
   // {
