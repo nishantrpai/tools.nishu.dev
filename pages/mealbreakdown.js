@@ -1,12 +1,12 @@
-// estimate the meal breakdown of provided product including calories
-import Head from 'next/head'
-import styles from '@/styles/Home.module.css'
-import { useState, useEffect } from 'react'
+import Head from 'next/head';
+import styles from '@/styles/Home.module.css';
+import { useState, useEffect } from 'react';
 import { FiUpload, FiCamera } from 'react-icons/fi';
-import Markdown from 'markdown-to-jsx';
+import MarkdownRenderer from '@/components/markdownrenderer';
 
 export default function MealBreakdown() {
   const [breakdown, setBreakdown] = useState(null);
+
   const detectBreakdown = async (event) => {
     const file = event.target.files[0];
     const canvas = document.getElementById('canvas');
@@ -21,9 +21,7 @@ export default function MealBreakdown() {
   }
 
   const getBreakdown = async () => {
-    // get canvas as data url send to gpt as req body
     const canvas = document.getElementById('canvas');
-    // reduce the size of the image to 500x500
     let tempCanvas = document.createElement('canvas');
     let tempCtx = tempCanvas.getContext('2d');
     tempCanvas.width = 500;
@@ -44,7 +42,6 @@ export default function MealBreakdown() {
   }
 
   useEffect(() => {
-    // when pasting image add it to canvas
     window.addEventListener('paste', async (event) => {
       const items = (event.clipboardData || event.originalEvent.clipboardData).items;
       for (const item of items) {
@@ -66,8 +63,7 @@ export default function MealBreakdown() {
         }
       }
     });
-  }, [])
-
+  }, []);
 
   return (
     <>
@@ -76,14 +72,9 @@ export default function MealBreakdown() {
         <meta name="description" content="Get meal breakdown for your food items including calories" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      {/* input to upload, canvas to render and prompt to detect the meal breakdown */}
       <main>
-        <h1 className={styles.title}>
-          Meal Breakdown
-        </h1>
-        <h2 className={styles.description}>
-          Get meal breakdown for your food items including calories
-        </h2>
+        <h1 className={styles.title}>Meal Breakdown</h1>
+        <h2 className={styles.description}>Get meal breakdown for your food items including calories</h2>
         <canvas id="canvas"
           width={500}
           height={500}
@@ -92,7 +83,6 @@ export default function MealBreakdown() {
             borderRadius: '5px',
             width: '100%',
             height: 'auto'
-
           }}
         ></canvas>
         <div style={{ marginTop: 20, display: 'flex', flexDirection: 'row', gap: 0, width: '100%', textAlign: 'left', fontSize: 32 }}>
@@ -105,7 +95,6 @@ export default function MealBreakdown() {
             </label>
             <input id="file-upload" type="file" accept="image/*" onChange={detectBreakdown} style={{ display: 'none' }} />
           </div>
-          {/* add camera input */}
           <div style={{
             flexBasis: '50%', textAlign: 'center', border: '1px solid #333',
             borderRadius: '0 5px 5px 0',
@@ -118,18 +107,10 @@ export default function MealBreakdown() {
           </div>
         </div>
         <button onClick={getBreakdown} style={{ marginTop: 20, fontSize: '1.25rem' }}>Get</button>
-        <Markdown style={{
-          fontSize: '1.5rem',
-          padding: '1rem',
-          display: 'block',
-          textAlign: 'left',
-          whiteSpace: 'pre-wrap',
-          marginTop: '1rem'
-        }}>
-          {breakdown}
-        </Markdown>
+        {breakdown && (
+          <MarkdownRenderer markdown={breakdown} />
+        )}
       </main>
     </>
   )
-
 }
