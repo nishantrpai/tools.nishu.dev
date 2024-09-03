@@ -86,14 +86,15 @@ export default function Liquify() {
       const ctx = canvas.getContext('2d')
       const image = new Image()
       image.onload = () => {
-        if (image.width < 500 || image.height < 500) {
-          canvas.width = 500
-          canvas.height = 500
-          ctx.drawImage(image, 0, 0, 500, 500)
+        const aspectRatio = image.width / image.height;
+        if (image.width < 800 || image.height < 800) {
+          canvas.width = 800;
+          canvas.height = 800 / aspectRatio;
+          ctx.drawImage(image, 0, 0, 800, 800 / aspectRatio);
         } else {
-          canvas.width = image.width
-          canvas.height = image.height
-          ctx.drawImage(image, 0, 0)
+          canvas.width = 800;
+          canvas.height = 800;
+          ctx.drawImage(image, 0, 0, 800, 800);
         }
         contextRef.current = ctx
 
