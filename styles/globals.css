@@ -91,6 +91,14 @@ main {
   min-height: 100vh;
 }
 
+select {
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #333;
+  width: 100%;
+  border-radius: 5px;
+}
+
 .grid {
   display: flex;
   flex-direction: row;
@@ -99,6 +107,16 @@ main {
   align-items: flex-start;
   width: 100%;
   max-width: var(--max-width);
+}
+
+input[type='text'] {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #333;
+  border-radius: 5px;
+  background-color: #000;
+  color: #fff;
 }
 
 code {

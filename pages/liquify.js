@@ -70,8 +70,8 @@ export default function Liquify() {
   const [brushSize, setBrushSize] = useState(50)
   const [isWarping, setIsWarping] = useState(false)
   const [chain, setChain] = useState('ETHEREUM') // Added chain state
-  const [contractAddress, setContractAddress] = useState('') // Added contract address state
-  const [tokenId, setTokenId] = useState('') // Added token ID state
+  const [contractAddress, setContractAddress] = useState('0x036721e5a769cc48b3189efbb9cce4471e8a48b1') // Added contract address state
+  const [tokenId, setTokenId] = useState('1') // Added token ID state
   const canvasRef = useRef(null)
   const contextRef = useRef(null)
   const cursorCanvasRef = useRef(null)
@@ -289,7 +289,7 @@ export default function Liquify() {
             <>
               Processing... Status: {status}
             </>
-          ) : `Upload image or paste from clipboard (Status: ${status})`}
+          ) : ``}
         </span>
         
         <input
@@ -300,6 +300,39 @@ export default function Liquify() {
             setStatus('image uploaded')
           }}
         />
+       
+        <div>
+          <select 
+            id="chain" 
+            value={chain} 
+            onChange={(e) => setChain(e.target.value)}
+          >
+
+            <option value="ETHEREUM">Mainnet</option>
+            <option value="ZORA">Zora</option>
+            <option value="BASE">Base</option>
+
+          </select>
+        </div>
+        <div>
+          <input 
+            type="text" 
+            id="contractAddress" 
+            value={contractAddress} 
+            placeholder='Enter contract address'
+            onChange={(e) => setContractAddress(e.target.value)}
+            style={{}}
+          />
+        </div>
+        <div>
+          <input 
+            type="text" 
+            id="tokenId" 
+            value={tokenId} 
+            placeholder='Enter token ID'
+            onChange={(e) => setTokenId(e.target.value)}
+          />
+        </div>
         <button
           onClick={() => {
             const canvas = canvasRef.current
@@ -316,38 +349,6 @@ export default function Liquify() {
         <button onClick={resetImage}>
           Reset
         </button>
-        <div>
-          <label htmlFor="chain">Select Chain: </label>
-          <select 
-            id="chain" 
-            value={chain} 
-            onChange={(e) => setChain(e.target.value)}
-          >
-
-            <option value="ETHEREUM">Mainnet</option>
-            <option value="ZORA">Zora</option>
-            <option value="BASE">Base</option>
-
-          </select>
-        </div>
-        <div>
-          <label htmlFor="contractAddress">Contract Address: </label>
-          <input 
-            type="text" 
-            id="contractAddress" 
-            value={contractAddress} 
-            onChange={(e) => setContractAddress(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="tokenId">Token ID: </label>
-          <input 
-            type="text" 
-            id="tokenId" 
-            value={tokenId} 
-            onChange={(e) => setTokenId(e.target.value)}
-          />
-        </div>
       </main>
     </>
   )
