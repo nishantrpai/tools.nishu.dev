@@ -1039,7 +1039,14 @@ export const tools = [
     description: 'Liquify your image',
     publishDate: '2nd Sep 2024',
     url: '/liquify'
+  },
+  {
+    title: 'Meal Breakdown from image',
+    description: 'Get meal breakdown from an image',
+    publishDate: '3rd Sep 2024',
+    url: '/mealbreakdown'
   }
+
 
   // {
   //   title: 'Atomic Breakdown',
