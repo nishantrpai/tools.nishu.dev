@@ -1,4 +1,4 @@
-// estimate the meal breakdown of provided product
+// estimate the meal breakdown of provided product including calories
 import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { useState, useEffect } from 'react'
@@ -34,7 +34,7 @@ export default function MealBreakdown() {
     const response = await fetch('/api/gpt', {
       method: 'POST',
       body: JSON.stringify({
-        prompt: `estimate the meal breakdown (in terms of proteins etc) of provided product (only give a breakdown) \n\nMeal Breakdown (use markdown formatting):\n\n`,
+        prompt: `estimate detailed meal breakdown (in terms of proteins, carbohydrates, fats, and calories) of provided product (only give a breakdown, don't add prefix or suffix) \n\nMeal Breakdown (use markdown formatting, give a table):\n\n`,
         image_url: dataURL,
         model: 'gpt-4o-mini'
       }),
@@ -73,7 +73,7 @@ export default function MealBreakdown() {
     <>
       <Head>
         <title>Meal Breakdown</title>
-        <meta name="description" content="Get meal breakdown for your food items" />
+        <meta name="description" content="Get meal breakdown for your food items including calories" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       {/* input to upload, canvas to render and prompt to detect the meal breakdown */}
@@ -82,7 +82,7 @@ export default function MealBreakdown() {
           Meal Breakdown
         </h1>
         <h2 className={styles.description}>
-          Get meal breakdown for your food items
+          Get meal breakdown for your food items including calories
         </h2>
         <canvas id="canvas"
           width={500}
