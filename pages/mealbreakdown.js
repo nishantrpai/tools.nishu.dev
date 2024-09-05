@@ -29,10 +29,14 @@ export default function MealBreakdown() {
     tempCtx.drawImage(canvas, 0, 0, 500, 500);
     const dataURL = tempCanvas.toDataURL();
     setBreakdown('Checking...');
+    
+    const originalWidth = canvas.width;
+    const originalHeight = canvas.height;
+
     const response = await fetch('/api/gpt', {
       method: 'POST',
       body: JSON.stringify({
-        prompt: `estimate detailed meal breakdown (in terms of proteins, carbohydrates, fats, and calories) of provided product (only give a breakdown, don't add prefix or suffix) \n\nMeal Breakdown (use markdown formatting, give a table):\n\n`,
+        prompt: `estimate detailed meal breakdown (in terms of proteins, carbohydrates, fats, and calories) of provided product (only give a breakdown, don't add prefix or suffix) \n\nThe original image dimensions are ${originalWidth}x${originalHeight}. The image has been scaled down to 500x500. \n\nMeal Breakdown (use markdown formatting, give a table):\n\n`,
         image_url: dataURL,
         model: 'gpt-4o-mini'
       }),
