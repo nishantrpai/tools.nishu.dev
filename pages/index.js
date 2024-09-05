@@ -1045,7 +1045,13 @@ export const tools = [
     description: 'Get meal breakdown from an image',
     publishDate: '3rd Sep 2024',
     url: '/mealbreakdown'
-  }
+  },
+  {
+    title: 'Add text to image',
+    description: 'Add text to image',
+    publishDate: '4th Sep 2024',
+    url: '/addtext'
+  },
 
 
   // {
