@@ -6,6 +6,7 @@ import MarkdownRenderer from '@/components/markdownrenderer';
 
 export default function MealBreakdown() {
   const [breakdown, setBreakdown] = useState(null);
+  const [ingredients, setIngredients] = useState('');
 
   const detectBreakdown = async (event) => {
     const file = event.target.files[0];
@@ -36,7 +37,7 @@ export default function MealBreakdown() {
     const response = await fetch('/api/gpt', {
       method: 'POST',
       body: JSON.stringify({
-        prompt: `estimate detailed meal breakdown (in terms of proteins, carbohydrates, fats, and calories) of provided product (only give a breakdown, don't add prefix or suffix) \n\nThe original image dimensions are ${originalWidth}x${originalHeight}. The image has been scaled down to 500x500. \n\nMeal Breakdown (use markdown formatting, give a table):\n\n`,
+        prompt: `estimate detailed meal breakdown (in terms of proteins, carbohydrates, fats, and calories) of provided product (only give a breakdown, don't add prefix or suffix) \n\nThe original image dimensions are ${originalWidth}x${originalHeight}. The image has been scaled down to 500x500. \n\nMeal Breakdown (use markdown formatting, give a table):\n\nIngredients: ${ingredients}\n\n`,
         image_url: dataURL,
         model: 'gpt-4o-mini'
       }),
@@ -109,6 +110,15 @@ export default function MealBreakdown() {
             </label>
             <input id="file-camera" type="file" accept="image/*" onChange={detectBreakdown} capture="environment" style={{ display: 'none' }} />
           </div>
+        </div>
+        <div style={{ marginTop: 20, width: '100%' }}>
+          <input 
+            type="text" 
+            placeholder="Add ingredients (comma separated)" 
+            value={ingredients} 
+            onChange={(e) => setIngredients(e.target.value)} 
+            style={{ width: '100%', padding: '10px', fontSize: '1rem' }} 
+          />
         </div>
         <button onClick={getBreakdown} style={{ marginTop: 20, fontSize: '1.25rem' }}>Get</button>
         {breakdown && (
