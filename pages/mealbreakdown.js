@@ -37,7 +37,7 @@ export default function MealBreakdown() {
     const response = await fetch('/api/gpt', {
       method: 'POST',
       body: JSON.stringify({
-        prompt: `breakdown of provided product \n\nThe original image dimensions are ${originalWidth}x${originalHeight}. The image has been scaled down to 500x500. \n\nAggregate Meal Breakdown (use markdown formatting, keep width small, no need to add prefix or suffix or preparation steps):\n\nIngredients: ${ingredients}\n\nMeal Breakdown:\n\n`,
+        prompt: `breakdown of provided product \n\nThe original image dimensions are ${originalWidth}x${originalHeight}. The image has been scaled down to 500x500. \n\nAggregate Meal Breakdown (use markdown formatting, keep width small, no need to add prefix or suffix or preparation steps):\n\nIngredients: ${ingredients}\n\nMeal Breakdown (including macros such as protein, carbohydrates, and fats):\n\n`,
         image_url: dataURL,
         model: 'gpt-4o-mini'
       }),
