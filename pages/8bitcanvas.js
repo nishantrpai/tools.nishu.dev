@@ -80,7 +80,7 @@ export default function Home() {
     analytics('8bitcanvas', { text })
     setLoading(true)
     console.log(text)
-    let prompt = `Given the prompt:${text}.\n\n
+    let prompt = `Given the prompt:${text} (only array).\n\n
     I have a 8 x 8 grid of squares, fill it with valid hex to match the prompt from birds eye view.\n\n
     Only send 64 hex colors as an array.\n\n
     Keep it minimal.`;
