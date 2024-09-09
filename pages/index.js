@@ -1052,6 +1052,18 @@ export const tools = [
     publishDate: '4th Sep 2024',
     url: '/addtext'
   },
+  {
+    title: 'Tinydino Punk Hat',
+    description: 'Add tinydino punk hat on any image',
+    publishDate: '5th Sep 2024',
+    url: '/tinydinopunkhat'
+  },
+  {
+    title: 'HigherFM',
+    description: 'Add higherfm on any image',
+    publishDate: '6th Sep 2024',
+    url: '/higherfm'
+  }
 
 
   // {
