@@ -134,7 +134,7 @@ export default function Home() {
                   width: '50px', 
                   height: '50px', 
                   backgroundColor: cellColor,
-                  border: cellColor === color ? '2px solid white' : 'none',
+                  border: cellColor === color ? '2px solid #ffffff' : 'none',
                   cursor: 'pointer'
                 }} 
                 onClick={() => {
@@ -145,7 +145,7 @@ export default function Home() {
             )
           )}
         </div>
-        <div>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20, justifyContent: 'space-between', marginTop: '20px' }}>
           <span>Selected Color: {cellColor}</span>
           <button onClick={downloadImage}>Download</button>
         </div>
