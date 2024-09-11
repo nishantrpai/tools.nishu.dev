@@ -1063,6 +1063,12 @@ export const tools = [
     description: 'Add higherfm on any image',
     publishDate: '6th Sep 2024',
     url: '/higherfm'
+  },
+  {
+    title: 'Perfectly Loop',
+    description: 'Make your gif perfectly loop',
+    publishDate: '6th Sep 2024',
+    url: '/perfectlyloop'
   }
 
 

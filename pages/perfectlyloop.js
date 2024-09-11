@@ -8,9 +8,6 @@ import gifshot from 'gifshot'
 export default function PerfectlyLoop() {
   const [gifFrames, setGifFrames] = useState([])
   const [image, setImage] = useState(null)
-  const [offsetX, setOffsetX] = useState(0)
-  const [offsetY, setOffsetY] = useState(0)
-  const [scale, setScale] = useState(1)
   const [processing, setProcessing] = useState(false)
   const [gifUrl, setGifUrl] = useState('')
 
@@ -24,7 +21,7 @@ export default function PerfectlyLoop() {
       context.clearRect(0, 0, canvas.width, canvas.height)
       context.drawImage(image, 0, 0, image.width, image.height)
     }
-  }, [image, offsetX, offsetY, scale])
+  }, [image])
 
   const downloadAsGif = async () => {
     setProcessing(true)
@@ -50,7 +47,9 @@ export default function PerfectlyLoop() {
   }
 
   const handleGifLoad = (gifData) => {
-    fetch(`https://api.codetabs.com/v1/proxy/?quest=${gifData}`).then((res) => res.arrayBuffer()).then((buffer) => {
+    const fetchGif = gifData.startsWith('data:') ? Promise.resolve(gifData) : fetch(`https://api.codetabs.com/v1/proxy/?quest=${gifData}`).then((res) => res.arrayBuffer());
+    
+    fetchGif.then((buffer) => {
       const gif = parseGIF(buffer);
       const frames = decompressFrames(gif, true);
       const gifCanvas = document.createElement('canvas');
@@ -58,7 +57,24 @@ export default function PerfectlyLoop() {
       gifCanvas.height = gif.lsd.height;
       const gifContext = gifCanvas.getContext('2d');
 
-      frames.forEach((frame) => {
+      // Check if the GIF can loop perfectly
+      const firstFrame = frames[0];
+      const loopEndFrame = frames.findIndex((frame, index) => {
+        return index > 0 && frame.patch.every((value, i) => value === firstFrame.patch[i]);
+      });
+
+      if (loopEndFrame === -1) {
+        alert("This GIF cannot loop perfectly.");
+        return;
+      }
+
+      const loopFrames = frames.slice(0, loopEndFrame + 1);
+
+      // Cut segment and add frames to make it perfectly loop
+      const additionalFrames = frames.slice(loopEndFrame + 1, loopEndFrame + 1 + 5); // Add 5 frames for smooth transition
+      const finalFrames = [...loopFrames, ...additionalFrames];
+
+      finalFrames.forEach((frame) => {
         const { patch, dims } = frame;
         const imageData = gifContext.createImageData(dims.width, dims.height);
         imageData.data.set(patch);
@@ -66,7 +82,7 @@ export default function PerfectlyLoop() {
         frame.url = gifCanvas.toDataURL('image/png');
       });
 
-      setGifFrames(frames);
+      setGifFrames(finalFrames);
     });
   }
 

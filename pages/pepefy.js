@@ -1,4 +1,3 @@
-// add pepe color to an image and save it
 import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { useState, useEffect } from 'react'
@@ -9,9 +8,8 @@ export default function Pepe() {
   const [y, setY] = useState(0)
   const pepeShades = [
     // dark light pepe shades
-    '#67984C', '#7AA357', '#8CB162', '#9EBF6D', '#B0CD78', '#C2DB83', '#D4E98E', '#E6F799',
+    '#294f14', '#67984C', '#7AA357', '#8CB162', '#9EBF6D', '#B0CD78', '#C2DB83', '#D4E98E', '#E6F799',
   ]
-  const [pepeShade, setPepeShade] = useState(pepeShades[0])
 
   const colorDistance = (c1, c2) => {
     return Math.sqrt((c1[0] - c2[0]) ** 2 + (c1[1] - c2[1]) ** 2 + (c1[2] - c2[2]) ** 2)
@@ -25,7 +23,7 @@ export default function Pepe() {
     ]
   }
 
-  const fillPepeColor = (x, y) => {
+  const fillPepeColor = (x, y, currentPepeShade) => {
     let canvas = document.getElementById('canvas')
     let context = canvas.getContext('2d')
     let imgData = context.getImageData(0, 0, canvas.width, canvas.height)
@@ -33,9 +31,8 @@ export default function Pepe() {
     // pick the pixel that mouse is clicking
     let currentPixelColor = canvas.getContext('2d').getImageData(x, y, 1, 1).data
     let rgb = [currentPixelColor[0], currentPixelColor[1], currentPixelColor[2]]
-    console.log('rgb', `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`)
-    console.log('pepeShade', pepeShade)
-    let pepeColor = hexToRGB(pepeShade)
+    let pepeColor = hexToRGB(currentPepeShade)
+
     // find all neighboring pixels that have the same color as the clicked pixel and fill them with the new color
     let stack = [[x, y]]
     let visited = new Set()
@@ -57,7 +54,7 @@ export default function Pepe() {
     context.putImageData(imgData, 0, 0)
   }
 
-
+  // reset the canvas when a new image is uploaded
   useEffect(() => {
     if (!img) return
     const canvas = document.getElementById('canvas')
@@ -65,15 +62,25 @@ export default function Pepe() {
     canvas.height = img.height
     const context = canvas.getContext('2d')
     context.drawImage(img, 0, 0)
-    canvas.addEventListener('click', (event) => {
+
+    const handleCanvasClick = (event) => {
       const x = event.clientX - canvas.offsetLeft
       const y = event.clientY - canvas.offsetTop
-      console.log('clic', 'x', x, 'y', y)
       setX(x)
       setY(y)
-      fillPepeColor(x, y)
-    })
-  }, [img])
+      // get pepe shade from the hidden span
+      const hiddenShade = document.getElementById('pepeShadeSpan').textContent
+      fillPepeColor(x, y, hiddenShade)
+    }
+
+    canvas.addEventListener('click', handleCanvasClick)
+
+    // cleanup event listener when component unmounts or image changes
+    return () => {
+      canvas.removeEventListener('click', handleCanvasClick)
+    }
+  }, [img]) // only reset the canvas if the image changes
+
   return (
     <>
       <Head>
@@ -82,12 +89,12 @@ export default function Pepe() {
         <meta name="description" content="Add pepe color to an image and save it" />
       </Head>
       <main>
-      <h1 className={styles.title}>
-        Pepe
-      </h1>
-      <h2 className={styles.description}>
-        Add pepe color to an image and save it
-      </h2>
+        <h1 className={styles.title}>
+          Pepe
+        </h1>
+        <h2 className={styles.description}>
+          Add pepe color to an image and save it
+        </h2>
         <input type="file" accept="image/*" onChange={(e) => {
           const file = e.target.files[0]
           const reader = new FileReader()
@@ -101,14 +108,17 @@ export default function Pepe() {
           reader.readAsDataURL(file)
         }} />
         <canvas id="canvas" style={{ border: '1px solid black' }}></canvas>
-        <div>
+        <div style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
           {pepeShades.map((shade, index) => (
-            <button key={index} style={{ backgroundColor: shade, color: 'white' }} onClick={() => setPepeShade(shade)}>
-              {shade}
+            <button key={index} style={{ backgroundColor: shade, color: 'white', width: '20px', height: '20px' }} 
+                    onClick={() => document.getElementById('pepeShadeSpan').textContent = shade}>
             </button>
           ))}
         </div>
-        
+
+        {/* hidden span to hold the color */}
+        <span id="pepeShadeSpan" style={{ visibility: 'hidden' }}>#294f14</span>
+
         {/* reset */}
         <button onClick={() => {
           const canvas = document.getElementById('canvas')
@@ -129,7 +139,6 @@ export default function Pepe() {
           Save Pepe
         </button>
       </main>
-
     </>
   )
 }
