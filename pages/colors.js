@@ -119,6 +119,7 @@ export default function Home() {
 
       <main className={styles.container}>
         <h1 className={styles.title}>Color Grid Generator</h1>
+        <h2 className={styles.description}>Select a color to generate a 10x10 color grid</h2>
         <input
           type="color"
           value={color}
