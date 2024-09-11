@@ -1065,10 +1065,10 @@ export const tools = [
     url: '/higherfm'
   },
   {
-    title: 'Perfectly Loop',
-    description: 'Make your gif perfectly loop',
-    publishDate: '6th Sep 2024',
-    url: '/perfectlyloop'
+    title: 'Colors',
+    description: 'Get all colors from hex',
+    publishDate: '11th Sep 2024',
+    url: '/colors'
   }
 
 
