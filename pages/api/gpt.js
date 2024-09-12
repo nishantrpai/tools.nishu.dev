@@ -2,16 +2,27 @@
 let API_KEY = process.env.OPENAI_API_KEY;
 
 import OpenAI from 'openai';
+import { RateLimiter } from 'limiter';
 
 const openai = new OpenAI({
   apiKey: API_KEY, // This is the default and can be omitted
 });
+
+// Create a rate limiter that allows 1 request per minute
+const limiter = new RateLimiter({ tokensPerInterval: 1, interval: "minute" });
 
 export default async function handler(req, res) {
   // Check if the request is coming from an external URL or curl
   const origin = req.headers.origin || req.headers.referer;
   if (!origin || !origin.includes('tools.nishu.dev')) {
     res.status(403).json({ error: 'Access denied' });
+    return;
+  }
+
+  // Check if we have any tokens left
+  const remainingRequests = await limiter.removeTokens(1);
+  if (remainingRequests < 0) {
+    res.status(429).json({ error: 'Rate limit exceeded. Please try again later.' });
     return;
   }
 
