@@ -15,7 +15,8 @@ const limiter = new RateLimiter({ tokensPerInterval: 1, interval: "minute" });
 // Create a map to store IP addresses and their request counts
 const ipRequestCounts = new Map();
 const MAX_REQUESTS_PER_HOUR = 60; // Adjust this value as needed
-const BLOCK_DURATION = 60 * 60 * 1000; // 1 hour in milliseconds
+// 24 hour block for IP
+const BLOCK_DURATION = 24 * 60 * 60 * 1000;
 
 function hashIP(ip) {
   return createHash('sha256').update(ip).digest('hex');
@@ -41,12 +42,13 @@ export default async function handler(req, res) {
 
   // Update request count for the IP
   if (!ipData) {
-    ipRequestCounts.set(clientIP, { count: 1, lastReset: Date.now() });
+    ipRequestCounts.set(clientIP, { count: 1, lastReset: Date.now(), rateLimitExceeded: 0 });
   } else {
     // Reset count if it's been more than an hour since the last request
     if (Date.now() - ipData.lastReset > 60 * 60 * 1000) {
       ipData.count = 1;
       ipData.lastReset = Date.now();
+      ipData.rateLimitExceeded = 0;
     } else {
       ipData.count++;
     }
@@ -63,6 +65,13 @@ export default async function handler(req, res) {
   // Check if we have any tokens left
   const remainingRequests = await limiter.removeTokens(1);
   if (remainingRequests < 0) {
+    ipData.rateLimitExceeded++;
+    if (ipData.rateLimitExceeded >= 3) {
+      ipData.blocked = true;
+      ipData.blockedAt = Date.now();
+      res.status(429).json({ error: 'You have been blocked for 24 hours due to repeated rate limit violations.' });
+      return;
+    }
     res.status(429).json({ error: 'Rate limit exceeded. Please try again later.' });
     return;
   }
