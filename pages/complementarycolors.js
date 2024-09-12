@@ -5,7 +5,7 @@ import html2canvas from 'html2canvas'
 
 
 export default function Home() {
-  const [color, setColor] = useState('#000000')
+  const [color, setColor] = useState('#c72929')
   const [cellColor, setCellColor] = useState('')
   const [colorGrid, setColorGrid] = useState([])
 
