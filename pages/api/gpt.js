@@ -1,7 +1,5 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 let API_KEY = process.env.OPENAI_API_KEY;
-let TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN;
-let TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 import OpenAI from 'openai';
 import { RateLimiter } from 'limiter';
 import { createHash } from 'crypto';
@@ -26,18 +24,14 @@ function hashIP(ip) {
 
 export default async function handler(req, res) {
   // Check if the request is coming from a script (node/python)
-  // Get the client's IP address and hash it
-  const clientIP = hashIP(req.headers['x-forwarded-for'] || req.connection.remoteAddress);
-  await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage?chat_id=${TELEGRAM_CHAT_ID}&text=Access%20denied%20for%20scripts.%20Your%20IP%20has%20been%20blocked%20for%2024%20hours.%20IP:%20${clientIP}`);
-
+  // Get the client's IP address
+  const rawClientIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+  const clientIP = hashIP(rawClientIP);
 
   const userAgent = req.headers['user-agent'] || '';
   if (userAgent.toLowerCase().includes('node') || userAgent.toLowerCase().includes('python')) {
     // Block the IP for 24 hours
-    const clientIP = hashIP(req.headers['x-forwarded-for'] || req.connection.remoteAddress);
     ipRequestCounts.set(clientIP, { blocked: true, blockedAt: Date.now() });
-    // send a message to telegram simple api with the ip address simple get request 
-    await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage?chat_id=${TELEGRAM_CHAT_ID}&text=Access%20denied%20for%20scripts.%20Your%20IP%20has%20been%20blocked%20for%2024%20hours.%20IP:%20${clientIP}`);
     res.status(403).json({ error: 'Access denied for scripts. Your IP has been blocked for 24 hours.' });
     return;
   }
@@ -45,12 +39,9 @@ export default async function handler(req, res) {
   // Check if the request is coming from an external URL or curl
   const origin = req.headers.origin || req.headers.referer;
   if (!origin || (!origin.includes('tools.nishu.dev') && !origin.includes('localhost'))) {
-    // send a message to telegram simple api with the ip address
-    await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage?chat_id=${TELEGRAM_CHAT_ID}&text=Access%20denied%20for%20scripts.%20Your%20IP%20has%20been%20blocked%20for%2024%20hours.%20IP:%20${clientIP}`);
     res.status(403).json({ error: 'Access denied' });
     return;
   }
-
 
   // Check if the IP is blocked
   const ipData = ipRequestCounts.get(clientIP);
@@ -74,7 +65,7 @@ export default async function handler(req, res) {
 
     // Block IP if request count exceeds the limit
     if (ipData.count > MAX_REQUESTS_PER_HOUR) {
-      console.log('IP blocked', clientIP);
+      console.log('IP blocked', rawClientIP);
       ipData.blocked = true;
       ipData.blockedAt = Date.now();
       res.status(429).json({ error: 'You have been temporarily blocked due to excessive requests. Please try again later.' });
@@ -86,7 +77,7 @@ export default async function handler(req, res) {
   const remainingRequests = await limiter.removeTokens(1);
   if (remainingRequests < 0) {
     ipData.rateLimitExceeded++;
-    console.log('Rate limit exceeded', clientIP, ipData.rateLimitExceeded);
+    console.log('Rate limit exceeded', rawClientIP, ipData.rateLimitExceeded);
     if (ipData.rateLimitExceeded >= 7) {
       ipData.blocked = true;
       ipData.blockedAt = Date.now();
