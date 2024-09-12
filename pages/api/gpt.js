@@ -5,6 +5,7 @@ let TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 import OpenAI from 'openai';
 import { RateLimiter } from 'limiter';
 import { createHash } from 'crypto';
+const fetch = (url) => import('node-fetch').then(({ default: fetch }) => fetch(url));
 
 const openai = new OpenAI({
   apiKey: API_KEY, // This is the default and can be omitted
@@ -28,7 +29,7 @@ export default async function handler(req, res) {
   // Get the client's IP address and hash it
   const clientIP = hashIP(req.headers['x-forwarded-for'] || req.connection.remoteAddress);
 
-  
+
   const userAgent = req.headers['user-agent'] || '';
   if (userAgent.toLowerCase().includes('node') || userAgent.toLowerCase().includes('python')) {
     // Block the IP for 24 hours
