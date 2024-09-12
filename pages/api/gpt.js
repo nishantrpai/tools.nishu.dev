@@ -66,7 +66,7 @@ export default async function handler(req, res) {
   const remainingRequests = await limiter.removeTokens(1);
   if (remainingRequests < 0) {
     ipData.rateLimitExceeded++;
-    if (ipData.rateLimitExceeded >= 3) {
+    if (ipData.rateLimitExceeded >= 5) {
       ipData.blocked = true;
       ipData.blockedAt = Date.now();
       res.status(429).json({ error: 'You have been blocked for 24 hours due to repeated rate limit violations.' });
