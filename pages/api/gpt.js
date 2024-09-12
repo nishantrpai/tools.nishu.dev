@@ -23,6 +23,13 @@ function hashIP(ip) {
 }
 
 export default async function handler(req, res) {
+  // Check if the request is coming from a script (node/python)
+  const userAgent = req.headers['user-agent'] || '';
+  if (userAgent.toLowerCase().includes('node') || userAgent.toLowerCase().includes('python')) {
+    res.status(403).json({ error: 'Access denied for scripts' });
+    return;
+  }
+
   // Check if the request is coming from an external URL or curl
   const origin = req.headers.origin || req.headers.referer;
   if (!origin || (!origin.includes('tools.nishu.dev') && !origin.includes('localhost'))) {
