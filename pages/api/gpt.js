@@ -3,6 +3,7 @@ let API_KEY = process.env.OPENAI_API_KEY;
 
 import OpenAI from 'openai';
 import { RateLimiter } from 'limiter';
+import { createHash } from 'crypto';
 
 const openai = new OpenAI({
   apiKey: API_KEY, // This is the default and can be omitted
@@ -11,12 +12,52 @@ const openai = new OpenAI({
 // Create a rate limiter that allows 1 request per minute
 const limiter = new RateLimiter({ tokensPerInterval: 1, interval: "minute" });
 
+// Create a map to store IP addresses and their request counts
+const ipRequestCounts = new Map();
+const MAX_REQUESTS_PER_HOUR = 60; // Adjust this value as needed
+const BLOCK_DURATION = 60 * 60 * 1000; // 1 hour in milliseconds
+
+function hashIP(ip) {
+  return createHash('sha256').update(ip).digest('hex');
+}
+
 export default async function handler(req, res) {
   // Check if the request is coming from an external URL or curl
   const origin = req.headers.origin || req.headers.referer;
-  if (!origin || !origin.includes('tools.nishu.dev')) {
+  if (!origin || (!origin.includes('tools.nishu.dev') && !origin.includes('localhost'))) {
     res.status(403).json({ error: 'Access denied' });
     return;
+  }
+
+  // Get the client's IP address and hash it
+  const clientIP = hashIP(req.headers['x-forwarded-for'] || req.connection.remoteAddress);
+
+  // Check if the IP is blocked
+  const ipData = ipRequestCounts.get(clientIP);
+  if (ipData && ipData.blocked && Date.now() - ipData.blockedAt < BLOCK_DURATION) {
+    res.status(429).json({ error: 'You have been temporarily blocked due to excessive requests. Please try again later.' });
+    return;
+  }
+
+  // Update request count for the IP
+  if (!ipData) {
+    ipRequestCounts.set(clientIP, { count: 1, lastReset: Date.now() });
+  } else {
+    // Reset count if it's been more than an hour since the last request
+    if (Date.now() - ipData.lastReset > 60 * 60 * 1000) {
+      ipData.count = 1;
+      ipData.lastReset = Date.now();
+    } else {
+      ipData.count++;
+    }
+
+    // Block IP if request count exceeds the limit
+    if (ipData.count > MAX_REQUESTS_PER_HOUR) {
+      ipData.blocked = true;
+      ipData.blockedAt = Date.now();
+      res.status(429).json({ error: 'You have been temporarily blocked due to excessive requests. Please try again later.' });
+      return;
+    }
   }
 
   // Check if we have any tokens left
