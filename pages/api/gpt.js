@@ -35,18 +35,8 @@ export default async function handler(req, res) {
     // Block the IP for 24 hours
     const clientIP = hashIP(req.headers['x-forwarded-for'] || req.connection.remoteAddress);
     ipRequestCounts.set(clientIP, { blocked: true, blockedAt: Date.now() });
-    // send a message to telegram simple api with the ip address
-    fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        chat_id: TELEGRAM_CHAT_ID,
-        text: `Access denied for scripts. Your IP has been blocked for 24 hours. IP: ${clientIP}`,
-      }),
-    });
-
+    // send a message to telegram simple api with the ip address simple get request 
+    await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage?chat_id=${TELEGRAM_CHAT_ID}&text=Access%20denied%20for%20scripts.%20Your%20IP%20has%20been%20blocked%20for%2024%20hours.%20IP:%20${clientIP}`);
     res.status(403).json({ error: 'Access denied for scripts. Your IP has been blocked for 24 hours.' });
     return;
   }
@@ -55,16 +45,7 @@ export default async function handler(req, res) {
   const origin = req.headers.origin || req.headers.referer;
   if (!origin || (!origin.includes('tools.nishu.dev') && !origin.includes('localhost'))) {
     // send a message to telegram simple api with the ip address
-    fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        chat_id: TELEGRAM_CHAT_ID,
-        text: `Access denied for scripts. Your IP has been blocked for 24 hours. IP: ${clientIP}`,
-      }),
-    });
+    await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage?chat_id=${TELEGRAM_CHAT_ID}&text=Access%20denied%20for%20scripts.%20Your%20IP%20has%20been%20blocked%20for%2024%20hours.%20IP:%20${clientIP}`);
     res.status(403).json({ error: 'Access denied' });
     return;
   }
