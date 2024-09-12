@@ -8,6 +8,13 @@ const openai = new OpenAI({
 });
 
 export default async function handler(req, res) {
+  // Check if the request is coming from an external URL or curl
+  const origin = req.headers.origin || req.headers.referer;
+  if (!origin || !origin.includes('tools.nishu.dev')) {
+    res.status(403).json({ error: 'Access denied' });
+    return;
+  }
+
   // if request is a GET request
   if (req.method !== 'GET') {
     // check body for prompt
@@ -74,6 +81,4 @@ export default async function handler(req, res) {
     res.status(200).json({ response: chatCompletion.choices[0].message.content });
     return;
   }
-
-
 }
