@@ -17,7 +17,7 @@ export default function Home() {
       method: 'POST',
       body: JSON.stringify({
         prompt: `"${text}" list different variations to convey this text as combinations of emojis. only provide the numbered list no prefix text or suffix text.'`,
-        model: 'gpt-4o-mini'
+        model: 'gpt-3.5-turbo'
       })
     })
     const data = await res.json()

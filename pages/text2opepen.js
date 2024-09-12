@@ -45,7 +45,7 @@ export default function Home() {
       },
       body: JSON.stringify({ 
         prompt,
-        model: 'gpt-4o-mini'
+        model: 'gpt-3.5-turbo'
       })
     })
     const data = await res.json()
