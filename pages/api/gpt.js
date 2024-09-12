@@ -1,6 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 let API_KEY = process.env.OPENAI_API_KEY;
-
+let TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN;
+let TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 import OpenAI from 'openai';
 import { RateLimiter } from 'limiter';
 import { createHash } from 'crypto';
@@ -29,6 +30,18 @@ export default async function handler(req, res) {
     // Block the IP for 24 hours
     const clientIP = hashIP(req.headers['x-forwarded-for'] || req.connection.remoteAddress);
     ipRequestCounts.set(clientIP, { blocked: true, blockedAt: Date.now() });
+    // send a message to telegram simple api with the ip address
+    fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT_ID,
+        text: `Access denied for scripts. Your IP has been blocked for 24 hours. IP: ${clientIP}`,
+      }),
+    });
+
     res.status(403).json({ error: 'Access denied for scripts. Your IP has been blocked for 24 hours.' });
     return;
   }
@@ -36,6 +49,17 @@ export default async function handler(req, res) {
   // Check if the request is coming from an external URL or curl
   const origin = req.headers.origin || req.headers.referer;
   if (!origin || (!origin.includes('tools.nishu.dev') && !origin.includes('localhost'))) {
+    // send a message to telegram simple api with the ip address
+    fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {  
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT_ID,
+        text: `Access denied for scripts. Your IP has been blocked for 24 hours. IP: ${clientIP}`,
+      }),
+    });
     res.status(403).json({ error: 'Access denied' });
     return;
   }
