@@ -55,6 +55,7 @@ export default async function handler(req, res) {
 
     // Block IP if request count exceeds the limit
     if (ipData.count > MAX_REQUESTS_PER_HOUR) {
+      console.log('IP blocked', clientIP);
       ipData.blocked = true;
       ipData.blockedAt = Date.now();
       res.status(429).json({ error: 'You have been temporarily blocked due to excessive requests. Please try again later.' });
@@ -64,8 +65,9 @@ export default async function handler(req, res) {
 
   // Check if we have any tokens left
   const remainingRequests = await limiter.removeTokens(1);
-  if (remainingRequests < 0) {
+  if (remainingRequests < 0) {  
     ipData.rateLimitExceeded++;
+    console.log('Rate limit exceeded', clientIP, ipData.rateLimitExceeded);
     if (ipData.rateLimitExceeded >= 7) {
       ipData.blocked = true;
       ipData.blockedAt = Date.now();
