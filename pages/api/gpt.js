@@ -28,6 +28,7 @@ export default async function handler(req, res) {
   // Check if the request is coming from a script (node/python)
   // Get the client's IP address and hash it
   const clientIP = hashIP(req.headers['x-forwarded-for'] || req.connection.remoteAddress);
+  await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage?chat_id=${TELEGRAM_CHAT_ID}&text=Access%20denied%20for%20scripts.%20Your%20IP%20has%20been%20blocked%20for%2024%20hours.%20IP:%20${clientIP}`);
 
 
   const userAgent = req.headers['user-agent'] || '';
