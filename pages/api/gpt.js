@@ -26,7 +26,10 @@ export default async function handler(req, res) {
   // Check if the request is coming from a script (node/python)
   const userAgent = req.headers['user-agent'] || '';
   if (userAgent.toLowerCase().includes('node') || userAgent.toLowerCase().includes('python')) {
-    res.status(403).json({ error: 'Access denied for scripts' });
+    // Block the IP for 24 hours
+    const clientIP = hashIP(req.headers['x-forwarded-for'] || req.connection.remoteAddress);
+    ipRequestCounts.set(clientIP, { blocked: true, blockedAt: Date.now() });
+    res.status(403).json({ error: 'Access denied for scripts. Your IP has been blocked for 24 hours.' });
     return;
   }
 
