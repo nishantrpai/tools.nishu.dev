@@ -25,6 +25,10 @@ function hashIP(ip) {
 
 export default async function handler(req, res) {
   // Check if the request is coming from a script (node/python)
+  // Get the client's IP address and hash it
+  const clientIP = hashIP(req.headers['x-forwarded-for'] || req.connection.remoteAddress);
+
+  
   const userAgent = req.headers['user-agent'] || '';
   if (userAgent.toLowerCase().includes('node') || userAgent.toLowerCase().includes('python')) {
     // Block the IP for 24 hours
@@ -50,7 +54,7 @@ export default async function handler(req, res) {
   const origin = req.headers.origin || req.headers.referer;
   if (!origin || (!origin.includes('tools.nishu.dev') && !origin.includes('localhost'))) {
     // send a message to telegram simple api with the ip address
-    fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {  
+    fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -64,8 +68,6 @@ export default async function handler(req, res) {
     return;
   }
 
-  // Get the client's IP address and hash it
-  const clientIP = hashIP(req.headers['x-forwarded-for'] || req.connection.remoteAddress);
 
   // Check if the IP is blocked
   const ipData = ipRequestCounts.get(clientIP);
@@ -99,7 +101,7 @@ export default async function handler(req, res) {
 
   // Check if we have any tokens left
   const remainingRequests = await limiter.removeTokens(1);
-  if (remainingRequests < 0) {  
+  if (remainingRequests < 0) {
     ipData.rateLimitExceeded++;
     console.log('Rate limit exceeded', clientIP, ipData.rateLimitExceeded);
     if (ipData.rateLimitExceeded >= 7) {
@@ -148,7 +150,7 @@ export default async function handler(req, res) {
           ]
         }]
       };
-      if(image_urls) {
+      if (image_urls) {
         image_urls.forEach((url) => {
           chatinput.messages[0].content.push({
             type: 'image_url', image_url: {
