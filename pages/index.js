@@ -1069,6 +1069,12 @@ export const tools = [
     description: 'Get all colors from hex',
     publishDate: '11th Sep 2024',
     url: '/colors'
+  },
+  {
+    title: 'Higher Confessions',
+    description: 'Generate higher confessions',
+    publishDate: '11th Sep 2024',
+    url: '/higherconfessions'
   }
 
 
