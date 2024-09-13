@@ -9,7 +9,7 @@ export default function HigherConfessions() {
 
 
   const generateConfession = () => {
-    let tempConfession =  `
+    let tempConfession = `
     <svg width="500" height="500" xmlns="http://www.w3.org/2000/svg">
     <defs>
         <style type="text/css">
@@ -31,16 +31,7 @@ export default function HigherConfessions() {
       
       <!-- Text -->
       <text>
-        <tspan x="50%" y="45%" font-family="Helvetica" font-size="16" fill="#06C85F" font-weight="bold" text-anchor="middle" dy="-20">
-          ${(() => {
-            const words = confession.toUpperCase().split(' ');
-            const lines = [];
-            for (let i = 0; i < words.length; i += 7) {
-              lines.push(`<tspan x="50%" dy="20">${words.slice(i, i + 7).join(' ')}</tspan>`);
-            }
-            return lines.join('');
-          })()}
-        </tspan>
+        ${confession.split('\n').map((line, index) => `<tspan x="50%" y="${40 + (index * 5)}%" font-family="Helvetica" font-size="16" fill="#06C85F" font-weight="bold" text-anchor="middle" dominant-baseline="middle">${line.trim().toUpperCase()}</tspan>`).join('')}
       </text>
     
       <text x="50%" y="95%" font-family="Helvetica" font-size="20" fill="#06C85F" font-weight="bold" text-anchor="middle">
@@ -68,39 +59,39 @@ export default function HigherConfessions() {
         <h1>Higher Confessions</h1>
         <h2 className={styles.description}>Generate Higher Confessions</h2>
 
-          <img src={confessionSVG} alt="Higher Confession" />
-          <textarea value={confession} onChange={(e) => setConfession(e.target.value)}  style={{
-            width: '95%',
-            height: '100px',
-            fontSize: '16px',
-            color: '#fff',
-            backgroundColor: '#000',
-            padding: '10px',
-            borderRadius: '5px',
-            border: '1px solid #333',
-            resize: 'none',
-            outline: 'none',
-          }}
-            placeholder="Enter your higher confession"
-          />
-          <button onClick={() => {
-            // 2x and download as png
-            const canvas = document.createElement('canvas')
-            const ctx = canvas.getContext('2d')
-            canvas.width = 1000
-            canvas.height = 1000
-            // confessionsvg is a data url
-            const img = new Image()
-            img.src = confessionSVG
-            img.onload = () => {
-              ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
-              const dataUrl = canvas.toDataURL('image/png')
-              const a = document.createElement('a')
-              a.href = dataUrl
-              a.download = 'higher-confession.png'
-              a.click()
-            }
-          }}>Generate</button>
+        <img src={confessionSVG} alt="Higher Confession" />
+        <textarea value={confession} onChange={(e) => setConfession(e.target.value)} style={{
+          width: '95%',
+          height: '100px',
+          fontSize: '16px',
+          color: '#fff',
+          backgroundColor: '#000',
+          padding: '10px',
+          borderRadius: '5px',
+          border: '1px solid #333',
+          resize: 'none',
+          outline: 'none',
+        }}
+          placeholder="Enter your higher confession"
+        />
+        <button onClick={() => {
+          // 2x and download as png
+          const canvas = document.createElement('canvas')
+          const ctx = canvas.getContext('2d')
+          canvas.width = 1000
+          canvas.height = 1000
+          // confessionsvg is a data url
+          const img = new Image()
+          img.src = confessionSVG
+          img.onload = () => {
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+            const dataUrl = canvas.toDataURL('image/png')
+            const a = document.createElement('a')
+            a.href = dataUrl
+            a.download = 'higher-confession.png'
+            a.click()
+          }
+        }}>Generate</button>
       </main>
     </>
   )
