@@ -3,7 +3,7 @@ import styles from '@/styles/Home.module.css'
 import { useState, useEffect } from 'react'
 
 export default function HigherConfessions() {
-  const [confession, setConfession] = useState('')
+  const [confession, setConfession] = useState('I JUST WANT TO GO HIGHER.')
   const [confessionSVG, setConfessionSVG] = useState('')
   const arrowPng = 'https://localhost:3000/arrow.png'
 
