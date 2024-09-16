@@ -91,7 +91,7 @@ export default function HigherConfessions() {
             a.download = 'higher-confession.png'
             a.click()
           }
-        }}>Download Image</button>
+        }}>Download Confession</button>
       </main>
     </>
   )
