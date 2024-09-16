@@ -1071,10 +1071,22 @@ export const tools = [
     url: '/colors'
   },
   {
+    title: 'Complementary Colors',
+    description: 'Get complementary color from hex',
+    publishDate: '12th Sep 2024',
+    url: '/complementarycolors'
+  },
+  {
     title: 'Higher Confessions',
     description: 'Generate higher confessions',
-    publishDate: '11th Sep 2024',
+    publishDate: '13th Sep 2024',
     url: '/higherconfessions'
+  },
+  {
+    title: 'Prompt Editor',
+    description: 'Edit prompt',
+    publishDate: '16th Sep 2024',
+    url: '/prompteditor'
   }
 
 
