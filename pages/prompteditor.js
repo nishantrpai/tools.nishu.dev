@@ -130,6 +130,13 @@ const PromptEditor = () => {
             {copy ? 'Copied!' : 'Copy to clipboard'}
           </button>
         }
+<span style={{
+  fontSize: 12,
+  color: '#888'
+}}>
+Get prompt from image: <a href='/getprompt' style={{ color: '#fff'}}> /getprompt </a>
+
+</span>
       </main>
     </>
   )
