@@ -1087,6 +1087,12 @@ export const tools = [
     description: 'Edit prompt',
     publishDate: '16th Sep 2024',
     url: '/prompteditor'
+  },
+  {
+    title: 'Imagine',
+    description: 'Imagine',
+    publishDate: '17th Sep 2024',
+    url: '/imagine'
   }
 
 
