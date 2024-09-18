@@ -1093,6 +1093,12 @@ export const tools = [
     description: 'Imagine',
     publishDate: '17th Sep 2024',
     url: '/imagine'
+  },
+  {
+    title: '2nd/3rd order effects',
+    description: '2nd/3rd order effects',
+    publishDate: '18th Sep 2024',
+    url: '/effects'
   }
 
 
