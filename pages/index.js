@@ -1099,6 +1099,12 @@ export const tools = [
     description: '2nd/3rd order effects',
     publishDate: '18th Sep 2024',
     url: '/effects'
+  },
+  {
+    title: 'Customer Discovery Questions',
+    description: 'Generate customer discovery questions',
+    publishDate: '19th Sep 2024',
+    url: '/customerdiscovery.js'
   }
 
 
