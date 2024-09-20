@@ -34,7 +34,7 @@ export default function LearnLanguage() {
       method: 'POST',
       body: JSON.stringify({
         prompt: `Generate a short, engaging story scenario in English for learning ${language} at ${levels[level - 1]} level. The story should start with "You are..." and be 1-2 sentences long, placing the user as the main character. Prompt the user to respond with a single sentence in ${language}. Include another character's dialogue in ${language} with its English translation in parentheses. End with a clear, simple question or prompt that requires only a one-sentence response in ${language}.`,
-        model: 'gpt-3.5-turbo'
+        model: 'gpt-4o-mini'
       })
     })
     const data = await res.json()
@@ -61,7 +61,7 @@ export default function LearnLanguage() {
                  was not acceptable. Note that responses containing numbers are generally acceptable (e.g., "2 pommes" 
                  or "2 vertes pommes" in French), but responses consisting of numbers alone may not be appropriate 
                  depending on the context. Conversation history: ${JSON.stringify(updatedConversation)}.`,
-        model: 'gpt-3.5-turbo'
+        model: 'gpt-4o-mini',
       })
     })
     const data = await res.json()
