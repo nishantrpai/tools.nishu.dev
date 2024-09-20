@@ -34,7 +34,7 @@ export default function LearnLanguage() {
       method: 'POST',
       body: JSON.stringify({
         prompt: `Generate a short, engaging story scenario in English for learning ${language} at ${levels[level - 1]} level. The story should start with "You are..." and be 1-2 sentences long, placing the user as the main character. Prompt the user to respond with a single sentence in ${language}. Include another character's dialogue in ${language} with its English translation in parentheses. End with a clear, simple question or prompt that requires only a one-sentence response in ${language}.`,
-        model: 'gpt-4o-mini'
+        model: 'gpt-3.5-turbo'
       })
     })
     const data = await res.json()
@@ -60,9 +60,8 @@ export default function LearnLanguage() {
                  respond with "GAME OVER: [reason]" where [reason] provides a brief explanation of why the response 
                  was not acceptable. Note that responses containing numbers are generally acceptable (e.g., "2 pommes" 
                  or "2 vertes pommes" in French), but responses consisting of numbers alone may not be appropriate 
-                 depending on the context.`,
-        model: 'gpt-4o-mini',
-        conversation: updatedConversation
+                 depending on the context. Conversation history: ${JSON.stringify(updatedConversation)}.`,
+        model: 'gpt-3.5-turbo'
       })
     })
     const data = await res.json()
@@ -141,7 +140,7 @@ export default function LearnLanguage() {
         {language && !isTyping && !gameOver && (
           <>
             <h2>Level {level}: {levels[level - 1]}</h2>
-            <div style={{display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '10px', border: '1px solid #333', padding: '10px', borderRadius: '5px', minHeight: '300px', overflowY: 'auto'  }}>
+            <div style={{display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '10px', border: '1px solid #333', padding: '10px', borderRadius: '5px', minHeight: '300px', maxHeight: '300px', overflowY: 'scroll'  }}>
               {conversation.map((message, index) => (
                 <div key={index} style={{display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '10px'}}>
                   <p style={{
