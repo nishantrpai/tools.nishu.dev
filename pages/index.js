@@ -1105,6 +1105,12 @@ export const tools = [
     description: 'Generate customer discovery questions',
     publishDate: '19th Sep 2024',
     url: '/customerdiscovery.js'
+  },
+  {
+    title: "Learn any language",
+    description: "Learn any language",
+    publishDate: "20th Sep 2024",
+    url: "/learnlanguage"
   }
 
 

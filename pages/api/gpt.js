@@ -10,7 +10,7 @@ const openai = new OpenAI({
 });
 
 // Create a rate limiter that allows 1 request per minute
-const limiter = new RateLimiter({ tokensPerInterval: 1, interval: "minute" });
+const limiter = new RateLimiter({ tokensPerInterval: 1, interval: "second" });
 
 // Create a map to store IP addresses and their request counts
 const ipRequestCounts = new Map();
