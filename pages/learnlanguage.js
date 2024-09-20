@@ -10,6 +10,7 @@ export default function LearnLanguage() {
   const [userInput, setUserInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [gameOver, setGameOver] = useState(false)
+  const [gameOverReason, setGameOverReason] = useState('')
   const [typingTimeout, setTypingTimeout] = useState(null)
   const [isTyping, setIsTyping] = useState(false)
 
@@ -51,20 +52,25 @@ export default function LearnLanguage() {
       body: JSON.stringify({
         prompt: `You are a language learning assistant for ${language}. The current level is ${levels[level - 1]}. 
                  The user's input is "${userInput}". First, check if the input is in ${language}. If it's not in ${language}, 
-                 respond with "GAME OVER" and explain that the response should be in ${language}. If it is in ${language}, 
-                 then evaluate if it's correct and understandable for the current context. If correct and understandable, 
-                 continue the story in 1-2 sentences, including a character's response in ${language} with its English 
-                 translation in parentheses. End with a new question or prompt for the user to respond to in ${language}. 
-                 If the input is in ${language} but incorrect or incomprehensible, respond with "GAME OVER" and provide 
-                 a brief explanation of why the response was not acceptable.`,
+                 respond with "GAME OVER: [reason]" where [reason] explains that the response should be in ${language}. 
+                 If it is in ${language}, then evaluate if it's correct and understandable for the current context. 
+                 If correct and understandable, continue the story in 1-2 sentences, including a character's response 
+                 in ${language} with its English translation in parentheses. End with a new question or prompt for the 
+                 user to respond to in ${language}. If the input is in ${language} but incorrect or incomprehensible, 
+                 respond with "GAME OVER: [reason]" where [reason] provides a brief explanation of why the response 
+                 was not acceptable. Note that responses containing numbers are generally acceptable (e.g., "2 pommes" 
+                 or "2 vertes pommes" in French), but responses consisting of numbers alone may not be appropriate 
+                 depending on the context.`,
         model: 'gpt-4o-mini',
         conversation: updatedConversation
       })
     })
     const data = await res.json()
     
-    if (data.response.includes("GAME OVER")) {
+    if (data.response.includes("GAME OVER:")) {
       setGameOver(true)
+      const reason = data.response.split("GAME OVER:")[1].trim()
+      setGameOverReason(reason)
     } else {
       setConversation([...updatedConversation, { role: 'assistant', content: data.response }])
     }
@@ -77,11 +83,13 @@ export default function LearnLanguage() {
     if (level < levels.length) {
       setLevel(level + 1)
       setGameOver(false)
+      setGameOverReason('')
     }
   }
 
   const restartGame = () => {
     setGameOver(false)
+    setGameOverReason('')
     generateStory()
   }
 
@@ -177,7 +185,7 @@ export default function LearnLanguage() {
         {gameOver && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginTop: '10px', padding: '10px', borderRadius: '5px', minHeight: '300px', overflowY: 'auto'  }}>
             <h2>Game Over</h2>
-            <p>Your last response was incorrect or not understandable. Try again!</p>
+            <p>Your last response was incorrect or not understandable. Reason: {gameOverReason}</p>
             <button onClick={restartGame} className={styles.button}>
               Restart Level
             </button>
