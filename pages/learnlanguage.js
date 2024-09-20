@@ -50,17 +50,14 @@ export default function LearnLanguage() {
     const res = await fetch('/api/gpt', {
       method: 'POST',
       body: JSON.stringify({
-        prompt: `You are a language learning assistant for ${language}. The current level is ${levels[level - 1]}. 
-                 The user's input is "${userInput}". First, check if the input is in ${language}. If it's not in ${language}, 
-                 respond with "GAME OVER: [reason]" where [reason] explains that the response should be in ${language}. 
-                 If it is in ${language}, then evaluate if it's correct and understandable for the current context. 
-                 If correct and understandable, continue the story in 1-2 sentences, including a character's response 
-                 in ${language} with its English translation in parentheses. End with a new question or prompt for the 
-                 user to respond to in ${language}. If the input is in ${language} but incorrect or incomprehensible, 
-                 respond with "GAME OVER: [reason]" where [reason] provides a brief explanation of why the response 
-                 was not acceptable. Note that responses containing numbers are generally acceptable (e.g., "2 pommes" 
-                 or "2 vertes pommes" in French), but responses consisting of numbers alone may not be appropriate 
-                 depending on the context. Conversation history: ${JSON.stringify(updatedConversation)}.`,
+        prompt: `Language learning assistant for ${language}. Level: ${levels[level - 1]}. 
+                 User input: "${userInput}". Check if in ${language}. If not, "GAME OVER: [reason]".
+                 If in ${language}, evaluate correctness and understandability, it is ok if the user's response is not perfect as long as it is understandable.
+                 If good, continue story (1-2 sentences). Include character's response in ${language} 
+                 (English translation in parentheses). End with new question/prompt in ${language}.
+                 If in ${language} but incorrect/incomprehensible, "GAME OVER: [reason]".
+                 Numbers generally okay (e.g., "2 pommes" in French), but context matters.
+                 Conversation history: ${JSON.stringify(updatedConversation)}.`,
         model: 'gpt-4o-mini',
       })
     })
