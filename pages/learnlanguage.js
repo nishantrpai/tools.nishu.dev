@@ -164,7 +164,7 @@ export default function LearnLanguage() {
               }}
             />
 
-            <button onClick={handleUserInput} className={styles.button} disabled={loading || !userInput}>
+            <button onClick={handleUserInput} className={styles.button}>
               {loading ? 'Processing...' : 'Send'}
             </button>
 
