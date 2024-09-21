@@ -9,8 +9,7 @@ export default function LearnLanguage() {
   const [conversation, setConversation] = useState([])
   const [userInput, setUserInput] = useState('')
   const [loading, setLoading] = useState(false)
-  const [gameOver, setGameOver] = useState(false)
-  const [gameOverReason, setGameOverReason] = useState('')
+  const [feedbackMessage, setFeedbackMessage] = useState('')
   const [typingTimeout, setTypingTimeout] = useState(null)
   const [isTyping, setIsTyping] = useState(false)
 
@@ -51,12 +50,12 @@ export default function LearnLanguage() {
       method: 'POST',
       body: JSON.stringify({
         prompt: `Language learning assistant for ${language}. Level: ${levels[level - 1]}. 
-                 User input: "${userInput}". Check if the response is appropriate for ${language} learning. If not, "GAME OVER: [reason]".
+                 User input: "${userInput}". Check if the response is appropriate for ${language} learning.
                  If appropriate, evaluate correctness and understandability. It's okay if the user's response is not perfect as long as it is understandable.
                  The alphabets can be in English or in ${language}.
                  If good, continue story (1-2 sentences). Include character's response in the language being learned 
                  (English translation in parentheses). End with new question/prompt in the language being learned.
-                 If the response is inappropriate or incomprehensible, "GAME OVER: [reason]".
+                 If the response is inappropriate or incomprehensible, have the character politely ask for clarification or indicate they didn't understand.
                  Numbers are generally okay, but context matters.
                  Conversation history: ${JSON.stringify(updatedConversation)}.`,
         model: 'gpt-4o-mini',
@@ -64,14 +63,13 @@ export default function LearnLanguage() {
     })
     const data = await res.json()
     
-    if (data.response.includes("GAME OVER:")) {
-      setGameOver(true)
-      const reason = data.response.split("GAME OVER:")[1].trim()
-      setGameOverReason(reason)
+    if (data.response.includes("I'm sorry, I didn't understand") || data.response.includes("Could you please clarify")) {
+      setFeedbackMessage("Your response was unclear or incorrect. Try again!")
     } else {
-      setConversation([...updatedConversation, { role: 'assistant', content: data.response }])
+      setFeedbackMessage("")
     }
     
+    setConversation([...updatedConversation, { role: 'assistant', content: data.response }])
     setUserInput('')
     setLoading(false)
   }
@@ -79,14 +77,12 @@ export default function LearnLanguage() {
   const handleLevelUp = () => {
     if (level < levels.length) {
       setLevel(level + 1)
-      setGameOver(false)
-      setGameOverReason('')
+      setFeedbackMessage('')
     }
   }
 
   const restartGame = () => {
-    setGameOver(false)
-    setGameOverReason('')
+    setFeedbackMessage('')
     generateStory()
   }
 
@@ -135,7 +131,7 @@ export default function LearnLanguage() {
           </div>
         )}
 
-        {language && !isTyping && !gameOver && (
+        {language && !isTyping && (
           <>
             <h2>Level {level}: {levels[level - 1]}</h2>
             <div style={{display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '10px', border: '1px solid #333', padding: '10px', borderRadius: '5px', minHeight: '300px', maxHeight: '300px', overflowY: 'scroll'  }}>
@@ -172,21 +168,15 @@ export default function LearnLanguage() {
               {loading ? 'Processing...' : 'Send'}
             </button>
 
+            {feedbackMessage && (
+              <p style={{ color: '#ff6b6b', marginTop: '10px' }}>{feedbackMessage}</p>
+            )}
+
             <p className={styles.hint}>
               Use the Google Translate tool below to help formulate your response in {language}.
             </p>
 
           </>
-        )}
-
-        {gameOver && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginTop: '10px', padding: '10px', borderRadius: '5px', minHeight: '300px', overflowY: 'auto'  }}>
-            <h2>Game Over</h2>
-            <p>Your last response was incorrect or not understandable. Reason: {gameOverReason}</p>
-            <button onClick={restartGame} className={styles.button}>
-              Restart Level
-            </button>
-          </div>
         )}
       </main>
     </>
