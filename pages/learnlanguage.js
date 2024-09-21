@@ -51,12 +51,13 @@ export default function LearnLanguage() {
       method: 'POST',
       body: JSON.stringify({
         prompt: `Language learning assistant for ${language}. Level: ${levels[level - 1]}. 
-                 User input: "${userInput}". Check if in ${language}. If not, "GAME OVER: [reason]".
-                 If in ${language}, evaluate correctness and understandability, it is ok if the user's response is not perfect as long as it is understandable.
-                 If good, continue story (1-2 sentences). Include character's response in ${language} 
-                 (English translation in parentheses). End with new question/prompt in ${language}.
-                 If in ${language} but incorrect/incomprehensible, "GAME OVER: [reason]".
-                 Numbers generally okay (e.g., "2 pommes" in French), but context matters.
+                 User input: "${userInput}". Check if the response is appropriate for ${language} learning. If not, "GAME OVER: [reason]".
+                 If appropriate, evaluate correctness and understandability. It's okay if the user's response is not perfect as long as it is understandable.
+                 The alphabets can be in English or in ${language}.
+                 If good, continue story (1-2 sentences). Include character's response in the language being learned 
+                 (English translation in parentheses). End with new question/prompt in the language being learned.
+                 If the response is inappropriate or incomprehensible, "GAME OVER: [reason]".
+                 Numbers are generally okay, but context matters.
                  Conversation history: ${JSON.stringify(updatedConversation)}.`,
         model: 'gpt-4o-mini',
       })
