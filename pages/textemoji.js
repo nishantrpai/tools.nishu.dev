@@ -26,8 +26,7 @@ export default function Home() {
 
   const copyToClipboard = (emoji) => {
     // remove all numbers, bullet points, dot in numbers, and spaces from the emoji
-    const cleanEmoji = emoji.replace(/\d/g, '').replace(/•/g, '').replace(/\s/g, '')
-    navigator.clipboard.writeText(cleanEmoji)
+    navigator.clipboard.writeText(emoji)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
