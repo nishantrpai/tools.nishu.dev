@@ -1111,6 +1111,12 @@ export const tools = [
     description: "Learn any language",
     publishDate: "20th Sep 2024",
     url: "/learnlanguage"
+  },
+  {
+    title: 'Generate text emoji',
+    description: 'Generate text emoji like (╯°□°)╯︵ ┻━┻',
+    publishDate: '20th Sep 2024',
+    url: '/textemoji'
   }
 
 
