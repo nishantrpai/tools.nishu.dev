@@ -1117,6 +1117,12 @@ export const tools = [
     description: 'Generate text emoji like (╯°□°)╯︵ ┻━┻',
     publishDate: '20th Sep 2024',
     url: '/textemoji'
+  },
+  {
+    title: 'Muscle Stretches',
+    description: 'Get muscle stretches for your body parts',
+    publishDate: '21st Sep 2024',
+    url: '/musclestretch'
   }
 
 
