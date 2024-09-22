@@ -49,14 +49,28 @@ export default function ListenWebsite() {
 
   const speak = () => {
     window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(content);
-    utterance.voice = voice || window.speechSynthesis.getVoices()[0];
-    utterance.rate = rate;
-    utterance.pitch = pitch;
-    utterance.volume = volume;
-    utterance.onstart = () => setIsPlaying(true);
-    utterance.onend = () => setIsPlaying(false);
-    window.speechSynthesis.speak(utterance);
+    const chunks = content.match(/.{1,100}/g); // Split content into chunks of 100 characters
+    let currentChunk = 0;
+
+    const speakChunk = () => {
+      if (currentChunk < chunks.length) {
+        const utterance = new SpeechSynthesisUtterance(chunks[currentChunk]);
+        utterance.voice = voice || window.speechSynthesis.getVoices()[0];
+        utterance.rate = rate;
+        utterance.pitch = pitch;
+        utterance.volume = volume;
+        utterance.onstart = () => setIsPlaying(true);
+        utterance.onend = () => {
+          currentChunk++;
+          speakChunk();
+        };
+        window.speechSynthesis.speak(utterance);
+      } else {
+        setIsPlaying(false);
+      }
+    };
+
+    speakChunk();
   }
 
   const stop = () => {
