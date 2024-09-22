@@ -1123,6 +1123,12 @@ export const tools = [
     description: 'Get muscle stretches for your body parts',
     publishDate: '21st Sep 2024',
     url: '/musclestretch'
+  },
+  {
+    title: 'Listen to Website',
+    description: 'Listen to website',
+    publishDate: '22nd Sep 2024',
+    url: '/listenwebsite'
   }
 
 
