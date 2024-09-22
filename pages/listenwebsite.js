@@ -76,7 +76,9 @@ export default function ListenWebsite() {
         <h1 className={styles.title}>
           Listen to Website
         </h1>
-        <div>
+        <h2 className={styles.description}>
+          Enter a website URL and listen to its content
+        </h2>
           <input 
             type="text" 
             value={url} 
@@ -85,22 +87,17 @@ export default function ListenWebsite() {
             style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
           />
           <button onClick={fetchContent}>Fetch Content</button>
-        </div>
-        <div>
           <textarea 
             style={{ background: '#000', border: '1px solid #333', width:'100%', minWidth: '300px', height: '200px', color: '#fff' }} 
             defaultValue={content} 
             onChange={(e) => setContent(e.target.value)}
           ></textarea>
-        </div>
-        <div>
           {voices.length > 0 &&
             <select value={vidx} onChange={e => { setVoice(voices[e.target.value]); setVoiceIndex(e.target.value) }}>
               {voices.map((voice, index) => (
                 <option key={index} value={index}>{voice.name}</option>
               ))}
             </select>}
-        </div>
         <div>
           <h3>Rate: {rate}</h3>
           <input type="range" min="0.5" max="2" step="0.1" value={rate} onChange={e => setRate(e.target.value)} />
