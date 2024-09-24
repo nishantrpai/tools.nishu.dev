@@ -90,7 +90,7 @@ export default function GrainyGifs() {
     <>
       <Head>
         <title>Grainy Gifs</title>
-        <meta name="description" content="Add grainy effect to your gifs" />
+        <meta name="description" content="Turn your images into grainy gifs" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
