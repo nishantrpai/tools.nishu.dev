@@ -10,6 +10,7 @@ export default function GrainyGifs() {
   const [processing, setProcessing] = useState(false)
   const [noiseAmount, setNoiseAmount] = useState(50)
   const [frameCount, setFrameCount] = useState(10)
+  const [frameRate, setFrameRate] = useState(10)
 
   useEffect(() => {
     const canvas = document.getElementById('canvas')
@@ -57,9 +58,9 @@ export default function GrainyGifs() {
       gifWidth: imgWidth,
       gifHeight: imgHeight,
       images: gifFramesWithImages,
-      frameDuration: 0.1,
+      frameDuration: 1 / frameRate,
       numFrames: frameCount,
-      interval: 0.1,
+      interval: 1 / frameRate,
       sampleInterval: 10,
       numWorkers: 4,
     }
@@ -136,6 +137,10 @@ export default function GrainyGifs() {
             Frame Count
           </label>
           <input type="number" min={1} max={100} value={frameCount} onChange={(e) => setFrameCount(Number(e.target.value))} />
+          <label>
+            Frame Rate
+          </label>
+          <input type="range" min={1} max={60} value={frameRate} onChange={(e) => setFrameRate(Number(e.target.value))} />
         </div>
 
         <button onClick={() => {
