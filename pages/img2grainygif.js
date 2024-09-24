@@ -138,7 +138,7 @@ export default function GrainyGifs() {
           </label>
           <input type="number" min={1} max={100} value={frameCount} onChange={(e) => setFrameCount(Number(e.target.value))} />
           <label>
-            Frame Rate
+            Frame Rate: {frameRate}
           </label>
           <input type="range" min={1} max={60} value={frameRate} onChange={(e) => setFrameRate(Number(e.target.value))} />
         </div>
