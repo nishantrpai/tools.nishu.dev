@@ -1129,6 +1129,18 @@ export const tools = [
     description: 'Listen to website',
     publishDate: '22nd Sep 2024',
     url: '/listenwebsite'
+  },
+  {
+    title: 'Transcribe Audio',
+    description: 'Transcribe Audio',
+    publishDate: '23rd Sep 2024',
+    url: '/transcribe'
+  },
+  {
+    title: 'Grainy Gif',
+    description: 'Get grainy gif from any image',
+    publishDate: '24th Sep 2024',
+    url: '/img2grainygif'
   }
 
 

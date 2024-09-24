@@ -41,7 +41,8 @@ export default function Pixelate() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main style={{
-        maxWidth: 1500,
+        maxWidth: '100%',
+        padding: '0 20px',
       }}>
 
         <h1>Pixelate</h1>
@@ -49,9 +50,9 @@ export default function Pixelate() {
         <input type="file" onChange={(e) => setImage(e.target.files[0])} />
         <label>Pixel Size: {pixelSize}</label>
         <input type="range" min={2} max={100} defaultValue={pixelSize} onChange={(e) => setPixelSize(e.target.value)} />
-        <div style={{ display: 'flex', gap: 10, margin: 'auto' }}>
-        <img src={image ? URL.createObjectURL(image) : ''} alt="" width={500} style={{ objectFit: 'cover', height: 'auto' }} />
-        <canvas id="canvas" style={{ width: '100%', height: 'auto', width: 500 }} />
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, margin: 'auto' }}>
+          <img src={image ? URL.createObjectURL(image) : ''} alt="" style={{ objectFit: 'cover', width: '100%', maxWidth: 500, height: 'auto' }} />
+          <canvas id="canvas" style={{ width: '100%', maxWidth: 500, height: 'auto' }} />
         </div>
         <button onClick={() => setImage(null)}>Clear</button>
         {/* download  */}
