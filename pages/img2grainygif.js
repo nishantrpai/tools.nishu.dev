@@ -58,6 +58,10 @@ export default function GrainyGifs() {
       gifHeight: imgHeight,
       images: gifFramesWithImages,
       frameDuration: 0.1,
+      numFrames: frameCount,
+      interval: 0.1,
+      sampleInterval: 10,
+      numWorkers: 4,
     }, function (obj) {
       if (!obj.error) {
         const a = document.createElement('a')
