@@ -118,7 +118,7 @@ export default function GrainyGifs() {
           <label>
             Noise Amount
           </label>
-          <input type="range" min={0} max={100} value={noiseAmount} onChange={(e) => setNoiseAmount(Number(e.target.value))} />
+          <input type="range" min={0} max={500} value={noiseAmount} onChange={(e) => setNoiseAmount(Number(e.target.value))} />
           <label>
             Frame Count
           </label>
