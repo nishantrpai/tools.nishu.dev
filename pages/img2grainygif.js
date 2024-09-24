@@ -35,7 +35,7 @@ export default function GrainyGifs() {
     context.putImageData(imageData, 0, 0)
   }
 
-  const downloadAsGif = async () => {
+  const downloadAsGif = async (compressed = false) => {
     setProcessing(true)
     const canvas = document.getElementById('canvas')
 
@@ -53,7 +53,7 @@ export default function GrainyGifs() {
       Array.from({ length: frameCount }).map(() => drawFrame())
     )
 
-    gifshot.createGIF({
+    const options = {
       gifWidth: imgWidth,
       gifHeight: imgHeight,
       images: gifFramesWithImages,
@@ -62,11 +62,20 @@ export default function GrainyGifs() {
       interval: 0.1,
       sampleInterval: 10,
       numWorkers: 4,
-    }, function (obj) {
+    }
+
+    if (compressed) {
+      options.quality = 1
+      options.sampleInterval = 20
+      options.gifWidth = Math.min(imgWidth, 800)
+      options.gifHeight = Math.round(options.gifWidth * (imgHeight / imgWidth))
+    }
+
+    gifshot.createGIF(options, function (obj) {
       if (!obj.error) {
         const a = document.createElement('a')
         a.href = obj.image
-        a.download = `grainy-${Date.now()}.gif`
+        a.download = `grainy-${compressed ? 'compressed-' : ''}${Date.now()}.gif`
         document.body.appendChild(a)
         a.click()
         document.body.removeChild(a)
@@ -141,10 +150,15 @@ export default function GrainyGifs() {
         }}>
           Download Image
         </button>
-        <button onClick={downloadAsGif} style={{
+        <button onClick={() => downloadAsGif(false)} style={{
           marginTop: 20
         }}>
           {processing ? 'Processing...' : 'Download as GIF'}
+        </button>
+        <button onClick={() => downloadAsGif(true)} style={{
+          marginTop: 20
+        }}>
+          {processing ? 'Processing...' : 'Download Compressed GIF (< 15MB)'}
         </button>
       </main>
     </>
