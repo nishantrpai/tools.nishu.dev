@@ -1138,7 +1138,7 @@ export const tools = [
   },
   {
     title: 'Grainy Gif',
-    description: 'Get grainy gif from any image',
+    description: 'Turn your images into grainy gifs',
     publishDate: '24th Sep 2024',
     url: '/img2grainygif'
   }
