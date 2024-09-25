@@ -1147,6 +1147,12 @@ export const tools = [
     description: 'Ask website',
     publishDate: '25th Sep 2024',
     url: '/askwebsite'
+  },
+  {
+    title: 'Scape Mobile Wallpaper',
+    description: 'Create mobile wallpaper from image',
+    publishDate: '26th Sep 2024',
+    url: '/scapewallpaper'
   }
 
 
