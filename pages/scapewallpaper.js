@@ -13,6 +13,7 @@ export default function ScapeWallpaper() {
   const [chain, setChain] = useState('ETHEREUM');
   const [position, setPosition] = useState({ x: 0 });
   const canvasRef = useRef(null);
+  const previewRef = useRef(null);
 
   const MOBILE_RESOLUTION = { width: 1080, height: 1920 }; // Standard mobile wallpaper resolution
   const VIEW_WIDTH = 500; // Width of the preview container
@@ -120,38 +121,15 @@ export default function ScapeWallpaper() {
   };
 
   const downloadImage = () => {
-    const canvas = document.createElement('canvas');
-    canvas.width = MOBILE_RESOLUTION.width;
-    canvas.height = MOBILE_RESOLUTION.height;
-    const ctx = canvas.getContext('2d');
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
-
-    const bgImg = new Image();
-    bgImg.src = bg;
-    bgImg.crossOrigin = 'Anonymous';
-    bgImg.onload = () => {
-      const scaleFactor = canvas.height / bgImg.height;
-      const scaledWidth = bgImg.width * scaleFactor;
-      const scaledHeight = canvas.height;
-      const x = (canvas.width - scaledWidth) / 2 + position.x * (MOBILE_RESOLUTION.width / VIEW_WIDTH);
-      
-      // Use a temporary canvas for high-quality scaling
-      const tempCanvas = document.createElement('canvas');
-      tempCanvas.width = scaledWidth;
-      tempCanvas.height = scaledHeight;
-      const tempCtx = tempCanvas.getContext('2d');
-      tempCtx.imageSmoothingEnabled = true;
-      tempCtx.imageSmoothingQuality = 'high';
-      tempCtx.drawImage(bgImg, 0, 0, scaledWidth, scaledHeight);
-      
-      ctx.drawImage(tempCanvas, x, 0);
-      
-      const a = document.createElement('a');
-      a.href = canvas.toDataURL('image/png');
-      a.download = 'scape-wallpaper.png';
-      a.click();
-    };
+    html2canvas(previewRef.current, {
+      backgroundColor: null,
+      scale: 2,
+    }).then(canvas => {
+      const link = document.createElement('a');
+      link.download = 'scape-wallpaper.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
   };
 
   return (
@@ -194,17 +172,25 @@ export default function ScapeWallpaper() {
             onChange={(e) => setPosition({...position, x: parseInt(e.target.value)})}
           />
         </div>
-        <div style={{ 
-          position: 'relative', 
-          width: '100%', 
-          maxWidth: `${VIEW_WIDTH}px`,
+        <div style={{
+          position: 'relative',
+          width: '100%',
           height: '100%',
-          aspectRatio: '9 / 16',
-          margin: '0 auto',
           border: '1px solid #333',
           borderRadius: '20px',
           overflow: 'hidden'
         }}>
+        <div 
+          ref={previewRef}
+          style={{ 
+            position: 'relative', 
+            width: '100%', 
+            height: '100%',
+            aspectRatio: '9 / 16',
+            margin: '0 auto',
+            overflow: 'hidden'
+          }}
+        >
           <canvas 
             ref={canvasRef} 
             width={VIEW_WIDTH * 2}  // Double the size for higher quality
@@ -214,6 +200,7 @@ export default function ScapeWallpaper() {
               height: '100%',
             }}
           />
+        </div>
         </div>
         <button onClick={downloadImage}>Download Wallpaper</button>
       </main>
