@@ -1141,6 +1141,12 @@ export const tools = [
     description: 'Turn your images into grainy gifs',
     publishDate: '24th Sep 2024',
     url: '/img2grainygif'
+  },
+  {
+    title: 'Ask Website',
+    description: 'Ask website',
+    publishDate: '25th Sep 2024',
+    url: '/askwebsite'
   }
 
 
