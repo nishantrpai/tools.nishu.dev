@@ -122,7 +122,7 @@ export default function ScapeWallpaper() {
 
   const downloadImage = () => {
     html2canvas(previewRef.current, {
-      backgroundColor: null,
+      backgroundColor: 'transparent',
       scale: 2,
     }).then(canvas => {
       const link = document.createElement('a');
