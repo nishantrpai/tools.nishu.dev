@@ -5,7 +5,7 @@ import { useState } from 'react'
 const Tool = () => {
   let tool = {
     title: '🔍 Boolean Search',
-    description: 'Get boolean search strings for Google, LinkedIn, Github, and more based on the signal you want to find.',
+    description: 'Get boolean search strings for Google, LinkedIn, Github, and more based on the signal you want to find. The format will verb + noun',
     publishDate: '26th March 2024',
   };
   const [query, setQuery] = useState('');
@@ -31,14 +31,23 @@ const Tool = () => {
             if (e.keyCode === 13) {
               // make api call to /gpt and set query
               setQuery('Loading...');
-              fetch(`/api/gpt?prompt=${encodeURI(`Generate a boolean search query that signals ${e.target.value}`)}`).then(res => res.json())
+              fetch('/api/gpt', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  prompt: `Generate a boolean search query that signals ${e.target.value}, the format will be verb + noun. Should be all verb and noun that help in signal. For e.g., ("announce" OR "announcing") AND ("seed round" OR "funding"). Only return the boolean search query and nothing else.`,
+                  model: 'gpt-4o-mini'
+                })
+              }).then(res => res.json())
                 .then(data => {
                   let query = data.response;
                   // remove . from the end of the query
                   if (query.endsWith('.')) {
                     query = query.slice(0, -1);
                   }
-                  setQuery(data.response);
+                  setQuery(query);
                 });
             }
           }}

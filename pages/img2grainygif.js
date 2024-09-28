@@ -11,6 +11,7 @@ export default function GrainyGifs() {
   const [noiseAmount, setNoiseAmount] = useState(50)
   const [frameCount, setFrameCount] = useState(10)
   const [frameRate, setFrameRate] = useState(10)
+  const [shakeAmount, setShakeAmount] = useState(0)
 
   useEffect(() => {
     const canvas = document.getElementById('canvas')
@@ -40,18 +41,20 @@ export default function GrainyGifs() {
     setProcessing(true)
     const canvas = document.getElementById('canvas')
 
-    const drawFrame = async () => {
+    const drawFrame = async (frameIndex) => {
       const tempCanvas = document.createElement('canvas')
       tempCanvas.width = imgWidth
       tempCanvas.height = imgHeight
       const tempContext = tempCanvas.getContext('2d')
-      tempContext.drawImage(image, 0, 0, imgWidth, imgHeight)
+      const shakeX = Math.random() * shakeAmount - shakeAmount / 2
+      const shakeY = Math.random() * shakeAmount - shakeAmount / 2
+      tempContext.drawImage(image, shakeX, shakeY, imgWidth, imgHeight)
       addGrainEffect(tempContext, imgWidth, imgHeight, noiseAmount)
       return tempCanvas.toDataURL('image/png')
     }
 
     const gifFramesWithImages = await Promise.all(
-      Array.from({ length: frameCount }).map(() => drawFrame())
+      Array.from({ length: frameCount }).map((_, index) => drawFrame(index))
     )
 
     const options = {
@@ -141,6 +144,10 @@ export default function GrainyGifs() {
             Frame Rate: {frameRate}
           </label>
           <input type="range" min={1} max={60} value={frameRate} onChange={(e) => setFrameRate(Number(e.target.value))} />
+          <label>
+            Camera Shake Amount: {shakeAmount}
+          </label>
+          <input type="range" min={0} max={50} value={shakeAmount} onChange={(e) => setShakeAmount(Number(e.target.value))} />
         </div>
 
         <button onClick={() => {
