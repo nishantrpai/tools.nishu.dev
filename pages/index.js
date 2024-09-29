@@ -1157,7 +1157,7 @@ export const tools = [
   {
     title: 'Find RSS feed',
     description: 'Find RSS feed for any website',
-    publishDate: '27th Sep 2024',
+    publishDate: '29th Sep 2024',
     url: '/findrssfeed'
   }
 
