@@ -1153,8 +1153,13 @@ export const tools = [
     description: 'Create mobile wallpaper from image',
     publishDate: '26th Sep 2024',
     url: '/scapewallpaper'
+  },
+  {
+    title: 'Find RSS feed',
+    description: 'Find RSS feed for any website',
+    publishDate: '27th Sep 2024',
+    url: '/findrssfeed'
   }
-
 
   // {
   //   title: 'Atomic Breakdown',
