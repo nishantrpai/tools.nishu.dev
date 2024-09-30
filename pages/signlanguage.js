@@ -118,6 +118,9 @@ export default function SignLanguage() {
     <>
       <Head>
         <title>Sign Language</title>
+        <meta name="description" content="Convert text to sign language" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
         <h1>Sign Language</h1>
