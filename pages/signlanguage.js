@@ -33,13 +33,37 @@ export default function SignLanguage() {
       const data = await response.json();
       const pages = data.query.pages;
       const pageId = Object.keys(pages)[0];
-      return pages[pageId].thumbnail ? pages[pageId].thumbnail.source : null;
+      const imageUrl = pages[pageId].thumbnail ? pages[pageId].thumbnail.source : null;
+      
+      if (imageUrl) {
+        return imageUrl;
+      } else {
+        // Generate a canvas with text if no image is available
+        const canvas = document.createElement('canvas');
+        canvas.width = 500;
+        canvas.height = 500;
+        const ctx = canvas.getContext('2d');
+        
+        // Set background
+        ctx.fillStyle = '#f0f0f0';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Set text style
+        ctx.fillStyle = '#333333';
+        ctx.font = 'bold 40px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        // Draw text
+        ctx.fillText(word.toUpperCase(), canvas.width / 2, canvas.height / 2);
+        
+        return canvas.toDataURL();
+      }
     } catch (error) {
       console.error('Error fetching Wikipedia image:', error);
       return null;
     }
   }
-
   const getSignVideo = async (word) => {
     try {
       let proxy = 'https://api.codetabs.com/v1/proxy/?quest='
@@ -105,12 +129,13 @@ export default function SignLanguage() {
         {signData.length > 0 && (
           <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 20 }}>
             <p style={{ fontSize: 20, fontWeight: 'bold', width: '100%', textAlign: 'center'}}>{signData[currentIndex].word.toUpperCase()}</p>
-            {signData[currentIndex].image && (
-              <img src={signData[currentIndex].image} alt={`Wikipedia image for ${signData[currentIndex].word}`} style={{ width: '100%' }} />
-            )}
             {signData[currentIndex].video && (
               <video src={signData[currentIndex].video} controls style={{ width: '100%' }} />
             )}
+            {signData[currentIndex].image && (
+              <img src={signData[currentIndex].image} alt={`Wikipedia image for ${signData[currentIndex].word}`} style={{ width: '100%' }} />
+            )}
+           
             <div style={{ display: 'flex', gap: 20, flex: 1 }}>
               <button onClick={handlePrevImage} style={{width: '50%', padding: 20}} disabled={currentIndex === 0}>Previous</button>
               <button onClick={handleNextImage} style={{width: '50%', padding: 20}} disabled={currentIndex === signData.length - 1}>Next</button>
