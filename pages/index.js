@@ -1159,6 +1159,12 @@ export const tools = [
     description: 'Find RSS feed for any website',
     publishDate: '29th Sep 2024',
     url: '/findrssfeed'
+  },
+  {
+    title: 'Sign Language',
+    description: 'Convert text to sign language',
+    publishDate: '29th Sep 2024',
+    url: '/signlanguage'
   }
 
   // {
