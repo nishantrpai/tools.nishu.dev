@@ -12,6 +12,7 @@ export default function FibonacciOverlay() {
   const [rotation, setRotation] = useState(0);
   const [scaleX, setScaleX] = useState(1);
   const [scaleY, setScaleY] = useState(1);
+  const [scale, setScale] = useState(1);
   const [flipHorizontal, setFlipHorizontal] = useState(false);
   const [flipVertical, setFlipVertical] = useState(false);
   const [overlayColor, setOverlayColor] = useState('#FF0000');
@@ -22,7 +23,7 @@ export default function FibonacciOverlay() {
     if (canvasRef.current) {
       drawFibonacciOverlay();
     }
-  }, [fibWidth, fibHeight, iterations, image, centerX, centerY, rotation, scaleX, scaleY, flipHorizontal, flipVertical, overlayColor, lineThickness]);
+  }, [fibWidth, fibHeight, iterations, image, centerX, centerY, rotation, scaleX, scaleY, scale, flipHorizontal, flipVertical, overlayColor, lineThickness]);
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
@@ -59,7 +60,10 @@ export default function FibonacciOverlay() {
 
     ctx.translate(canvasWidth / 2 + centerX, canvasHeight / 2 + centerY);
     ctx.rotate(rotation * Math.PI / 180);
-    ctx.scale(flipHorizontal ? -scaleX : scaleX, flipVertical ? -scaleY : scaleY);
+    ctx.scale(
+      flipHorizontal ? -scaleX * scale : scaleX * scale, 
+      flipVertical ? -scaleY * scale : scaleY * scale
+    );
 
     ctx.beginPath();
     ctx.rect(-fibWidth / 2, -fibHeight / 2, fibWidth, fibHeight);
@@ -172,6 +176,12 @@ export default function FibonacciOverlay() {
           <label>Scale Y: 
             <input type="range" min="0.1" max="3" step="0.1" value={scaleY} onChange={(e) => setScaleY(parseFloat(e.target.value))} />
             {scaleY.toFixed(1)}
+          </label>
+        </div>
+        <div>
+          <label>Scale: 
+            <input type="range" min="0.1" max="3" step="0.1" value={scale} onChange={(e) => setScale(parseFloat(e.target.value))} />
+            {scale.toFixed(1)}
           </label>
         </div>
         <div>
