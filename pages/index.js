@@ -1163,8 +1163,14 @@ export const tools = [
   {
     title: 'Sign Language',
     description: 'Convert text to sign language',
-    publishDate: '29th Sep 2024',
+    publishDate: '30th Sep 2024',
     url: '/signlanguage'
+  },
+  {
+    title: 'Fibonacci',
+    description: 'Generate fibonacci sequence',
+    publishDate: '1st Oct 2024',
+    url: '/fibonacci'
   }
 
   // {
