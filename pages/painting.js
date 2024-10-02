@@ -67,6 +67,17 @@ export default function PaintingTool() {
     image.src = img
   }
 
+  const saveCanvas = () => {
+    const canvas = canvasRef.current
+    const ctx = canvas.getContext('2d')
+    const image = ctx.getImageData(0, 0, canvas.width, canvas.height)
+    const url = canvas.toDataURL()
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'canvas.png'
+    a.click()
+  }
+
   return (
     <>
       <Head>
@@ -112,6 +123,7 @@ export default function PaintingTool() {
           />
           <span>{brushSize}px</span>
           <button onClick={resetCanvas}>Reset</button>
+          <button onClick={saveCanvas}>Save</button>
         </div>
       </main>
     </>
