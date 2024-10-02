@@ -2,6 +2,7 @@ import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { useState, useEffect } from 'react'
 import { FiSearch } from 'react-icons/fi'
+import { LogDescription } from 'ethers'
 
 
 export const tools = [
@@ -1171,6 +1172,12 @@ export const tools = [
     description: 'Generate fibonacci sequence',
     publishDate: '1st Oct 2024',
     url: '/fibonacci'
+  },
+  {
+    title: 'Painting Tool',
+    LogDescription: 'Painting Tool',
+    publishDate: '2nd Oct 2024',
+    url: '/painting'
   }
 
   // {
