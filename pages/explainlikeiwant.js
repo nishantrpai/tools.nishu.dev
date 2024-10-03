@@ -4,28 +4,28 @@ import { useState, useEffect, useRef } from 'react'
 
 export default function ExplainLikeIWant() {
   const [text, setText] = useState('')
-  const [age, setAge] = useState(1)
+  const [complexity, setComplexity] = useState(1)
   const [explanation, setExplanation] = useState('')
   const [loading, setLoading] = useState(false)
-  const ageTimeoutRef = useRef(null)
+  const complexityTimeoutRef = useRef(null)
   
-  const explain = async (newAge) => {
+  const explain = async (newComplexity) => {
     setLoading(true)
-    const res = await fetch(`/api/gpt?prompt='text: "${text}"\n\explain like i want to a ${newAge} year old with context and understanding of their age'`)
+    const res = await fetch(`/api/gpt?prompt='text: "${text}"\n\explain in ${newComplexity} sentence structures'`)
     const data = await res.json()
     setExplanation(data.response)
     setLoading(false)
   }
 
 
-  const handleAgeChange = (e) => {
-    const newAge = e.target.value
-    setAge(newAge)
-    if (ageTimeoutRef.current) {
-      clearTimeout(ageTimeoutRef.current)
+  const handleComplexityChange = (e) => {
+    const newComplexity = e.target.value
+    setComplexity(newComplexity)
+    if (complexityTimeoutRef.current) {
+      clearTimeout(complexityTimeoutRef.current)
     }
-    ageTimeoutRef.current = setTimeout(() => {
-      explain(newAge)
+    complexityTimeoutRef.current = setTimeout(() => {
+      explain(newComplexity)
     }, 500)
   }
 
@@ -33,7 +33,7 @@ export default function ExplainLikeIWant() {
     <>
       <Head>
         <title>Explain Like I Want To</title>
-        <meta name="description" content="Explain this to me in a way that suits my age" />
+        <meta name="description" content="Explain this to me in a way that suits my complexity level" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -42,7 +42,7 @@ export default function ExplainLikeIWant() {
           Explain Like I Want To
         </h1>
         <span style={{ color: '#777', fontSize: '14px', marginBottom: '20px', display: 'block' }}>
-          Explain this to me in a way that suits my age
+          Explain this to me in a way that suits my complexity level
         </span>
 
         <textarea
@@ -66,13 +66,13 @@ export default function ExplainLikeIWant() {
           min="1"
           max="30"
           step="1"
-          value={age}
-          onChange={handleAgeChange}
+          value={complexity}
+          onChange={handleComplexityChange}
           style={{ width: '100%', margin: '20px 0' }}
         />
-        <span>Age: {age}</span>
+        <span>Complexity: {complexity}</span>
 
-        <button onClick={() => explain(age)} className={styles.button}>
+        <button onClick={() => explain(complexity)} className={styles.button}>
           {loading ? 'Explaining...' : 'Explain'}
         </button>
 
