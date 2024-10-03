@@ -1175,9 +1175,16 @@ export const tools = [
   },
   {
     title: 'Painting Tool',
-    LogDescription: 'Painting Tool',
+    description: 'Painting Tool',
     publishDate: '2nd Oct 2024',
     url: '/painting'
+  },
+  {
+    title: 'Lichess Gif',
+    description: 'Get lichess game as gif',
+    publishDate: '3rd Oct 2024',
+    url: '/lichessgif'
+
   }
 
   // {
