@@ -1184,7 +1184,12 @@ export const tools = [
     description: 'Get lichess game as gif',
     publishDate: '3rd Oct 2024',
     url: '/lichessgif'
-
+  },
+  {
+    title: 'Explain Like I want to',
+    description: 'Explain like I want to',
+    publishDate: '4th Oct 2024',
+    url: '/explainlikeiwant'
   }
 
   // {
