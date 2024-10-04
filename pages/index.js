@@ -1190,6 +1190,12 @@ export const tools = [
     description: 'Explain like I want to',
     publishDate: '4th Oct 2024',
     url: '/explainlikeiwant'
+  },
+  {
+    title: 'Compressionist',
+    description: 'Compress your image',
+    publishDate: '5th Oct 2024',
+    url: '/compressionist'
   }
 
   // {
