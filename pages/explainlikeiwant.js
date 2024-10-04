@@ -11,7 +11,7 @@ export default function ExplainLikeIWant() {
   
   const explain = async (newComplexity) => {
     setLoading(true)
-    const res = await fetch(`/api/gpt?prompt='text: "${text}"\n\explain in ${newComplexity} sentence structures'`)
+    const res = await fetch(`/api/gpt?prompt='text: "${text}"\n\explain in ${newComplexity} sentence structures with more nuance as complexity increases'`)
     const data = await res.json()
     setExplanation(data.response)
     setLoading(false)
