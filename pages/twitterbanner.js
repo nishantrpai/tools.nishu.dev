@@ -87,11 +87,11 @@ export default function TwitterBanner() {
           <label>
             Move X
           </label>
-          <input type="range" min={-500} max={500} value={offsetX} onChange={(e) => setOffsetX(Number(e.target.value))} />
+          <input type="range" min={-1500} max={1500} value={offsetX} onChange={(e) => setOffsetX(Number(e.target.value))} />
           <label>
             Move Y
           </label>
-          <input type="range" min={-500} max={500} value={offsetY} onChange={(e) => setOffsetY(Number(e.target.value))} />
+          <input type="range" min={-1500} max={1500} value={offsetY} onChange={(e) => setOffsetY(Number(e.target.value))} />
           <label>
             Scale
           </label>
