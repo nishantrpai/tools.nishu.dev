@@ -1196,6 +1196,12 @@ export const tools = [
     description: 'Compress your image',
     publishDate: '5th Oct 2024',
     url: '/compressionist'
+  },
+  {
+    title: 'Twitter Banner', 
+    description: 'Image to twitter banner',
+    publishDate: '6th Oct 2024',
+    url: '/twitterbanner'
   }
 
   // {
