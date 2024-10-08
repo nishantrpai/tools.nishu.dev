@@ -1202,6 +1202,12 @@ export const tools = [
     description: 'Image to twitter banner',
     publishDate: '6th Oct 2024',
     url: '/twitterbanner'
+  },
+  {
+    title: 'Gradient Wave',
+    description: 'Generate gradient wave',
+    publishDate: '7th Oct 2024',
+    url: '/gradientwave'
   }
 
   // {
