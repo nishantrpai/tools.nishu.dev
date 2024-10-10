@@ -8,7 +8,7 @@ export default function ExplainLikeIWant() {
   const [explanation, setExplanation] = useState('')
   const [loading, setLoading] = useState(false)
   const complexityTimeoutRef = useRef(null)
-  
+
   const explain = async (newComplexity) => {
     setLoading(true)
     const res = await fetch(`/api/gpt?prompt='text: "${text}"\n\explain in ${newComplexity} sentence structures with more nuance as complexity increases'`)
@@ -75,9 +75,16 @@ export default function ExplainLikeIWant() {
         <button onClick={() => explain(complexity)} className={styles.button}>
           {loading ? 'Explaining...' : 'Explain'}
         </button>
+        {/* add copy button  */}
+        <button onClick={() => {
+          navigator.clipboard.writeText(explanation);
+          alert('Explanation copied to clipboard');
+        }}>
+          Copy Explanation
+        </button>
 
         {explanation && (
-          <div style={{ whiteSpace: 'pre-wrap', fontFamily: 'monospace', textAlign: 'left', padding: '10px', border: '1px solid #333', background: '#000', width: '100%', lineHeight: 1.5, color: '#fff', fontSize: 20, borderRadius: 10}}>
+          <div style={{ whiteSpace: 'pre-wrap', fontFamily: 'monospace', textAlign: 'left', padding: '10px', border: '1px solid #333', background: '#000', width: '100%', lineHeight: 1.5, color: '#fff', fontSize: 20, borderRadius: 10 }}>
             {explanation}
           </div>
         )}

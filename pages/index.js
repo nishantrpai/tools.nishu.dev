@@ -1208,6 +1208,12 @@ export const tools = [
     description: 'Generate gradient wave',
     publishDate: '7th Oct 2024',
     url: '/gradientwave'
+  },
+  {
+    title: 'Keyboard Mouse Lock',
+    description: 'Lock your keyboard and mouse',
+    publishDate: '8th Oct 2024',
+    url: '/keyboardmouselock'
   }
 
   // {
