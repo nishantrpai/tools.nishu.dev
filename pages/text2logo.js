@@ -9,6 +9,7 @@ export default function Text2Logo() {
   const [logoSvg, setLogoSvg] = useState('')
   const [loading, setLoading] = useState(false)
   const [editMode, setEditMode] = useState(false)
+  const [isNewLogo, setIsNewLogo] = useState(true)
   const svgRef = useRef(null)
   
   const getDataURI = (svg) => {
@@ -19,7 +20,7 @@ export default function Text2Logo() {
     setLoading(true)
     let prompt = `Generate a minimal, beautiful SVG logo based on the text: "${text}". The logo should be simple, symmetrical, and not contain any text or HTML tags. Use gradients or varying opacity to create depth if needed. The SVG should be 480x480px with a transparent background. Don't add any additional shapes or objects. Ensure all elements are connected and not fragmented. Use appropriate colors that will work well on both light and dark backgrounds. Only provide the SVG code, starting with <svg> and ending with </svg>, without any additional characters or tags.`
     
-    if (logoSvg) {
+    if (!isNewLogo && logoSvg) {
       prompt = `Modify the existing SVG logo: ${logoSvg}. Add or replace elements based on the text: "${text}". Maintain the overall structure and style of the existing logo while incorporating new elements that represent the text. Ensure the modifications are seamless and the result looks cohesive. Only provide the SVG code, starting with <svg> and ending with </svg>, without any additional characters or tags.`
     }
     
@@ -30,7 +31,9 @@ export default function Text2Logo() {
         body: JSON.stringify({ prompt, model: 'gpt-4o' })
       })
       const data = await res.json()
-      setLogoSvg(data.response)
+      // Remove any ```svg or ``` tags from the response
+      const cleanedResponse = data.response.replace(/^```svg\s*|\s*```$/g, '').trim()
+      setLogoSvg(cleanedResponse)
     } catch (error) {
       console.error("Error generating logo:", error)
     } finally {
@@ -115,6 +118,33 @@ export default function Text2Logo() {
     }
   }
 
+  const downloadPNG = async () => {
+    if (logoSvg) {
+      // use logo svg to png
+      // generate data uri from svg
+      const dataUri = getDataURI(logoSvg)
+      // use data uri to generate png
+      const img = new Image()
+      img.src = dataUri
+      await new Promise((resolve) => { img.onload = resolve })
+
+      const canvas = document.createElement('canvas')
+      canvas.width = 480
+      canvas.height = 480
+
+      const ctx = canvas.getContext('2d')
+      ctx.drawImage(img, 0, 0, 480, 480)
+
+      const pngBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'))
+      const url = URL.createObjectURL(pngBlob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'logo.png'
+      a.click()
+      URL.revokeObjectURL(url)
+    }
+  }
+
   return (
     <div className={styles.container}>
       <Head>
@@ -143,8 +173,33 @@ export default function Text2Logo() {
           }}
         />
 
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+          <label style={{ marginRight: '10px' }}>
+            <input
+              type="radio"
+              name="logoOption"
+              value="new"
+              checked={isNewLogo}
+              onChange={() => setIsNewLogo(true)}
+              style={{ marginRight: '5px' }}
+            />
+            Create New Logo
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="logoOption"
+              value="modify"
+              checked={!isNewLogo}
+              onChange={() => setIsNewLogo(false)}
+              style={{ marginRight: '5px' }}
+            />
+            Modify Existing Logo
+          </label>
+        </div>
+
         <button onClick={generateLogo} className={styles.button} disabled={loading}>
-          {loading ? 'Generating...' : logoSvg ? 'Modify Logo' : 'Generate Logo'}
+          {loading ? 'Generating...' : isNewLogo ? 'Generate Logo' : 'Modify Logo'}
         </button>
 
         <p style={{color: '#888', fontSize: '14px', margin: '10px 0'}}>
@@ -180,6 +235,9 @@ export default function Text2Logo() {
             <div style={{display: 'flex', flexDirection: 'column', gap: '10px', justifyContent: 'center', alignItems: 'center', marginBottom: '20px'}}>
               <button onClick={downloadSvg} className={styles.button}>
                 Download SVG
+              </button>
+              <button onClick={downloadPNG} className={styles.button}>
+                Download PNG
               </button>
               <button onClick={downloadFaviconSet} className={styles.button}>
                 Download Favicon Set
