@@ -1214,6 +1214,12 @@ export const tools = [
     description: 'Lock your keyboard and mouse',
     publishDate: '8th Oct 2024',
     url: '/keyboardmouselock'
+  },
+  {
+    title: "Text 2 Logo",
+    description: "Turn text into logo",
+    publishDate: "9th Oct 2024",
+    url: "/text2logo"
   }
 
   // {
