@@ -17,10 +17,10 @@ export default function Text2Logo() {
 
   const generateLogo = async () => {
     setLoading(true)
-    let prompt = `Generate a minimal, beautiful SVG logo based on the text: "${text}". The logo should be simple, symmetrical, and not contain any text or HTML tags. Use gradients or varying opacity to create depth if needed. The SVG should be 480x480px with a transparent background. Don't add any additional shapes or objects. Ensure all elements are connected and not fragmented. Use appropriate colors that will work well on both light and dark backgrounds. Only provide the SVG code as a string, no backticks or other characters.`
+    let prompt = `Generate a minimal, beautiful SVG logo based on the text: "${text}". The logo should be simple, symmetrical, and not contain any text or HTML tags. Use gradients or varying opacity to create depth if needed. The SVG should be 480x480px with a transparent background. Don't add any additional shapes or objects. Ensure all elements are connected and not fragmented. Use appropriate colors that will work well on both light and dark backgrounds. Only provide the SVG code, starting with <svg> and ending with </svg>, without any additional characters or tags.`
     
     if (logoSvg) {
-      prompt = `Modify the existing SVG logo: ${logoSvg}. Add or replace elements based on the text: "${text}". Maintain the overall structure and style of the existing logo while incorporating new elements that represent the text. Ensure the modifications are seamless and the result looks cohesive. Only provide the SVG code as a string, no explanations or other text.`
+      prompt = `Modify the existing SVG logo: ${logoSvg}. Add or replace elements based on the text: "${text}". Maintain the overall structure and style of the existing logo while incorporating new elements that represent the text. Ensure the modifications are seamless and the result looks cohesive. Only provide the SVG code, starting with <svg> and ending with </svg>, without any additional characters or tags.`
     }
     
     try {
