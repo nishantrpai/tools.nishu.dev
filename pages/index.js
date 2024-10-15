@@ -1220,6 +1220,12 @@ export const tools = [
     description: "Turn text into logo",
     publishDate: "9th Oct 2024",
     url: "/text2logo"
+  },
+  {
+    title: 'Save SVG as PNG',
+    description: 'Save SVG as PNG',
+    publishDate: '10th Oct 2024',
+    url: '/svg2png'
   }
 
   // {
