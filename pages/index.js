@@ -1226,6 +1226,12 @@ export const tools = [
     description: 'Save SVG as PNG',
     publishDate: '10th Oct 2024',
     url: '/svg2png'
+  },
+  {
+    title: 'Higher Filters',
+    description: 'Apply higher filter to your image',
+    publishDate: '11th Oct 2024',
+    url: '/higherfilter'
   }
 
   // {
