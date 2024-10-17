@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 
 export default function HigherFilter() {
   const [image, setImage] = useState(null)
-  const [greenIntensity, setGreenIntensity] = useState(139)
+  const [greenIntensity, setGreenIntensity] = useState(214)
   
   useEffect(() => {
     if (image) {
@@ -23,9 +23,9 @@ export default function HigherFilter() {
     const data = imageData.data
     for (let i = 0; i < data.length; i += 4) {
       const avg = (data[i] + data[i + 1] + data[i + 2]) / 3
-      data[i] = 3 // Red channel
+      data[i] = 84 // Red channel
       data[i + 1] = greenIntensity // Green channel
-      data[i + 2] = 6 // Blue channel
+      data[i + 2] = 86 // Blue channel
       data[i + 3] = data[i + 3] * (avg / 255) // Alpha channel
     }
     context.putImageData(imageData, 0, 0)
