@@ -1,10 +1,11 @@
 import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 export default function HigherFilter() {
   const [image, setImage] = useState(null)
   const [greenIntensity, setGreenIntensity] = useState(214)
+  const canvasRef = useRef(null)
   
   useEffect(() => {
     if (image) {
@@ -13,22 +14,16 @@ export default function HigherFilter() {
   }, [image, greenIntensity])
 
   const applyFilter = () => {
-    const canvas = document.getElementById('canvas')
+    const canvas = canvasRef.current
     const context = canvas.getContext('2d')
     canvas.width = image.width
     canvas.height = image.height
     context.clearRect(0, 0, canvas.width, canvas.height)
     context.drawImage(image, 0, 0, image.width, image.height)
-    const imageData = context.getImageData(0, 0, canvas.width, canvas.height)
-    const data = imageData.data
-    for (let i = 0; i < data.length; i += 4) {
-      const avg = (data[i] + data[i + 1] + data[i + 2]) / 3
-      data[i] = 84 // Red channel
-      data[i + 1] = greenIntensity // Green channel
-      data[i + 2] = 86 // Blue channel
-      data[i + 3] = data[i + 3] * (avg / 255) // Alpha channel
-    }
-    context.putImageData(imageData, 0, 0)
+
+    // Create an overlay rectangle
+    context.fillStyle = `rgba(84, ${greenIntensity}, 86, 0.5)`
+    context.fillRect(0, 0, canvas.width, canvas.height)
   }
 
   return (
@@ -38,10 +33,7 @@ export default function HigherFilter() {
         <meta name="description" content="Higher Filter" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main style={{
-        maxWidth: '100%',
-        padding: '0 20px',
-      }}>
+      <main>
         <h1>Higher Filter</h1>
         <h2 className={styles.description}>Add higher filter on any image</h2>
         <input type="file" accept="image/*" onChange={(e) => {
@@ -61,19 +53,19 @@ export default function HigherFilter() {
           <input
             type="range"
             id="greenIntensity"
-            min="0"
-            max="255"
+            min="100"
+            max="250"
             value={greenIntensity}
             onChange={(e) => setGreenIntensity(Number(e.target.value))}
           />
           <span>{greenIntensity}</span>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, margin: 'auto' }}>
-          <canvas id="canvas" style={{ width: '100%', maxWidth: 500, height: 'auto' }} />
+          <canvas ref={canvasRef} style={{ width: '100%', maxWidth: 500, height: 'auto' }} />
         </div>
         <button onClick={() => setImage(null)}>Clear</button>
         <button onClick={() => {
-          const canvas = document.getElementById('canvas')
+          const canvas = canvasRef.current
           const a = document.createElement('a')
           a.href = canvas.toDataURL('image/png')
           a.download = 'higher_filter.png'
