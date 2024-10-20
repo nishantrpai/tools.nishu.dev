@@ -11,7 +11,7 @@ export default function DiamondFilter() {
   useEffect(() => {
     // Load the diamond texture
     const texture = new Image()
-    texture.src = '/diamondfilter.jpg'
+    texture.src = '/diamondfilter.avif'
     texture.onload = () => setDiamondTexture(texture)
   }, [])
 
