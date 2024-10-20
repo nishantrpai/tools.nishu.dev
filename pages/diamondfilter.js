@@ -80,14 +80,14 @@ export default function DiamondFilter() {
       <Head>
         <title>Diamond Filter</title>
         <link rel="icon" href="/favicon.ico" />
-        <meta name="description" content="Add diamond texture to an image and save it" />
+        <meta name="description" content="Click the area you want to fill with diamond texture" />
       </Head>
       <main>
         <h1 className={styles.title}>
           Diamond Filter
         </h1>
         <h2 className={styles.description}>
-          Add diamond texture to an image and save it
+          Click the area you want to fill with diamond texture
         </h2>
         <input type="file" accept="image/*" onChange={(e) => {
           const file = e.target.files[0]

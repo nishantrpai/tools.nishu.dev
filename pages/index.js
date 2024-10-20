@@ -1430,7 +1430,7 @@ export const tools = [
   },
   {
     title: 'Diamond Filter',
-    description: 'Add diamond filter to your image',
+    description: 'Click the area you want to fill with diamond texture',
     publishDate: '12th Oct 2024',
     url: '/diamondfilter',
     tags: []
