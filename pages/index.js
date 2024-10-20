@@ -1427,6 +1427,13 @@ export const tools = [
       "publishDate": "11th Oct 2024",
       "url": "/higherfilter",
       "tags": ['higher']
+  },
+  {
+    title: 'Diamond Filter',
+    description: 'Add diamond filter to your image',
+    publishDate: '12th Oct 2024',
+    url: '/diamondfilter',
+    tags: []
   }
 ]
 
