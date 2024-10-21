@@ -1417,28 +1417,28 @@ export const tools = [
   {
       "title": "Save SVG as PNG",
       "description": "Save SVG as PNG",
-      "publishDate": "10th Oct 2024",
+      "publishDate": "17th Oct 2024",
       "url": "/svg2png",
       "tags": []
   },
   {
       "title": "Higher Filters",
       "description": "Apply higher filter to your image",
-      "publishDate": "11th Oct 2024",
+      "publishDate": "18th Oct 2024",
       "url": "/higherfilter",
       "tags": ['higher']
   },
   {
     title: 'Diamond Filter',
     description: 'Click the area you want to fill with diamond texture',
-    publishDate: '12th Oct 2024',
+    publishDate: '20th Oct 2024',
     url: '/diamondfilter',
     tags: []
   },
   {
     title: 'Custom Texture',
-    description: 'Custom texture',
-    publishDate: '12th Oct 2024',
+    description: 'Click the area you want to fill with custom texture',
+    publishDate: '21th Oct 2024',
     url: '/customtexture',
     tags: []
   }
