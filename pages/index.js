@@ -1434,6 +1434,13 @@ export const tools = [
     publishDate: '12th Oct 2024',
     url: '/diamondfilter',
     tags: []
+  },
+  {
+    title: 'Custom Texture',
+    description: 'Custom texture',
+    publishDate: '12th Oct 2024',
+    url: '/customtexture',
+    tags: []
   }
 ]
 
