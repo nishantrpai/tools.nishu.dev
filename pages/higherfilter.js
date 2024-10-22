@@ -46,7 +46,6 @@ export default function HigherFilter() {
       </Head>
       <main style={{
         maxWidth: '100%',
-        padding: '0 20px',
       }}>
         <h1>Higher Filter</h1>
         <h2 className={styles.description}>Add higher filter on any image</h2>
