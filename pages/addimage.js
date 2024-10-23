@@ -108,18 +108,21 @@ const AddImage = () => {
         <label>
           Rotation X:
           <input type="range" min="-180" max="180" value={rotation.x} onChange={handleRotation('x')} />
+          <input type="number" value={rotation.x} onChange={handleRotation('x')} style={{width: '50px', border: '1px solid #333', background: '#000', color: '#fff', borderRadius: '5px', marginLeft: '10px'}} />
         </label>
       </div>
       <div>
         <label>
           Rotation Y:
           <input type="range" min="-180" max="180" value={rotation.y} onChange={handleRotation('y')} />
+          <input type="number" value={rotation.y} onChange={handleRotation('y')} style={{width: '50px', border: '1px solid #333', background: '#000', color: '#fff', borderRadius: '5px', marginLeft: '10px'}} />
         </label>
       </div>
       <div>
         <label>
           Rotation Z:
           <input type="range" min="-180" max="180" value={rotation.z} onChange={handleRotation('z')} />
+          <input type="number" value={rotation.z} onChange={handleRotation('z')} style={{width: '50px', border: '1px solid #333', background: '#000', color: '#fff', borderRadius: '5px', marginLeft: '10px'}} />
         </label>
       </div>
       <div>
