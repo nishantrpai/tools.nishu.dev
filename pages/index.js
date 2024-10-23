@@ -1448,6 +1448,13 @@ export const tools = [
     publishDate: '22th Oct 2024',
     url: '/addimage',
     tags: []
+  },
+  {
+    title: 'Higher Filter Gif',
+    description: 'Apply higher filter to your gif',
+    publishDate: '23th Oct 2024',
+    url: '/higherfiltergif',
+    tags: ['higher']
   }
 ]
 
