@@ -1441,6 +1441,13 @@ export const tools = [
     publishDate: '21th Oct 2024',
     url: '/customtexture',
     tags: []
+  },
+  {
+    title: 'Add Image',
+    description: 'Add image to your image',
+    publishDate: '22th Oct 2024',
+    url: '/addimage',
+    tags: []
   }
 ]
 
