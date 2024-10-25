@@ -1455,6 +1455,13 @@ export const tools = [
     publishDate: '23th Oct 2024',
     url: '/higherfiltergif',
     tags: ['higher']
+  },
+  {
+    title: 'Invert Colors',
+    description: 'Invert colors of your image',
+    publishDate: '24th Oct 2024',
+    url: '/invert',
+    tags: []
   }
 ]
 
