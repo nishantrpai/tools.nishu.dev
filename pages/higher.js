@@ -1490,8 +1490,8 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Tools by Nishu</title>
-        <meta name="description" content="tools.nishu.dev" />
+        <title>Higher Tools</title>
+        <meta name="description" content="Higher tools" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
