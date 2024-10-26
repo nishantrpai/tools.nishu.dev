@@ -185,7 +185,7 @@ export const tools = [
       "title": "Higher",
       "description": "Add \"↑\" on any image",
       "publishDate": "17th April 2024",
-      "url": "/higher",
+      "url": "/higherarrow",
       "icon": "↑",
       "tags": ['higher']
   },
