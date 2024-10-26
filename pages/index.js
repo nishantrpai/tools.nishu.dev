@@ -1462,6 +1462,13 @@ export const tools = [
     publishDate: '24th Oct 2024',
     url: '/invert',
     tags: []
+  },
+  {
+    title: 'Wow',
+    description: 'Wow',
+    publishDate: '25th Oct 2024',
+    url: '/wow',
+    tags: []
   }
 ]
 
