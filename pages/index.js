@@ -1469,6 +1469,13 @@ export const tools = [
     publishDate: '25th Oct 2024',
     url: '/wow',
     tags: []
+  },
+  {
+    title: 'Collage',
+    description: 'Create collage',
+    publishDate: '26th Oct 2024',
+    url: '/collage',
+    tags: []
   }
 ]
 
