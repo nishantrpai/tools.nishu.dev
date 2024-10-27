@@ -5,46 +5,18 @@ import html2canvas from 'html2canvas'
 
 export default function Collage() {
   const [images, setImages] = useState([])
+  const [gap, setGap] = useState(0)
+  const [backgroundColor, setBackgroundColor] = useState('#000000')
+  const [imgBackground, setImgBackground] = useState('#ddd')
   const canvasRefs = useRef({})
 
   const layouts = {
     basic: [
       [["1x1", "1x1"], ["1x1", "1x1"]],
-      [["1x1", "1x1", "1x1"]],
-      [["1x1", "1x1", "1x1", "1x1"]],
-      [["1x1", "1x1"]],
-      [["1x1"], ["1x1"]],
-      [["1x1"], ["1x1"], ["1x1"], ["1x1"]],
-      [["1x1", "1x1", "1x1"], ["1x1", "1x1", "1x1"]],
-      [["1x1", "1x1", "1x1", "1x1"], ["1x1", "1x1", "1x1", "1x1"]],
-      [["2x1", "2x1"], ["1x1", "1x1"]],
-      [["2x1", "2x1"], ["1x1"]]
-    ],
-    one_big_photo: [
-      [["2x2", "1x1", "1x1"], ["1x1", "1x1", "1x1"]],
-      [["1x1", "2x2", "1x1"], ["1x1", "1x1", "1x1"]],
-      [["1x1", "1x1", "1x1"], ["1x1", "2x2", "1x1"]],
-      [["1x1", "2x1", "1x1"], ["1x1", "1x1", "1x1"]],
-      [["1x1", "1x1", "1x1"], ["1x1", "1x1", "2x2"]],
-      [["1x1", "1x1", "1x1"], ["2x2", "1x1", "1x1"]],
-      [["1x1", "1x1", "1x1"], ["1x1", "1x1", "2x2"]],
-      [["1x1", "2x1", "1x1"], ["1x1", "1x1", "1x1"], ["1x1", "1x1", "1x1"]],
-      [["1x1", "1x1", "1x1", "2x2"], ["1x1", "1x1", "1x1", "1x1"]],
-      [["1x1", "1x1", "1x1", "1x1"], ["1x1", "1x1", "1x1", "2x2"]]
-    ],
-    jigsaw: [
-      [["2x2", "1x1"], ["1x1", "1x1"]],
-      [["1x1", "1x1", "1x1"], ["1x1", "1x1", "2x2"]],
-      [["1x1", "2x1", "1x1"], ["1x1", "1x1", "1x1"], ["1x1"]],
-      [["1x1", "1x1", "1x1"], ["1x1", "2x2", "1x1"]],
-      [["2x2", "1x1"], ["1x1", "1x1"], ["1x1", "1x1"]],
-      [["2x2", "1x1", "1x1"], ["1x1", "1x1", "1x1"]],
-      [["2x2", "1x1", "1x1"], ["1x1", "1x1", "2x2"]],
-      [["1x1", "2x2", "1x1"], ["1x1", "1x1", "1x1"], ["1x1"]]
     ]
   }
 
-  const handleImageUpload = (e) => {
+    const handleImageUpload = (e) => {
     const files = Array.from(e.target.files)
     Promise.all(files.map(file => {
       return new Promise((resolve) => {
@@ -66,6 +38,9 @@ export default function Collage() {
     canvas.width = width
     canvas.height = height
     
+    ctx.clearRect(0, 0, width, height)
+    ctx.fillStyle = imgBackground
+    ctx.fillRect(0, 0, width, height)
     // Calculate dimensions to maintain aspect ratio and cover
     const imgRatio = img.width / img.height
     const canvasRatio = width / height
@@ -89,10 +64,11 @@ export default function Collage() {
     const gridStyle = {
       display: 'grid',
       gridTemplateColumns: `repeat(${layout[0].length}, 1fr)`,
-      gap: '0',
+      gap: `${gap}px`,
       width: '100%',
       maxWidth: '500px',
-      margin: '20px auto'
+      margin: '20px auto',
+      backgroundColor: backgroundColor,
     }
 
     return (
@@ -100,7 +76,7 @@ export default function Collage() {
         {layout.flatMap((row, rowIndex) =>
           row.map((cell, colIndex) => {
             const [width, height] = cell.split('x').map(Number)
-            const cellWidth = 500 / layout[0].length * width
+            const cellWidth = (500 - (layout[0].length - 1) * gap) / layout[0].length * width
             const cellHeight = cellWidth * (height / width)
             const imageIndex = rowIndex * row.length + colIndex
 
@@ -109,7 +85,7 @@ export default function Collage() {
                 gridColumn: `span ${width}`,
                 gridRow: `span ${height}`,
                 aspectRatio: `${width}/${height}`,
-                backgroundColor: '#ddd',
+                backgroundColor: imgBackground,
                 overflow: 'hidden'
               }}>
                 {images[imageIndex] && 
@@ -141,7 +117,7 @@ export default function Collage() {
       const layoutArray = layouts[layout][index]
       const totalColumns = layoutArray[0].length
       const baseWidth = 500
-      const cellWidth = baseWidth / totalColumns
+      const cellWidth = (baseWidth - (totalColumns - 1) * gap) / totalColumns
       
       let totalHeight = 0
       layoutArray.forEach(row => {
@@ -151,13 +127,12 @@ export default function Collage() {
         }))
         totalHeight += maxRowHeight * cellWidth
       })
+      totalHeight += (layoutArray.length - 1) * gap
 
       html2canvas(gridElement, {
         useCORS: true,
-        backgroundColor: null,
-        width: baseWidth,
-        height: totalHeight,
-        scale: 4
+        backgroundColor: backgroundColor,
+        scale: 2
       }).then(canvas => {
         const link = document.createElement('a')
         link.download = `collage-${layout}-${index + 1}.png`
@@ -182,6 +157,36 @@ export default function Collage() {
         <div>
           <input type="file" multiple onChange={handleImageUpload} />
         </div>
+        <div>
+          <label htmlFor="gap">Gap between images (px): </label>
+          <input
+            type="number"
+            id="gap"
+            value={gap}
+            onChange={(e) => setGap(Number(e.target.value))}
+            min="0"
+            max="20"
+          />
+        </div>
+        <div>
+          <label htmlFor="backgroundColor">Background Color: </label>
+          <input
+            type="color"
+            id="backgroundColor"
+            value={backgroundColor}
+            onChange={(e) => setBackgroundColor(e.target.value)}
+          />
+        </div>
+        <div>
+          <label htmlFor="imgBackground">Image Background Color: </label>
+          <input
+            type="color"
+            id="imgBackground"
+            value={imgBackground}
+            onChange={(e) => setImgBackground(e.target.value)}
+          />
+        </div>
+
         {Object.entries(layouts).map(([layoutName, layoutOptions]) => (
           <div key={layoutName}>
             <h2>{layoutName.charAt(0).toUpperCase() + layoutName.slice(1)} Layouts</h2>
