@@ -1,7 +1,6 @@
 import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { useState, useEffect, useRef } from 'react'
-import html2canvas from 'html2canvas'
 
 export default function Collage() {
   const [images, setImages] = useState([])
@@ -141,36 +140,65 @@ export default function Collage() {
       </div>
     )
   }
-
   const downloadCollage = (layout, index) => {
-    const gridElement = document.getElementById(`grid-${layout}-${index}`)
-    if (gridElement) {
-      const layoutArray = layouts[layout][index]
-      const totalColumns = layoutArray[0].length
-      const baseWidth = 500
-      const cellWidth = (baseWidth - (totalColumns - 1) * gap) / totalColumns
-      
-      let totalHeight = 0
-      layoutArray.forEach(row => {
-        const maxRowHeight = Math.max(...row.map(cell => {
-          const [_, height] = cell.split('x').map(Number)
-          return height
-        }))
-        totalHeight += maxRowHeight * cellWidth
-      })
-      totalHeight += (layoutArray.length - 1) * gap
+    const layoutArray = layouts[layout][index]
+    const totalColumns = layoutArray[0].length
+    const totalRows = layoutArray.length
+    const baseWidth = 2000 // Increased base width for better quality
+    const cellSize = baseWidth / Math.max(totalColumns, totalRows)
+    
+    const canvasWidth = cellSize * totalColumns + (totalColumns - 1) * gap
+    const canvasHeight = cellSize * totalRows + (totalRows - 1) * gap
 
-      html2canvas(gridElement, {
-        useCORS: true,
-        backgroundColor: backgroundColor,
-        scale: 1
-      }).then(canvas => {
-        const link = document.createElement('a')
-        link.download = `collage-${layout}-${index + 1}.png`
-        link.href = canvas.toDataURL('image/png', 1.0)
-        link.click()
+    const canvas = document.createElement('canvas')
+    canvas.width = canvasWidth
+    canvas.height = canvasHeight
+    const ctx = canvas.getContext('2d')
+
+    // Fill background
+    ctx.fillStyle = backgroundColor
+    ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+    let yOffset = 0
+    layoutArray.forEach((row, rowIndex) => {
+      let xOffset = 0
+      row.forEach((cell, colIndex) => {
+        const [width, height] = cell.split('x').map(Number)
+        const cellWidth = cellSize * width
+        const cellHeight = cellSize * height
+        const imageIndex = rowIndex * row.length + colIndex
+
+        if (images[imageIndex]) {
+          const img = images[imageIndex]
+          const imgRatio = img.width / img.height
+          const cellRatio = cellWidth / cellHeight
+          let drawWidth = cellWidth
+          let drawHeight = cellHeight
+          let imgOffsetX = 0
+          let imgOffsetY = 0
+
+          if (imgRatio > cellRatio) {
+            drawHeight = cellWidth / imgRatio
+            imgOffsetY = (cellHeight - drawHeight) / 2
+          } else {
+            drawWidth = cellHeight * imgRatio
+            imgOffsetX = (cellWidth - drawWidth) / 2
+          }
+
+          ctx.fillStyle = imgBackground
+          ctx.fillRect(xOffset, yOffset, cellWidth, cellHeight)
+          ctx.drawImage(img, xOffset + imgOffsetX, yOffset + imgOffsetY, drawWidth, drawHeight)
+        }
+
+        xOffset += cellWidth + gap
       })
-    }
+      yOffset += cellSize + gap
+    })
+
+    const link = document.createElement('a')
+    link.download = `collage-${layout}-${index + 1}.png`
+    link.href = canvas.toDataURL('image/png', 1.0)
+    link.click()
   }
 
   return (
