@@ -163,7 +163,7 @@ export default function Collage() {
       html2canvas(gridElement, {
         useCORS: true,
         backgroundColor: backgroundColor,
-        scale: 2
+        scale: 1
       }).then(canvas => {
         const link = document.createElement('a')
         link.download = `collage-${layout}-${index + 1}.png`
