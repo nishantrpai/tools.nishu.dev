@@ -1476,6 +1476,13 @@ export const tools = [
     publishDate: '26th Oct 2024',
     url: '/collage',
     tags: []
+  },
+  {
+    title: 'Misprint',
+    description: 'Misprint your image',
+    publishDate: '27th Oct 2024',
+    url: '/misprint',
+    tags: []
   }
 ]
 
