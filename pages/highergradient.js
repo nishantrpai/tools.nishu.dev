@@ -8,7 +8,7 @@ export default function HigherGradient() {
   const [endGreenIntensity, setEndGreenIntensity] = useState(139)
   const [filterThreshold, setFilterThreshold] = useState(50)
   const [gradientDirection, setGradientDirection] = useState('horizontal') // horizontal, vertical, diagonal
-  
+
   useEffect(() => {
     if (image) {
       applyGradient()
@@ -31,9 +31,9 @@ export default function HigherGradient() {
     for (let y = 0; y < canvas.height; y++) {
       for (let x = 0; x < canvas.width; x++) {
         const i = (y * canvas.width + x) * 4
-        
+
         let gradientFactor
-        switch(gradientDirection) {
+        switch (gradientDirection) {
           case 'horizontal':
             gradientFactor = x / canvas.width
             break
@@ -72,8 +72,8 @@ export default function HigherGradient() {
         <h1>Higher Gradient</h1>
         <h2 className={styles.description}>Add higher gradient filter on any image</h2>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, margin: 'auto' }}>
-          <canvas 
-            id="canvas" 
+          <canvas
+            id="canvas"
             style={{ width: '100%', maxWidth: 500, height: 'auto' }}
           />
         </div>
@@ -90,10 +90,10 @@ export default function HigherGradient() {
           }
           reader.readAsDataURL(file)
         }} />
-        
+
         <div style={{ marginTop: '20px' }}>
           <label>Gradient Direction: </label>
-          <select 
+          <select
             value={gradientDirection}
             onChange={(e) => setGradientDirection(e.target.value)}
           >
@@ -145,8 +145,20 @@ export default function HigherGradient() {
         <button onClick={() => setImage(null)}>Clear</button>
         <button onClick={() => {
           const canvas = document.getElementById('canvas')
+          const tempCanvas = document.createElement('canvas')
+          const tempContext = tempCanvas.getContext('2d')
+          tempCanvas.width = canvas.width
+          tempCanvas.height = canvas.height
+
+          // Draw black background
+          tempContext.fillStyle = 'black'
+          tempContext.fillRect(0, 0, tempCanvas.width, tempCanvas.height)
+
+          // Draw the original canvas on top
+          tempContext.drawImage(canvas, 0, 0)
+
           const a = document.createElement('a')
-          a.href = canvas.toDataURL('image/png')
+          a.href = tempCanvas.toDataURL('image/png')
           a.download = 'higher_gradient.png'
           a.click()
         }}>Download</button>
