@@ -1469,6 +1469,13 @@ export const tools = [
     publishDate: '25th Oct 2024',
     url: '/wow',
     tags: []
+  },
+  {
+    title: 'Higher Gradient',
+    description: 'Add higher gradient filter on any image',
+    publishDate: '28th Oct 2024',
+    url: '/highergradient',
+    tags: ['higher']
   }
 ]
 

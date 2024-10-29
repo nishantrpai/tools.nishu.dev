@@ -1483,6 +1483,13 @@ export const tools = [
     publishDate: '27th Oct 2024',
     url: '/misprint',
     tags: []
+  },
+  {
+    title: 'Higher Gradient',
+    description: 'Add higher gradient filter on any image',
+    publishDate: '28th Oct 2024',
+    url: '/highergradient',
+    tags: ['higher']
   }
 ]
 
