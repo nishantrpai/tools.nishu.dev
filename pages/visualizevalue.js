@@ -51,11 +51,11 @@ export default function VisualizeValue() {
       await new Promise((resolve) => { img.onload = resolve })
 
       const canvas = document.createElement('canvas')
-      canvas.width = 480
-      canvas.height = 480
+      canvas.width = 960
+      canvas.height = 960
 
       const ctx = canvas.getContext('2d')
-      ctx.drawImage(img, 0, 0, 480, 480)
+      ctx.drawImage(img, 0, 0, 960, 960)
 
       const pngBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'))
       const url = URL.createObjectURL(pngBlob)
