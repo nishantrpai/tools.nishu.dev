@@ -14,7 +14,7 @@ export default function VisualizeValue() {
 
   const generateImage = async () => {
     setLoading(true)
-    const prompt = `Generate a minimal, beautiful SVG image that explains the following complex system: "${description}". The image should be simple, symmetrical, and not contain any text or HTML tags. Use gradients or varying opacity to create depth if needed, but limit colors to grayscale or white. The SVG should be 480x480px with a black background. Don't add any additional shapes or objects. Ensure all elements are connected and not fragmented. Only provide the SVG code, starting with <svg> and ending with </svg>, without any additional characters or tags.`
+    const prompt = `Generate a minimal, beautiful SVG image that explains the following complex system: "${description}". The image should be simple, symmetrical, and not contain any text or HTML tags. Use gradients or varying opacity to create depth if needed, but limit colors to grayscale. The SVG should be 480x480px with a black background. Don't add any additional shapes or objects. Ensure all elements are connected and not fragmented. Only provide the SVG code, starting with <svg> and ending with </svg>, without any additional characters or tags.`
     
     try {
       const res = await fetch(`/api/gpt`, {
