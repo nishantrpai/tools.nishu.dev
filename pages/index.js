@@ -1490,6 +1490,13 @@ export const tools = [
     publishDate: '28th Oct 2024',
     url: '/highergradient',
     tags: ['higher']
+  },
+  {
+    title: 'Visualize Value',
+    description: 'Visualize value',
+    publishDate: '31st Oct 2024',
+    url: '/visualizevalue',
+    tags: []
   }
 ]
 
