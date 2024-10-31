@@ -8,6 +8,7 @@ export default function HigherFilter() {
   const [filterThreshold, setFilterThreshold] = useState(50)
   const [selectedAreaOnly, setSelectedAreaOnly] = useState(false)
   const [selectionRect, setSelectionRect] = useState({ x: 50, y: 50, width: 200, height: 200 })
+  const [reverseFilter, setReverseFilter] = useState(false)
   const isDragging = useRef(false)
   const dragStart = useRef({ x: 0, y: 0 })
   const dragType = useRef(null) // 'move' or 'resize'
@@ -17,7 +18,7 @@ export default function HigherFilter() {
     if (image) {
       applyFilter()
     }
-  }, [image, greenIntensity, filterThreshold, selectedAreaOnly, selectionRect])
+  }, [image, greenIntensity, filterThreshold, selectedAreaOnly, selectionRect, reverseFilter])
 
   const applyFilter = (hideSelection = false) => {
     const canvas = document.getElementById('canvas')
@@ -45,7 +46,7 @@ export default function HigherFilter() {
 
         if (isInSelectedArea) {
           const avg = (data[i] + data[i + 1] + data[i + 2]) / 3
-          if (avg > filterThreshold) {
+          if ((reverseFilter && avg <= filterThreshold) || (!reverseFilter && avg > filterThreshold)) {
             data[i] = 84 // Red channel
             data[i + 1] = greenIntensity // Green channel
             data[i + 2] = 86 // Blue channel
@@ -200,6 +201,16 @@ export default function HigherFilter() {
               onChange={(e) => setSelectedAreaOnly(e.target.checked)}
             />
             Apply to selected area only
+          </label>
+        </div>
+        <div style={{ marginTop: '20px' }}>
+          <label>
+            <input
+              type="checkbox"
+              checked={reverseFilter}
+              onChange={(e) => setReverseFilter(e.target.checked)}
+            />
+            Reverse filter (apply to lower colors)
           </label>
         </div>
         <div style={{ marginTop: '20px' }}>
