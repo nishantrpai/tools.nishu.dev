@@ -1497,6 +1497,13 @@ export const tools = [
     publishDate: '31st Oct 2024',
     url: '/visualizevalue',
     tags: []
+  },
+  {
+    title: 'Color Filter',
+    description: 'Color filter',
+    publishDate: '1st Nov 2024',
+    url: '/colorfilter',
+    tags: []
   }
 ]
 
