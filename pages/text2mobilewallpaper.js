@@ -83,9 +83,7 @@ export default function MobileGradientWallpaper() {
         <button 
           onClick={generateGradient}
           style={{
-            padding: '10px 20px',
             marginBottom: '20px',
-            background: '#333',
             border: 'none',
             borderRadius: '5px',
             color: '#fff',
