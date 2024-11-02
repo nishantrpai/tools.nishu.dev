@@ -1506,10 +1506,10 @@ export const tools = [
     tags: []
   },
   {
-    title: 'Text to Pallete',
-    description: 'Text to Pallete',
+    title: 'Text to Palette',
+    description: 'Suggest a color palette for your prompt',
     publishDate: '2nd Nov 2024',
-    url: '/text2pallete',
+    url: '/text2palette',
     tags: []
   }
 ]
