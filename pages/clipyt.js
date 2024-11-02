@@ -6,11 +6,12 @@ import { FiYoutube } from 'react-icons/fi'
 export default function ClipYT() {
   const [url, setUrl] = useState('')
   const [startTime, setStartTime] = useState('00:00')
-  const [endTime, setEndTime] = useState('00:10')
+  const [endTime, setEndTime] = useState('00:10') 
   const videoRef = useRef(null)
   const mediaRecorderRef = useRef(null)
   const [isRecording, setIsRecording] = useState(false)
   const [redirectedUrl, setRedirectedUrl] = useState('')
+  const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
 
   const getYoutubeId = (url) => {
@@ -33,6 +34,7 @@ export default function ClipYT() {
     if (!video) return
 
     const currentTime = video.currentTime
+    setCurrentTime(currentTime)
     if (currentTime >= parseTime(endTime)) {
       video.pause()
       video.currentTime = parseTime(startTime)
@@ -94,23 +96,24 @@ export default function ClipYT() {
     const video = videoRef.current
     if (video) {
       video.currentTime = e.target.value
+      setCurrentTime(e.target.value)
     }
   }
 
-  // useEffect(() => {
-  //   if (url) {
-  //     const fetchRedirectedUrl = async () => {
-  //       const proxyUrl = `https://inv.nadeko.net/latest_version?id=${getYoutubeId(url)}&itag=18`
-  //       try {
-  //         const response = await fetch(proxyUrl)
-  //         setRedirectedUrl(response.url)
-  //       } catch (error) {
-  //         console.error('Error fetching redirected URL:', error)
-  //       }
-  //     }
-  //     fetchRedirectedUrl()
-  //   }
-  // }, [url])
+  useEffect(() => {
+    if (url) {
+      const fetchRedirectedUrl = async () => {
+        const proxyUrl = `https://api.codetabs.com/v1/proxy/?quest=https://inv.nadeko.net/latest_version?id=${getYoutubeId(url)}&itag=18`
+        try {
+          const response = await fetch(proxyUrl)
+          setRedirectedUrl(response.url)
+        } catch (error) {
+          console.error('Error fetching redirected URL:', error)
+        }
+      }
+      fetchRedirectedUrl()
+    }
+  }, [url])
 
   useEffect(() => {
     const video = videoRef.current
@@ -137,20 +140,20 @@ export default function ClipYT() {
         </h2>
 
         <div style={{ display: 'flex', width: '100%', border: '1px solid #333', borderRadius: '5px', marginBottom: '20px' }}>
-          <input
-            type="text"
-            style={{ flexBasis: '100%', padding: '10px', border: 'none', outline: 'none', background: 'none', color: '#fff' }}
-            placeholder="Paste YouTube video URL"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
+          <input 
+            type="text" 
+            style={{ flexBasis: '100%', padding: '10px', border: 'none', outline: 'none', background: 'none', color: '#fff' }} 
+            placeholder="Paste YouTube video URL" 
+            value={url} 
+            onChange={(e) => setUrl(e.target.value)} 
           />
         </div>
 
         <div style={{ display: 'flex', gap: '20px', marginBottom: '20px' }}>
           <div>
             <label style={{ display: 'block', marginBottom: '5px' }}>Start Time (MM:SS or HH:MM:SS)</label>
-            <input
-              type="text"
+            <input 
+              type="text" 
               value={startTime}
               onChange={handleStartTimeChange}
               style={{ padding: '5px', background: 'none', border: '1px solid #333', color: '#fff' }}
@@ -158,8 +161,8 @@ export default function ClipYT() {
           </div>
           <div>
             <label style={{ display: 'block', marginBottom: '5px' }}>End Time (MM:SS or HH:MM:SS)</label>
-            <input
-              type="text"
+            <input 
+              type="text" 
               value={endTime}
               onChange={(e) => setEndTime(e.target.value)}
               style={{ padding: '5px', background: 'none', border: '1px solid #333', color: '#fff' }}
@@ -167,21 +170,25 @@ export default function ClipYT() {
           </div>
         </div>
 
+        {redirectedUrl && (
           <div style={{ border: '1px solid #333', borderRadius: '5px', padding: '20px' }}>
             <video
               ref={videoRef}
-              src={`https://api.codetabs.com/v1/proxy/?quest=https://inv.nadeko.net/latest_version?id=${getYoutubeId(url)}&itag=18`}
+              src={redirectedUrl}
               controls
               style={{ width: '100%' }}
               onTimeUpdate={handleTimeUpdate}
+              crossOrigin="anonymous"
             />
-            <button
+            
+            <button 
               onClick={isRecording ? stopRecording : startRecording}
               style={{ marginTop: '10px', padding: '5px 10px', color: 'white', border: 'none', borderRadius: '5px' }}
             >
               {isRecording ? 'Stop Recording' : 'Start Recording'}
             </button>
           </div>
+        )}
       </main>
     </>
   )
