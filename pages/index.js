@@ -1518,6 +1518,13 @@ export const tools = [
     publishDate: '2nd Nov 2024',
     url: '/text2mobilewallpaper',
     tags: []
+  },
+  {
+    title: 'Image to Mobile Wallpaper',
+    description: 'Create mobile wallpaper from image',
+    publishDate: '3rd Nov 2024',
+    url: '/img2mobilewallpaper',
+    tags: []
   }
 ]
 
