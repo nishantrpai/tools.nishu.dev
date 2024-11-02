@@ -1522,24 +1522,32 @@ export const tools = [
   {
     title: 'Image to Mobile Wallpaper',
     description: 'Create mobile wallpaper from image',
-    publishDate: '3rd Nov 2024',
+    publishDate: '2nd Nov 2024',
     url: '/img2mobilewallpaper',
     tags: []
   },
   {
     title: 'Gradient Punks',
     description: 'Generate gradient punks',
-    publishDate: '4th Nov 2024',
+    publishDate: '2nd Nov 2024',
     url: '/gradientpunks',
     tags: []
   },
   {
     title: "Punk Wallpaper",
     description: "Generate punk wallpaper",
-    publishDate: "5th Nov 2024",
+    publishDate: "2n Nov 2024",
     url: "/punkwallpaper",
     tags: []
+  },
+  {
+    title: 'Clip YT',
+    description: 'Clip YouTube video',
+    publishDate: '2nd Nov 2024',
+    url: '/clipyt',
+    tags: []
   }
+
 ]
 
 export default function Home() {
