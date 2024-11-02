@@ -1532,6 +1532,13 @@ export const tools = [
     publishDate: '4th Nov 2024',
     url: '/gradientpunks',
     tags: []
+  },
+  {
+    title: "Punk Wallpaper",
+    description: "Generate punk wallpaper",
+    publishDate: "5th Nov 2024",
+    url: "/punkwallpaper",
+    tags: []
   }
 ]
 
