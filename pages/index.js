@@ -1504,6 +1504,13 @@ export const tools = [
     publishDate: '1st Nov 2024',
     url: '/colorfilter',
     tags: []
+  },
+  {
+    title: 'Text to Pallete',
+    description: 'Text to Pallete',
+    publishDate: '2nd Nov 2024',
+    url: '/text2pallete',
+    tags: []
   }
 ]
 
