@@ -1511,6 +1511,13 @@ export const tools = [
     publishDate: '2nd Nov 2024',
     url: '/text2palette',
     tags: []
+  },
+  {
+    title: 'Gradient Mobile Wallpaper',
+    description: 'Create mobile wallpaper from gradient',
+    publishDate: '2nd Nov 2024',
+    url: '/mobilegradientwallpaper',
+    tags: []
   }
 ]
 
