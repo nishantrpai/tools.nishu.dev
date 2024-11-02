@@ -1525,6 +1525,13 @@ export const tools = [
     publishDate: '3rd Nov 2024',
     url: '/img2mobilewallpaper',
     tags: []
+  },
+  {
+    title: 'Gradient Punks',
+    description: 'Generate gradient punks',
+    publishDate: '4th Nov 2024',
+    url: '/gradientpunks',
+    tags: []
   }
 ]
 
