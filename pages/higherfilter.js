@@ -13,7 +13,7 @@ export default function HigherFilter() {
   const dragStart = useRef({ x: 0, y: 0 })
   const dragType = useRef(null) // 'move' or 'resize'
   const resizeHandle = useRef(null) // 'nw', 'ne', 'sw', 'se'
-  
+
   useEffect(() => {
     if (image) {
       applyFilter()
@@ -36,12 +36,12 @@ export default function HigherFilter() {
     for (let y = 0; y < canvas.height; y++) {
       for (let x = 0; x < canvas.width; x++) {
         const i = (y * canvas.width + x) * 4
-        
-        const isInSelectedArea = selectedAreaOnly ? 
-          x >= selectionRect.x && 
-          x <= selectionRect.x + selectionRect.width && 
-          y >= selectionRect.y && 
-          y <= selectionRect.y + selectionRect.height : 
+
+        const isInSelectedArea = selectedAreaOnly ?
+          x >= selectionRect.x &&
+          x <= selectionRect.x + selectionRect.width &&
+          y >= selectionRect.y &&
+          y <= selectionRect.y + selectionRect.height :
           true
 
         if (isInSelectedArea) {
@@ -62,7 +62,7 @@ export default function HigherFilter() {
       context.strokeStyle = 'white'
       context.lineWidth = 2
       context.strokeRect(selectionRect.x, selectionRect.y, selectionRect.width, selectionRect.height)
-      
+
       // Draw resize handles
       const handles = [
         { x: selectionRect.x, y: selectionRect.y }, // nw
@@ -70,7 +70,7 @@ export default function HigherFilter() {
         { x: selectionRect.x, y: selectionRect.y + selectionRect.height }, // sw
         { x: selectionRect.x + selectionRect.width, y: selectionRect.y + selectionRect.height } // se
       ]
-      
+
       handles.forEach(handle => {
         context.fillStyle = 'white'
         context.fillRect(handle.x - 4, handle.y - 4, 8, 8)
@@ -80,7 +80,7 @@ export default function HigherFilter() {
 
   const handleMouseDown = (e) => {
     if (!selectedAreaOnly || !image) return
-    
+
     const canvas = document.getElementById('canvas')
     const rect = canvas.getBoundingClientRect()
     const scaleX = canvas.width / rect.width
@@ -108,7 +108,7 @@ export default function HigherFilter() {
 
     // Check if clicking inside selection rectangle
     if (x >= selectionRect.x && x <= selectionRect.x + selectionRect.width &&
-        y >= selectionRect.y && y <= selectionRect.y + selectionRect.height) {
+      y >= selectionRect.y && y <= selectionRect.y + selectionRect.height) {
       isDragging.current = true
       dragType.current = 'move'
       dragStart.current = { x: x - selectionRect.x, y: y - selectionRect.y }
@@ -133,7 +133,7 @@ export default function HigherFilter() {
       }))
     } else if (dragType.current === 'resize') {
       const newRect = { ...selectionRect }
-      
+
       if (resizeHandle.current.includes('n')) {
         newRect.height = newRect.height - (y - newRect.y)
         newRect.y = y
@@ -170,8 +170,8 @@ export default function HigherFilter() {
         <h1>Higher Filter</h1>
         <h2 className={styles.description}>Add higher filter on any image</h2>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, margin: 'auto' }}>
-          <canvas 
-            id="canvas" 
+          <canvas
+            id="canvas"
             style={{ width: '100%', maxWidth: 500, height: 'auto', cursor: selectedAreaOnly ? 'crosshair' : 'default' }}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
@@ -179,90 +179,93 @@ export default function HigherFilter() {
             onMouseLeave={handleMouseUp}
           />
         </div>
-
-        <input type="file" accept="image/*" onChange={(e) => {
-          const file = e.target.files[0]
-          const reader = new FileReader()
-          reader.onload = () => {
-            const img = new Image()
-            img.src = reader.result
-            img.onload = () => {
-              setImage(img)
-              setSelectionRect({ x: 50, y: 50, width: 200, height: 200 })
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 10, margin: 'auto' }}>
+          <input type="file" accept="image/*" onChange={(e) => {
+            const file = e.target.files[0]
+            const reader = new FileReader()
+            reader.onload = () => {
+              const img = new Image()
+              img.src = reader.result
+              img.onload = () => {
+                setImage(img)
+                setSelectionRect({ x: 50, y: 50, width: 200, height: 200 })
+              }
             }
-          }
-          reader.readAsDataURL(file)
-        }} />
-        <div style={{ marginTop: '20px' }}>
-          <label>
+            reader.readAsDataURL(file)
+          }} />
+          <div style={{ marginTop: '20px' }}>
+            <label>
+              <input
+                type="checkbox"
+                checked={selectedAreaOnly}
+                onChange={(e) => setSelectedAreaOnly(e.target.checked)}
+                style={{ marginRight: 10 }}
+              />
+              Apply to selected area only
+            </label>
+          </div>
+          <div style={{ marginTop: '20px' }}>
+            <label>
+              <input
+                type="checkbox"
+                checked={reverseFilter}
+                onChange={(e) => setReverseFilter(e.target.checked)}
+                style={{ marginRight: 10 }}
+              />
+              Reverse filter (apply to lower colors)
+            </label>
+          </div>
+          <div style={{ marginTop: '20px' }}>
+            <label htmlFor="greenIntensity">Green Intensity: </label>
             <input
-              type="checkbox"
-              checked={selectedAreaOnly}
-              onChange={(e) => setSelectedAreaOnly(e.target.checked)}
+              type="range"
+              id="greenIntensity"
+              min="0"
+              max="255"
+              value={greenIntensity}
+              onChange={(e) => setGreenIntensity(Number(e.target.value))}
             />
-            Apply to selected area only
-          </label>
-        </div>
-        <div style={{ marginTop: '20px' }}>
-          <label>
+            <input type="number" value={greenIntensity} style={{ width: 50, background: 'none', border: '1px solid #333', color: '#fff', borderRadius: 5, padding: 5, marginLeft: 10 }} onChange={(e) => setGreenIntensity(Number(e.target.value))} />
+          </div>
+          <div style={{ marginTop: '20px' }}>
+            <label htmlFor="filterThreshold">Filter Threshold: </label>
             <input
-              type="checkbox"
-              checked={reverseFilter}
-              onChange={(e) => setReverseFilter(e.target.checked)}
+              type="range"
+              id="filterThreshold"
+              min="0"
+              max="255"
+              value={filterThreshold}
+              onChange={(e) => setFilterThreshold(Number(e.target.value))}
             />
-            Reverse filter (apply to lower colors)
-          </label>
+            <input type="number" value={filterThreshold} style={{ width: 50, background: 'none', border: '1px solid #333', color: '#fff', borderRadius: 5, padding: 5, marginLeft: 10 }} onChange={(e) => setFilterThreshold(Number(e.target.value))} />
+          </div>
+          <button onClick={() => setImage(null)}>Clear</button>
+          <button onClick={() => {
+            // Apply filter without selection rectangle
+            applyFilter(true)
+
+            const canvas = document.getElementById('canvas')
+            const tempCanvas = document.createElement('canvas')
+            const tempContext = tempCanvas.getContext('2d')
+            tempCanvas.width = canvas.width
+            tempCanvas.height = canvas.height
+
+            // Draw black background
+            tempContext.fillStyle = 'black'
+            tempContext.fillRect(0, 0, tempCanvas.width, tempCanvas.height)
+
+            // Draw the filtered image on top
+            tempContext.drawImage(canvas, 0, 0)
+
+            const a = document.createElement('a')
+            a.href = tempCanvas.toDataURL('image/png')
+            a.download = 'higher_filter.png'
+            a.click()
+
+            // Reapply filter with selection rectangle
+            applyFilter()
+          }}>Download</button>
         </div>
-        <div style={{ marginTop: '20px' }}>
-          <label htmlFor="greenIntensity">Green Intensity: </label>
-          <input
-            type="range"
-            id="greenIntensity"
-            min="0"
-            max="255"
-            value={greenIntensity}
-            onChange={(e) => setGreenIntensity(Number(e.target.value))}
-          />
-          <span>{greenIntensity}</span>
-        </div>
-        <div style={{ marginTop: '20px' }}>
-          <label htmlFor="filterThreshold">Filter Threshold: </label>
-          <input
-            type="range"
-            id="filterThreshold"
-            min="0"
-            max="255"
-            value={filterThreshold}
-            onChange={(e) => setFilterThreshold(Number(e.target.value))}
-          />
-          <span>{filterThreshold}</span>
-        </div>
-        <button onClick={() => setImage(null)}>Clear</button>
-        <button onClick={() => {
-          // Apply filter without selection rectangle
-          applyFilter(true)
-          
-          const canvas = document.getElementById('canvas')
-          const tempCanvas = document.createElement('canvas')
-          const tempContext = tempCanvas.getContext('2d')
-          tempCanvas.width = canvas.width
-          tempCanvas.height = canvas.height
-          
-          // Draw black background
-          tempContext.fillStyle = 'black'
-          tempContext.fillRect(0, 0, tempCanvas.width, tempCanvas.height)
-          
-          // Draw the filtered image on top
-          tempContext.drawImage(canvas, 0, 0)
-          
-          const a = document.createElement('a')
-          a.href = tempCanvas.toDataURL('image/png')
-          a.download = 'higher_filter.png'
-          a.click()
-          
-          // Reapply filter with selection rectangle
-          applyFilter()
-        }}>Download</button>
       </main>
     </>
   )
