@@ -219,10 +219,12 @@ export default function HigherFilter() {
             Green Intensity
           </label>
           <input type="range" min={0} max={255} value={greenIntensity} onChange={(e) => setGreenIntensity(Number(e.target.value))} />
+          <input type="number" value={greenIntensity} style={{ width: 50, background: 'none', border: '1px solid #333', color: '#fff', borderRadius: 5, padding: 5, marginLeft: 10 }} onChange={(e) => setGreenIntensity(Number(e.target.value))} />
           <label>
             Filter Threshold
           </label>
           <input type="range" min={0} max={255} value={filterThreshold} onChange={(e) => setFilterThreshold(Number(e.target.value))} />
+          <input type="number" value={filterThreshold} style={{ width: 50, background: 'none', border: '1px solid #333', color: '#fff', borderRadius: 5, padding: 5, marginLeft: 10 }} onChange={(e) => setFilterThreshold(Number(e.target.value))} />            <input type="number" value={greenIntensity} style={{ width: 50, background: 'none', border: '1px solid #333', color: '#fff', borderRadius: 5, padding: 5, marginLeft: 10 }} onChange={(e) => setGreenIntensity(Number(e.target.value))} />
         </div>
 
         <button onClick={() => {
