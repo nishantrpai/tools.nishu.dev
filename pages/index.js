@@ -709,7 +709,7 @@ export const tools = [
   },
   {
       "title": "Image Profile",
-      "description": "Get image profile of any image",
+      "description": "Get color profile from any image",
       "publishDate": "29th June 2024",
       "url": "/imgprofile",
       "tags": []
