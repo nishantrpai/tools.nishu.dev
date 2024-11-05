@@ -11,7 +11,6 @@ export default function ColorProfile() {
   const [rgb, setRgb] = useState('')
   const [hsl, setHsl] = useState('')
   const [cmyk, setCmyk] = useState('')
-  const [colorName, setColorName] = useState('')
 
   const isLightColor = (hex) => {
     const rgb = parseInt(hex.replace('#', ''), 16)
@@ -22,24 +21,57 @@ export default function ColorProfile() {
     return luma > 200
   }
 
-  // make prompt to /api/gpt asking for color profile of the hex as json
-  const getColorProfile = async () => {
-    setLoading(true)
-    let prompt = `given a color: ${color}, provide the color profile as json including hex, rgb, hsl, cmyk, and color name. Keys should be hex, rgb, hsl, cmyk, and colorName. Provide valid hex, will be used as bg. Only 1 level json, don't make sub keys. Rgb should be rgb() or rgba(). E.g., of response {"hex": "#000000", "rgb": "rgb(0,0,0)", "hsl": "hsl(0,0%,0%)", "cmyk": "cmyk(0,0,0,100)", "colorName": "black"}`;
+  const hexToRgb = (hex) => {
+    const r = parseInt(hex.slice(1, 3), 16)
+    const g = parseInt(hex.slice(3, 5), 16)
+    const b = parseInt(hex.slice(5, 7), 16)
+    return `rgb(${r}, ${g}, ${b})`
+  }
 
-    const res = await fetch(`/api/gpt?prompt`, {
-      method: 'POST',
-      body: JSON.stringify({
-        prompt
-      })
-    })
-    let { response: data } = await res.json()
-    data = JSON.parse(data)
-    setHex(data.hex)
-    setRgb(data.rgb)
-    setHsl(data.hsl)
-    setCmyk(data.cmyk)
-    setColorName(data.colorName)
+  const hexToHsl = (hex) => {
+    let r = parseInt(hex.slice(1, 3), 16) / 255
+    let g = parseInt(hex.slice(3, 5), 16) / 255
+    let b = parseInt(hex.slice(5, 7), 16) / 255
+
+    const max = Math.max(r, g, b)
+    const min = Math.min(r, g, b)
+    let h, s, l = (max + min) / 2
+
+    if (max === min) {
+      h = s = 0
+    } else {
+      const d = max - min
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
+      switch (max) {
+        case r: h = (g - b) / d + (g < b ? 6 : 0); break
+        case g: h = (b - r) / d + 2; break
+        case b: h = (r - g) / d + 4; break
+      }
+      h /= 6
+    }
+
+    return `hsl(${Math.round(h * 360)}, ${Math.round(s * 100)}%, ${Math.round(l * 100)}%)`
+  }
+
+  const hexToCmyk = (hex) => {
+    let r = parseInt(hex.slice(1, 3), 16) / 255
+    let g = parseInt(hex.slice(3, 5), 16) / 255
+    let b = parseInt(hex.slice(5, 7), 16) / 255
+
+    let k = 1 - Math.max(r, g, b)
+    let c = (1 - r - k) / (1 - k)
+    let m = (1 - g - k) / (1 - k)
+    let y = (1 - b - k) / (1 - k)
+
+    return `cmyk(${Math.round(c * 100)}, ${Math.round(m * 100)}, ${Math.round(y * 100)}, ${Math.round(k * 100)})`
+  }
+
+  const getColorProfile = () => {
+    setLoading(true)
+    setHex(color)
+    setRgb(hexToRgb(color))
+    setHsl(hexToHsl(color))
+    setCmyk(hexToCmyk(color))
     setLoading(false)
   }
 
@@ -90,8 +122,7 @@ export default function ColorProfile() {
                 flexDirection: 'column',
                 textTransform: 'uppercase',
               }}>
-                <span style={{ fontWeight: 'bold', fontSize: 24 }}>{colorName}</span>
-                <span style={{ fontSize: 12, opacity: '0.75' }}> {hex}</span>
+                <span style={{ fontWeight: 'bold', fontSize: 24 }}>{hex}</span>
                 <span style={{ fontSize: 12, opacity: '0.75' }}> {rgb}</span>
                 <span style={{ fontSize: 12, opacity: '0.75' }}> {hsl}</span>
                 <span style={{ fontSize: 12, opacity: '0.75' }}> {cmyk}</span>
@@ -112,7 +143,6 @@ export default function ColorProfile() {
             });
           }} className={styles.button}>
             Download Color Profile
-          
           </button>)}
       </main>
     </>

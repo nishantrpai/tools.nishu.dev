@@ -1,17 +1,15 @@
-// simple tool for getting color profile of any hex
 import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { useState, useEffect } from 'react'
 import html2canvas from 'html2canvas'
 
 export default function ColorProfile() {
-  const [color, setColor] = useState('#000000')
+  const [color, setColor] = useState('')
   const [loading, setLoading] = useState(false)
   const [hex, setHex] = useState('')
   const [rgb, setRgb] = useState('')
   const [hsl, setHsl] = useState('')
   const [cmyk, setCmyk] = useState('')
-  const [colorName, setColorName] = useState('')
   const [image, setImage] = useState('')
 
   const isLightColor = (hex) => {
@@ -21,11 +19,6 @@ export default function ColorProfile() {
     const b = (rgb >> 0) & 0xff
     const luma = 0.2126 * r + 0.7152 * g + 0.0722 * b
     return luma > 200
-  }
-
-
-  const colorDistance = (c1, c2) => {
-    return Math.sqrt((c1[0] - c2[0]) ** 2 + (c1[1] - c2[1]) ** 2 + (c1[2] - c2[2]) ** 2)
   }
 
   const getColorProfileFromImage = async (image) => {
@@ -40,52 +33,76 @@ export default function ColorProfile() {
       canvas.height = img.height;
       ctx.drawImage(img, 0, 0);
       let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-      let color = {};
+      let colorCounts = {};
+      let maxCount = 0;
+
       for (let i = 0; i < imageData.length; i += 4) {
         let r = imageData[i];
         let g = imageData[i + 1];
         let b = imageData[i + 2];
         let rgb = `rgb(${r},${g},${b})`;
-        // if there exists a color that is
-        if (color[rgb]) {
-          color[rgb]++;
+        
+        if (colorCounts[rgb]) {
+          colorCounts[rgb]++;
         } else {
-          color[rgb] = 1;
+          colorCounts[rgb] = 1;
+        }
+
+        if (colorCounts[rgb] > maxCount) {
+          maxCount = colorCounts[rgb];
+          dominantColor = rgb;
         }
       }
-      
 
-      console.log(dominantColor);
       setColor(dominantColor);
-
+      updateColorProfile(dominantColor);
     }
   }
 
-  useEffect(() => {
-    if (color) {
-      getColorProfile()
+  const updateColorProfile = (color) => {
+    setHex(rgbToHex(color));
+    setRgb(color);
+    setHsl(rgbToHsl(color));
+    setCmyk(rgbToCmyk(color));
+  }
+
+  const rgbToHex = (rgb) => {
+    const [r, g, b] = rgb.match(/\d+/g);
+    return "#" + ((1 << 24) + (+r << 16) + (+g << 8) + +b).toString(16).slice(1);
+  }
+
+  const rgbToHsl = (rgb) => {
+    let [r, g, b] = rgb.match(/\d+/g).map(Number);
+    r /= 255; g /= 255; b /= 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    let h, s, l = (max + min) / 2;
+
+    if (max === min) {
+      h = s = 0;
+    } else {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+        case g: h = (b - r) / d + 2; break;
+        case b: h = (r - g) / d + 4; break;
+      }
+      h /= 6;
     }
-  }, [color])
 
-  // make prompt to /api/gpt asking for color profile of the hex as json
-  const getColorProfile = async () => {
-    setLoading(true)
-    let prompt = `given the color: ${color}, provide the color profile as json including hex, rgb, hsl, cmyk, and color name. Keys should be hex, rgb, hsl, cmyk, and colorName. Provide valid hex, will be used as bg. Only 1 level json, don't make sub keys. Rgb should be rgb() or rgba(). E.g., of response {"hex": "#000000", "rgb": "rgb(0,0,0)", "hsl": "hsl(0,0%,0%)", "cmyk": "cmyk(0,0,0,100)", "colorName": "black"}`;
+    return `hsl(${Math.round(h * 360)}, ${Math.round(s * 100)}%, ${Math.round(l * 100)}%)`;
+  }
 
-    const res = await fetch(`/api/gpt?prompt`, {
-      method: 'POST',
-      body: JSON.stringify({
-        prompt
-      })
-    })
-    let { response: data } = await res.json()
-    data = JSON.parse(data)
-    setHex(data.hex)
-    setRgb(data.rgb)
-    setHsl(data.hsl)
-    setCmyk(data.cmyk)
-    setColorName(data.colorName)
-    setLoading(false)
+  const rgbToCmyk = (rgb) => {
+    let [r, g, b] = rgb.match(/\d+/g).map(Number);
+    r /= 255; g /= 255; b /= 255;
+    
+    let k = 1 - Math.max(r, g, b);
+    let c = (1 - r - k) / (1 - k) || 0;
+    let m = (1 - g - k) / (1 - k) || 0;
+    let y = (1 - b - k) / (1 - k) || 0;
+
+    return `cmyk(${Math.round(c * 100)}, ${Math.round(m * 100)}, ${Math.round(y * 100)}, ${Math.round(k * 100)})`;
   }
 
   return (
@@ -139,8 +156,7 @@ export default function ColorProfile() {
                   flexDirection: 'column',
                   textTransform: 'uppercase',
                 }}>
-                  <span style={{ fontWeight: 'bold', fontSize: 24 }}>{colorName}</span>
-                  <span style={{ fontSize: 12, opacity: '0.75' }}> {hex}</span>
+                  <span style={{ fontWeight: 'bold', fontSize: 24 }}>{hex}</span>
                   <span style={{ fontSize: 12, opacity: '0.75' }}> {rgb}</span>
                   <span style={{ fontSize: 12, opacity: '0.75' }}> {hsl}</span>
                   <span style={{ fontSize: 12, opacity: '0.75' }}> {cmyk}</span>
@@ -154,8 +170,8 @@ export default function ColorProfile() {
             maxWidth: '500px', height: '520px',
             backgroundImage: `url(${image})`,
             backgroundSize: 'cover',
+            backgroundPosition: 'center',
           }} />
-
 
         </div>
         {/* download */}
@@ -171,7 +187,6 @@ export default function ColorProfile() {
             });
           }} className={styles.button}>
             Download Color Profile
-
           </button>)}
       </main>
     </>

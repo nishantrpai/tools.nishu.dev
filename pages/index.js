@@ -1546,6 +1546,13 @@ export const tools = [
     publishDate: '2nd Nov 2024',
     url: '/clipyt',
     tags: []
+  },
+  {
+    title: 'HTML to PDF',
+    description: 'Convert HTML to PDF',
+    publishDate: '2nd Nov 2024',
+    url: '/html2pdf',
+    tags: []
   }
 
 ]
