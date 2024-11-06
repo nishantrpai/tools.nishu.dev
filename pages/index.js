@@ -1557,7 +1557,7 @@ export const tools = [
   {
     title: 'Haze Effect',
     description: 'Add haze effect to your image',
-    publishDate: '3rd Nov 2024',
+    publishDate: '7th Nov 2024',
     url: '/haze',
     tags: []
   }

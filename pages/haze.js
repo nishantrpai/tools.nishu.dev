@@ -48,6 +48,30 @@ export default function MotionEffect() {
     a.click()
   }
 
+  const downloadSideBySide = () => {
+    const canvas = document.getElementById('canvas')
+    const ctx = canvas.getContext('2d')
+    const img = new Image()
+    img.src = URL.createObjectURL(image)
+    img.onload = () => {
+      const newCanvas = document.createElement('canvas')
+      newCanvas.width = canvas.width * 2
+      newCanvas.height = canvas.height
+      const newCtx = newCanvas.getContext('2d')
+      
+      // Draw original image on the left
+      newCtx.drawImage(img, 0, 0, canvas.width, canvas.height)
+      
+      // Draw haze effect image on the right
+      newCtx.drawImage(canvas, canvas.width, 0)
+      
+      const a = document.createElement('a')
+      a.href = newCanvas.toDataURL()
+      a.download = 'haze_effect_side_by_side.png'
+      a.click()
+    }
+  }
+
   return (
     <>
       <Head>
@@ -133,6 +157,7 @@ export default function MotionEffect() {
         <div style={{ display: 'flex', gap: 10, flexDirection: 'column', alignItems: 'flex-start' }}>
           <button onClick={() => setImage(null)}>Clear</button>
           <button onClick={downloadImage}>Download</button>
+          <button onClick={downloadSideBySide}>Download Side by Side</button>
         </div>
       </main>
     </>
