@@ -122,6 +122,13 @@ export default function MotionEffect() {
             style={{ display: 'block' }}
           />
         </div>
+        <div>
+          <label>Haze Direction: {hazeDirection}</label>
+          <select value={hazeDirection} onChange={(e) => setHazeDirection(e.target.value)}>
+            <option value="left">Left</option>
+            <option value="right">Right</option>
+          </select>
+        </div>
 
         <div style={{ display: 'flex', gap: 10, flexDirection: 'column', alignItems: 'flex-start' }}>
           <button onClick={() => setImage(null)}>Clear</button>
