@@ -1553,6 +1553,13 @@ export const tools = [
     publishDate: '2nd Nov 2024',
     url: '/html2pdf',
     tags: []
+  },
+  {
+    title: 'Haze Effect',
+    description: 'Add haze effect to your image',
+    publishDate: '3rd Nov 2024',
+    url: '/haze',
+    tags: []
   }
 
 ]
