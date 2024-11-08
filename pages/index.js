@@ -1560,6 +1560,13 @@ export const tools = [
     publishDate: '7th Nov 2024',
     url: '/haze',
     tags: []
+  },
+  {
+    title: 'Higher Italic',
+    description: 'Add higher italic on any image',
+    publishDate: '7th Nov 2024',
+    url: '/higheritalic',
+    tags: []
   }
 
 ]

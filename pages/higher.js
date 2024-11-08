@@ -1476,6 +1476,13 @@ export const tools = [
     publishDate: '28th Oct 2024',
     url: '/highergradient',
     tags: ['higher']
+  },
+  {
+    title: 'Higher Italic',
+    description: 'Add higher italic on any image',
+    publishDate: '7th Nov 2024',
+    url: '/higheritalic',
+    tags: []
   }
 ]
 
