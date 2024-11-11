@@ -1567,6 +1567,13 @@ export const tools = [
     publishDate: '7th Nov 2024',
     url: '/higheritalic',
     tags: []
+  },
+  {
+    title: 'Classical Filter',
+    description: 'Classical filter',
+    publishDate: '11th Nov 2024',
+    url: '/classicalfilter',
+    tags: []
   }
 
 ]

@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react'
 import { decompressFrames, parseGIF } from 'gifuct-js'
 import gifshot from 'gifshot'
 
-export default function HigherFilter() {
+export default function HigherFilterGif() {
   const [gifFrames, setGifFrames] = useState([])
   const [currentFrameIndex, setCurrentFrameIndex] = useState(0)
   const [greenIntensity, setGreenIntensity] = useState(139)
@@ -38,7 +38,6 @@ export default function HigherFilter() {
     canvas.width = imgWidth
     canvas.height = imgHeight
     context.clearRect(0, 0, canvas.width, canvas.height)
-    // Draw a black rectangle as background
     context.fillStyle = 'black'
     context.fillRect(0, 0, canvas.width, canvas.height)
     
@@ -63,14 +62,12 @@ export default function HigherFilter() {
 
   const downloadAsGif = async () => {
     setProcessing(true)
-    const canvas = document.getElementById('canvas')
 
     const applyFilterToFrame = (frame) => {
       const tempCanvas = document.createElement('canvas')
       tempCanvas.width = imgWidth
       tempCanvas.height = imgHeight
       const tempContext = tempCanvas.getContext('2d')
-      // Draw a black rectangle as background
       tempContext.fillStyle = 'black'
       tempContext.fillRect(0, 0, imgWidth, imgHeight)
       tempContext.drawImage(frame, 0, 0, imgWidth, imgHeight)
@@ -102,9 +99,9 @@ export default function HigherFilter() {
       gifHeight: imgHeight,
       images: gifFramesWithFilter,
       interval: frameDelays.map(delay => delay / 100),
-      quality: 1, // Increase quality (1-10)
-      numWorkers: 10, // Increase number of workers for better performance
-      sampleInterval: 1, // Decrease sample interval for better quality
+      quality: 1,
+      numWorkers: 10,
+      sampleInterval: 1,
       progressCallback: (captureProgress) => {
         console.log(`GIF Creation Progress: ${captureProgress}`)
       },
@@ -124,8 +121,8 @@ export default function HigherFilter() {
     })
   }
 
-  const handleGifLoad = (gifData) => {
-    fetch(`https://api.codetabs.com/v1/proxy/?quest=${gifData}`).then((res) => res.arrayBuffer()).then((buffer) => {
+  const handleGifLoad = (gifData, isUrl = false) => {
+    const processGif = (buffer) => {
       const gif = parseGIF(buffer);
       const frames = decompressFrames(gif, true);
 
@@ -143,7 +140,6 @@ export default function HigherFilter() {
           gifContext.clearRect(dims.left, dims.top, dims.width, dims.height);
         }
 
-        // Draw a black rectangle as background
         gifContext.fillStyle = 'black';
         gifContext.fillRect(0, 0, gifCanvas.width, gifCanvas.height);
 
@@ -158,7 +154,15 @@ export default function HigherFilter() {
       setImgWidth(gif.lsd.width);
       setImgHeight(gif.lsd.height);
       setCurrentFrameIndex(0);
-    });
+    };
+
+    if (isUrl) {
+      fetch(`https://api.codetabs.com/v1/proxy/?quest=${gifData}`)
+        .then((res) => res.arrayBuffer())
+        .then(processGif);
+    } else {
+      processGif(gifData);
+    }
   }
 
   const handleFileUpload = (event) => {
@@ -167,11 +171,11 @@ export default function HigherFilter() {
     reader.onload = () => {
       handleGifLoad(reader.result);
     };
-    reader.readAsDataURL(file);
+    reader.readAsArrayBuffer(file);
   }
 
   const handleUrlInput = () => {
-    handleGifLoad(gifUrl);
+    handleGifLoad(gifUrl, true);
   }
 
   return (
@@ -202,7 +206,7 @@ export default function HigherFilter() {
           margin: '20px 0'
         }}></canvas>
         <div style={{ display: 'flex', gap: 20, flexDirection: 'column', width: '50%' }}>
-        <input type="file" accept="image/*" onChange={handleFileUpload} />
+        <input type="file" accept="image/gif" onChange={handleFileUpload} />
         <div style={{display: 'flex', gap: 20}}>
         <input type="text" placeholder="Enter GIF URL" value={gifUrl} onChange={(e) => setGifUrl(e.target.value)} style={{
           width: '100%',
@@ -224,7 +228,7 @@ export default function HigherFilter() {
             Filter Threshold
           </label>
           <input type="range" min={0} max={255} value={filterThreshold} onChange={(e) => setFilterThreshold(Number(e.target.value))} />
-          <input type="number" value={filterThreshold} style={{ width: 50, background: 'none', border: '1px solid #333', color: '#fff', borderRadius: 5, padding: 5, marginLeft: 10 }} onChange={(e) => setFilterThreshold(Number(e.target.value))} />            <input type="number" value={greenIntensity} style={{ width: 50, background: 'none', border: '1px solid #333', color: '#fff', borderRadius: 5, padding: 5, marginLeft: 10 }} onChange={(e) => setGreenIntensity(Number(e.target.value))} />
+          <input type="number" value={filterThreshold} style={{ width: 50, background: 'none', border: '1px solid #333', color: '#fff', borderRadius: 5, padding: 5, marginLeft: 10 }} onChange={(e) => setFilterThreshold(Number(e.target.value))} />
         </div>
 
         <button onClick={() => {
