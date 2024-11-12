@@ -1574,6 +1574,13 @@ export const tools = [
     publishDate: '11th Nov 2024',
     url: '/classicalfilter',
     tags: []
+  },
+  {
+    title: 'Anime Filter',
+    description: 'Anime filter',
+    publishDate: '12th Nov 2024',
+    url: '/animefilter',
+    tags: []
   }
 
 ]
