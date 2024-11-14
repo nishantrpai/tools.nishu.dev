@@ -22,9 +22,9 @@ export default function DitherFilter() {
     canvas.width = image.width
     canvas.height = image.height
     context.clearRect(0, 0, canvas.width, canvas.height)
-    
+
     context.drawImage(image, 0, 0, image.width, image.height)
-    
+
     const imageData = context.getImageData(0, 0, canvas.width, canvas.height)
     const data = imageData.data
 
@@ -50,15 +50,15 @@ export default function DitherFilter() {
   const applyOrderedDithering = (data, width, height) => {
     const matrix = createBayerMatrix(matrixSize)
     const matrixDim = Math.pow(2, matrixSize)
-    
+
     for (let y = 0; y < height; y++) {
       for (let x = 0; x < width; x++) {
         const i = (y * width + x) * 4
-        
+
         const mx = x % matrixDim
         const my = y % matrixDim
         const matrixValue = matrix[my][mx] / (matrixDim * matrixDim)
-        
+
         if (isColorMode) {
           for (let c = 0; c < 3; c++) {
             data[i + c] = data[i + c] < (threshold * matrixValue) ? 0 : 255
@@ -68,7 +68,7 @@ export default function DitherFilter() {
           const color = avg < (threshold * matrixValue) ? 0 : 255
 
           data[i] = color
-          data[i + 1] = color 
+          data[i + 1] = color
           data[i + 2] = color
         }
       }
@@ -79,14 +79,14 @@ export default function DitherFilter() {
     for (let y = 0; y < height; y++) {
       for (let x = 0; x < width; x++) {
         const i = (y * width + x) * 4
-        
+
         if (isColorMode) {
           for (let c = 0; c < 3; c++) {
             const oldColor = data[i + c]
             const newColor = oldColor < threshold ? 0 : 255
             data[i + c] = newColor
             const error = oldColor - newColor
-            
+
             if (x < width - 1) data[i + 4 + c] += error * 7 / 16
             if (y < height - 1) {
               if (x > 0) data[i + width * 4 - 4 + c] += error * 3 / 16
@@ -100,7 +100,7 @@ export default function DitherFilter() {
           const error = avg - newColor
 
           data[i] = data[i + 1] = data[i + 2] = newColor
-          
+
           if (x < width - 1) {
             data[i + 4] += error * 7 / 16
             data[i + 5] += error * 7 / 16
@@ -151,7 +151,7 @@ export default function DitherFilter() {
           const color = avg < (threshold * matrixValue) ? 0 : 255
 
           data[i] = color
-          data[i + 1] = color 
+          data[i + 1] = color
           data[i + 2] = color
         }
       }
@@ -162,12 +162,12 @@ export default function DitherFilter() {
     if (n === 1) {
       return [[0, 2], [3, 1]]
     }
-    
+
     const size = Math.pow(2, n)
     const matrix = Array(size).fill().map(() => Array(size).fill(0))
     const prevMatrix = createBayerMatrix(n - 1)
     const prevSize = Math.pow(2, n - 1)
-    
+
     for (let y = 0; y < size; y++) {
       for (let x = 0; x < size; x++) {
         const i = Math.floor(y / 2)
@@ -183,7 +183,7 @@ export default function DitherFilter() {
         }
       }
     }
-    
+
     return matrix
   }
 
@@ -247,7 +247,7 @@ export default function DitherFilter() {
             />
             <input type="number" value={threshold} style={{ width: 50, background: 'none', border: '1px solid #333', color: '#fff', borderRadius: 5, padding: 5, marginLeft: 10 }} onChange={(e) => setThreshold(Number(e.target.value))} />
           </div>
-          
+
           <div style={{ marginTop: '20px' }}>
             <label htmlFor="matrixSize">Matrix Size: </label>
             <input
@@ -301,6 +301,18 @@ export default function DitherFilter() {
           <button onClick={() => setImage(null)}>Clear</button>
           <button onClick={() => {
             const canvas = document.getElementById('canvas')
+            const context = canvas.getContext('2d')
+
+            // Store current image data
+            const imageData = context.getImageData(0, 0, canvas.width, canvas.height)
+
+            // Fill background with black
+            context.fillStyle = '#000000'
+            context.fillRect(0, 0, canvas.width, canvas.height)
+
+            // Draw original image data back on top
+            context.putImageData(imageData, 0, 0)
+
             const a = document.createElement('a')
             a.href = canvas.toDataURL('image/png')
             a.download = 'dither_filter.png'
