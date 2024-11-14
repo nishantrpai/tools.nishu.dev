@@ -1581,6 +1581,13 @@ export const tools = [
     publishDate: '12th Nov 2024',
     url: '/animefilter',
     tags: []
+  },
+  {
+    title: 'Dither Filter',
+    description: 'Dither Filter',
+    publishDate: '14th Nov 2024',
+    url: '/ditherfilter',
+    tags: []
   }
 
 ]
