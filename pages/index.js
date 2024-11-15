@@ -1588,6 +1588,13 @@ export const tools = [
     publishDate: '14th Nov 2024',
     url: '/ditherfilter',
     tags: []
+  },
+  {
+    title: 'Img to Pallete',
+    description: 'Img to Pallete',
+    publishDate: '14th Nov 2024',
+    url: '/img2palette',
+    tags: []
   }
 
 ]
