@@ -167,8 +167,8 @@ export default function Img2Palette() {
                 alignItems: 'center'
               }}>
                 <div style={{
-                  width: '69px',
-                  height: '69px',
+                  width: '60px',
+                  height: '60px',
                   backgroundColor: color,
                   borderRadius: '5px',
                   border: '1px solid #333'
