@@ -15,6 +15,7 @@ export default function HigherFilterGif() {
   const [processing, setProcessing] = useState(false)
   const [gifUrl, setGifUrl] = useState('')
   const [frameDelays, setFrameDelays] = useState([])
+  const [isReverse, setIsReverse] = useState(false)
 
   useEffect(() => {
     if (gifFrames.length > 0) {
@@ -30,14 +31,13 @@ export default function HigherFilterGif() {
     if (gifFrames.length > 0) {
       applyFilter()
     }
-  }, [currentFrameIndex, greenIntensity, filterThreshold])
+  }, [currentFrameIndex, greenIntensity, filterThreshold, isReverse])
 
   const applyFilter = () => {
     const canvas = document.getElementById('canvas')
     const context = canvas.getContext('2d')
     canvas.width = imgWidth
     canvas.height = imgHeight
-    context.clearRect(0, 0, canvas.width, canvas.height)
     context.fillStyle = 'black'
     context.fillRect(0, 0, canvas.width, canvas.height)
     
@@ -49,7 +49,7 @@ export default function HigherFilterGif() {
       const data = imageData.data
       for (let i = 0; i < data.length; i += 4) {
         const avg = (data[i] + data[i + 1] + data[i + 2]) / 3
-        if (avg > filterThreshold) {
+        if (isReverse ? avg <= filterThreshold : avg > filterThreshold) {
           data[i] = 84 // Red channel
           data[i + 1] = greenIntensity // Green channel
           data[i + 2] = 86 // Blue channel
@@ -75,7 +75,7 @@ export default function HigherFilterGif() {
       const data = imageData.data
       for (let i = 0; i < data.length; i += 4) {
         const avg = (data[i] + data[i + 1] + data[i + 2]) / 3
-        if (avg > filterThreshold) {
+        if (isReverse ? avg <= filterThreshold : avg > filterThreshold) {
           data[i] = 84 // Red channel
           data[i + 1] = greenIntensity // Green channel
           data[i + 2] = 86 // Blue channel
@@ -99,9 +99,9 @@ export default function HigherFilterGif() {
       gifHeight: imgHeight,
       images: gifFramesWithFilter,
       interval: frameDelays.map(delay => delay / 100),
-      quality: 1,
+      quality: 100,
       numWorkers: 10,
-      sampleInterval: 1,
+      sampleInterval: 10,
       progressCallback: (captureProgress) => {
         console.log(`GIF Creation Progress: ${captureProgress}`)
       },
@@ -109,7 +109,7 @@ export default function HigherFilterGif() {
       if (!obj.error) {
         const a = document.createElement('a')
         a.href = obj.image
-        a.download = `higherfilter-${Date.now()}.gif`
+        a.download = `higherfilter-${isReverse ? 'reverse-' : ''}${Date.now()}.gif`
         document.body.appendChild(a)
         a.click()
         document.body.removeChild(a)
@@ -136,12 +136,12 @@ export default function HigherFilterGif() {
 
       frames.forEach((frame, frameIndex) => {
         const { patch, dims, disposalType } = frame;
+        gifContext.fillStyle = 'black';
+        gifContext.fillRect(0, 0, gifCanvas.width, gifCanvas.height);
+
         if (frameIndex > 0 && disposalType === 2) {
           gifContext.clearRect(dims.left, dims.top, dims.width, dims.height);
         }
-
-        gifContext.fillStyle = 'black';
-        gifContext.fillRect(0, 0, gifCanvas.width, gifCanvas.height);
 
         const imageData = gifContext.createImageData(dims.width, dims.height);
         imageData.data.set(patch);
@@ -229,6 +229,14 @@ export default function HigherFilterGif() {
           </label>
           <input type="range" min={0} max={255} value={filterThreshold} onChange={(e) => setFilterThreshold(Number(e.target.value))} />
           <input type="number" value={filterThreshold} style={{ width: 50, background: 'none', border: '1px solid #333', color: '#fff', borderRadius: 5, padding: 5, marginLeft: 10 }} onChange={(e) => setFilterThreshold(Number(e.target.value))} />
+          <label>
+            <input
+              type="checkbox"
+              checked={isReverse}
+              onChange={(e) => setIsReverse(e.target.checked)}
+            />
+            Reverse Filter
+          </label>
         </div>
 
         <button onClick={() => {
@@ -236,7 +244,7 @@ export default function HigherFilterGif() {
           const dataURL = canvas.toDataURL('image/png')
           const a = document.createElement('a')
           a.href = dataURL
-          a.download = `higherfilter-${Date.now()}.png`
+          a.download = `higherfilter-${isReverse ? 'reverse-' : ''}${Date.now()}.png`
           a.click()
         }} style={{
           marginTop: 20

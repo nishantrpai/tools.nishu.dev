@@ -1595,6 +1595,13 @@ export const tools = [
     publishDate: '14th Nov 2024',
     url: '/img2palette',
     tags: []
+  },
+  {
+    title: 'Unblur',
+    description: 'Unblur out specific area',
+    publishDate: '14th Nov 2024',
+    url: '/unblur',
+    tags: []
   }
 
 ]
