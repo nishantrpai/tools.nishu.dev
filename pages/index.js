@@ -1599,7 +1599,7 @@ export const tools = [
   {
     title: 'Unblur',
     description: 'Unblur out specific area',
-    publishDate: '14th Nov 2024',
+    publishDate: '17th Nov 2024',
     url: '/unblur',
     tags: []
   }
