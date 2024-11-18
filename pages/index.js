@@ -1602,6 +1602,13 @@ export const tools = [
     publishDate: '17th Nov 2024',
     url: '/unblur',
     tags: []
+  },
+  {
+    title: 'Spotlight',
+    description: 'Spotlight',
+    publishDate: '17th Nov 2024',
+    url: '/spotlight',
+    tags: []
   }
 
 ]
