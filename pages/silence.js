@@ -129,8 +129,8 @@ export default function Silence() {
       
       analyserNode.getByteTimeDomainData(originalData)
       
-      // Clear only what's needed
-      ctx.fillStyle = 'rgb(200, 200, 200)'
+      // Clear canvas with black background
+      ctx.fillStyle = '#000'
       ctx.fillRect(0, 0, width, height)
       
       // Draw original waveform (blue)
@@ -172,7 +172,7 @@ export default function Silence() {
       ctx.stroke()
 
       // Simplified center lines
-      ctx.strokeStyle = 'rgb(0, 0, 0)'
+      ctx.strokeStyle = 'rgb(255, 255, 255)'
       ctx.beginPath()
       ctx.moveTo(0, height/4)
       ctx.lineTo(width, height/4)
@@ -182,7 +182,7 @@ export default function Silence() {
 
       // Add labels only once per second
       if (Date.now() % 1000 < 16) {
-        ctx.fillStyle = 'black'
+        ctx.fillStyle = 'white'
         ctx.font = '14px Arial'
         ctx.fillText('Original Audio', 10, 20)
         ctx.fillText('Inverted Audio', 10, height/2 + 20)
@@ -225,7 +225,7 @@ export default function Silence() {
         
         <canvas 
           ref={canvasRef}
-          style={{ width: '100%', height: 'auto', border: '1px solid #ccc' }}
+          style={{ width: '100%', height: 'auto', border: '1px solid #333' }}
         />
 
         <div style={{ marginBottom: '1rem' }}>
