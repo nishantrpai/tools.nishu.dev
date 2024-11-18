@@ -13,6 +13,7 @@ export default function Silence() {
   const [noiseLevel, setNoiseLevel] = useState(0.15)
   const [oscillator, setOscillator] = useState(null)
   const [qValue, setQValue] = useState(0.25)
+  const [destructiveInterference, setDestructiveInterference] = useState(true)
 
   const startRecording = async () => {
     try {
@@ -72,7 +73,7 @@ export default function Silence() {
         for (let i = 0; i < inputData.length; i++) {
           const white = Math.random() * 2 - 1
           lastOutput = (0.02 * white + 0.98 * lastOutput)
-          outputData[i] = (-inputData[i] + lastOutput * noiseLevel)
+          outputData[i] = destructiveInterference ? (-inputData[i] + lastOutput * noiseLevel) : (inputData[i] + lastOutput * noiseLevel)
         }
       }
 
@@ -269,6 +270,17 @@ export default function Silence() {
               onChange={(e) => setQValue(Number(e.target.value))}
               style={{ width: '100%' }}
             />
+          </label>
+        </div>
+
+        <div style={{ marginBottom: '1rem' }}>
+          <label>
+            <input
+              type="checkbox"
+              checked={destructiveInterference}
+              onChange={(e) => setDestructiveInterference(e.target.checked)}
+            />
+            Enable Destructive Interference
           </label>
         </div>
 
