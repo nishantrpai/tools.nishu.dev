@@ -1609,6 +1609,13 @@ export const tools = [
     publishDate: '17th Nov 2024',
     url: '/spotlight',
     tags: []
+  },
+  {
+    title: 'Silence',
+    description: 'Silence',
+    publishDate: '17th Nov 2024',
+    url: '/silence',
+    tags: []
   }
 
 ]
