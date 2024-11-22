@@ -45,7 +45,7 @@ export default function HigherHat() {
   return (
     <>
       <Head>
-        <title>snoofi</title>
+        <title>bite</title>
         <meta name="description" content="Add bitecoin on any image" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
