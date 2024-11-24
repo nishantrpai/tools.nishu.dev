@@ -5,7 +5,6 @@ import { useState, useEffect, useRef } from 'react'
 export default function CustomTexture() {
   const [img, setImg] = useState(null)
   const [customTexture, setCustomTexture] = useState(null)
-  const [textureSize, setTextureSize] = useState(1) // New state for texture size
   const [x, setX] = useState(0)
   const [y, setY] = useState(0)
   const canvasRef = useRef(null)
@@ -22,12 +21,7 @@ export default function CustomTexture() {
     let rgb = [currentPixelColor[0], currentPixelColor[1], currentPixelColor[2]]
 
     // Create a pattern from the custom texture
-    let patternCanvas = document.createElement('canvas')
-    let patternContext = patternCanvas.getContext('2d')
-    patternCanvas.width = customTexture.width * textureSize
-    patternCanvas.height = customTexture.height * textureSize
-    patternContext.drawImage(customTexture, 0, 0, patternCanvas.width, patternCanvas.height)
-    let pattern = context.createPattern(patternCanvas, 'repeat')
+    let pattern = context.createPattern(customTexture, 'repeat')
     context.fillStyle = pattern
 
     // Find all neighboring pixels that have the same color as the clicked pixel and fill them with the custom texture
@@ -74,7 +68,7 @@ export default function CustomTexture() {
     return () => {
       canvas.removeEventListener('click', handleCanvasClick)
     }
-  }, [img, customTexture, textureSize]) // Added textureSize to dependencies
+  }, [img, customTexture])
 
   const loadImage = (file, setImageFunction) => {
     const reader = new FileReader()
@@ -131,17 +125,6 @@ export default function CustomTexture() {
               const file = e.target.files[0]
               loadImage(file, setCustomTexture)
             }} 
-          />
-        </div>
-        <div>
-          <label htmlFor="textureSize">Texture Size: </label>
-          <input 
-            id="textureSize"
-            type="number" 
-            min="0.1" 
-            step="0.1" 
-            value={textureSize} 
-            onChange={(e) => setTextureSize(parseFloat(e.target.value))}
           />
         </div>
         <canvas ref={canvasRef} style={{ border: '1px solid #333', borderRadius: '10px' }}></canvas>
