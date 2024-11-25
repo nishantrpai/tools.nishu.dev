@@ -1616,6 +1616,13 @@ export const tools = [
     publishDate: '17th Nov 2024',
     url: '/silence',
     tags: []
+  },
+  {
+    title: 'Matrix Effect',
+    description: 'Matrix Effect',
+    publishDate: '17th Nov 2024',
+    url: '/matrixeffect',
+    tags: []
   }
 
 ]

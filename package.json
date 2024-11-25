@@ -19,6 +19,7 @@
     "chart.js": "^4.4.3",
     "email-validator": "^2.0.4",
     "ethers": "^6.11.1",
+    "expo-image-manipulator": "^13.0.5",
     "face-api.js": "^0.22.2",
     "frames.js": "^0.15.2",
     "fs": "^0.0.1-security",
