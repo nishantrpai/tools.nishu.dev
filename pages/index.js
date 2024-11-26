@@ -1620,8 +1620,15 @@ export const tools = [
   {
     title: 'Matrix Effect',
     description: 'Matrix Effect',
-    publishDate: '17th Nov 2024',
+    publishDate: '25th Nov 2024',
     url: '/matrixeffect',
+    tags: []
+  },
+  {
+    title: 'Knitting Filter',
+    description: 'Knitting Filter',
+    publishDate: '26th Nov 2024',
+    url: '/knittingfilter',
     tags: []
   }
 
