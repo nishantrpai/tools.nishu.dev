@@ -161,8 +161,20 @@ export default function KnittingFilter() {
           <button onClick={() => setImage(null)}>Clear</button>
           <button onClick={() => {
             const canvas = document.getElementById('canvas')
+            const tempCanvas = document.createElement('canvas')
+            const tempContext = tempCanvas.getContext('2d')
+            tempCanvas.width = canvas.width
+            tempCanvas.height = canvas.height + 50 // Add extra height for the black rectangle
+            
+            // Draw a black rectangle below
+            tempContext.fillStyle = '#000'
+            tempContext.fillRect(0, canvas.height, canvas.width, 50)
+
+            // Draw the original canvas content
+            tempContext.drawImage(canvas, 0, 0)
+
             const a = document.createElement('a')
-            a.href = canvas.toDataURL('image/png')
+            a.href = tempCanvas.toDataURL('image/png')
             a.download = 'knitting_filter.png'
             a.click()
           }}>Download</button>

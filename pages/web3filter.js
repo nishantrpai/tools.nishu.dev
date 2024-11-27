@@ -144,8 +144,20 @@ export default function Web3Filter() {
           <button onClick={() => setImage(null)}>Clear</button>
           <button onClick={() => {
             const canvas = document.getElementById('canvas')
+            const tempCanvas = document.createElement('canvas')
+            const tempContext = tempCanvas.getContext('2d')
+            tempCanvas.width = canvas.width
+            tempCanvas.height = canvas.height
+
+            // Draw black background
+            tempContext.fillStyle = 'black'
+            tempContext.fillRect(0, 0, tempCanvas.width, tempCanvas.height)
+
+            // Draw the original canvas on top
+            tempContext.drawImage(canvas, 0, 0)
+
             const a = document.createElement('a')
-            a.href = canvas.toDataURL('image/png')
+            a.href = tempCanvas.toDataURL('image/png')
             a.download = 'web3_filter.png'
             a.click()
           }}>Download</button>
