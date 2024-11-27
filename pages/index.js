@@ -1630,6 +1630,13 @@ export const tools = [
     publishDate: '26th Nov 2024',
     url: '/knittingfilter',
     tags: []
+  },
+  {
+    title: 'Web3 Filter',
+    description: 'Web3 Filter',
+    publishDate: '26th Nov 2024',
+    url: '/web3filter',
+    tags: []
   }
 
 ]

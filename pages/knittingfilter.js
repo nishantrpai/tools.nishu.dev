@@ -20,7 +20,6 @@ export default function KnittingFilter() {
     canvas.width = image.width
     canvas.height = image.height
     context.clearRect(0, 0, canvas.width, canvas.height)
-    
     // Draw initial image
     context.drawImage(image, 0, 0, image.width, image.height)
     
