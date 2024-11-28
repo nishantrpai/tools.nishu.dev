@@ -1637,6 +1637,13 @@ export const tools = [
     publishDate: '26th Nov 2024',
     url: '/web3filter',
     tags: []
+  },
+  {
+    title: 'Camcorder Filter',
+    description: 'Camcorder Filter',
+    publishDate: '26th Nov 2024',
+    url: '/camfilter',
+    tags: []
   }
 
 ]
