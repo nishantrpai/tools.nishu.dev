@@ -1644,6 +1644,13 @@ export const tools = [
     publishDate: '26th Nov 2024',
     url: '/camfilter',
     tags: []
+  },
+  {
+    title: 'Resize Images',
+    description: 'Resize Images',
+    publishDate: '26th Nov 2024',
+    url: '/resizeimages',
+    tags: []
   }
 
 ]
