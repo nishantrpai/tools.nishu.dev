@@ -1646,10 +1646,10 @@ export const tools = [
     tags: []
   },
   {
-    title: 'Resize Images',
-    description: 'Resize Images',
+    title: 'Bulk Resize Images',
+    description: 'Bulk resize images to specific dimensions',
     publishDate: '26th Nov 2024',
-    url: '/resizeimages',
+    url: '/bulkresize',
     tags: []
   }
 

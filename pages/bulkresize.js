@@ -74,14 +74,14 @@ export default function ResizeImages() {
   return (
     <div className={styles.container}>
       <Head>
-        <title>Resize Images</title>
-        <meta name="description" content="Resize images to specific dimensions" />
+        <title>Bulk Resize Images</title>
+        <meta name="description" content="Bulk resize images to specific dimensions" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <main className={styles.main}>
         <h1 className={styles.title}>
-          Resize Images
+          Bulk Resize Images
         </h1>
 
         <p style={{
@@ -91,7 +91,7 @@ export default function ResizeImages() {
           width: '100%',
           textAlign: 'center'
         }}>
-          Resize multiple images to the same dimensions with transparent background
+          Bulk resize multiple images to the same dimensions with transparent background
         </p>
 
         <div style={{
