@@ -15,6 +15,27 @@ export default function ResizeImages() {
     resizeImages(files)
   }
 
+  const downloadZip = async () => {
+    const zip = new JSZip()
+    
+    // Convert data URLs to blobs
+    const promises = resizedPhotos.map(async (photo, i) => {
+      const response = await fetch(photo.resized.url)
+      const blob = await response.blob()
+      zip.file(`${photos[i].name}`, blob)
+    })
+    
+    await Promise.all(promises)
+
+    const content = await zip.generateAsync({type: 'blob'})
+    const url = URL.createObjectURL(content)
+    const a = document.createElement('a') 
+    a.href = url
+    a.download = 'bulk-resize.zip'
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   const resizeImages = async (files) => {
     const resized = await Promise.all(files.map(async (file) => {
       const img = new Image()
@@ -180,6 +201,7 @@ export default function ResizeImages() {
             </div>
           </div>
         </div>
+        <button onClick={downloadZip}>Download Zip</button>
       </main>
     </div>
   )
