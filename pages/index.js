@@ -1648,8 +1648,15 @@ export const tools = [
   {
     title: 'Bulk Resize Images',
     description: 'Bulk resize images to specific dimensions',
-    publishDate: '26th Nov 2024',
+    publishDate: '4th Dec 2024',
     url: '/bulkresize',
+    tags: []
+  },
+  {
+    title: 'Text 2 Chonks',
+    description: 'Text 2 Chonks',
+    publishDate: '5th Dec 2024',
+    url: '/text2chonks',
     tags: []
   }
 
