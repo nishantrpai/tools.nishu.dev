@@ -113,7 +113,7 @@ export default function ComicSans() {
           <input
             type="range"
           min="16"
-          max="100"
+          max="200"
           value={fontSize}
           onChange={(e) => setFontSize(Number(e.target.value))}
           style={{ width: 100 }}
