@@ -1658,6 +1658,13 @@ export const tools = [
     publishDate: '5th Dec 2024',
     url: '/text2chonks',
     tags: []
+  },
+  {
+    title: 'Motion Blur',
+    description: 'Motion Blur Effect',
+    publishDate: '5th Dec 2024',
+    url: '/motionblur',
+    tags: []
   }
 
 ]
