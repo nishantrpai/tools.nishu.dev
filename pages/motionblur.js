@@ -62,7 +62,7 @@ export default function MotionBlur() {
           <input 
             type="range" 
             min={1} 
-            max={100} 
+            max={500} 
             value={blurAmount} 
             onChange={(e) => setBlurAmount(parseInt(e.target.value))} 
           />
@@ -72,7 +72,7 @@ export default function MotionBlur() {
           <input 
             type="range" 
             min={1} 
-            max={100} 
+            max={500} 
             value={steps} 
             onChange={(e) => setSteps(parseInt(e.target.value))} 
           />
@@ -98,8 +98,23 @@ export default function MotionBlur() {
         <button onClick={() => setImage(null)}>Clear</button>
         <button onClick={() => {
           const canvas = document.getElementById('canvas')
+          const ctx = canvas.getContext('2d')
+          
+          // Create temporary canvas with black background
+          const tempCanvas = document.createElement('canvas')
+          tempCanvas.width = canvas.width
+          tempCanvas.height = canvas.height
+          const tempCtx = tempCanvas.getContext('2d')
+          
+          // Draw black background
+          tempCtx.fillStyle = '#000000'
+          tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height)
+          
+          // Draw original canvas content on top
+          tempCtx.drawImage(canvas, 0, 0)
+          
           const a = document.createElement('a')
-          a.href = canvas.toDataURL()
+          a.href = tempCanvas.toDataURL()
           a.download = 'motion-blur.png'
           a.click()
         }}>Download</button>
