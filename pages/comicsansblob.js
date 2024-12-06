@@ -16,6 +16,7 @@ export default function ComicSansBlob() {
   const [numPoints, setNumPoints] = useState(8)
   const [offset, setOffset] = useState(25)
   const [complexity, setComplexity] = useState(1)
+  const [borderWidth, setBorderWidth] = useState(3)
 
   const generateBlobCoordinates = () => {
     const random = (min, max) => Math.floor(min + Math.random() * (max - min))
@@ -159,6 +160,17 @@ export default function ComicSansBlob() {
             />
           </div>
 
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+            <span>Border Width</span>
+            <input 
+              type="range" 
+              min="1" 
+              max="10" 
+              value={borderWidth} 
+              onChange={(e) => setBorderWidth(Number(e.target.value))} 
+            />
+          </div>
+
           <button onClick={generateBlobCoordinates}>Generate New Blob Shape</button>
 
           {image && (
@@ -190,7 +202,7 @@ export default function ComicSansBlob() {
                     height: `${blobSize}px`,
                     backgroundColor: `rgba(${hexToRgb(blobColor).r}, ${hexToRgb(blobColor).g}, ${hexToRgb(blobColor).b}, 0.25)`,
                     // background: 'rgba(255, 232, 31, 0.25)',
-                    border: `3px solid ${blobColor}`,
+                    border: `${borderWidth}px solid ${blobColor}`,
                     borderRadius: coordinates,
                     transform: `rotate(${rotation}deg)`,
                     transition: 'border-radius 0.3s ease',
