@@ -1672,6 +1672,13 @@ export const tools = [
     publishDate: '5th Dec 2024',
     url: '/comicsans',
     tags: []
+  },
+  {
+    title: 'Comic Sans Blob',
+    description: 'Comic Sans Blob',
+    publishDate: '5th Dec 2024',
+    url: '/comicsansblob',
+    tags: []
   }
 
 ]
