@@ -1665,6 +1665,13 @@ export const tools = [
     publishDate: '5th Dec 2024',
     url: '/motionblur',
     tags: []
+  },
+  {
+    title: 'Comic Sans',
+    description: 'Comic Sans',
+    publishDate: '5th Dec 2024',
+    url: '/comicsans',
+    tags: []
   }
 
 ]
