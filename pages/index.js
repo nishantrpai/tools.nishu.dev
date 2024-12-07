@@ -1662,22 +1662,29 @@ export const tools = [
   {
     title: 'Motion Blur',
     description: 'Motion Blur Effect',
-    publishDate: '5th Dec 2024',
+    publishDate: '6th Dec 2024',
     url: '/motionblur',
     tags: []
   },
   {
     title: 'Comic Sans',
     description: 'Comic Sans',
-    publishDate: '5th Dec 2024',
+    publishDate: '6th Dec 2024',
     url: '/comicsans',
     tags: []
   },
   {
     title: 'Comic Sans Blob',
     description: 'Comic Sans Blob',
-    publishDate: '5th Dec 2024',
+    publishDate: '6th Dec 2024',
     url: '/comicsansblob',
+    tags: []
+  },
+  {
+    title: 'Higher Glasses',
+    description: 'Add higher glasses on any image',
+    publishDate: '7th Dec 2024',
+    url: '/higherglasses',
     tags: []
   }
 

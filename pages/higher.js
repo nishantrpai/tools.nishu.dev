@@ -1483,6 +1483,13 @@ export const tools = [
     publishDate: '7th Nov 2024',
     url: '/higheritalic',
     tags: []
+  },
+  {
+    title: 'Higher Glasses',
+    description: 'Add higher glasses on any image',
+    publishDate: '8th Nov 2024',
+    url: '/higherglasses',
+    tags: []
   }
 ]
 
