@@ -1686,6 +1686,13 @@ export const tools = [
     publishDate: '7th Dec 2024',
     url: '/higherglasses',
     tags: []
+  },
+  {
+    title: 'Helvetica Blob',
+    description: 'Helvetica Blob',
+    publishDate: '8th Dec 2024',
+    url: '/helveticablob',
+    tags: []
   }
 
 ]

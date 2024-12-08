@@ -68,7 +68,7 @@ function InfiniteCanvas() {
   }
 
   const pointerMoveListener = (e) => {
-    if (isResizing && currentWindow !== null) {
+    if (isResizing && currentWindow !== null && e.ctrlKey) {
       const newWidth = canvas.windows[currentWindow].width + e.movementX
       const newHeight = canvas.windows[currentWindow].height + e.movementY
       canvas.windows[currentWindow].width = Math.max(100, newWidth)
@@ -76,7 +76,7 @@ function InfiniteCanvas() {
       canvas.windows[currentWindow].z = currentTop
       setCurrentTop(currentTop + 1)
     } else if (isDragging) {
-      if (currentWindow !== null) {
+      if (currentWindow !== null && e.ctrlKey) {
         canvas.windows[currentWindow].x += e.movementX / canvas.zoom
         canvas.windows[currentWindow].y += e.movementY / canvas.zoom
         canvas.windows[currentWindow].z = currentTop
@@ -269,12 +269,14 @@ function InfiniteCanvas() {
                   setCurrentTop(currentTop + 1)
                   setCanvas({ ...canvas })
                 }}
-                onMouseEnter={() => {
-                  document.body.style.cursor = 'nwse-resize'
+                onMouseEnter={(e) => {
+                  if (e.ctrlKey) {
+                    document.body.style.cursor = 'nwse-resize'
+                  }
                 }}
                 onPointerDown={(e) => {
                   setCurrentWindow(idx)
-                  if (e.target.tagName === 'DIV') {
+                  if (e.target.tagName === 'DIV' && e.ctrlKey) {
                     setIsResizing(true)
                   }
                 }}
@@ -291,12 +293,16 @@ function InfiniteCanvas() {
                   background: '#000',
                   borderRadius: '7px 7px 0 0',
                 }}
-                  onMouseEnter={() => {
-                    document.body.style.cursor = 'move'
+                  onMouseEnter={(e) => {
+                    if (e.ctrlKey) {
+                      document.body.style.cursor = 'move'
+                    }
                   }}
-                  onPointerDown={() => {
-                    setCurrentWindow(idx)
-                    setIsDragging(true)
+                  onPointerDown={(e) => {
+                    if (e.ctrlKey) {
+                      setCurrentWindow(idx)
+                      setIsDragging(true)
+                    }
                   }}
                   onPointerUp={() => {
                     setCurrentWindow(null)
