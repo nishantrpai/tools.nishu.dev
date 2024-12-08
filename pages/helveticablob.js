@@ -212,8 +212,14 @@ export default function HelveticaBlob() {
                     justifyContent: 'center'
                   }}
                 >
+                  <style jsx>{`
+                    @font-face {
+                      font-family: 'Helvetica';
+                      src: url('/fonts/helvetica-bold.ttf') format('truetype');
+                    }
+                  `}</style>
                   <span style={{
-                    fontFamily: 'Comic Sans MS',
+                    fontFamily: 'Helvetica, Arial, sans-serif',
                     position: 'absolute',
                     top: '100%',
                     width: 'max-content',
