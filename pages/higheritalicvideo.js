@@ -1,6 +1,7 @@
 import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { useState, useEffect, useRef } from 'react'
+import Whammy from 'whammy'
 
 export default function HigherItalicVideo() {
   const [video, setVideo] = useState(null)
@@ -11,16 +12,20 @@ export default function HigherItalicVideo() {
   const [videoWidth, setVideoWidth] = useState(0)
   const [videoHeight, setVideoHeight] = useState(0)
   const [maxScale, setMaxScale] = useState(1)
+  const [isRecording, setIsRecording] = useState(false)
   const canvasRef = useRef(null)
   const videoRef = useRef(null)
   const animationRef = useRef(null)
-  const italicRef = useRef(new Image())
+  const italicRef = useRef(typeof window !== 'undefined' ? new window.Image() : null)
+  const mediaRecorderRef = useRef(null)
 
   const higherItalic = '/higheritalic.svg'
 
   useEffect(() => {
     // Preload the italic image
-    italicRef.current.src = higherItalic
+    if (italicRef.current) {
+      italicRef.current.src = higherItalic
+    }
   }, [])
 
   const drawFrame = () => {
@@ -36,7 +41,7 @@ export default function HigherItalicVideo() {
       
       // Draw higher italic centered
       const italic = italicRef.current
-      if (italic.complete) {
+      if (italic && italic.complete) {
         context.save()
         // Calculate center position
         const centerX = (canvas.width - italic.width * scale) / 2
@@ -56,8 +61,11 @@ export default function HigherItalicVideo() {
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current)
       }
+      if (mediaRecorderRef.current && isRecording) {
+        mediaRecorderRef.current.stop()
+      }
     }
-  }, [])
+  }, [isRecording])
 
   useEffect(() => {
     drawFrame()
@@ -107,36 +115,58 @@ export default function HigherItalicVideo() {
   }
 
   const downloadVideo = async () => {
-    const canvas = canvasRef.current
-    const stream = canvas.captureStream(30)
+    // First pause any existing playback
+    handlePause()
+    
+    const canvas = canvasRef.current;
+    const stream = canvas.captureStream(30); // capture 30 fps
     const mediaRecorder = new MediaRecorder(stream, {
-      mimeType: 'video/mp4;codecs=avc1'
-    })
-
-    const chunks = []
+      mimeType: 'video/webm',
+      videoBitsPerSecond: 5000000 // 5 Mbps for better quality
+    });
+    
+    mediaRecorderRef.current = mediaRecorder;
+    setIsRecording(true);
+    
+    const chunks = [];
     mediaRecorder.ondataavailable = (e) => {
-      chunks.push(e.data)
-    }
-
+      console.log('on data', e)
+      if (e.data.size > 0) {
+        chunks.push(e.data);
+      }
+    };
+  
     mediaRecorder.onstop = () => {
-      const blob = new Blob(chunks, { type: 'video/mp4' })
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `higheritalic-video-${Date.now()}.mp4`
-      a.click()
-    }
-
-    const videoElement = videoRef.current
-    videoElement.currentTime = 0
-    mediaRecorder.start()
-    videoElement.play()
-
+      setIsRecording(false);
+      console.log('chunks length', chunks.length)
+      const blob = new Blob(chunks, { type: 'video/webm' });
+      const url = URL.createObjectURL(blob);
+  
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `higheritalic-video-${Date.now()}.webm`;
+      a.click();
+  
+      URL.revokeObjectURL(url);
+    };
+  
+    const videoElement = videoRef.current;
+    videoElement.currentTime = 0;
+    
+    // Start recording
+    mediaRecorder.start();
+    
+    // Play the video
+    videoElement.play();
+    drawFrame();
+  
+    // Stop recording when video ends
     videoElement.onended = () => {
-      mediaRecorder.stop()
-      videoElement.pause()
-    }
-  }
+      mediaRecorder.stop();
+      videoElement.pause();
+      cancelAnimationFrame(animationRef.current);
+    };
+  };
 
   return (
     <>
@@ -178,7 +208,9 @@ export default function HigherItalicVideo() {
         <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
           <button onClick={handlePlay}>Play</button>
           <button onClick={handlePause}>Pause</button>
-          <button onClick={downloadVideo}>Download Video</button>
+          <button onClick={downloadVideo} disabled={isRecording}>
+            {isRecording ? 'Recording...' : 'Download Video'}
+          </button>
         </div>
 
         <div style={{ display: 'flex', gap: 20, flexDirection: 'column', width: '50%' }}>
