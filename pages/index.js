@@ -1700,6 +1700,13 @@ export const tools = [
     publishDate: '10th Dec 2024',
     url: '/tldrimg',
     tags: []
+  },
+  {
+    title: 'Higher Italic Video',
+    description: 'Add higher italic on any video',
+    publishDate: '11th Dec 2024',
+    url: '/higheritalicvideo',
+    tags: []
   }
 
 ]
