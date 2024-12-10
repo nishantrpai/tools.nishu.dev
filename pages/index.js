@@ -1693,6 +1693,13 @@ export const tools = [
     publishDate: '8th Dec 2024',
     url: '/helveticablob',
     tags: []
+  },
+  {
+    title: 'TLDR img',
+    description: 'TLDR text in img',
+    publishDate: '10th Dec 2024',
+    url: '/tldrimg',
+    tags: []
   }
 
 ]
