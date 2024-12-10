@@ -1482,14 +1482,21 @@ export const tools = [
     description: 'Add higher italic on any image',
     publishDate: '7th Nov 2024',
     url: '/higheritalic',
-    tags: []
+    tags: ['higher']
   },
   {
     title: 'Higher Glasses',
     description: 'Add higher glasses on any image',
-    publishDate: '8th Nov 2024',
+    publishDate: '8th Dec 2024',
     url: '/higherglasses',
-    tags: []
+    tags: ['higher']
+  },
+  {
+    title: 'Higher Italic Video',
+    description: 'Add higher italic video to any video',
+    publishDate: '10th Dec 2024',
+    url: '/higheritalicvideo',
+    tags: ['higher']
   }
 ]
 
