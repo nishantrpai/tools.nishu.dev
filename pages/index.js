@@ -1704,8 +1704,15 @@ export const tools = [
   {
     title: 'Higher Italic Video',
     description: 'Add higher italic on any video',
-    publishDate: '11th Dec 2024',
+    publishDate: '10th Dec 2024',
     url: '/higheritalicvideo',
+    tags: []
+  },
+  {
+    title: 'Blonde',
+    description: 'Add blonde color to any image',
+    publishDate: '11th Dec 2024',
+    url: '/blonde',
     tags: []
   }
 
