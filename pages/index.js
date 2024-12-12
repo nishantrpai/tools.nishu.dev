@@ -1714,6 +1714,13 @@ export const tools = [
     publishDate: '11th Dec 2024',
     url: '/blonde',
     tags: []
+  },
+  {
+    title: 'Comic Sans or not',
+    description: 'Comic sans or not',
+    publishDate: '12th Dec 2024',
+    url: '/comicsansornot',
+    tags: []
   }
 
 ]
