@@ -152,12 +152,14 @@ export default function Website2GPTData() {
               flex: 1 
             }}
           >
-            {fetching ? 'Fetching...' : 'Fetch All Content'}
+            {fetching ? 'Fetching...' : 'Fetch'}
           </button>
           <button 
             onClick={downloadContent}
             disabled={Object.keys(contents).length === 0}
             style={{ 
+              display: 'flex',
+              gap: '10px',
               padding: '10px', 
               background: '#111', 
               border: '1px solid #333', 
@@ -167,7 +169,7 @@ export default function Website2GPTData() {
               flex: 1 
             }}
           >
-            <FiDownload /> Download Content
+            <FiDownload /> Download
           </button>
         </div>
 
