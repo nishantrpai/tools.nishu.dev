@@ -1721,6 +1721,13 @@ export const tools = [
     publishDate: '12th Dec 2024',
     url: '/comicsansornot',
     tags: []
+  },
+  {
+    title: 'Website to gpt data',
+    description: 'Website to gpt data',
+    publishDate: '13th Dec 2024',
+    url: '/website2gptdata',
+    tags: []
   }
 
 ]
