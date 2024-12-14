@@ -81,7 +81,7 @@ export default function AnimeFilter() {
 
       // Blend with edge detection
       if (edgeData[i] === 0) {
-        data[i] = data[i + 1] = data[i + 2] = 0
+        data[i] = data[i + 1] = data[i + 2] = 255
       }
 
       // Ensure values are in valid range
