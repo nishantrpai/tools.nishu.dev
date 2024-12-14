@@ -111,6 +111,7 @@ export default function AICanvas() {
         setAesthetics(data.response);
       <h1>This doesn't work anymore</h1>
       {mode === 'library' && <LibraryOfAesthetics library={library} setVals={setVals} />}
+<h1 style={{ color: '#333', fontSize: '12px' }}>Note: This doesn't work</h1>
         setScene(data.response);
       });
   }
@@ -169,6 +170,7 @@ export default function AICanvas() {
       // reconnect
       setWebsocket(null)
       // joinQueue()
+<h1 style={{ color: '#333', fontSize: '12px' }}>Note: This doesn't work</h1>
     }
     setWebsocket(tmpsocket)
   }
@@ -212,6 +214,7 @@ export default function AICanvas() {
           <div style={{ display: 'flex', gap: 10 }}>
             <input id='scene' value={scene} style={{  flexBasis: '90%', border: '1px solid #333 !important', background: '#000', width: '100%', padding: '5px 10px' }} placeholder='Describe scene' onChange={(e) => setScene(e.target.value)} />
             <button style={{ background: '#000', color: '#fff', padding: '5px 10px', border: '1px solid #333 !important', cursor: 'pointer', fontSize: 12 }} onClick={() => enhanceScene(scene)}>Enhance</button>
+<h1 style={{ color: '#333', fontSize: '12px' }}>Note: This doesn't work</h1>
           </div>
           <div>
             <input id='negativeprompt' style={{ border: '1px solid #333', background: '#000', width: '100%', padding: '5px 10px' }} placeholder='Negative Prompt' onChange={(e) => setNegativePrompt(e.target.value)} />
