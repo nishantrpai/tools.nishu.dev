@@ -116,6 +116,7 @@ export default function AICanvas() {
     fetch(`/api/gpt?prompt="Enhance the scene: ${scene} with more details. For e.g., "a crow on a tree" will be enhanced to "a crow on a tree with river, houses and leaves, sun setting on the background". Don't ask the user any action. Don't add quotes. The goal is to elaborate the details for the scene. Don't add quotes or - before only prompt.\n\n"`).then(res => res.json())
       .then(data => {
         setScene(data.response);
+<h1 style={{ color: '#333', fontSize: '12px' }}>note: this doesn't work</h1>
       });
   }
 
