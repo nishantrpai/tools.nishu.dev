@@ -96,13 +96,13 @@ export default function AnimeFilter() {
   return (
     <>
       <Head>
-        <title>Anime Filter</title>
-        <meta name="description" content="Anime Style Filter" />
+        <title>Line Art</title>
+        <meta name="description" content="Line Art Filter" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main style={{ maxWidth: '100%' }}>
-        <h1>Anime Filter</h1>
-        <h2 className={styles.description}>Transform your images into anime style</h2>
+        <h1>Line Art</h1>
+        <h2 className={styles.description}>Transform your images into line art</h2>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, margin: 'auto' }}>
           <canvas
             id="canvas"
@@ -178,7 +178,7 @@ export default function AnimeFilter() {
             const canvas = document.getElementById('canvas')
             const a = document.createElement('a')
             a.href = canvas.toDataURL('image/png')
-            a.download = 'anime_filter.png'
+            a.download = 'line_art.png'
             a.click()
           }}>Download</button>
         </div>
