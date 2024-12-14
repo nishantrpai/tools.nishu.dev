@@ -116,7 +116,6 @@ export default function AICanvas() {
     fetch(`/api/gpt?prompt="Enhance the scene: ${scene} with more details. For e.g., "a crow on a tree" will be enhanced to "a crow on a tree with river, houses and leaves, sun setting on the background". Don't ask the user any action. Don't add quotes. The goal is to elaborate the details for the scene. Don't add quotes or - before only prompt.\n\n"`).then(res => res.json())
       .then(data => {
         setScene(data.response);
-<h1 style={{ color: '#333', fontSize: '12px' }}>note: this doesn't work</h1>
       });
   }
 
@@ -184,7 +183,6 @@ export default function AICanvas() {
     console.log('old from memory', tmpLibrary.imgs.length)
     setLibrary(tmpLibrary)
     if (websocket !== null) return;
-<h1 style={{ color: '#333', fontSize: '12px' }}>note: this doesn't work</h1>
     joinQueue()
   }, [])
 
@@ -284,7 +282,6 @@ const PastGenerations = ({ library, setVals }) => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%', height: '900px', scrollbarWidth: 'thin', width: '100%' }}>
       {/* generate  divs with varying height, but fixed width */}
-<h1 style={{ color: '#333', fontSize: '12px' }}>note: this doesn't work</h1>
       {Object.keys(timeline).map(date => {
         return (
           <div>
@@ -326,4 +323,3 @@ const LibraryOfAesthetics = ({ library, setVals }) => {
     </div>
   )
 }
-<h1 style={{ color: '#333', fontSize: '12px' }}>note: this doesn't work</h1>
