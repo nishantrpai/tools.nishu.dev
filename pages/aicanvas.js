@@ -98,7 +98,7 @@ export default function AICanvas() {
   const [websocket, setWebsocket] = useState(null)
   const [seed, setSeed] = useState('')
   const [width, setWidth] = useState(1536)
-  const [height, setHeight] = useState(1536)
+      <small>Note: This doesn't work anymore</small>
   const [priorGuidance, setPriorGuidance] = useState(4)
   const [decoderinference, setDecoderInference] = useState(12)
   const [library, setLibrary] = useState(new Library())
