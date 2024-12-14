@@ -24,22 +24,22 @@ export default function WhichFont() {
     // get canvas as data url send to gpt as req body
     const canvas = document.getElementById('canvas');
     // reduce the size of the image to 500x500
-    let tempCanvas = document.createElement('canvas');
+        prompt: 'Is this font Helvetica or not? Please reply only YES/NO', image_url: dataURL,
     let tempCtx = tempCanvas.getContext('2d');
     tempCanvas.width = 500;
     tempCanvas.height = 500;
     tempCtx.drawImage(canvas, 0, 0, 500, 500);
     const dataURL = tempCanvas.toDataURL();
-    setFont('Detecting Font...');
-    const response = await fetch('/api/gpt', {
+        <title>Helvetica Font or not</title>
+        <meta name="description" content="Is this Helvetica font" />
       method: 'POST',
       body: JSON.stringify({
         prompt: 'Is this font comic sans or not? Please reply only YES/NO', image_url: dataURL,
         model: 'gpt-4o-mini'
       }),
     });
-    const data = await response.json();
-    setFont(data.response);
+        <h1 className={styles.title}>Is this Helvetica font?</h1>
+        <h2 className={styles.description}>Is this Helvetica font?</h2>
   }
   return (
     <>
