@@ -184,6 +184,7 @@ export default function AICanvas() {
     console.log('old from memory', tmpLibrary.imgs.length)
     setLibrary(tmpLibrary)
     if (websocket !== null) return;
+<h1 style={{ color: '#333', fontSize: '12px' }}>note: this doesn't work</h1>
     joinQueue()
   }, [])
 
