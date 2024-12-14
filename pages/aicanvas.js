@@ -58,8 +58,7 @@ class Library {
       if (!aesthetics[img.aesthetics]) aesthetics[img.aesthetics] = [];
       aesthetics[img.aesthetics].push(img);
     });
-const [width, setWidth] = useState(1536)
-const [height, setHeight] = useState(1536)
+    return aesthetics;
   }
 
   // remove from library
@@ -89,6 +88,7 @@ const getAllAesthetics = () => {
 
 
 export default function AICanvas() {
+
   const [mode, setMode] = useState('past')
   const [aesthetics, setAesthetics] = useState('')
   const [negativeprompt, setNegativePrompt] = useState('')
@@ -98,7 +98,7 @@ export default function AICanvas() {
   const [websocket, setWebsocket] = useState(null)
   const [seed, setSeed] = useState('')
   const [width, setWidth] = useState(1536)
-      <small>Note: This doesn't work anymore</small>
+  const [height, setHeight] = useState(1536)
   const [priorGuidance, setPriorGuidance] = useState(4)
   const [decoderinference, setDecoderInference] = useState(12)
   const [library, setLibrary] = useState(new Library())
@@ -109,9 +109,12 @@ export default function AICanvas() {
     fetch(`/api/gpt?prompt="Enhance the aesthetics for the description: '${aesthetics} aesthtics', only limit to describing the lights, shades, filters, colors, textures, patterns in extremely technical terms. Don't repeat the prompt or words like "enhance". Only output the aesthetics no prefixes.Don't ask the user any action. Don't add quotes or - before only prompt. Describe in third person, don't ask the user to feel etc, only describe."`).then(res => res.json())
       .then(data => {
         setAesthetics(data.response);
-      <h1>This doesn't work anymore</h1>
-      {mode === 'library' && <LibraryOfAesthetics library={library} setVals={setVals} />}
-<h1 style={{ color: '#333', fontSize: '12px' }}>Note: This doesn't work</h1>
+      });
+  }
+
+  const enhanceScene = (scene) => {
+    fetch(`/api/gpt?prompt="Enhance the scene: ${scene} with more details. For e.g., "a crow on a tree" will be enhanced to "a crow on a tree with river, houses and leaves, sun setting on the background". Don't ask the user any action. Don't add quotes. The goal is to elaborate the details for the scene. Don't add quotes or - before only prompt.\n\n"`).then(res => res.json())
+      .then(data => {
         setScene(data.response);
       });
   }
@@ -129,10 +132,10 @@ export default function AICanvas() {
   }
 
   const joinQueue = () => {
-<h1 style={{ color: '#333', fontSize: '12px' }}>Note: This doesn't work</h1>
     if (websocket !== null) websocket.close();
     setWebsocket(null)
     let tmpsocket = new WebSocket('wss://warp-ai-wuerstchen.hf.space/queue/join');
+    tmpsocket.onopen = () => {
       console.log('connected')
     }
     tmpsocket.onmessage = (event) => {
@@ -148,7 +151,6 @@ export default function AICanvas() {
       }
       if (data.msg.includes('process_') && data.msg !== 'process_starts') {
         if (!data.output.error)
-<h1 style={{ color: '#333', fontSize: '12px' }}>Note: This doesn't work</h1>
           setGen(`https://warp-ai-wuerstchen.hf.space/file=${data.output.data[0][0].name}`)
       }
       if (data.msg == 'process_completed') {
@@ -170,7 +172,6 @@ export default function AICanvas() {
       // reconnect
       setWebsocket(null)
       // joinQueue()
-<h1 style={{ color: '#333', fontSize: '12px' }}>Note: This doesn't work</h1>
     }
     setWebsocket(tmpsocket)
   }
@@ -214,7 +215,6 @@ export default function AICanvas() {
           <div style={{ display: 'flex', gap: 10 }}>
             <input id='scene' value={scene} style={{  flexBasis: '90%', border: '1px solid #333 !important', background: '#000', width: '100%', padding: '5px 10px' }} placeholder='Describe scene' onChange={(e) => setScene(e.target.value)} />
             <button style={{ background: '#000', color: '#fff', padding: '5px 10px', border: '1px solid #333 !important', cursor: 'pointer', fontSize: 12 }} onClick={() => enhanceScene(scene)}>Enhance</button>
-<h1 style={{ color: '#333', fontSize: '12px' }}>Note: This doesn't work</h1>
           </div>
           <div>
             <input id='negativeprompt' style={{ border: '1px solid #333', background: '#000', width: '100%', padding: '5px 10px' }} placeholder='Negative Prompt' onChange={(e) => setNegativePrompt(e.target.value)} />
