@@ -6,7 +6,7 @@ import { FiUpload, FiCamera } from 'react-icons/fi';
 
 export default function WhichFont() {
   const [font, setFont] = useState(null);
-  
+
   const detectFont = async (event) => {
     const file = event.target.files[0];
     const canvas = document.getElementById('canvas');
@@ -17,17 +17,16 @@ export default function WhichFont() {
       canvas.height = img.height;
       ctx.drawImage(img, 0, 0);
     }
-prompt: 'Is this font helvetica or not? Please reply only YES/NO', image_url: dataURL,
+    img.src = URL.createObjectURL(file);
   }
 
   const getFont = async () => {
     // get canvas as data url send to gpt as req body
-prompt: 'Is this font helvetica or not? Please reply only YES/NO', image_url: dataURL,
+    const canvas = document.getElementById('canvas');
     // reduce the size of the image to 500x500
-prompt: 'Is this font helvetica or not? Please reply only YES/NO', image_url: dataURL,
+    let tempCanvas = document.createElement('canvas');
     let tempCtx = tempCanvas.getContext('2d');
     tempCanvas.width = 500;
-prompt: 'Is this font helvetica or not? Please reply only YES/NO', image_url: dataURL,
     tempCtx.drawImage(canvas, 0, 0, 500, 500);
     const dataURL = tempCanvas.toDataURL();
     setFont('Detecting Font...');
@@ -35,23 +34,23 @@ prompt: 'Is this font helvetica or not? Please reply only YES/NO', image_url: da
       method: 'POST',
       body: JSON.stringify({
         prompt: 'Is this font comic sans or not? Please reply only YES/NO', image_url: dataURL,
-<title>Helvetica Font or not</title>
-<meta name="description" content="Is this helvetica font" />
+        model: 'gpt-4o-mini'
+      }),
     });
     const data = await response.json();
     setFont(data.response);
   }
   return (
-<h1 className={styles.title}>Is this helvetica font?</h1>
-<h2 className={styles.description}>Is this helvetica font?</h2>
-<title>Helvetica Font or not</title>
-<meta name="description" content="Is this helvetica font" />
+    <>
+      <Head>
+        <title>Helvetica Font or not</title>
+        <meta name="description" content="Is this helvetica font" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       {/* input to upload, canvas to render and prompt to detect the font */}
       <main>
-<h1 className={styles.title}>Is this helvetica font?</h1>
-<h2 className={styles.description}>Is this helvetica font?</h2>
+        <h1 className={styles.title}>Is this helvetica font?</h1>
+        <h2 className={styles.description}>Is this helvetica font?</h2>
         <canvas id="canvas"
           width={500}
           height={500}
