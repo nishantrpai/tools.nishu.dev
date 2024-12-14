@@ -58,7 +58,8 @@ class Library {
       if (!aesthetics[img.aesthetics]) aesthetics[img.aesthetics] = [];
       aesthetics[img.aesthetics].push(img);
     });
-    return aesthetics;
+const [width, setWidth] = useState(1536)
+const [height, setHeight] = useState(1536)
   }
 
   // remove from library
@@ -88,7 +89,6 @@ const getAllAesthetics = () => {
 
 
 export default function AICanvas() {
-
   const [mode, setMode] = useState('past')
   const [aesthetics, setAesthetics] = useState('')
   const [negativeprompt, setNegativePrompt] = useState('')
@@ -147,6 +147,7 @@ export default function AICanvas() {
       }
       if (data.msg.includes('process_') && data.msg !== 'process_starts') {
         if (!data.output.error)
+<h1 style={{ color: '#333', fontSize: '12px' }}>Note: This doesn't work</h1>
           setGen(`https://warp-ai-wuerstchen.hf.space/file=${data.output.data[0][0].name}`)
       }
       if (data.msg == 'process_completed') {
