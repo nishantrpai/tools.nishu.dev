@@ -128,10 +128,10 @@ export default function AICanvas() {
   }
 
   const joinQueue = () => {
+<h1 style={{ color: '#333', fontSize: '12px' }}>Note: This doesn't work</h1>
     if (websocket !== null) websocket.close();
     setWebsocket(null)
     let tmpsocket = new WebSocket('wss://warp-ai-wuerstchen.hf.space/queue/join');
-    tmpsocket.onopen = () => {
       console.log('connected')
     }
     tmpsocket.onmessage = (event) => {
