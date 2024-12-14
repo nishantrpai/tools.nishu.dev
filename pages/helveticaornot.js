@@ -17,14 +17,14 @@ export default function WhichFont() {
       canvas.height = img.height;
       ctx.drawImage(img, 0, 0);
     }
-    img.src = URL.createObjectURL(file);
+prompt: 'Is this font helvetica or not? Please reply only YES/NO', image_url: dataURL,
   }
 
   const getFont = async () => {
     // get canvas as data url send to gpt as req body
 prompt: 'Is this font helvetica or not? Please reply only YES/NO', image_url: dataURL,
     // reduce the size of the image to 500x500
-    let tempCanvas = document.createElement('canvas');
+prompt: 'Is this font helvetica or not? Please reply only YES/NO', image_url: dataURL,
     let tempCtx = tempCanvas.getContext('2d');
     tempCanvas.width = 500;
 prompt: 'Is this font helvetica or not? Please reply only YES/NO', image_url: dataURL,
