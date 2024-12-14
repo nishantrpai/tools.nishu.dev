@@ -109,12 +109,8 @@ export default function AICanvas() {
     fetch(`/api/gpt?prompt="Enhance the aesthetics for the description: '${aesthetics} aesthtics', only limit to describing the lights, shades, filters, colors, textures, patterns in extremely technical terms. Don't repeat the prompt or words like "enhance". Only output the aesthetics no prefixes.Don't ask the user any action. Don't add quotes or - before only prompt. Describe in third person, don't ask the user to feel etc, only describe."`).then(res => res.json())
       .then(data => {
         setAesthetics(data.response);
-      });
-  }
-
-  const enhanceScene = (scene) => {
-    fetch(`/api/gpt?prompt="Enhance the scene: ${scene} with more details. For e.g., "a crow on a tree" will be enhanced to "a crow on a tree with river, houses and leaves, sun setting on the background". Don't ask the user any action. Don't add quotes. The goal is to elaborate the details for the scene. Don't add quotes or - before only prompt.\n\n"`).then(res => res.json())
-      .then(data => {
+      <h1>This doesn't work anymore</h1>
+      {mode === 'library' && <LibraryOfAesthetics library={library} setVals={setVals} />}
         setScene(data.response);
       });
   }
