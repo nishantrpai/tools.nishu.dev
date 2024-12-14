@@ -33,7 +33,7 @@ export default function WhichFont() {
     const response = await fetch('/api/gpt', {
       method: 'POST',
       body: JSON.stringify({
-        prompt: 'Is this font comic sans or not? Please reply only YES/NO', image_url: dataURL,
+        prompt: 'Is this font helvetica or not? Please reply only YES/NO', image_url: dataURL,
         model: 'gpt-4o-mini'
       }),
     });
@@ -43,14 +43,14 @@ export default function WhichFont() {
   return (
     <>
       <Head>
-        <title>Helvetica Font or not</title>
-        <meta name="description" content="Is this helvetica font" />
+        <title>Helvetica Font or Not</title>
+        <meta name="description" content="Is this Helvetica font?" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       {/* input to upload, canvas to render and prompt to detect the font */}
       <main>
-        <h1 className={styles.title}>Is this helvetica font?</h1>
-        <h2 className={styles.description}>Is this helvetica font?</h2>
+        <h1 className={styles.title}>Is this Helvetica font?</h1>
+        <h2 className={styles.description}>Is this Helvetica font?</h2>
         <canvas id="canvas"
           width={500}
           height={500}
