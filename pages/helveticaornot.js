@@ -27,7 +27,7 @@ export default function WhichFont() {
     let tempCanvas = document.createElement('canvas');
     let tempCtx = tempCanvas.getContext('2d');
     tempCanvas.width = 500;
-    tempCanvas.height = 500;
+prompt: 'Is this font helvetica or not? Please reply only YES/NO', image_url: dataURL,
     tempCtx.drawImage(canvas, 0, 0, 500, 500);
     const dataURL = tempCanvas.toDataURL();
     setFont('Detecting Font...');
@@ -44,14 +44,14 @@ export default function WhichFont() {
   return (
     <>
       <Head>
-        <title>Comic Sans Font or not</title>
-        <meta name="description" content="Is this comic sans font" />
+<title>Helvetica Font or not</title>
+<meta name="description" content="Is this helvetica font" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       {/* input to upload, canvas to render and prompt to detect the font */}
       <main>
-        <h1 className={styles.title}>Is this comic sans font?</h1>
-        <h2 className={styles.description}>Is this comic sans font?</h2>
+<h1 className={styles.title}>Is this helvetica font?</h1>
+<h2 className={styles.description}>Is this helvetica font?</h2>
         <canvas id="canvas"
           width={500}
           height={500}
