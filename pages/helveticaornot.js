@@ -22,7 +22,7 @@ export default function WhichFont() {
 
   const getFont = async () => {
     // get canvas as data url send to gpt as req body
-    const canvas = document.getElementById('canvas');
+prompt: 'Is this font helvetica or not? Please reply only YES/NO', image_url: dataURL,
     // reduce the size of the image to 500x500
     let tempCanvas = document.createElement('canvas');
     let tempCtx = tempCanvas.getContext('2d');
@@ -35,15 +35,15 @@ prompt: 'Is this font helvetica or not? Please reply only YES/NO', image_url: da
       method: 'POST',
       body: JSON.stringify({
         prompt: 'Is this font comic sans or not? Please reply only YES/NO', image_url: dataURL,
-        model: 'gpt-4o-mini'
-      }),
+<title>Helvetica Font or not</title>
+<meta name="description" content="Is this helvetica font" />
     });
     const data = await response.json();
     setFont(data.response);
   }
   return (
-    <>
-      <Head>
+<h1 className={styles.title}>Is this helvetica font?</h1>
+<h2 className={styles.description}>Is this helvetica font?</h2>
 <title>Helvetica Font or not</title>
 <meta name="description" content="Is this helvetica font" />
         <link rel="icon" href="/favicon.ico" />
