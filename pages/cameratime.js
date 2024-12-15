@@ -13,7 +13,7 @@ export default function CurrentTime() {
   const [imgHeight, setImgHeight] = useState(0)
   const [hatType, setHatType] = useState(0)
 
-  const updateTime = () => { const now = new Date(); document.getElementById('current-time').innerText = now.toLocaleTimeString(); }
+  const updateTime = () => { const now = new Date(); document.getElementById('current-time').innerText = now.toLocaleTimeString(); const svg = document.getElementById('svg'); if (svg) { svg.textContent = now.toLocaleTimeString(); } }
 
   useEffect(() => { updateTime(); const interval = setInterval(updateTime, 1000); return () => clearInterval(interval);
     // draw image on canvas
@@ -24,7 +24,7 @@ export default function CurrentTime() {
       canvas.width = imgWidth
       canvas.height = imgHeight
       context.clearRect(0, 0, canvas.width, canvas.height)
-      context.drawImage(image, 0, 0, image.width, image.height)
+      context.drawImage(image, 0, 0, image.width, image.height); const svg = new Image(); svg.src = '/higheritalic.svg'; svg.onload = () => { context.drawImage(svg, offsetX, offsetY, svg.width * scale, svg.height * scale); }
       // const hat = new Image()
       if (hatType === 0)
         // hat.src = higherHat
@@ -50,7 +50,7 @@ export default function CurrentTime() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <h1 className={styles.title} id="current-time">{new Date().toLocaleTimeString()}
+        <h1 className={styles.title} id="current-time"><svg id="svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100"><text x="10" y="20" font-family="Arial" font-size="20" fill="black">{new Date().toLocaleTimeString()}</text></svg>
           
         </h1>
         <span style={{
