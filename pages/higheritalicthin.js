@@ -13,7 +13,7 @@ export default function HigherHat() {
   const [imgHeight, setImgHeight] = useState(0)
   const [hatType, setHatType] = useState(0)
 
-  const higherHat = '/higheritalic.svg'
+  const higherHat = '/higheritalicthin.svg'
 
   useEffect(() => {
     // draw image on canvas
@@ -45,13 +45,13 @@ export default function HigherHat() {
   return (
     <>
       <Head>
-        <title>Higher Italic</title>
-        <meta name="description" content="Higher Italic" />
+        <title>Higher Italic Thin Thin</title>
+        <meta name="description" content="Higher Italic Thin Thin" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
         <h1 className={styles.title}>
-          Higher Italic
+          Higher Italic Thin
         </h1>
         <span style={{
           width: '100%',
@@ -59,7 +59,7 @@ export default function HigherHat() {
           color: '#666',
           fontSize: '14px'
         }}>
-          Add higher italic on any image
+          Add higher italic thin on any image
         </span>
 
         {/* upload photo */}
@@ -112,7 +112,7 @@ export default function HigherHat() {
           const dataURL = canvas.toDataURL('image/png')
           const a = document.createElement('a')
           a.href = dataURL
-          a.download = `higheritalic-${Date.now()}.png`
+          a.download = `higheritalicthin-${Date.now()}.png`
           a.click()
         }} style={{
           marginTop: 20
