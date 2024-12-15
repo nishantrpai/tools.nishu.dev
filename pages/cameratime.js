@@ -45,13 +45,13 @@ export default function HigherHat() {
   return (
     <>
       <Head>
-        <title>Higher Italic</title>
-        <meta name="description" content="Higher Italic" />
+        <title>Current Time: </title>
+        <meta name="description" content="Current Time: " />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
         <h1 className={styles.title}>
-          Higher Italic
+          Current Time: 
         </h1>
         <span style={{
           width: '100%',
@@ -59,7 +59,7 @@ export default function HigherHat() {
           color: '#666',
           fontSize: '14px'
         }}>
-          Add higher italic on any image
+          Add current time on any image
         </span>
 
         {/* upload photo */}
@@ -107,7 +107,7 @@ export default function HigherHat() {
           <input type="range" min={-360} max={360} value={offsetTheta} onChange={(e) => setOffsetTheta(e.target.value)} />
         </div>
 
-        <button onClick={() => {
+        <button onClick={() => { const now = new Date(); alert(`Current Time: ${now.toLocaleTimeString()}`);
           const canvas = document.getElementById('canvas')
           const dataURL = canvas.toDataURL('image/png')
           const a = document.createElement('a')
@@ -117,7 +117,7 @@ export default function HigherHat() {
         }} style={{
           marginTop: 20
         }}>
-          Download Image
+          Capture Real Time Photo
         </button>
       </main>
     </>
