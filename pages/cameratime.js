@@ -13,7 +13,7 @@ export default function CurrentTime() {
   const [imgHeight, setImgHeight] = useState(0)
   const [hatType, setHatType] = useState(0)
 
-  const updateTime = () => { const now = new Date(); document.getElementById('current-time').innerText = `Current Time: ${now.toLocaleTimeString()}`; }
+  const updateTime = () => { const now = new Date(); document.getElementById('current-time').innerText = now.toLocaleTimeString(); }
 
   useEffect(() => { updateTime(); const interval = setInterval(updateTime, 1000); return () => clearInterval(interval);
     // draw image on canvas
@@ -50,7 +50,7 @@ export default function CurrentTime() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <h1 className={styles.title} id="current-time">
+        <h1 className={styles.title} id="current-time">{new Date().toLocaleTimeString()}
           
         </h1>
         <span style={{
