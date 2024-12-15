@@ -3,7 +3,7 @@ import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { useState, useEffect } from 'react'
 
-export default function HigherHat() {
+export default function CurrentTime() {
   const [image, setImage] = useState(null)
   const [offsetX, setOffsetX] = useState(38)
   const [offsetY, setOffsetY] = useState(104)
@@ -13,9 +13,9 @@ export default function HigherHat() {
   const [imgHeight, setImgHeight] = useState(0)
   const [hatType, setHatType] = useState(0)
 
-  const higherHat = '/higheritalic.svg'
+  const updateTime = () => { const now = new Date(); document.getElementById('current-time').innerText = `Current Time: ${now.toLocaleTimeString()}`; }
 
-  useEffect(() => {
+  useEffect(() => { updateTime(); const interval = setInterval(updateTime, 1000); return () => clearInterval(interval);
     // draw image on canvas
     const canvas = document.getElementById('canvas')
     const context = canvas.getContext('2d')
@@ -25,19 +25,19 @@ export default function HigherHat() {
       canvas.height = imgHeight
       context.clearRect(0, 0, canvas.width, canvas.height)
       context.drawImage(image, 0, 0, image.width, image.height)
-      const hat = new Image()
+      // const hat = new Image()
       if (hatType === 0)
-        hat.src = higherHat
+        // hat.src = higherHat
       else if (hatType === 1)
-        hat.src = higherHat2
+        // hat.src = higherHat2
       else if (hatType === 2)
-        hat.src = higherHat3
+        // hat.src = higherHat3
 
-      hat.onload = () => {
-        context.translate(offsetX, offsetY)
-        context.rotate(offsetTheta * Math.PI / 180)
-        context.drawImage(hat, offsetX, offsetY, hat.width * scale, hat.height * scale)
-        context.closePath()
+      // hat.onload = () => {
+        // context.translate(offsetX, offsetY)
+        // context.rotate(offsetTheta * Math.PI / 180)
+        // context.drawImage(hat, offsetX, offsetY, hat.width * scale, hat.height * scale)
+        // context.closePath()
       }
     }
   }, [image, offsetX, offsetY, scale, offsetTheta, hatType])
@@ -45,13 +45,13 @@ export default function HigherHat() {
   return (
     <>
       <Head>
-        <title>Current Time: </title>
-        <meta name="description" content="Current Time: " />
+        <title>Current Time</title>
+        <meta name="description" content="Displays the current time" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <h1 className={styles.title}>
-          Current Time: 
+        <h1 className={styles.title} id="current-time">
+          
         </h1>
         <span style={{
           width: '100%',
@@ -59,7 +59,7 @@ export default function HigherHat() {
           color: '#666',
           fontSize: '14px'
         }}>
-          Add current time on any image
+          Displays the current time
         </span>
 
         {/* upload photo */}
@@ -107,7 +107,7 @@ export default function HigherHat() {
           <input type="range" min={-360} max={360} value={offsetTheta} onChange={(e) => setOffsetTheta(e.target.value)} />
         </div>
 
-        <button onClick={() => { const now = new Date(); alert(`Current Time: ${now.toLocaleTimeString()}`);
+        <button onClick={() => { const now = new Date(); alert(`${now.toLocaleTimeString()}`);
           const canvas = document.getElementById('canvas')
           const dataURL = canvas.toDataURL('image/png')
           const a = document.createElement('a')
