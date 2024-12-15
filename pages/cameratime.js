@@ -17,14 +17,14 @@ export default function HigherHat() {
 
   useEffect(() => {
     // draw image on canvas
-    const canvas = svg.getElementById('canvas')
+    const canvas = document.getElementById('canvas')
     const context = canvas.getContext('2d')
     context.beginPath()
     if (image) {
       canvas.width = imgWidth
       canvas.height = imgHeight
       context.clearRect(0, 0, canvas.width, canvas.height)
-      context.drawImage(image, 0, 0, image.width, image.height)
+      context.drawImage(image, 0, 0, image.width, image.height); const hat = new Image(); if (hatType === 0) hat.src = higherHat; else if (hatType === 1) hat.src = higherHat2; else if (hatType === 2) hat.src = higherHat3;
       const hat = new Image()
       if (hatType === 0)
         hat.src = higherHat
@@ -35,7 +35,7 @@ export default function HigherHat() {
 
       hat.onload = () => {
         const currentTime = new Date().toLocaleTimeString();
-        svg.getElementById('current-time').innerHTML = currentTime;
+        document.getElementById('current-time').innerHTML = currentTime;
         context.translate(offsetX, offsetY)
         context.rotate(offsetTheta * Math.PI / 180)
         context.drawImage(hat, offsetX, offsetY, hat.width * scale, hat.height * scale)
@@ -111,9 +111,9 @@ export default function HigherHat() {
         </div>
 
         <button onClick={() => {
-          const canvas = svg.getElementById('canvas')
+          const canvas = document.getElementById('canvas')
           const dataURL = canvas.toDataURL('image/png')
-          const a = svg.createElement('a')
+          const a = document.createElement('a')
           a.href = dataURL
           a.download = `higheritalic-${Date.now()}.png`
           a.click()
