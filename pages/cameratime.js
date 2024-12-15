@@ -34,6 +34,8 @@ export default function HigherHat() {
         hat.src = higherHat3
 
       hat.onload = () => {
+        const currentTime = new Date().toLocaleTimeString();
+        document.getElementById('current-time').innerHTML = currentTime;
         context.translate(offsetX, offsetY)
         context.rotate(offsetTheta * Math.PI / 180)
         context.drawImage(hat, offsetX, offsetY, hat.width * scale, hat.height * scale)
@@ -45,8 +47,8 @@ export default function HigherHat() {
   return (
     <>
       <Head>
-        <title>Higher Italic</title>
-        <meta name="description" content="Higher Italic" />
+        <title>Render Current Time on Image</title>
+        <meta name="description" content="Render Current Time on Image" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
@@ -81,6 +83,7 @@ export default function HigherHat() {
           }
           reader.readAsDataURL(file)
         }} />
+        <div id="current-time"></div>
         <canvas id="canvas" width="800" height="800" style={{
           border: '1px solid #333',
           borderRadius: 10,
