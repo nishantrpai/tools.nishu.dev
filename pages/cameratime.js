@@ -17,7 +17,7 @@ export default function HigherHat() {
 
   useEffect(() => {
     // draw image on canvas
-    const canvas = document.getElementById('canvas')
+    const canvas = svg.getElementById('canvas')
     const context = canvas.getContext('2d')
     context.beginPath()
     if (image) {
@@ -35,7 +35,7 @@ export default function HigherHat() {
 
       hat.onload = () => {
         const currentTime = new Date().toLocaleTimeString();
-        document.getElementById('current-time').innerHTML = currentTime;
+        svg.getElementById('current-time').innerHTML = currentTime;
         context.translate(offsetX, offsetY)
         context.rotate(offsetTheta * Math.PI / 180)
         context.drawImage(hat, offsetX, offsetY, hat.width * scale, hat.height * scale)
@@ -111,9 +111,9 @@ export default function HigherHat() {
         </div>
 
         <button onClick={() => {
-          const canvas = document.getElementById('canvas')
+          const canvas = svg.getElementById('canvas')
           const dataURL = canvas.toDataURL('image/png')
-          const a = document.createElement('a')
+          const a = svg.createElement('a')
           a.href = dataURL
           a.download = `higheritalic-${Date.now()}.png`
           a.click()
