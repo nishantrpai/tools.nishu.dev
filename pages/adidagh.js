@@ -45,13 +45,13 @@ export default function HigherHat() {
   return (
     <>
       <Head>
-        <title>Higher Helvetica</title>
-        <meta name="description" content="Higher Helvetica" />
+        <title>Adidagh</title>
+        <meta name="description" content="Adidagh" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
         <h1 className={styles.title}>
-          Higher Helvetica
+          Adidagh
         </h1>
         <span style={{
           width: '100%',
