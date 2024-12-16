@@ -125,10 +125,8 @@ export default function HigherItalicVideo() {
     hqCanvas.height = canvas.height;
     
     // Match original video frame rate
-    const fps = videoElement.webkitVideoDecodedByteCount ? 
-      Math.round(videoElement.webkitDecodedFrameCount / videoElement.currentTime) : 
-      30; // Fallback to 30fps if can't detect
-    
+    const userFps = prompt('Enter desired frame rate (fps):');
+    const fps = userFps ? parseInt(userFps, 10) : 30;
     const stream = hqCanvas.captureStream(fps);
     const mediaRecorder = new MediaRecorder(stream, {
       mimeType: 'video/webm',
