@@ -47,7 +47,7 @@ export default function HigherItalicVideo() {
         const centerY = (canvas.height - italic.height * scale) / 2
         context.translate(centerX + offsetX, centerY + offsetY)
         context.rotate(offsetTheta * Math.PI / 180)
-        context.drawImage(italic, 0, 0, italic.width * scale, italic.height * scale)
+        
         context.restore()
       }
 
