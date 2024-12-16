@@ -234,7 +234,7 @@ export default function HigherItalicVideo() {
           <button onClick={handlePlay}>Play</button>
           <button onClick={handlePause}>Pause</button>
           <button onClick={handleDownload} disabled={isRecording}>
-            {isRecording ? 'Recording...' : 'Download Video'}
+            {isRecording ? 'Downloading...' : 'Download Video'}
           </button>
         </div>
 
