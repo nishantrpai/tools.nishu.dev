@@ -244,22 +244,6 @@ export default function HigherItalicVideo() {
           </label>
           <input type="number" min="1" max="60" value={userfps} onChange={(e) => setUserfps(Number(e.target.value))} />
 
-          <label>
-            Offset X
-          </label>
-          
-          <label>
-            Offset Y
-          </label>
-          
-          <label>
-            Scale
-          </label>
-          
-          <label>
-            Rotate
-          </label>
-          
         </div>
       </main>
     </>
