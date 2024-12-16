@@ -13,7 +13,7 @@ export default function HigherHat() {
   const [imgHeight, setImgHeight] = useState(0)
   const [hatType, setHatType] = useState(0)
 
-  const higherHat = '/higherhelvetica.svg'
+  const higherHat = '/adidagh.svg'
 
   useEffect(() => {
     // draw image on canvas
