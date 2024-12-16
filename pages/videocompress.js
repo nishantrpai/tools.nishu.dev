@@ -18,13 +18,13 @@ export default function HigherItalicVideo() {
   const italicRef = useRef(typeof window !== 'undefined' ? new window.Image() : null)
   const mediaRecorderRef = useRef(null)
 
-  //const higherItalic = '/higheritalic.svg'
+  const higherItalic = '/higheritalic.svg'
 
   useEffect(() => {
     // Preload the italic image
-    // if (italicRef.current) {
-    //   italicRef.current.src = higherItalic
-    // }
+    if (italicRef.current) {
+      italicRef.current.src = higherItalic
+    }
   }, [])
 
   const drawFrame = () => {
@@ -47,7 +47,7 @@ export default function HigherItalicVideo() {
         const centerY = (canvas.height - italic.height * scale) / 2
         context.translate(centerX + offsetX, centerY + offsetY)
         context.rotate(offsetTheta * Math.PI / 180)
-        //context.drawImage(italic, 0, 0, italic.width * scale, italic.height * scale)
+        context.drawImage(italic, 0, 0, italic.width * scale, italic.height * scale)
         context.restore()
       }
 
@@ -128,6 +128,7 @@ export default function HigherItalicVideo() {
     const fps = videoElement.webkitVideoDecodedByteCount ? 
       Math.round(videoElement.webkitDecodedFrameCount / videoElement.currentTime) : 
       30; // Fallback to 30fps if can't detect
+    
     const stream = hqCanvas.captureStream(fps);
     const mediaRecorder = new MediaRecorder(stream, {
       mimeType: 'video/webm',
@@ -168,25 +169,13 @@ export default function HigherItalicVideo() {
       const centerY = (hqCanvas.height - italic.height * scale) / 2;
       hqContext.translate(centerX + offsetX, centerY + offsetY);
       hqContext.rotate(offsetTheta * Math.PI / 180);
-      //hqContext.drawImage(italic, 0, 0, italic.width * scale, italic.height * scale);
+      hqContext.drawImage(italic, 0, 0, italic.width * scale, italic.height * scale);
       hqContext.restore();
     };
   
     // Capture frames at original video frame rate
     const captureInterval = setInterval(() => {
-	let currentFrame = 0;
-
       if (!videoElement.paused && !videoElement.ended) {
-        const videoDuration = Math.round(videoElement.duration * 1000);
-        const maxFrame = Math.round(videoDuration / 1000) * fps;
-        if(currentFrame < maxFrame){
-          captureFrame();
-          currentFrame++;
-        } else {
-          clearInterval(captureInterval)
-          mediaRecorder.stop();
-        }
-      }
         captureFrame();
       }
     }, 1000 / fps);
@@ -208,13 +197,13 @@ export default function HigherItalicVideo() {
   return (
     <>
       <Head>
-        <title>Compress Video</title>
-        <meta name="description" content="Compress Video" />
+        <title>Higher Italic Video</title>
+        <meta name="description" content="Higher Italic Video" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
         <h1 className={styles.title}>
-          Compress Video
+          Higher Italic Video
         </h1>
         <span style={{
           width: '100%',
