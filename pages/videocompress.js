@@ -126,7 +126,7 @@ export default function HigherItalicVideo() {
     
     // Match original video frame rate
     const userFps = prompt('Enter desired frame rate (fps):');
-    const fps = userFps ? parseInt(userFps, 10) : 30;
+    const fps = userFps ? Math.max(1, parseInt(userFps, 10)) : 30;
     const stream = hqCanvas.captureStream(fps);
     const mediaRecorder = new MediaRecorder(stream, {
       mimeType: 'video/webm',
@@ -173,7 +173,19 @@ export default function HigherItalicVideo() {
   
     // Capture frames at original video frame rate
     const captureInterval = setInterval(() => {
+	let currentFrame = 0;
+
       if (!videoElement.paused && !videoElement.ended) {
+        const videoDuration = Math.round(videoElement.duration * 1000);
+        const maxFrame = Math.round(videoDuration / 1000) * fps;
+        if(currentFrame < maxFrame){
+          captureFrame();
+          currentFrame++;
+        } else {
+          clearInterval(captureInterval)
+          mediaRecorder.stop();
+        }
+      }
         captureFrame();
       }
     }, 1000 / fps);
