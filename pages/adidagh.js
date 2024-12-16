@@ -45,8 +45,8 @@ export default function HigherHat() {
   return (
     <>
       <Head>
-        <title>Adidagh</title>
-        <meta name="description" content="Adidagh" />
+        <title>Add Adidagh to any image</title>
+        <meta name="description" content="Add Adidagh to any image" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
@@ -59,7 +59,7 @@ export default function HigherHat() {
           color: '#666',
           fontSize: '14px'
         }}>
-          Add higher helvetica on any image
+          Add Adidagh to any image
         </span>
 
         {/* upload photo */}
