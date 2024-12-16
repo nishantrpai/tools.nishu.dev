@@ -4,10 +4,10 @@ import { useState, useEffect, useRef } from 'react'
 
 export default function HigherItalicVideo() {
   const [video, setVideo] = useState(null)
-  const [offsetX, setOffsetX] = useState(0) // Start at 0 for center
-  const [offsetY, setOffsetY] = useState(0) // Start at 0 for center 
-  const [scale, setScale] = useState(1) // Start with scale 1
-  const [offsetTheta, setOffsetTheta] = useState(0)
+  //const [offsetX, setOffsetX] = useState(0) // Start at 0 for center
+  //const [offsetY, setOffsetY] = useState(0) // Start at 0 for center 
+  //const [scale, setScale] = useState(1) // Start with scale 1
+  //const [offsetTheta, setOffsetTheta] = useState(0)
   const [videoWidth, setVideoWidth] = useState(0)
   const [videoHeight, setVideoHeight] = useState(0)
   const [maxScale, setMaxScale] = useState(1)
@@ -46,8 +46,8 @@ export default function HigherItalicVideo() {
         // Calculate center position
         const centerX = (canvas.width - italic.width * scale) / 2
         const centerY = (canvas.height - italic.height * scale) / 2
-        context.translate(centerX + offsetX, centerY + offsetY)
-        context.rotate(offsetTheta * Math.PI / 180)
+        context.translate(centerX, centerY)
+        //context.rotate(offsetTheta * Math.PI / 180)
         
         context.restore()
       }
@@ -167,8 +167,8 @@ export default function HigherItalicVideo() {
       const italic = italicRef.current;
       const centerX = (hqCanvas.width - italic.width * scale) / 2;
       const centerY = (hqCanvas.height - italic.height * scale) / 2;
-      hqContext.translate(centerX + offsetX, centerY + offsetY);
-      hqContext.rotate(offsetTheta * Math.PI / 180);
+      hqContext.translate(centerX, centerY);
+      //hqContext.rotate(offsetTheta * Math.PI / 180);
       hqContext.drawImage(italic, 0, 0, italic.width * scale, italic.height * scale);
       hqContext.restore();
     };
@@ -247,19 +247,19 @@ export default function HigherItalicVideo() {
           <label>
             Offset X
           </label>
-          <input type="range" min={-(videoWidth/4)} max={videoWidth/4} value={offsetX} onChange={(e) => setOffsetX(Number(e.target.value))} />
+          
           <label>
             Offset Y
           </label>
-          <input type="range" min={-(videoHeight/4)} max={videoHeight/4} value={offsetY} onChange={(e) => setOffsetY(Number(e.target.value))} />
+          
           <label>
             Scale
           </label>
-          <input type="range" min={0.1} max={maxScale} step={0.1} value={scale} onChange={(e) => setScale(Number(e.target.value))} />
+          
           <label>
             Rotate
           </label>
-          <input type="range" min={-360} max={360} value={offsetTheta} onChange={(e) => setOffsetTheta(Number(e.target.value))} />
+          
         </div>
       </main>
     </>
