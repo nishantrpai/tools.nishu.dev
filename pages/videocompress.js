@@ -11,7 +11,8 @@ export default function HigherItalicVideo() {
   const [videoWidth, setVideoWidth] = useState(0)
   const [videoHeight, setVideoHeight] = useState(0)
   const [maxScale, setMaxScale] = useState(1)
-  const [isRecording, setIsRecording] = useState(false)
+  const [isRecording, setIsRecording] = useState(false),
+    [userfps, setUserfps] = useState(30)
   const canvasRef = useRef(null)
   const videoRef = useRef(null)
   const animationRef = useRef(null)
@@ -125,11 +126,10 @@ export default function HigherItalicVideo() {
     hqCanvas.height = canvas.height;
     
     // Match original video frame rate
-    const fps = videoElement.webkitVideoDecodedByteCount ? 
-      Math.round(videoElement.webkitDecodedFrameCount / videoElement.currentTime) : 
-      30; // Fallback to 30fps if can't detect
-    
-    const stream = hqCanvas.captureStream(fps);
+    const userfps = 30; // Default fps
+    const fps = videoElement.webkitVideoDecodedByteCount ?
+      Math.round(videoElement.webkitDecodedFrameCount / videoElement.currentTime) : userfps; // Fallback to userfps if can't detect
+    const stream = hqCanvas.captureStream(userfps);
     const mediaRecorder = new MediaRecorder(stream, {
       mimeType: 'video/webm',
       videoBitsPerSecond: 8000000 // 8 Mbps for good quality
@@ -173,13 +173,12 @@ export default function HigherItalicVideo() {
       hqContext.restore();
     };
   
-    // Capture frames at original video frame rate
+    // Capture frames at user specified frame rate
     const captureInterval = setInterval(() => {
       if (!videoElement.paused && !videoElement.ended) {
         captureFrame();
       }
-    }, 1000 / fps);
-  
+    }, 1000 / userfps);
     videoElement.onended = () => {
       clearInterval(captureInterval);
       setIsRecording(false);
@@ -240,6 +239,11 @@ export default function HigherItalicVideo() {
         </div>
 
         <div style={{ display: 'flex', gap: 20, flexDirection: 'column', width: '50%' }}>
+          <label>
+            User FPS
+          </label>
+          <input type="number" min="1" max="60" value={userfps} onChange={(e) => setUserfps(Number(e.target.value))} />
+
           <label>
             Offset X
           </label>
