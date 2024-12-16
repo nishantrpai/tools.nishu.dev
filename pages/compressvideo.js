@@ -69,7 +69,7 @@ export default function HigherItalicVideo() {
 
   useEffect(() => {
     drawFrame()
-  }, [offsetX, offsetY, scale, offsetTheta])
+  }, [])
 
   const handleVideoUpload = (event) => {
     const file = event.target.files[0]
