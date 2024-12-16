@@ -18,7 +18,7 @@ export default function HigherItalicVideo() {
   const italicRef = useRef(typeof window !== 'undefined' ? new window.Image() : null)
   const mediaRecorderRef = useRef(null)
 
-  const higherItalic = '/higheritalic.svg'
+  //const higherItalic = '/higheritalic.svg'
 
   useEffect(() => {
     // Preload the italic image
@@ -47,7 +47,7 @@ export default function HigherItalicVideo() {
         const centerY = (canvas.height - italic.height * scale) / 2
         context.translate(centerX + offsetX, centerY + offsetY)
         context.rotate(offsetTheta * Math.PI / 180)
-        context.drawImage(italic, 0, 0, italic.width * scale, italic.height * scale)
+        //context.drawImage(italic, 0, 0, italic.width * scale, italic.height * scale)
         context.restore()
       }
 
@@ -169,7 +169,7 @@ export default function HigherItalicVideo() {
       const centerY = (hqCanvas.height - italic.height * scale) / 2;
       hqContext.translate(centerX + offsetX, centerY + offsetY);
       hqContext.rotate(offsetTheta * Math.PI / 180);
-      hqContext.drawImage(italic, 0, 0, italic.width * scale, italic.height * scale);
+      //hqContext.drawImage(italic, 0, 0, italic.width * scale, italic.height * scale);
       hqContext.restore();
     };
   
