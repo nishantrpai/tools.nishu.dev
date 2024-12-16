@@ -197,13 +197,13 @@ export default function HigherItalicVideo() {
   return (
     <>
       <Head>
-        <title>Higher Italic Video</title>
-        <meta name="description" content="Higher Italic Video" />
+        <title>Compress Video</title>
+        <meta name="description" content="Compress Video" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
         <h1 className={styles.title}>
-          Higher Italic Video
+          Compress Video
         </h1>
         <span style={{
           width: '100%',
