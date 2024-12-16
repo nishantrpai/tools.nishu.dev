@@ -22,9 +22,9 @@ export default function HigherItalicVideo() {
 
   useEffect(() => {
     // Preload the italic image
-    if (italicRef.current) {
-      italicRef.current.src = higherItalic
-    }
+    // if (italicRef.current) {
+    //   italicRef.current.src = higherItalic
+    // }
   }, [])
 
   const drawFrame = () => {
