@@ -11,8 +11,8 @@ export default function HigherItalicVideo() {
   const [videoWidth, setVideoWidth] = useState(0)
   const [videoHeight, setVideoHeight] = useState(0)
   const [maxScale, setMaxScale] = useState(1)
-  const [isRecording, setIsRecording] = useState(false),
-    [userfps, setUserfps] = useState(30)
+  const [isRecording, setIsRecording] = useState(false)
+  const  [userfps, setUserfps] = useState(30)
   const canvasRef = useRef(null)
   const videoRef = useRef(null)
   const animationRef = useRef(null)
