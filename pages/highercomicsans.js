@@ -48,6 +48,7 @@ export default function HigherHat() {
         <title>Higher Helvetica</title>
         <meta name="description" content="Higher Helvetica" />
         <link rel="icon" href="/favicon.ico" />
+        <link rel="preconnect" href="https://fonts.googleapis.com">
       </Head>
       <main>
         <h1 className={styles.title}>
