@@ -47,13 +47,13 @@ export default function HigherHat() {
   return (
     <>
       <Head>
-        <title>Higher Comic Sans</title>
-        <meta name="description" content="Higher Comic Sans" />
+        <title>Higher Balsamiq Sans</title>
+        <meta name="description" content="Higher Balsamiq Sans" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
         <h1 className={styles.title}>
-          Higher Comic Sans
+          Higher Balsamiq Sans
         </h1>
         <span style={{
           width: '100%',
@@ -61,7 +61,7 @@ export default function HigherHat() {
           color: '#666',
           fontSize: '14px'
         }}>
-          Add higher comicsans on any image
+          Add higher Balsamiq Sans on any image
         </span>
 
         {/* upload photo */}
@@ -114,7 +114,7 @@ export default function HigherHat() {
           const dataURL = canvas.toDataURL('image/png')
           const a = document.createElement('a')
           a.href = dataURL
-          a.download = `highercomicsans-${Date.now()}.png`
+          a.download = `higherBalsamiq Sans-${Date.now()}.png`
           a.click()
         }} style={{
           marginTop: 20
