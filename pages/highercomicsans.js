@@ -45,13 +45,13 @@ export default function HigherHat() {
   return (
     <>
       <Head>
-        <title>Higher Helvetica</title>
-        <meta name="description" content="Higher Helvetica" />
+        <title>Higher Comic Sans</title>
+        <meta name="description" content="Higher Comic Sans" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
         <h1 className={styles.title}>
-          Higher Helvetica
+          Higher Comic Sans
         </h1>
         <span style={{
           width: '100%',
@@ -59,7 +59,7 @@ export default function HigherHat() {
           color: '#666',
           fontSize: '14px'
         }}>
-          Add higher helvetica on any image
+          Add higher comicsans on any image
         </span>
 
         {/* upload photo */}
@@ -112,7 +112,7 @@ export default function HigherHat() {
           const dataURL = canvas.toDataURL('image/png')
           const a = document.createElement('a')
           a.href = dataURL
-          a.download = `higherhelvetica-${Date.now()}.png`
+          a.download = `highercomicsans-${Date.now()}.png`
           a.click()
         }} style={{
           marginTop: 20
