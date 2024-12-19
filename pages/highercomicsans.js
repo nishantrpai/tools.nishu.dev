@@ -48,7 +48,7 @@ export default function HigherHat() {
         <title>Higher Comic Sans</title>
         <meta name="description" content="Higher Comic Sans" />
         <link rel="icon" href="/favicon.ico" />
-        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.googleapis.com"/>
       </Head>
       <main>
         <h1 className={styles.title}>
