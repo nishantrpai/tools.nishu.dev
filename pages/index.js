@@ -1728,6 +1728,32 @@ export const tools = [
     publishDate: '13th Dec 2024',
     url: '/website2gptdata',
     tags: []
+  },
+  {
+    title: 'Helvetica or not',
+    description: 'Helvetica or not',
+    publishDate: '14th Dec 2024',
+    url: '/helveticaornot',
+    tags: []
+  },
+  {
+    title: 'Line Art',
+    description: 'Line Art',
+    publishDate: '15th Dec 2024',
+    url: '/lineart',
+    tags: []
+  },
+  {
+    title: 'Higher Italic Thin',
+    description: 'Add higher italic thin on any image',
+    publishDate: '16th Dec 2024',
+    url: '/higheritalicthin',
+  },
+  {
+    title: 'Higher Helvetica',
+    description: 'Add higher helvetica on any image',
+    publishDate: '17th Dec 2024',
+    url: '/higherhelvetica',
   }
 
 ]
