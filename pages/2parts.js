@@ -108,16 +108,17 @@ const HalfCombine = () => {
               <input type="checkbox" checked={horizontal} onChange={(e) => setHorizontal(e.target.checked)} />
               <label>Horizontal</label>
             </div>
+            <label>Percentage:</label>
             <input
               type="number"
               value={percentage}
               onChange={(e) => setPercentage(e.target.value)}
               min="0"
               max="100"
-              style={{ width: '100px', margin: '10px 0' }}
+              style={{ width: '100px', margin: '10px 0', background: '#000', border: '1px solid #333', borderRadius: 5, padding: 5 }}
             />
             <canvas id="canvas" width={500} height={500} style={{width: '100%'}}></canvas>
-            <button style={{ border: '1px solid #333' }} onClick={downloadImage}>Download Combined Image</button>
+            <button style={{  }} onClick={downloadImage}>Download</button>
           </div>
         </div>
       </main>
