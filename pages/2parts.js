@@ -60,18 +60,23 @@ const HalfCombine = () => {
 
       if( horizontal ) {
       const maxHeight = Math.max(image1.height, image2.height)
+      const width1 = image1.width * (percentage / 100)
+      const width2 = image2.width * (1 - (percentage / 100))
+      canvas.width = width1 + width2
       canvas.height = maxHeight
       ctx.clearRect(0, 0, canvas.width, canvas.height)
-      const width1 = (canvas.width * percentage) / 100
-      const width2 = canvas.width - width1
+      // const width1 = (canvas.width * percentage) / 100
+      // const width2 = canvas.width - width1
       ctx.drawImage(image1, 0, 0, width1, maxHeight, 0, 0, width1, maxHeight)
       ctx.drawImage(image2, width1, 0, width2, maxHeight, width1, 0, width2, maxHeight)
       } else {
         const maxWidth = Math.max(image1.width, image2.width)
-        canvas.width = maxWidth
+        const height1 = image1.height * (percentage / 100)
+        const height2 = image2.height * (1 - (percentage / 100))
+        canvas.width = height1 + height2
         ctx.clearRect(0, 0, canvas.width, canvas.height)
-        const height1 = (canvas.height * percentage) / 100
-        const height2 = canvas.height - height1
+        // const height1 = (canvas.height * percentage) / 100
+        // const height2 = canvas.height - height1
         ctx.drawImage(image1, 0, 0, maxWidth, height1, 0, 0, maxWidth, height1)
         ctx.drawImage(image2, 0, height1, maxWidth, height2, 0, height1, maxWidth, height2)
       }
@@ -111,7 +116,7 @@ const HalfCombine = () => {
               max="100"
               style={{ width: '100px', margin: '10px 0' }}
             />
-            <canvas id="canvas" width={500} height={500}></canvas>
+            <canvas id="canvas" width={500} height={500} style={{width: '100%'}}></canvas>
             <button style={{ border: '1px solid #333' }} onClick={downloadImage}>Download Combined Image</button>
           </div>
         </div>
