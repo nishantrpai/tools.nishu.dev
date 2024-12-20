@@ -1754,6 +1754,12 @@ export const tools = [
     description: 'Add higher helvetica on any image',
     publishDate: '17th Dec 2024',
     url: '/higherhelvetica',
+  },
+  {
+    title: 'Part Combine',
+    description: 'Combine parts of two images',
+    publishDate: '18th Dec 2024',
+    url: '/2parts',
   }
 
 ]
