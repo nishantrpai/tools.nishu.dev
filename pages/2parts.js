@@ -8,6 +8,7 @@ const HalfCombine = () => {
   const [canvas, setCanvas] = useState(null)
   const [ctx, setCtx] = useState(null)
   const [percentage, setPercentage] = useState(50)
+  const [horizontal, setHorizontal] = useState(true)
 
   const handleImage1 = (e) => {
     const file = e.target.files[0]
@@ -55,6 +56,9 @@ const HalfCombine = () => {
 
   useEffect(() => {
     if (image1 && image2) {
+      if(!canvas || !ctx) return
+
+      if( horizontal ) {
       const maxHeight = Math.max(image1.height, image2.height)
       canvas.height = maxHeight
       ctx.clearRect(0, 0, canvas.width, canvas.height)
@@ -62,8 +66,17 @@ const HalfCombine = () => {
       const width2 = canvas.width - width1
       ctx.drawImage(image1, 0, 0, width1, maxHeight, 0, 0, width1, maxHeight)
       ctx.drawImage(image2, width1, 0, width2, maxHeight, width1, 0, width2, maxHeight)
+      } else {
+        const maxWidth = Math.max(image1.width, image2.width)
+        canvas.width = maxWidth
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        const height1 = (canvas.height * percentage) / 100
+        const height2 = canvas.height - height1
+        ctx.drawImage(image1, 0, 0, maxWidth, height1, 0, 0, maxWidth, height1)
+        ctx.drawImage(image2, 0, height1, maxWidth, height2, 0, height1, maxWidth, height2)
+      }
     }
-  }, [image1, image2, percentage])
+  }, [image1, image2, percentage, horizontal])
 
   return (
     <>
@@ -86,6 +99,10 @@ const HalfCombine = () => {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <input type="file" onChange={handleImage1} />
             <input type="file" onChange={handleImage2} />
+            <div style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
+              <input type="checkbox" checked={horizontal} onChange={(e) => setHorizontal(e.target.checked)} />
+              <label>Horizontal</label>
+            </div>
             <input
               type="number"
               value={percentage}
