@@ -1754,6 +1754,12 @@ export const tools = [
     description: 'Add higher helvetica on any image',
     publishDate: '17th Dec 2024',
     url: '/higherhelvetica',
+  },
+  {
+    title: 'Higher Comic Sans',
+    description: 'Add higher comic sans on any image',
+    publishDate: '20th Dec 2024',
+    url: '/highercomicsans',
   }
 
 ]
