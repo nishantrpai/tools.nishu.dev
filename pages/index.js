@@ -1760,6 +1760,12 @@ export const tools = [
     description: 'Combine parts of two images',
     publishDate: '18th Dec 2024',
     url: '/2parts',
+  },
+  {
+    title: 'Part Motion Blur',
+    description: 'Part motion blur',
+    publishDate: '19th Dec 2024',
+    url: '/partmotionblur',
   }
 
 ]

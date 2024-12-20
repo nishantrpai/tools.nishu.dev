@@ -92,19 +92,24 @@ export default function HigherHat() {
           <label>
             Offset X
           </label>
-          <input type="range" min={-(imgWidth * 1.5)} max={(imgWidth * 1.5)} value={offsetX} onChange={(e) => setOffsetX(e.target.value)} /><input type="number" value={offsetX} onChange={(e) => setOffsetX(e.target.value)} />
+          <input type="range" min={-(imgWidth * 1.5)} max={(imgWidth * 1.5)} value={offsetX} onChange={(e) => setOffsetX(e.target.value)} />
+          <input type="number" value={offsetX} onChange={(e) => setOffsetX(e.target.value)} />
+          
           <label>
             Offset Y
           </label>
           <input type="range" min={-(imgHeight * 1.5)} max={(imgHeight * 1.5)} value={offsetY} onChange={(e) => setOffsetY(e.target.value)} /><input type="number" value={offsetY} onChange={(e) => setOffsetY(e.target.value)} />
+          <input type="number"  value={offsetY} onChange={(e) => setOffsetY(e.target.value)} />
           <label>
             Scale
           </label>
-          <input type="range" min={0} max={10} step={0.01} value={scale} onChange={(e) => setScale(e.target.value)} /><input type="number" value={scale} onChange={(e) => setScale(e.target.value)} />
+          <input type="range" min={0} max={10} step={0.01} value={scale} onChange={(e) => setScale(e.target.value)} />
+          <input type="number" value={scale} onChange={(e) => setScale(e.target.value)} />
           <label>
             Rotate
           </label>
-          <input type="range" min={-360} max={360} value={offsetTheta} onChange={(e) => setOffsetTheta(e.target.value)} /><input type="number" value={offsetTheta} onChange={(e) => setOffsetTheta(e.target.value)} />
+          <input type="range" min={-360} max={360} value={offsetTheta} onChange={(e) => setOffsetTheta(e.target.value)} />
+          <input type="number" value={offsetTheta} onChange={(e) => setOffsetTheta(e.target.value)} />
         </div>
 
         <button onClick={() => {
