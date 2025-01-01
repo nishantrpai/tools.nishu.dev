@@ -1,5 +1,5 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-let API_KEY = process.env.OPENAI_API_KEY;
+let API_KEY = process.env.GEMINI_API_KEY;
 import OpenAI from 'openai';
 import { RateLimiter } from 'limiter';
 import { createHash } from 'crypto';
@@ -7,6 +7,7 @@ const fetch = (url) => import('node-fetch').then(({ default: fetch }) => fetch(u
 
 const openai = new OpenAI({
   apiKey: API_KEY, // This is the default and can be omitted
+  baseURL: "https://generativelanguage.googleapis.com/v1beta/"
 });
 
 // Create a rate limiter that allows 1 request per minute

@@ -1766,6 +1766,12 @@ export const tools = [
     description: 'Part motion blur',
     publishDate: '19th Dec 2024',
     url: '/partmotionblur',
+  },
+  {
+    title: 'Word Axis',
+    description: 'Word Axis',
+    publishDate: '1st Jan 2024',
+    url: '/wordaxis'
   }
 
 ]
