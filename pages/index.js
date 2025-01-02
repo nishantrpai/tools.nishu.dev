@@ -1770,8 +1770,14 @@ export const tools = [
   {
     title: 'Word Axis',
     description: 'Word Axis',
-    publishDate: '1st Jan 2024',
+    publishDate: '1st Jan 2025',
     url: '/wordaxis'
+  },
+  {
+    title: 'Text Frames',
+    description: 'Text Frames',
+    publishDate: '2nd Jan 2025',
+    url: '/textframes'
   }
 
 ]
