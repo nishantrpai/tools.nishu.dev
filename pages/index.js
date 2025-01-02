@@ -1778,6 +1778,12 @@ export const tools = [
     description: 'Text Frames',
     publishDate: '2nd Jan 2025',
     url: '/textframes'
+  },
+  {
+    title: "Don't Die",
+    description: "Don't Die",
+    publishDate: '2nd Jan 2025',
+    url: '/dontdie'
   }
 
 ]
