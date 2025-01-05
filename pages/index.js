@@ -1784,6 +1784,12 @@ export const tools = [
     description: "Don't Die",
     publishDate: '2nd Jan 2025',
     url: '/dontdie'
+  },
+  {
+    title: 'Anyone 2 Jack',
+    description: 'Anyone 2 Jack',
+    publishDate: '3rd Jan 2025',
+    url: '/anyone2jack'
   }
 
 ]
