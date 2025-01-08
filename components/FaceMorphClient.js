@@ -44,7 +44,7 @@ export default function FaceMorph() {
           // Load Jack's image
           const jackImg = new Image()
           jackImg.crossOrigin = "anonymous"
-          jackImg.src = '/jackbutche.jpeg'
+          jackImg.src = '/jackbutcher.jpeg'
           jackImg.onload = () => {
             if (mounted) {
               setJackFace(jackImg)

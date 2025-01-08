@@ -36,6 +36,7 @@
     "html2canvas": "^1.4.1",
     "html2pdf.js": "^0.10.2",
     "jimp": "^0.22.12",
+    "jspdf": "^2.5.2",
     "jszip": "^3.10.1",
     "limiter": "^2.1.0",
     "markdown-to-jsx": "^7.5.0",
