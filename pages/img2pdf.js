@@ -59,26 +59,19 @@ export default function JpegToPdf() {
   return (
   <div className={styles.container}>
     <Head>
-    <title>JPEG to PDF</title>
-    <meta name="description" content="Convert multiple JPEGs to a single PDF." />
+    <title>Images to PDF</title>
+    <meta name="description" content="Convert multiple images to a single PDF." />
     <link rel="icon" href="/favicon.ico" />
     </Head>
   
     <main className={styles.main}>
     <h1 className={styles.title}>
-      JPEG to PDF
+      Images to PDF
     </h1>
-  
-    <p style={{
-      color: '#888',
-      fontSize: '16px',
-      margin: '20px 0',
-      width: '100%',
-      textAlign: 'center'
-    }}>
-      Convert multiple JPEGs to a single PDF
-    </p>
-  
+    <h2 className={styles.description}>
+      Download multiple images as a single PDF
+    </h2>
+    
     <div style={{
       display: 'flex',
       flexDirection: 'column',

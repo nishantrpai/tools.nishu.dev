@@ -1792,10 +1792,10 @@ export const tools = [
     url: '/anyone2jack'
   },
   {
-    title: 'JPEGs to PDF',
-    description: 'JPEGs to PDF',
+    title: 'Images to PDF',
+    description: 'Images to PDF',
     publishDate: '8th Jan 2025',
-    url: '/jpeg2pdf'
+    url: '/img2pdf'
   }
 
 ]
