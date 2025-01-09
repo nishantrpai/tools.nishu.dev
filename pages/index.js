@@ -1796,6 +1796,12 @@ export const tools = [
     description: 'Images to PDF',
     publishDate: '8th Jan 2025',
     url: '/img2pdf'
+  },
+  {
+    title: 'Text to Video',
+    description: 'Text to Video',
+    publishDate: '9th Jan 2025',
+    url: '/text2video'
   }
 
 ]
