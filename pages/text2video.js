@@ -116,7 +116,7 @@ export default function Text2Video() {
     const stream = canvasRef.current.captureStream(30)
     const mediaRecorder = new MediaRecorder(stream, {
       mimeType: 'video/webm;codecs=vp9',
-      videoBitsPerSecond: 5 * 1024 * 1024
+      videoBitsPerSecond: 8000000
     })
 
     mediaRecorderRef.current = mediaRecorder
