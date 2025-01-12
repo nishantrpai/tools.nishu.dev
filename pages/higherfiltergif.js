@@ -355,7 +355,7 @@ async function preprocessFrames() {
           {processing ? 'Processing...' : 'Download as GIF'}
         </button>
         <button onClick={handleDownloadMP4} disabled={isRecording}>
-          {isRecording ? 'Recording...' : 'Download as MP4'}
+          {isRecording ? 'Recording...' : 'Download as webm'}
         </button>
 
       </main>
