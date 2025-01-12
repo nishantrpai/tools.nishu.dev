@@ -1,7 +1,7 @@
 // here is how i made this https://www.youtube.com/watch?v=dQw4w9WgXcQ
 import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { decompressFrames, parseGIF } from 'gifuct-js'
 import gifshot from 'gifshot'
 
@@ -16,6 +16,9 @@ export default function HigherFilterGif() {
   const [gifUrl, setGifUrl] = useState('')
   const [frameDelays, setFrameDelays] = useState([])
   const [isReverse, setIsReverse] = useState(false)
+  const [isRecording, setIsRecording] = useState(false)
+  const canvasRef = useRef(null)
+
 
   useEffect(() => {
     if (gifFrames.length > 0) {
@@ -40,7 +43,7 @@ export default function HigherFilterGif() {
     canvas.height = imgHeight
     context.fillStyle = 'black'
     context.fillRect(0, 0, canvas.width, canvas.height)
-    
+
     const img = new Image()
     img.src = gifFrames[currentFrameIndex].url
     img.onload = () => {
@@ -121,6 +124,77 @@ export default function HigherFilterGif() {
     })
   }
 
+  const handleDownloadMP4 = () => {
+    const canvas = canvasRef.current
+    const context = canvas.getContext('2d')
+    const fps = 1000 / (frameDelays.reduce((a, b) => a + b, 0) / frameDelays.length)
+
+    const stream = canvas.captureStream(fps)
+    const mediaRecorder = new MediaRecorder(stream, {
+      mimeType: 'video/mp4',
+      videoBitsPerSecond: 8000000
+    })
+    const chunks = []
+    let frameIndex = 0
+
+    mediaRecorder.ondataavailable = (e) => {
+      if (e.data.size > 0) {
+        chunks.push(e.data)
+      }
+    }
+
+    mediaRecorder.onstop = () => {
+      const blob = new Blob(chunks, { type: 'video/webm' })
+      const url = URL.createObjectURL(blob)
+
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `rendered-video-${Date.now()}.webm`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+    }
+
+    const captureFrame = () => {
+      if (gifFrames.length > 0) {
+      const img = new Image()
+      img.onload = () => {
+        context.clearRect(0, 0, canvas.width, canvas.height)
+        context.drawImage(img, 0, 0, imgWidth, imgHeight)
+        const imageData = context.getImageData(0, 0, canvas.width, canvas.height)
+        const data = imageData.data
+        for (let i = 0; i < data.length; i += 4) {
+        const avg = (data[i] + data[i + 1] + data[i + 2]) / 3
+        if (isReverse ? avg <= filterThreshold : avg > filterThreshold) {
+          data[i] = 84 // Red channel
+          data[i + 1] = data[i+1] + greenIntensity;
+          data[i + 2] = 86 // Blue channel
+          data[i + 3] = data[i + 3] * (avg / 255) // Alpha channel
+        }
+        }
+        // context.putImageData(imageData, 0, 0)
+      }
+      img.src = gifFrames[frameIndex].url
+      frameIndex = (frameIndex + 1) % gifFrames.length
+      }
+    }
+    const captureInterval = setInterval(() => {
+      captureFrame()
+    }, 1000 / fps)
+
+    mediaRecorder.start()
+    setIsRecording(true)
+
+    setTimeout(() => {
+      clearInterval(captureInterval)
+      setIsRecording(false)
+      mediaRecorder.stop()
+    }, (gifFrames.length * 1000) / fps)
+  }
+
+
+
   const handleGifLoad = (gifData, isUrl = false) => {
     const processGif = (buffer) => {
       const gif = parseGIF(buffer);
@@ -151,6 +225,7 @@ export default function HigherFilterGif() {
       });
 
       setGifFrames(frames);
+      console.log(JSON.stringify(frames), 'frames');
       setImgWidth(gif.lsd.width);
       setImgHeight(gif.lsd.height);
       setCurrentFrameIndex(0);
@@ -197,8 +272,11 @@ export default function HigherFilterGif() {
         }}>
           Add higher filter to your gifs
         </span>
-        
-        <canvas id="canvas" width="800" height="800" style={{
+
+        <canvas 
+        id="canvas" 
+        ref={canvasRef}
+        width="800" height="800" style={{
           border: '1px solid #333',
           borderRadius: 10,
           width: '100%',
@@ -206,19 +284,19 @@ export default function HigherFilterGif() {
           margin: '20px 0'
         }}></canvas>
         <div style={{ display: 'flex', gap: 20, flexDirection: 'column', width: '50%' }}>
-        <input type="file" accept="image/gif" onChange={handleFileUpload} />
-        <div style={{display: 'flex', gap: 20}}>
-        <input type="text" placeholder="Enter GIF URL" value={gifUrl} onChange={(e) => setGifUrl(e.target.value)} style={{
-          width: '100%',
-          borderRadius: 10,
-          padding: 10,
-          border: '1px solid #333',
-          outline: 'none',
-          backgroundColor: '#000',
-          color: '#fff'
-        }}/>
-        <button onClick={handleUrlInput}>Load</button>
-        </div>
+          <input type="file" accept="image/gif" onChange={handleFileUpload} />
+          <div style={{ display: 'flex', gap: 20 }}>
+            <input type="text" placeholder="Enter GIF URL" value={gifUrl} onChange={(e) => setGifUrl(e.target.value)} style={{
+              width: '100%',
+              borderRadius: 10,
+              padding: 10,
+              border: '1px solid #333',
+              outline: 'none',
+              backgroundColor: '#000',
+              color: '#fff'
+            }} />
+            <button onClick={handleUrlInput}>Load</button>
+          </div>
           <label>
             Green Intensity
           </label>
@@ -256,6 +334,10 @@ export default function HigherFilterGif() {
         }}>
           {processing ? 'Processing...' : 'Download as GIF'}
         </button>
+        <button onClick={handleDownloadMP4} disabled={isRecording}>
+          {isRecording ? 'Recording...' : 'Download as MP4'}
+        </button>
+
       </main>
     </>
   )
