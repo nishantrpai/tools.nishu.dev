@@ -36,6 +36,43 @@ export default function HigherFilterGif() {
     }
   }, [currentFrameIndex, greenIntensity, filterThreshold, isReverse])
 
+
+// Helper
+function loadImageAsync(url) {
+  return new Promise((resolve) => {
+    const img = new Image()
+    img.onload = () => resolve(img)
+    img.src = url
+  })
+}
+
+async function preprocessFrames() {
+  const processedFrames = []
+  for (const frame of gifFrames) {
+    const img = await loadImageAsync(frame.url)
+    const offscreen = document.createElement('canvas')
+    offscreen.width = img.width
+    offscreen.height = img.height
+    const offCtx = offscreen.getContext('2d')
+    offCtx.drawImage(img, 0, 0)
+    const imageData = offCtx.getImageData(0, 0, offscreen.width, offscreen.height)
+    const data = imageData.data
+    for (let i = 0; i < data.length; i += 4) {
+      const avg = (data[i] + data[i + 1] + data[i + 2]) / 3
+      if ((isReverse && avg <= filterThreshold) || (!isReverse && avg > filterThreshold)) {
+        data[i] = 84
+        data[i + 1] = greenIntensity
+        data[i + 2] = 86
+        data[i + 3] = data[i + 3] * (avg / 255)
+      }
+    }
+    offCtx.putImageData(imageData, 0, 0)
+    processedFrames.push(offscreen.toDataURL())
+  }
+  return processedFrames
+}
+
+
   const applyFilter = () => {
     const canvas = document.getElementById('canvas')
     const context = canvas.getContext('2d')
@@ -47,6 +84,11 @@ export default function HigherFilterGif() {
     const img = new Image()
     img.src = gifFrames[currentFrameIndex].url
     img.onload = () => {
+      canvas.width = imgWidth
+      canvas.height = imgHeight
+      context.clearRect(0, 0, canvas.width, canvas.height)
+      context.fillStyle = 'black'
+      context.fillRect(0, 0, canvas.width, canvas.height)
       context.drawImage(img, 0, 0, imgWidth, imgHeight)
       const imageData = context.getImageData(0, 0, canvas.width, canvas.height)
       const data = imageData.data
@@ -89,22 +131,16 @@ export default function HigherFilterGif() {
       return tempCanvas.toDataURL('image/png')
     }
 
-    const gifFramesWithFilter = await Promise.all(gifFrames.map((frame) => {
-      const img = new Image()
-      img.src = frame.url
-      return new Promise((resolve) => {
-        img.onload = () => resolve(applyFilterToFrame(img))
-      })
-    }))
+    const gifFramesWithFilter = await preprocessFrames()
 
     gifshot.createGIF({
       gifWidth: imgWidth,
       gifHeight: imgHeight,
       images: gifFramesWithFilter,
       interval: frameDelays.map(delay => delay / 100),
-      quality: 100,
+      quality: 1,
       numWorkers: 10,
-      sampleInterval: 10,
+      sampleInterval: 1,
       progressCallback: (captureProgress) => {
         console.log(`GIF Creation Progress: ${captureProgress}`)
       },
@@ -124,10 +160,11 @@ export default function HigherFilterGif() {
     })
   }
 
-  const handleDownloadMP4 = () => {
+  const handleDownloadMP4 = async () => {
     const canvas = canvasRef.current
     const context = canvas.getContext('2d')
     const fps = 1000 / (frameDelays.reduce((a, b) => a + b, 0) / frameDelays.length)
+    const mp4Frames = await preprocessFrames() // same preprocess function as for GIF
 
     const stream = canvas.captureStream(fps)
     const mediaRecorder = new MediaRecorder(stream, {
@@ -138,15 +175,12 @@ export default function HigherFilterGif() {
     let frameIndex = 0
 
     mediaRecorder.ondataavailable = (e) => {
-      if (e.data.size > 0) {
-        chunks.push(e.data)
-      }
+      if (e.data.size > 0) chunks.push(e.data)
     }
 
     mediaRecorder.onstop = () => {
       const blob = new Blob(chunks, { type: 'video/webm' })
       const url = URL.createObjectURL(blob)
-
       const a = document.createElement('a')
       a.href = url
       a.download = `rendered-video-${Date.now()}.webm`
@@ -156,44 +190,31 @@ export default function HigherFilterGif() {
       URL.revokeObjectURL(url)
     }
 
-    const captureFrame = () => {
-      if (gifFrames.length > 0) {
-      const img = new Image()
-      img.onload = () => {
-        context.clearRect(0, 0, canvas.width, canvas.height)
-        context.drawImage(img, 0, 0, imgWidth, imgHeight)
-        const imageData = context.getImageData(0, 0, canvas.width, canvas.height)
-        const data = imageData.data
-        for (let i = 0; i < data.length; i += 4) {
-        const avg = (data[i] + data[i + 1] + data[i + 2]) / 3
-        if (isReverse ? avg <= filterThreshold : avg > filterThreshold) {
-          data[i] = 84 // Red channel
-          data[i + 1] = data[i+1] + greenIntensity;
-          data[i + 2] = 86 // Blue channel
-          data[i + 3] = data[i + 3] * (avg / 255) // Alpha channel
+    mediaRecorder.start()
+
+    // Render each processed frame onto the canvas in sequence
+    const renderNextFrame = () => {
+      if (frameIndex < mp4Frames.length) {
+        const img = new Image()
+        img.onload = () => {
+          canvas.width = img.width
+          canvas.height = img.height
+          // draw a black background
+          context.fillStyle = 'black'
+          context.fillRect(0, 0, canvas.width, canvas.height)
+          context.drawImage(img, 0, 0)
+          // download each frame as image
+          frameIndex++
+
+          setTimeout(renderNextFrame, frameDelays[frameIndex - 1] || 100) // use each frame’s delay
         }
-        }
-        // context.putImageData(imageData, 0, 0)
-      }
-      img.src = gifFrames[frameIndex].url
-      frameIndex = (frameIndex + 1) % gifFrames.length
+        img.src = mp4Frames[frameIndex]
+      } else {
+        mediaRecorder.stop()
       }
     }
-    const captureInterval = setInterval(() => {
-      captureFrame()
-    }, 1000 / fps)
-
-    mediaRecorder.start()
-    setIsRecording(true)
-
-    setTimeout(() => {
-      clearInterval(captureInterval)
-      setIsRecording(false)
-      mediaRecorder.stop()
-    }, (gifFrames.length * 1000) / fps)
+    renderNextFrame()
   }
-
-
 
   const handleGifLoad = (gifData, isUrl = false) => {
     const processGif = (buffer) => {
@@ -225,7 +246,6 @@ export default function HigherFilterGif() {
       });
 
       setGifFrames(frames);
-      console.log(JSON.stringify(frames), 'frames');
       setImgWidth(gif.lsd.width);
       setImgHeight(gif.lsd.height);
       setCurrentFrameIndex(0);
