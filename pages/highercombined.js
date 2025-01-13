@@ -29,6 +29,39 @@ const tools = [
         max: 255,
       },
     ],
+    apply: (image) => {
+      // apply filter function
+      if(!image) return;
+      const reverseFilter = document.querySelector('#reverseFilter')?.checked;
+      const greenIntensity = parseInt(document.querySelector('#greenIntensity')?.value || 0, 10);
+      const filterThreshold = parseInt(document.querySelector('#filterThreshold')?.value || 0, 10);
+
+      const canvas = document.getElementById('canvas')
+      const context = canvas.getContext('2d')
+      canvas.width = image.width
+      canvas.height = image.height
+      context.clearRect(0, 0, canvas.width, canvas.height)
+      // Draw a black rectangle as background
+      context.fillStyle = 'black'
+      context.fillRect(0, 0, canvas.width, canvas.height)
+      context.drawImage(image, 0, 0, image.width, image.height)
+      const imageData = context.getImageData(0, 0, canvas.width, canvas.height)
+      const data = imageData.data
+
+      for (let y = 0; y < canvas.height; y++) {
+        for (let x = 0; x < canvas.width; x++) {
+          const i = (y * canvas.width + x) * 4
+          const avg = (data[i] + data[i + 1] + data[i + 2]) / 3
+          if ((reverseFilter && avg <= filterThreshold) || (!reverseFilter && avg > filterThreshold)) {
+            data[i] = 84 // Red channel
+            data[i + 1] = greenIntensity // Green channel
+            data[i + 2] = 86 // Blue channel
+            data[i + 3] = data[i + 3] * (avg / 255) // Alpha channel
+          }
+        }
+      }
+      context.putImageData(imageData, 0, 0)
+    }
   },
   {
     id: 'hat',
@@ -65,6 +98,12 @@ const tools = [
         max: 360,
       },
     ],
+    apply: (canvas) => {
+      // apply hat function
+      const offsetX = parseInt(document.querySelector('#offsetX')?.value || 0, 10);
+      const offsetY = parseInt(document.querySelector('#offsetY')?.value || 0, 10);
+      const scale = parseFloat(document.querySelector('#scale')?.value || 1);
+    }
   },
   // Add more tools here
 ]
@@ -92,73 +131,16 @@ export default function HigherCombined() {
 
   const higherHat = '/higheritalic.svg'
 
-  useEffect(() => {
-    if (image) {
-      applyFilter()
-      if (activeTool === 'hat') {
-        applyHat()
-      }
-    }
-  }, [image, greenIntensity, filterThreshold, selectedAreaOnly, selectionRect, reverseFilter, offsetX, offsetY, scale, offsetTheta, hatType, activeTool])
+  // useEffect(() => {
+  //   if (image) {
+  //     applyFilter()
+  //     if (activeTool === 'hat') {
+  //       applyHat()
+  //     }
+  //   }
+  // }, [image, greenIntensity, filterThreshold, selectedAreaOnly, selectionRect, reverseFilter, offsetX, offsetY, scale, offsetTheta, hatType, activeTool])
 
   const applyFilter = (hideSelection = false) => {
-    const canvas = document.getElementById('canvas')
-    const context = canvas.getContext('2d')
-    canvas.width = image.width
-    canvas.height = image.height
-    if(history.length === 0) {
-    context.clearRect(0, 0, canvas.width, canvas.height)
-    }
-    // Draw a black rectangle as background
-    context.fillStyle = 'black'
-    context.fillRect(0, 0, canvas.width, canvas.height)
-    context.drawImage(image, 0, 0, image.width, image.height)
-    const imageData = context.getImageData(0, 0, canvas.width, canvas.height)
-    const data = imageData.data
-
-    for (let y = 0; y < canvas.height; y++) {
-      for (let x = 0; x < canvas.width; x++) {
-        const i = (y * canvas.width + x) * 4
-
-        const isInSelectedArea = selectedAreaOnly ?
-          x >= selectionRect.x &&
-          x <= selectionRect.x + selectionRect.width &&
-          y >= selectionRect.y &&
-          y <= selectionRect.y + selectionRect.height :
-          true
-
-        if (isInSelectedArea) {
-          const avg = (data[i] + data[i + 1] + data[i + 2]) / 3
-          if ((reverseFilter && avg <= filterThreshold) || (!reverseFilter && avg > filterThreshold)) {
-            data[i] = 84 // Red channel
-            data[i + 1] = greenIntensity // Green channel
-            data[i + 2] = 86 // Blue channel
-            data[i + 3] = data[i + 3] * (avg / 255) // Alpha channel
-          }
-        }
-      }
-    }
-    context.putImageData(imageData, 0, 0)
-
-    // Draw selection rectangle if needed
-    if (selectedAreaOnly && !hideSelection) {
-      context.strokeStyle = 'white'
-      context.lineWidth = 2
-      context.strokeRect(selectionRect.x, selectionRect.y, selectionRect.width, selectionRect.height)
-
-      // Draw resize handles
-      const handles = [
-        { x: selectionRect.x, y: selectionRect.y }, // nw
-        { x: selectionRect.x + selectionRect.width, y: selectionRect.y }, // ne
-        { x: selectionRect.x, y: selectionRect.y + selectionRect.height }, // sw
-        { x: selectionRect.x + selectionRect.width, y: selectionRect.y + selectionRect.height } // se
-      ]
-
-      handles.forEach(handle => {
-        context.fillStyle = 'white'
-        context.fillRect(handle.x - 4, handle.y - 4, 8, 8)
-      })
-    }
   }
 
   const applyHat = () => {
@@ -204,84 +186,6 @@ export default function HigherCombined() {
     }
   }
 
-  const handleMouseDown = (e) => {
-    if (!selectedAreaOnly || !image) return
-
-    const canvas = document.getElementById('canvas')
-    const rect = canvas.getBoundingClientRect()
-    const scaleX = canvas.width / rect.width
-    const scaleY = canvas.height / rect.height
-    const x = (e.clientX - rect.left) * scaleX
-    const y = (e.clientY - rect.top) * scaleY
-
-    // Check if clicking on resize handles
-    const handles = [
-      { type: 'nw', x: selectionRect.x, y: selectionRect.y },
-      { type: 'ne', x: selectionRect.x + selectionRect.width, y: selectionRect.y },
-      { type: 'sw', x: selectionRect.x, y: selectionRect.y + selectionRect.height },
-      { type: 'se', x: selectionRect.x + selectionRect.width, y: selectionRect.y + selectionRect.height }
-    ]
-
-    for (const handle of handles) {
-      if (Math.abs(x - handle.x) < 10 && Math.abs(y - handle.y) < 10) {
-        isDragging.current = true
-        dragType.current = 'resize'
-        resizeHandle.current = handle.type
-        dragStart.current = { x, y }
-        return
-      }
-    }
-
-    // Check if clicking inside selection rectangle
-    if (x >= selectionRect.x && x <= selectionRect.x + selectionRect.width &&
-      y >= selectionRect.y && y <= selectionRect.y + selectionRect.height) {
-      isDragging.current = true
-      dragType.current = 'move'
-      dragStart.current = { x: x - selectionRect.x, y: y - selectionRect.y }
-    }
-  }
-
-  const handleMouseMove = (e) => {
-    if (!isDragging.current || !selectedAreaOnly || !image) return
-
-    const canvas = document.getElementById('canvas')
-    const rect = canvas.getBoundingClientRect()
-    const scaleX = canvas.width / rect.width
-    const scaleY = canvas.height / rect.height
-    const x = (e.clientX - rect.left) * scaleX
-    const y = (e.clientY - rect.top) * scaleY
-
-    if (dragType.current === 'move') {
-      setSelectionRect(prev => ({
-        ...prev,
-        x: Math.max(0, Math.min(x - dragStart.current.x, canvas.width - prev.width)),
-        y: Math.max(0, Math.min(y - dragStart.current.y, canvas.height - prev.height))
-      }))
-    } else if (dragType.current === 'resize') {
-      const newRect = { ...selectionRect }
-
-      if (resizeHandle.current.includes('n')) {
-        newRect.height = newRect.height - (y - newRect.y)
-        newRect.y = y
-      }
-      if (resizeHandle.current.includes('s')) {
-        newRect.height = y - newRect.y
-      }
-      if (resizeHandle.current.includes('w')) {
-        newRect.width = newRect.width - (x - newRect.x)
-        newRect.x = x
-      }
-      if (resizeHandle.current.includes('e')) {
-        newRect.width = x - newRect.x
-      }
-
-      setSelectionRect(newRect)
-    }
-  }
-
-  const handleMouseUp = () => {
-    isDragging.current = false
-  }
 
   const renderSettings = () => {
     const tool = tools.find(t => t.id === activeTool)
@@ -296,7 +200,7 @@ export default function HigherCombined() {
                 <input
                   type="checkbox"
                   checked={eval(setting.state)}
-                  onChange={(e) => eval(`set${setting.state.charAt(0).toUpperCase() + setting.state.slice(1)}(e.target.checked)`)}
+                  onChange={(e) => {tool.apply(image)}}
                   style={{ marginRight: 10 }}
                 />
                 {setting.label}
@@ -313,8 +217,7 @@ export default function HigherCombined() {
                 min={setting.min}
                 max={setting.max}
                 step={setting.step || 1}
-                value={eval(setting.state)}
-                onChange={(e) => eval(`set${setting.state.charAt(0).toUpperCase() + setting.state.slice(1)}(Number(e.target.value))`)}
+                onChange={(e) => {tool.apply(image)}}
               />
               <input type="number" value={eval(setting.state)} style={{ width: 50, background: 'none', border: '1px solid #333', color: '#fff', borderRadius: 5, padding: 5, marginLeft: 10 }} onChange={(e) => eval(`set${setting.state.charAt(0).toUpperCase() + setting.state.slice(1)}(Number(e.target.value))`)} />
             </div>
@@ -349,10 +252,6 @@ export default function HigherCombined() {
           <canvas
             id="canvas"
             style={{ width: '100%', maxWidth: 500, height: 'auto', cursor: selectedAreaOnly ? 'crosshair' : 'default' }}
-            onMouseDown={handleMouseDown}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            onMouseLeave={handleMouseUp}
           />
         </div>
         <input type="file" accept="image/*" onChange={(e) => {
@@ -366,6 +265,17 @@ export default function HigherCombined() {
               setSelectionRect({ x: 50, y: 50, width: 200, height: 200 })
               setImgWidth(img.width)
               setImgHeight(img.height)
+              let canvas = document.getElementById('canvas')
+              canvas.width = img.width
+              canvas.height = img.height
+              let context = canvas.getContext('2d')
+              context.clearRect(0, 0, canvas.width, canvas.height)
+              let drawimg = new Image()
+              drawimg.onload = () => {
+                console.log('drawing image')
+                context.drawImage(img, 0, 0)
+              }
+              drawimg.src = reader.result
               saveHistory()
             }
           }
