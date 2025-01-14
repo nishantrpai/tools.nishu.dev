@@ -13,6 +13,7 @@ const tools = [
         type: 'checkbox',
         label: 'Reverse filter (apply to lower colors)',
         state: 'reverseFilter',
+        default: false,
       },
       {
         type: 'range',
@@ -31,7 +32,7 @@ const tools = [
     ],
     apply: (image) => {
       // apply filter function
-      if(!image) return;
+      if (!image) return;
       const reverseFilter = document.querySelector('#reverseFilter')?.checked;
       const greenIntensity = parseInt(document.querySelector('#greenIntensity')?.value || 0, 10);
       const filterThreshold = parseInt(document.querySelector('#filterThreshold')?.value || 0, 10);
@@ -64,7 +65,7 @@ const tools = [
     }
   },
   {
-    id: 'hat',
+    id: 'higheritalic',
     name: 'Higher Italic',
     icon: FaHatWizard,
     settings: [
@@ -94,15 +95,34 @@ const tools = [
         type: 'range',
         label: 'Rotate',
         state: 'offsetTheta',
+        default: 0,
         min: -360,
         max: 360,
       },
     ],
-    apply: (canvas) => {
+    apply: (image) => {
       // apply hat function
       const offsetX = parseInt(document.querySelector('#offsetX')?.value || 0, 10);
       const offsetY = parseInt(document.querySelector('#offsetY')?.value || 0, 10);
       const scale = parseFloat(document.querySelector('#scale')?.value || 1);
+      const offsetTheta = parseInt(document.querySelector('#offsetTheta')?.value || 0, 10);
+      const canvas = document.getElementById('canvas')
+      const context = canvas.getContext('2d')
+      canvas.width = image.width
+      canvas.height = image.height
+      context.clearRect(0, 0, canvas.width, canvas.height)
+      context.drawImage(image, 0, 0, image.width, image.height)
+      if (image) {
+        const hat = new Image()
+        hat.onload = () => {
+          context.translate(offsetX, offsetY)
+          context.rotate(offsetTheta * Math.PI / 180)
+          context.drawImage(hat, offsetX, offsetY, hat.width * scale, hat.height * scale)
+          context.resetTransform()
+        }
+        hat.src = '/higheritalic.svg'
+      }
+  
     }
   },
   // Add more tools here
@@ -110,18 +130,8 @@ const tools = [
 
 export default function HigherCombined() {
   const [image, setImage] = useState(null)
-  const [greenIntensity, setGreenIntensity] = useState(139)
-  const [filterThreshold, setFilterThreshold] = useState(50)
-  const [selectedAreaOnly, setSelectedAreaOnly] = useState(false)
-  const [selectionRect, setSelectionRect] = useState({ x: 50, y: 50, width: 200, height: 200 })
-  const [reverseFilter, setReverseFilter] = useState(false)
-  const [offsetX, setOffsetX] = useState(38)
-  const [offsetY, setOffsetY] = useState(104)
-  const [scale, setScale] = useState(2.4)
-  const [offsetTheta, setOffsetTheta] = useState(0)
   const [imgWidth, setImgWidth] = useState(0)
   const [imgHeight, setImgHeight] = useState(0)
-  const [hatType, setHatType] = useState(0)
   const [activeTool, setActiveTool] = useState('filter')
   const [history, setHistory] = useState([])
   const isDragging = useRef(false)
@@ -140,30 +150,6 @@ export default function HigherCombined() {
   //   }
   // }, [image, greenIntensity, filterThreshold, selectedAreaOnly, selectionRect, reverseFilter, offsetX, offsetY, scale, offsetTheta, hatType, activeTool])
 
-  const applyFilter = (hideSelection = false) => {
-  }
-
-  const applyHat = () => {
-    const canvas = document.getElementById('canvas')
-    const context = canvas.getContext('2d')
-    if (image) {
-      const hat = new Image()
-      if (hatType === 0)
-        hat.src = higherHat
-      else if (hatType === 1)
-        hat.src = higherHat2
-      else if (hatType === 2)
-        hat.src = higherHat3
-
-      hat.onload = () => {
-        context.translate(offsetX, offsetY)
-        context.rotate(offsetTheta * Math.PI / 180)
-        context.drawImage(hat, offsetX, offsetY, hat.width * scale, hat.height * scale)
-        context.resetTransform()
-        saveHistory()
-      }
-    }
-  }
 
   const saveHistory = () => {
     const canvas = document.getElementById('canvas')
@@ -199,8 +185,8 @@ export default function HigherCombined() {
               <label>
                 <input
                   type="checkbox"
-                  checked={eval(setting.state)}
-                  onChange={(e) => {tool.apply(image)}}
+                  checked={eval(setting.default)}
+                  onChange={(e) => { tool.apply(image) }}
                   style={{ marginRight: 10 }}
                 />
                 {setting.label}
@@ -209,7 +195,7 @@ export default function HigherCombined() {
           )
         case 'range':
           return (
-            <div key={setting.state} style={{ marginTop: '20px' }}>
+            <div key={setting.id} style={{ marginTop: '20px' }}>
               <label htmlFor={setting.state}>{setting.label}: </label>
               <input
                 type="range"
@@ -217,9 +203,13 @@ export default function HigherCombined() {
                 min={setting.min}
                 max={setting.max}
                 step={setting.step || 1}
-                onChange={(e) => {tool.apply(image)}}
+                defaultValue={setting.default || 0}
+                onChange={(e) => {
+                  document.querySelector(`#${setting.state}`).value = e.target.value
+                  tool.apply(image)
+                }
+                }
               />
-              <input type="number" value={eval(setting.state)} style={{ width: 50, background: 'none', border: '1px solid #333', color: '#fff', borderRadius: 5, padding: 5, marginLeft: 10 }} onChange={(e) => eval(`set${setting.state.charAt(0).toUpperCase() + setting.state.slice(1)}(Number(e.target.value))`)} />
             </div>
           )
         default:
@@ -227,6 +217,15 @@ export default function HigherCombined() {
       }
     })
   }
+
+  useEffect(() => {
+    // if canvas is not empty setImage to the canvas
+    if (document.getElementById('canvas').toDataURL() !== '') {
+      const img = new Image()
+      img.src = document.getElementById('canvas').toDataURL()
+      setImage(img)
+    }
+  }, [activeTool])
 
   return (
     <>
@@ -251,7 +250,7 @@ export default function HigherCombined() {
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, margin: 'auto' }}>
           <canvas
             id="canvas"
-            style={{ width: '100%', maxWidth: 500, height: 'auto', cursor: selectedAreaOnly ? 'crosshair' : 'default' }}
+            style={{ width: '100%', maxWidth: 500, height: 'auto', }}
           />
         </div>
         <input type="file" accept="image/*" onChange={(e) => {
@@ -262,7 +261,6 @@ export default function HigherCombined() {
             img.src = reader.result
             img.onload = () => {
               setImage(img)
-              setSelectionRect({ x: 50, y: 50, width: 200, height: 200 })
               setImgWidth(img.width)
               setImgHeight(img.height)
               let canvas = document.getElementById('canvas')
@@ -276,7 +274,7 @@ export default function HigherCombined() {
                 context.drawImage(img, 0, 0)
               }
               drawimg.src = reader.result
-              saveHistory()
+              // saveHistory()
             }
           }
           reader.readAsDataURL(file)
