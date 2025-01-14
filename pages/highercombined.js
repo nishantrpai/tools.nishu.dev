@@ -76,6 +76,11 @@ const tools = [
         options: ['Helvetica', 'Times New Roman', 'Comic Sans'],
       },
       {
+        type: 'color',
+        label: 'Color',
+        state: 'color',
+      },
+      {
         type: 'range',
         label: 'Offset X',
         state: 'offsetX',
@@ -112,8 +117,8 @@ const tools = [
       const offsetY = parseInt(document.querySelector('#offsetY')?.value || 0, 10);
       const scale = parseFloat(document.querySelector('#scale')?.value || 1);
       const offsetTheta = parseInt(document.querySelector('#offsetTheta')?.value || 0, 10);
+      const color = document.querySelector('#color')?.value || '#000000'
       const selectFont = document.querySelector('#selectFont')?.value || 'Helvetica'
-      console.log(selectFont)
       const canvas = document.getElementById('canvas')
       const context = canvas.getContext('2d')
       canvas.width = image.width
@@ -128,17 +133,16 @@ const tools = [
           context.drawImage(hat, offsetX, offsetY, hat.width * scale, hat.height * scale)
           context.resetTransform()
         }
-        if (selectFont == 'Helvetica') {
-          console.log('helvetica')
-          hat.src = '/higherhelvetica.svg'
-        }
-        else if (selectFont == 'Times New Roman') {
-          hat.src = '/higheritalic.svg'
-        }
-        else if (selectFont == 'Comic Sans') {
-          console.log('comic sans')
-          hat.src = '/highercomicsans.svg'
-        }
+        const svgPath = selectFont === 'Helvetica' ? '/higherhelvetica.svg' :
+          selectFont === 'Times New Roman' ? '/higheritalic.svg' :
+            '/highercomicsans.svg';
+        fetch(svgPath)
+          .then(response => response.text())
+          .then(svgText => {
+            const coloredSvg = svgText.replace(/fill="[^"]*"/g, `fill="${color}"`);
+            const blob = new Blob([coloredSvg], { type: 'image/svg+xml' });
+            hat.src = URL.createObjectURL(blob);
+          });
       }
     }
   },
@@ -224,6 +228,18 @@ export default function HigherCombined() {
                   <option key={option} value={option}>{option}</option>
                 ))}
               </select>
+            </div>
+          )
+        case 'color':
+          return (
+            <div key={setting.id} style={{ marginTop: '20px' }}>
+              <label htmlFor={setting.state}>{setting.label}: </label>
+              <input
+                type="color"
+                id={setting.state}
+                defaultValue={setting.default || '#000000'}
+                onChange={(e) => tool.apply(image)}
+              />
             </div>
           )
         default:
