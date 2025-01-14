@@ -119,6 +119,11 @@ export default function HigherCombined() {
           min: -360,
           max: 360,
         },
+        {
+          type: 'hidden',
+          state: 'processedImageUrl',
+          default: ''
+        }
       ],
       apply: (image) => {
         // apply hat function
@@ -127,6 +132,33 @@ export default function HigherCombined() {
         const scale = parseFloat(document.querySelector('#scale')?.value || 1);
         const offsetTheta = parseInt(document.querySelector('#offsetTheta')?.value || 0, 10);
         const foreground = document.querySelector('#foreground')?.checked;
+        const processedImageUrl = document.querySelector('#processedImageUrl')?.value;
+        if (foreground && !processedImageUrl) {
+          if (processedImageUrl !== 'processing') {
+            document.querySelector('#processedImageUrl').value = 'processing';
+            let loadingDiv = document.createElement('span');
+            loadingDiv.id = 'loadingDiv';
+            loadingDiv.innerText = 'Processing Foreground, please wait...';
+            document.querySelector('#tool-settings').appendChild(loadingDiv);
+            // add a status to show that the image is being processed
+            removeBg(image.src).then(async (processedImg) => {
+              console.log('processedImg', processedImg)
+              try {
+                const response = await fetch(processedImg);
+                const blob = await response.blob();
+                const blobUrl = URL.createObjectURL(blob);
+                document.querySelector('#processedImageUrl').value = blobUrl;
+                document.querySelector('#loadingDiv').innerText = 'Processed Foreground';
+                setTimeout(() => {
+                  document.querySelector('#loadingDiv').remove();
+                }, 2000);
+              } catch (error) {
+                console.error('Error fetching the processed image:', error);
+                isProcessing = false;
+              }
+            });
+          }
+        }
         const color = document.querySelector('#color')?.value || '#000000'
         const selectFont = document.querySelector('#selectFont')?.value || 'Helvetica'
         const canvas = document.getElementById('canvas')
@@ -140,22 +172,23 @@ export default function HigherCombined() {
           hat.onload = () => {
             context.translate(offsetX, offsetY)
             context.rotate(offsetTheta * Math.PI / 180)
-            // if foreground is checked, draw  the hat then the foreground
+            // if foreground is checked, draw the hat then the foreground
             console.log('foreground', foreground)
-            if(foreground) {
-              // first draw the hat then fetch the foreground and draw it
-              context.drawImage(hat, 0, 0, hat.width * scale, hat.height * scale)
-              let foregroundImg  = new Image()
-              foregroundImg.onload = () => {
-                context.drawImage(foregroundImg, 0, 0, hat.width * scale, hat.height * scale)
+            if (!foreground) {
+              context.drawImage(hat, offsetX, offsetY, hat.width * scale, hat.height * scale)
+            } else {
+              if (processedImageUrl != 'processing' && processedImageUrl) {
+                // first draw the hat then fetch the foreground and draw it
+                let foregroundImg = new Image()
+                foregroundImg.onload = () => {
+                  console.log('drawing foreground')
+                  context.drawImage(hat, offsetX, offsetY, hat.width * scale, hat.height * scale)
+                  context.drawImage(foregroundImg, 0, 0, canvas.width, canvas.height)
+                }
+                foregroundImg.src = processedImageUrl
               }
-              removeBg(image.src).then((processedImg) => {
-                console.log('processedImg', processedImg)
-                foregroundImg.src = `${processedImg}`
-              });
 
             }
-            context.drawImage(hat, offsetX, offsetY, hat.width * scale, hat.height * scale)
             context.resetTransform()
           }
           const svgPath = selectFont === 'Helvetica' ? '/higherhelvetica.svg' :
@@ -276,6 +309,15 @@ export default function HigherCombined() {
               />
             </div>
           )
+        case 'hidden':
+          return (
+            <input
+              key={setting.id}
+              type="hidden"
+              id={setting.state}
+              defaultValue={setting.default}
+            />
+          )
         default:
           return null
       }
@@ -341,7 +383,9 @@ export default function HigherCombined() {
           }
           reader.readAsDataURL(file)
         }} />
+        <div id="tool-settings" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
         {renderSettings()}
+        </div>
         <button onClick={() => setImage(null)}>Clear</button>
         <button onClick={() => {
           // Apply filter without selection rectangle
