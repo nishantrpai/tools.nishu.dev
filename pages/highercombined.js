@@ -65,10 +65,16 @@ const tools = [
     }
   },
   {
-    id: 'higheritalic',
-    name: 'Higher Italic',
+    id: 'highertags',
+    name: 'Higher Tags',
     icon: FaHatWizard,
     settings: [
+      {
+        type: 'select',
+        label: 'Select Font',
+        state: 'selectFont',
+        options: ['Helvetica', 'Times New Roman', 'Comic Sans'],
+      },
       {
         type: 'range',
         label: 'Offset X',
@@ -106,6 +112,8 @@ const tools = [
       const offsetY = parseInt(document.querySelector('#offsetY')?.value || 0, 10);
       const scale = parseFloat(document.querySelector('#scale')?.value || 1);
       const offsetTheta = parseInt(document.querySelector('#offsetTheta')?.value || 0, 10);
+      const selectFont = document.querySelector('#selectFont')?.value || 'Helvetica'
+      console.log(selectFont)
       const canvas = document.getElementById('canvas')
       const context = canvas.getContext('2d')
       canvas.width = image.width
@@ -120,9 +128,18 @@ const tools = [
           context.drawImage(hat, offsetX, offsetY, hat.width * scale, hat.height * scale)
           context.resetTransform()
         }
-        hat.src = '/higheritalic.svg'
+        if (selectFont == 'Helvetica') {
+          console.log('helvetica')
+          hat.src = '/higherhelvetica.svg'
+        }
+        else if (selectFont == 'Times New Roman') {
+          hat.src = '/higheritalic.svg'
+        }
+        else if (selectFont == 'Comic Sans') {
+          console.log('comic sans')
+          hat.src = '/highercomicsans.svg'
+        }
       }
-  
     }
   },
   // Add more tools here
@@ -193,6 +210,20 @@ export default function HigherCombined() {
                 }
                 }
               />
+            </div>
+          )
+        case 'select':
+          return (
+            <div key={setting.id} style={{ marginTop: '20px' }}>
+              <label htmlFor={setting.state}>{setting.label}: </label>
+              <select
+                id={setting.state}
+                onChange={(e) => tool.apply(image)}
+              >
+                {setting.options.map(option => (
+                  <option key={option} value={option}>{option}</option>
+                ))}
+              </select>
             </div>
           )
         default:
