@@ -134,22 +134,8 @@ export default function HigherCombined() {
   const [imgHeight, setImgHeight] = useState(0)
   const [activeTool, setActiveTool] = useState('filter')
   const [history, setHistory] = useState([])
-  const isDragging = useRef(false)
-  const dragStart = useRef({ x: 0, y: 0 })
-  const dragType = useRef(null) // 'move' or 'resize'
-  const resizeHandle = useRef(null) // 'nw', 'ne', 'sw', 'se'
 
   const higherHat = '/higheritalic.svg'
-
-  // useEffect(() => {
-  //   if (image) {
-  //     applyFilter()
-  //     if (activeTool === 'hat') {
-  //       applyHat()
-  //     }
-  //   }
-  // }, [image, greenIntensity, filterThreshold, selectedAreaOnly, selectionRect, reverseFilter, offsetX, offsetY, scale, offsetTheta, hatType, activeTool])
-
 
   const saveHistory = () => {
     const canvas = document.getElementById('canvas')
