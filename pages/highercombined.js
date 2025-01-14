@@ -130,12 +130,9 @@ const tools = [
 
 export default function HigherCombined() {
   const [image, setImage] = useState(null)
-  const [imgWidth, setImgWidth] = useState(0)
-  const [imgHeight, setImgHeight] = useState(0)
   const [activeTool, setActiveTool] = useState('filter')
   const [history, setHistory] = useState([])
 
-  const higherHat = '/higheritalic.svg'
 
   const saveHistory = () => {
     const canvas = document.getElementById('canvas')
@@ -247,8 +244,6 @@ export default function HigherCombined() {
             img.src = reader.result
             img.onload = () => {
               setImage(img)
-              setImgWidth(img.width)
-              setImgHeight(img.height)
               let canvas = document.getElementById('canvas')
               canvas.width = img.width
               canvas.height = img.height
