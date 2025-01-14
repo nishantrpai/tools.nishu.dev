@@ -24,6 +24,7 @@ export default function RemoveBg() {
   useEffect(() => {
     if (!img) return
     removeBg(img).then((processedImg) => {
+      console.log(processedImg);
       setProcessedImg(processedImg)
     })
   }, [img])

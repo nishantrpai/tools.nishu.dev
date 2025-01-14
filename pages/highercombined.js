@@ -2,158 +2,191 @@ import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { useState, useEffect, useRef } from 'react'
 import { FaFilter, FaHatWizard, FaUndo } from 'react-icons/fa'
-
-const tools = [
-  {
-    id: 'filter',
-    name: 'Higher Filter',
-    icon: FaFilter,
-    settings: [
-      {
-        type: 'checkbox',
-        label: 'Reverse filter (apply to lower colors)',
-        state: 'reverseFilter',
-        default: false,
-      },
-      {
-        type: 'range',
-        label: 'Green Intensity',
-        state: 'greenIntensity',
-        min: 0,
-        max: 255,
-      },
-      {
-        type: 'range',
-        label: 'Filter Threshold',
-        state: 'filterThreshold',
-        min: 0,
-        max: 255,
-      },
-    ],
-    apply: (image) => {
-      // apply filter function
-      if (!image) return;
-      const reverseFilter = document.querySelector('#reverseFilter')?.checked;
-      const greenIntensity = parseInt(document.querySelector('#greenIntensity')?.value || 0, 10);
-      const filterThreshold = parseInt(document.querySelector('#filterThreshold')?.value || 0, 10);
-
-      const canvas = document.getElementById('canvas')
-      const context = canvas.getContext('2d')
-      canvas.width = image.width
-      canvas.height = image.height
-      context.clearRect(0, 0, canvas.width, canvas.height)
-      // Draw a black rectangle as background
-      context.fillStyle = 'black'
-      context.fillRect(0, 0, canvas.width, canvas.height)
-      context.drawImage(image, 0, 0, image.width, image.height)
-      const imageData = context.getImageData(0, 0, canvas.width, canvas.height)
-      const data = imageData.data
-
-      for (let y = 0; y < canvas.height; y++) {
-        for (let x = 0; x < canvas.width; x++) {
-          const i = (y * canvas.width + x) * 4
-          const avg = (data[i] + data[i + 1] + data[i + 2]) / 3
-          if ((reverseFilter && avg <= filterThreshold) || (!reverseFilter && avg > filterThreshold)) {
-            data[i] = 84 // Red channel
-            data[i + 1] = greenIntensity // Green channel
-            data[i + 2] = 86 // Blue channel
-            data[i + 3] = data[i + 3] * (avg / 255) // Alpha channel
-          }
-        }
-      }
-      context.putImageData(imageData, 0, 0)
-    }
-  },
-  {
-    id: 'highertags',
-    name: 'Higher Tags',
-    icon: FaHatWizard,
-    settings: [
-      {
-        type: 'select',
-        label: 'Select Font',
-        state: 'selectFont',
-        options: ['Helvetica', 'Times New Roman', 'Comic Sans'],
-      },
-      {
-        type: 'color',
-        label: 'Color',
-        state: 'color',
-      },
-      {
-        type: 'range',
-        label: 'Offset X',
-        state: 'offsetX',
-        min: -1500,
-        max: 1500,
-      },
-      {
-        type: 'range',
-        label: 'Offset Y',
-        state: 'offsetY',
-        min: -1500,
-        max: 1500,
-      },
-      {
-        type: 'range',
-        label: 'Scale',
-        state: 'scale',
-        min: 0,
-        max: 10,
-        step: 0.01,
-      },
-      {
-        type: 'range',
-        label: 'Rotate',
-        state: 'offsetTheta',
-        default: 0,
-        min: -360,
-        max: 360,
-      },
-    ],
-    apply: (image) => {
-      // apply hat function
-      const offsetX = parseInt(document.querySelector('#offsetX')?.value || 0, 10);
-      const offsetY = parseInt(document.querySelector('#offsetY')?.value || 0, 10);
-      const scale = parseFloat(document.querySelector('#scale')?.value || 1);
-      const offsetTheta = parseInt(document.querySelector('#offsetTheta')?.value || 0, 10);
-      const color = document.querySelector('#color')?.value || '#000000'
-      const selectFont = document.querySelector('#selectFont')?.value || 'Helvetica'
-      const canvas = document.getElementById('canvas')
-      const context = canvas.getContext('2d')
-      canvas.width = image.width
-      canvas.height = image.height
-      context.clearRect(0, 0, canvas.width, canvas.height)
-      context.drawImage(image, 0, 0, image.width, image.height)
-      if (image) {
-        const hat = new Image()
-        hat.onload = () => {
-          context.translate(offsetX, offsetY)
-          context.rotate(offsetTheta * Math.PI / 180)
-          context.drawImage(hat, offsetX, offsetY, hat.width * scale, hat.height * scale)
-          context.resetTransform()
-        }
-        const svgPath = selectFont === 'Helvetica' ? '/higherhelvetica.svg' :
-          selectFont === 'Times New Roman' ? '/higheritalic.svg' :
-            '/highercomicsans.svg';
-        fetch(svgPath)
-          .then(response => response.text())
-          .then(svgText => {
-            const coloredSvg = svgText.replace(/fill="[^"]*"/g, `fill="${color}"`);
-            const blob = new Blob([coloredSvg], { type: 'image/svg+xml' });
-            hat.src = URL.createObjectURL(blob);
-          });
-      }
-    }
-  },
-  // Add more tools here
-]
+import { removeBackground } from '@imgly/background-removal'
 
 export default function HigherCombined() {
+
+  const tools = [
+    {
+      id: 'filter',
+      name: 'Higher Filter',
+      icon: FaFilter,
+      settings: [
+        {
+          type: 'checkbox',
+          label: 'Reverse filter (apply to lower colors)',
+          state: 'reverseFilter',
+          default: false,
+        },
+        {
+          type: 'range',
+          label: 'Green Intensity',
+          state: 'greenIntensity',
+          min: 0,
+          max: 255,
+        },
+        {
+          type: 'range',
+          label: 'Filter Threshold',
+          state: 'filterThreshold',
+          min: 0,
+          max: 255,
+        },
+      ],
+      apply: (image) => {
+        // apply filter function
+        if (!image) return;
+        const reverseFilter = document.querySelector('#reverseFilter')?.checked;
+        const greenIntensity = parseInt(document.querySelector('#greenIntensity')?.value || 0, 10);
+        const filterThreshold = parseInt(document.querySelector('#filterThreshold')?.value || 0, 10);
+
+        const canvas = document.getElementById('canvas')
+        const context = canvas.getContext('2d')
+        canvas.width = image.width
+        canvas.height = image.height
+        context.clearRect(0, 0, canvas.width, canvas.height)
+        // Draw a black rectangle as background
+        context.fillStyle = 'black'
+        context.fillRect(0, 0, canvas.width, canvas.height)
+        context.drawImage(image, 0, 0, image.width, image.height)
+        const imageData = context.getImageData(0, 0, canvas.width, canvas.height)
+        const data = imageData.data
+
+        for (let y = 0; y < canvas.height; y++) {
+          for (let x = 0; x < canvas.width; x++) {
+            const i = (y * canvas.width + x) * 4
+            const avg = (data[i] + data[i + 1] + data[i + 2]) / 3
+            if ((reverseFilter && avg <= filterThreshold) || (!reverseFilter && avg > filterThreshold)) {
+              data[i] = 84 // Red channel
+              data[i + 1] = greenIntensity // Green channel
+              data[i + 2] = 86 // Blue channel
+              data[i + 3] = data[i + 3] * (avg / 255) // Alpha channel
+            }
+          }
+        }
+        context.putImageData(imageData, 0, 0)
+      }
+    },
+    {
+      id: 'highertags',
+      name: 'Higher Tags',
+      icon: FaHatWizard,
+      settings: [
+        {
+          type: 'select',
+          label: 'Select Font',
+          state: 'selectFont',
+          options: ['Helvetica', 'Times New Roman', 'Comic Sans'],
+        },
+        {
+          type: 'color',
+          label: 'Color',
+          state: 'color',
+        },
+        {
+          type: 'checkbox',
+          label: 'Foreground',
+          state: 'foreground',
+          default: false,
+        },
+        {
+          type: 'range',
+          label: 'Offset X',
+          state: 'offsetX',
+          min: -1500,
+          max: 1500,
+        },
+        {
+          type: 'range',
+          label: 'Offset Y',
+          state: 'offsetY',
+          min: -1500,
+          max: 1500,
+        },
+        {
+          type: 'range',
+          label: 'Scale',
+          state: 'scale',
+          min: 0,
+          max: 10,
+          step: 0.01,
+        },
+        {
+          type: 'range',
+          label: 'Rotate',
+          state: 'offsetTheta',
+          default: 0,
+          min: -360,
+          max: 360,
+        },
+      ],
+      apply: (image) => {
+        // apply hat function
+        const offsetX = parseInt(document.querySelector('#offsetX')?.value || 0, 10);
+        const offsetY = parseInt(document.querySelector('#offsetY')?.value || 0, 10);
+        const scale = parseFloat(document.querySelector('#scale')?.value || 1);
+        const offsetTheta = parseInt(document.querySelector('#offsetTheta')?.value || 0, 10);
+        const foreground = document.querySelector('#foreground')?.checked;
+        const color = document.querySelector('#color')?.value || '#000000'
+        const selectFont = document.querySelector('#selectFont')?.value || 'Helvetica'
+        const canvas = document.getElementById('canvas')
+        const context = canvas.getContext('2d')
+        canvas.width = image.width
+        canvas.height = image.height
+        context.clearRect(0, 0, canvas.width, canvas.height)
+        context.drawImage(image, 0, 0, image.width, image.height)
+        if (image) {
+          const hat = new Image()
+          hat.onload = () => {
+            context.translate(offsetX, offsetY)
+            context.rotate(offsetTheta * Math.PI / 180)
+            // if foreground is checked, draw  the hat then the foreground
+            console.log('foreground', foreground)
+            if(foreground) {
+              // first draw the hat then fetch the foreground and draw it
+              context.drawImage(hat, 0, 0, hat.width * scale, hat.height * scale)
+              let foregroundImg  = new Image()
+              foregroundImg.onload = () => {
+                context.drawImage(foregroundImg, 0, 0, hat.width * scale, hat.height * scale)
+              }
+              removeBg(image.src).then((processedImg) => {
+                console.log('processedImg', processedImg)
+                foregroundImg.src = `${processedImg}`
+              });
+
+            }
+            context.drawImage(hat, offsetX, offsetY, hat.width * scale, hat.height * scale)
+            context.resetTransform()
+          }
+          const svgPath = selectFont === 'Helvetica' ? '/higherhelvetica.svg' :
+            selectFont === 'Times New Roman' ? '/higheritalic.svg' :
+              '/highercomicsans.svg';
+          fetch(svgPath)
+            .then(response => response.text())
+            .then(svgText => {
+              const coloredSvg = svgText.replace(/fill="[^"]*"/g, `fill="${color}"`);
+              const blob = new Blob([coloredSvg], { type: 'image/svg+xml' });
+              hat.src = URL.createObjectURL(blob);
+            });
+        }
+      }
+    },
+    // Add more tools here
+  ]
+
   const [image, setImage] = useState(null)
   const [activeTool, setActiveTool] = useState('filter')
   const [history, setHistory] = useState([])
 
+  const removeBg = async (imageSrc) => {
+    try {
+      const blob = await removeBackground(imageSrc)
+      const url = URL.createObjectURL(blob)
+      return url
+    } catch (error) {
+      console.error('Background removal failed:', error)
+    }
+  }
 
   const saveHistory = () => {
     const canvas = document.getElementById('canvas')
@@ -189,7 +222,8 @@ export default function HigherCombined() {
               <label>
                 <input
                   type="checkbox"
-                  checked={eval(setting.default)}
+                  id={setting.state}
+                  defaultValue={eval(setting.default)}
                   onChange={(e) => { tool.apply(image) }}
                   style={{ marginRight: 10 }}
                 />
