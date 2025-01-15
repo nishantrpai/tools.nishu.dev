@@ -375,9 +375,9 @@ export default function HigherCombined() {
               <tool.icon /> {tool.name}
             </button>
           ))}
-          <button onClick={undo}>
+          {/* <button onClick={undo}>
             <FaUndo /> Undo
-          </button>
+          </button> */}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, margin: 'auto' }}>
           <canvas
