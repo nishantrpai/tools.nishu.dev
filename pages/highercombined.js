@@ -76,7 +76,7 @@ export default function HigherCombined() {
           type: 'select',
           label: 'Select Font',
           state: 'selectFont',
-          options: ['Helvetica', 'Times New Roman', 'Comic Sans'],
+          options: ['Helvetica', 'Times New Roman', 'Comic Sans', 'Higher TM', 'Arrow'],
         },
         {
           type: 'color',
@@ -191,9 +191,34 @@ export default function HigherCombined() {
             }
             context.resetTransform()
           }
-          const svgPath = selectFont === 'Helvetica' ? '/higherhelvetica.svg' :
-            selectFont === 'Times New Roman' ? '/higheritalic.svg' :
-              '/highercomicsans.svg';
+            let svgPath;
+            switch (selectFont) {
+            case 'Helvetica':
+              svgPath = '/higherhelvetica.svg';
+              break;
+            case 'Times New Roman':
+              svgPath = '/higheritalic.svg';
+              break;
+            case 'Comic Sans':
+              svgPath = '/highercomicsans.svg';
+              break;
+            case 'Higher TM':
+              svgPath = '/highertm.svg';
+              break;
+            case 'Arrow':
+              svgPath = '/higherarrow.svg';
+              break;
+            default:
+              svgPath = '/higherdefault.svg';
+            }
+
+
+
+          if(svgPath.endsWith('.png')) {
+            hat.src = svgPath;
+            return;
+          }
+          
           fetch(svgPath)
             .then(response => response.text())
             .then(svgText => {
@@ -224,6 +249,7 @@ export default function HigherCombined() {
   const saveHistory = () => {
     const canvas = document.getElementById('canvas')
     const dataURL = canvas.toDataURL()
+    setImage(dataURL)
     setHistory(prevHistory => [...prevHistory, dataURL])
   }
 
