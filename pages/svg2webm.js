@@ -86,7 +86,7 @@ export default function Svg2Webm() {
         ctx.clearRect(0, 0, canvas.width, canvas.height)
         ctx.drawImage(svgImage, offsetX, offsetY, imgWidth * scale, imgHeight * scale)
         ctx.save()
-        ctx.translate(xOffset, yOffset)
+        // ctx.translate(xOffset, yOffset)
         ctx.strokeStyle = pathColor
         ctx.lineWidth = 2
         ctx.setLineDash([totalLength])

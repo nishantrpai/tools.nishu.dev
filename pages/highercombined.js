@@ -32,6 +32,13 @@ export default function HigherCombined() {
           min: 0,
           max: 255,
         },
+        {
+          type: 'range',
+          label: 'Grainy',
+          state: 'grainyThreshold',
+          min: 0,
+          max: 100,
+        }
       ],
       apply: (image) => {
         // apply filter function
@@ -39,6 +46,7 @@ export default function HigherCombined() {
         const reverseFilter = document.querySelector('#reverseFilter')?.checked;
         const greenIntensity = parseInt(document.querySelector('#greenIntensity')?.value || 0, 10);
         const filterThreshold = parseInt(document.querySelector('#filterThreshold')?.value || 0, 10);
+        const grainyThreshold = parseInt(document.querySelector('#grainyThreshold')?.value || 0, 10);
 
         const canvas = document.getElementById('canvas')
         const context = canvas.getContext('2d')
@@ -57,14 +65,23 @@ export default function HigherCombined() {
             const i = (y * canvas.width + x) * 4
             const avg = (data[i] + data[i + 1] + data[i + 2]) / 3
             if ((reverseFilter && avg <= filterThreshold) || (!reverseFilter && avg > filterThreshold)) {
-              data[i] = 84 // Red channel
+              data[i] = 84  // Red channel
               data[i + 1] = greenIntensity // Green channel
-              data[i + 2] = 86 // Blue channel
+              data[i + 2] = 86  // Blue channel
               data[i + 3] = data[i + 3] * (avg / 255) // Alpha channel
             }
           }
         }
         context.putImageData(imageData, 0, 0)
+
+        for (let i = 0; i < data.length; i += 4) {
+          const grain = Math.random() * grainyThreshold
+          data[i] += grain
+          data[i + 1] += grain
+          data[i + 2] += grain
+        }
+        context.putImageData(imageData, 0, 0)
+
       }
     },
     {
@@ -191,8 +208,8 @@ export default function HigherCombined() {
             }
             context.resetTransform()
           }
-            let svgPath;
-            switch (selectFont) {
+          let svgPath;
+          switch (selectFont) {
             case 'Helvetica':
               svgPath = '/higherhelvetica.svg';
               break;
@@ -212,15 +229,15 @@ export default function HigherCombined() {
               break;
             default:
               svgPath = '/higherdefault.svg';
-            }
+          }
 
 
 
-          if(['/higherscanner.svg'].includes(svgPath)) {
+          if (['/higherscanner.svg'].includes(svgPath)) {
             hat.src = svgPath;
             return;
           }
-          
+
           fetch(svgPath)
             .then(response => response.text())
             .then(svgText => {
@@ -412,7 +429,7 @@ export default function HigherCombined() {
           reader.readAsDataURL(file)
         }} />
         <div id="tool-settings" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
-        {renderSettings()}
+          {renderSettings()}
         </div>
         <button onClick={() => setImage(null)}>Clear</button>
         <button onClick={() => {
