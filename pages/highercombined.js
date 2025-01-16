@@ -76,7 +76,7 @@ export default function HigherCombined() {
           type: 'select',
           label: 'Select Font',
           state: 'selectFont',
-          options: ['Helvetica', 'Times New Roman', 'Comic Sans', 'Higher TM', 'Arrow'],
+          options: ['Helvetica', 'Times New Roman', 'Comic Sans', 'Higher TM', 'Arrow', 'Scanner'],
         },
         {
           type: 'color',
@@ -197,7 +197,7 @@ export default function HigherCombined() {
               svgPath = '/higherhelvetica.svg';
               break;
             case 'Times New Roman':
-              svgPath = '/higherscanner.svg';
+              svgPath = '/higheritalic.svg';
               break;
             case 'Comic Sans':
               svgPath = '/highercomicsans.svg';
@@ -207,6 +207,8 @@ export default function HigherCombined() {
               break;
             case 'Arrow':
               svgPath = '/higherarrow.svg';
+            case 'Scanner':
+              svgPath = '/higherscanner.svg';
               break;
             default:
               svgPath = '/higherdefault.svg';
@@ -214,7 +216,7 @@ export default function HigherCombined() {
 
 
 
-          if(svgPath.endsWith('.png')) {
+          if(['/higherscanner.svg'].includes(svgPath)) {
             hat.src = svgPath;
             return;
           }
