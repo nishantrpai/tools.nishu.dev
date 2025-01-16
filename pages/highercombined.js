@@ -197,7 +197,7 @@ export default function HigherCombined() {
               svgPath = '/higherhelvetica.svg';
               break;
             case 'Times New Roman':
-              svgPath = '/higheritalic.svg';
+              svgPath = '/higherscanner.svg';
               break;
             case 'Comic Sans':
               svgPath = '/highercomicsans.svg';
