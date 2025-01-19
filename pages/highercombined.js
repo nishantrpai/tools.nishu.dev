@@ -38,6 +38,13 @@ export default function HigherCombined() {
           state: 'grainyThreshold',
           min: 0,
           max: 100,
+        },
+        {
+          type: 'range',
+          label: 'Motion Blur',
+          state: 'motionBlur',
+          min: 0,
+          max: 100
         }
       ],
       apply: (image) => {
@@ -137,6 +144,22 @@ export default function HigherCombined() {
           max: 360,
         },
         {
+          type: 'range',
+          label: 'Drag Gap',
+          state: 'dragGap',
+          default: 0,
+          min: 0,
+          max: 5000,
+        },
+        {
+          type: 'range',
+          label: 'Drag reps',
+          state: 'dragReps',
+          default: 0,
+          min: 0,
+          max: 100,
+        },
+        {
           type: 'hidden',
           state: 'processedImageUrl',
           default: ''
@@ -149,6 +172,8 @@ export default function HigherCombined() {
         const scale = parseFloat(document.querySelector('#scale')?.value || 1);
         const offsetTheta = parseInt(document.querySelector('#offsetTheta')?.value || 0, 10);
         const foreground = document.querySelector('#foreground')?.checked;
+        const dragGap = parseInt(document.querySelector('#dragGap')?.value || 0, 10);
+        const dragReps = parseInt(document.querySelector('#dragReps')?.value || 0, 10);
         const processedImageUrl = document.querySelector('#processedImageUrl')?.value;
         if (foreground && !processedImageUrl) {
           if (processedImageUrl !== 'processing') {
@@ -192,14 +217,26 @@ export default function HigherCombined() {
             // if foreground is checked, draw the hat then the foreground
             console.log('foreground', foreground)
             if (!foreground) {
-              context.drawImage(hat, offsetX, offsetY, hat.width * scale, hat.height * scale)
+              if (dragReps > 0) {
+                for (let i = 0; i < dragReps; i++) {
+                  context.drawImage(hat, offsetX, offsetY + (i * dragGap), hat.width * scale, hat.height * scale)
+                }
+              } else {
+                context.drawImage(hat, offsetX, offsetY, hat.width * scale, hat.height * scale)
+              }
             } else {
               if (processedImageUrl != 'processing' && processedImageUrl) {
                 // first draw the hat then fetch the foreground and draw it
                 let foregroundImg = new Image()
                 foregroundImg.onload = () => {
                   console.log('drawing foreground')
-                  context.drawImage(hat, offsetX, offsetY, hat.width * scale, hat.height * scale)
+                  if (dragReps > 0) {
+                    for (let i = 0; i < dragReps; i++) {
+                      context.drawImage(hat, offsetX, offsetY + (i * dragGap), hat.width * scale, hat.height * scale)
+                    }
+                  } else {
+                    context.drawImage(hat, offsetX, offsetY, hat.width * scale, hat.height * scale)
+                  }
                   context.drawImage(foregroundImg, 0, 0, canvas.width, canvas.height)
                 }
                 foregroundImg.src = processedImageUrl
