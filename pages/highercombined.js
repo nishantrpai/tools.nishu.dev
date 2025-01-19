@@ -54,6 +54,7 @@ export default function HigherCombined() {
         const greenIntensity = parseInt(document.querySelector('#greenIntensity')?.value || 0, 10);
         const filterThreshold = parseInt(document.querySelector('#filterThreshold')?.value || 0, 10);
         const grainyThreshold = parseInt(document.querySelector('#grainyThreshold')?.value || 0, 10);
+        const motionBlur = parseInt(document.querySelector('#motionBlur')?.value || 0, 10);
 
         const canvas = document.getElementById('canvas')
         const context = canvas.getContext('2d')
@@ -80,14 +81,27 @@ export default function HigherCombined() {
           }
         }
         context.putImageData(imageData, 0, 0)
-
-        for (let i = 0; i < data.length; i += 4) {
-          const grain = Math.random() * grainyThreshold
-          data[i] += grain
-          data[i + 1] += grain
-          data[i + 2] += grain
+        if (grainyThreshold !== 0) {
+          for (let i = 0; i < data.length; i += 4) {
+            const grain = Math.random() * grainyThreshold
+            data[i] += grain
+            data[i + 1] += grain
+            data[i + 2] += grain
+          }
+          context.putImageData(imageData, 0, 0)
         }
-        context.putImageData(imageData, 0, 0)
+
+        if (motionBlur !== 0) {
+          const steps = 100
+          const alpha = 1 / steps
+          context.save()
+          for (let i = 0; i < steps; i++) {
+            const offset = (i - steps / 2) * (motionBlur / steps)
+            context.globalAlpha = alpha
+            context.drawImage(canvas, offset, 0, canvas.width, canvas.height)
+          }
+          context.restore()
+        }
 
       }
     },
