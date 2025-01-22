@@ -1802,6 +1802,12 @@ export const tools = [
     description: 'Text to Video',
     publishDate: '9th Jan 2025',
     url: '/text2video'
+  },
+  {
+    title: 'Combine Multiple Images',
+    description: 'Combine Multiple Images',
+    publishDate: '22nd Jan 2025',
+    url: '/nparts'
   }
 
 ]
