@@ -114,7 +114,7 @@ export default function HigherCombined() {
           type: 'select',
           label: 'Select Font',
           state: 'selectFont',
-          options: ['Helvetica', 'Times New Roman', 'Comic Sans', 'Higher TM', 'Arrow', 'Scanner'],
+          options: ['Helvetica', 'Times New Roman', 'Comic Sans', 'Higher TM', 'Arrow', 'Scanner', 'Adidagh'],
         },
         {
           type: 'color',
@@ -277,6 +277,8 @@ export default function HigherCombined() {
               svgPath = '/higherarrow.svg';
             case 'Scanner':
               svgPath = '/higherscanner.svg';
+            case 'Adidagh':
+              svgPath = '/adidagh.svg';
               break;
             default:
               svgPath = '/higherdefault.svg';
