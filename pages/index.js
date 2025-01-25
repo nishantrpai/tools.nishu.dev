@@ -1808,6 +1808,12 @@ export const tools = [
     description: 'Combine Multiple Images',
     publishDate: '22nd Jan 2025',
     url: '/nparts'
+  },
+  {
+    title: 'Pixel Brush',
+    description: 'Pixel Brush',
+    publishDate: '23rd Jan 2025',
+    url: '/pixelbrush'
   }
 
 ]
