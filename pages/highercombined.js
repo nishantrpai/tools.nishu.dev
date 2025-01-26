@@ -13,17 +13,16 @@ export default function HigherCombined() {
       icon: FaFilter,
       settings: [
         {
+          type: 'color',
+          label: 'Color',
+          state: 'color',
+          default: '#54FF56',
+        },
+        {
           type: 'checkbox',
           label: 'Reverse filter (apply to lower colors)',
           state: 'reverseFilter',
           default: false,
-        },
-        {
-          type: 'range',
-          label: 'Green Intensity',
-          state: 'greenIntensity',
-          min: 0,
-          max: 255,
         },
         {
           type: 'range',
@@ -48,13 +47,23 @@ export default function HigherCombined() {
         }
       ],
       apply: (image) => {
+        const hexToRgb = (hex) => {
+          const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+          return result ? {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+          } : null
+        }
         // apply filter function
         if (!image) return;
         const reverseFilter = document.querySelector('#reverseFilter')?.checked;
-        const greenIntensity = parseInt(document.querySelector('#greenIntensity')?.value || 0, 10);
+        // const greenIntensity = parseInt(document.querySelector('#greenIntensity')?.value || 0, 10);
         const filterThreshold = parseInt(document.querySelector('#filterThreshold')?.value || 0, 10);
         const grainyThreshold = parseInt(document.querySelector('#grainyThreshold')?.value || 0, 10);
         const motionBlur = parseInt(document.querySelector('#motionBlur')?.value || 0, 10);
+        const color = document.querySelector('#color')?.value || '#000000'
+        const filterColor = hexToRgb(color)
 
         const canvas = document.getElementById('canvas')
         const context = canvas.getContext('2d')
@@ -73,9 +82,9 @@ export default function HigherCombined() {
             const i = (y * canvas.width + x) * 4
             const avg = (data[i] + data[i + 1] + data[i + 2]) / 3
             if ((reverseFilter && avg <= filterThreshold) || (!reverseFilter && avg > filterThreshold)) {
-              data[i] = 84  // Red channel
-              data[i + 1] = greenIntensity // Green channel
-              data[i + 2] = 86  // Blue channel
+              data[i] = filterColor.r  // Red channel
+              data[i + 1] = filterColor.g // Green channel
+              data[i + 2] = filterColor.b  // Blue channel
               data[i + 3] = data[i + 3] * (avg / 255) // Alpha channel
             }
           }
