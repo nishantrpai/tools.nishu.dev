@@ -44,6 +44,13 @@ export default function HigherCombined() {
           state: 'motionBlur',
           min: 0,
           max: 100
+        },
+        {
+          type: 'range',
+          label: 'Opacity Layer',
+          state: 'opacityLayer',
+          min: 0,
+          max: 100
         }
       ],
       apply: (image) => {
@@ -63,6 +70,7 @@ export default function HigherCombined() {
         const grainyThreshold = parseInt(document.querySelector('#grainyThreshold')?.value || 0, 10);
         const motionBlur = parseInt(document.querySelector('#motionBlur')?.value || 0, 10);
         const color = document.querySelector('#color')?.value || '#000000'
+        const opacityLayer = parseInt(document.querySelector('#opacityLayer')?.value || 0, 10);
         const filterColor = hexToRgb(color)
 
         const canvas = document.getElementById('canvas')
@@ -110,6 +118,12 @@ export default function HigherCombined() {
             context.drawImage(canvas, offset, 0, canvas.width, canvas.height)
           }
           context.restore()
+        }
+
+        if (opacityLayer !== 0) {
+          // draw a rectangle with the 0,0,0 and opacity
+          context.fillStyle = `rgba(0,0,0,${opacityLayer / 100})`
+          context.fillRect(0, 0, canvas.width, canvas.height)
         }
 
       }
@@ -284,8 +298,10 @@ export default function HigherCombined() {
               break;
             case 'Arrow':
               svgPath = '/higherarrow.svg';
+              break;
             case 'Scanner':
               svgPath = '/higherscanner.svg';
+              break;
             case 'Adidagh':
               svgPath = '/adidagh.svg';
               break;
