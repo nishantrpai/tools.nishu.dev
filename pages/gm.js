@@ -159,6 +159,20 @@ export default function GMSpeechBubble() {
             </label>
             <input type="range" min={-360} max={360} value={offsetTheta} onChange={(e) => setOffsetTheta(e.target.value)} />
             <input type="number" value={offsetTheta} onChange={(e) => setOffsetTheta(e.target.value)} />
+            <button
+            id="save"
+             onClick={() => {
+              if (document.getElementById('canvas').toDataURL() !== '') {
+                const img = new Image()
+                img.src = document.getElementById('canvas').toDataURL()
+                setImage(img)
+              }
+              document.getElementById('save').innerText = 'Saved...'
+              setTimeout(() => {
+                document.getElementById('save').innerText = 'Save'
+              }, 2000)
+            }}>Save</button>
+
             <button onClick={() => {
               const canvas = canvasRef.current
               const dataURL = canvas.toDataURL('image/png')
