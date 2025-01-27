@@ -1814,6 +1814,12 @@ export const tools = [
     description: 'Pixel Brush',
     publishDate: '23rd Jan 2025',
     url: '/pixelbrush'
+  },
+  {
+    title: 'GM',
+    description: 'GM',
+    publishDate: '27th Jan 2025',
+    url: '/gm'
   }
 
 ]
