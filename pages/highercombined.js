@@ -200,6 +200,22 @@ export default function HigherCombined() {
           type: 'hidden',
           state: 'processedImageUrl',
           default: ''
+        },
+        {
+          type: 'range',
+          label: 'Emboss',
+          state: 'emboss',
+          default: 0,
+          min: 0,
+          max: 100,
+        },
+        {
+          type: 'range',
+          label: 'Opacity',
+          state: 'opacity',
+          default: 100,
+          min: 0,
+          max: 100,
         }
       ],
       apply: (image) => {
@@ -212,6 +228,8 @@ export default function HigherCombined() {
         const dragGap = parseInt(document.querySelector('#dragGap')?.value || 0, 10);
         const dragReps = parseInt(document.querySelector('#dragReps')?.value || 0, 10);
         const processedImageUrl = document.querySelector('#processedImageUrl')?.value;
+        const emboss = parseInt(document.querySelector('#emboss')?.value || 0, 10);
+        const opacity = parseInt(document.querySelector('#opacity')?.value || 0, 10);
         if (foreground && !processedImageUrl) {
           if (processedImageUrl !== 'processing') {
             document.querySelector('#processedImageUrl').value = 'processing';
@@ -239,6 +257,7 @@ export default function HigherCombined() {
           }
         }
         const color = document.querySelector('#color')?.value || '#000000'
+        document.querySelector('#color').style.backgroundColor = color
         const selectFont = document.querySelector('#selectFont')?.value || 'Helvetica'
         const canvas = document.getElementById('canvas')
         const context = canvas.getContext('2d')
@@ -252,14 +271,27 @@ export default function HigherCombined() {
             context.translate(offsetX, offsetY)
             context.rotate(offsetTheta * Math.PI / 180)
             // if foreground is checked, draw the hat then the foreground
+            context.globalAlpha = opacity / 100
             console.log('foreground', foreground)
             if (!foreground) {
               if (dragReps > 0) {
                 for (let i = 0; i < dragReps; i++) {
-                  context.drawImage(hat, offsetX, offsetY + (i * dragGap), hat.width * scale, hat.height * scale)
+                  if (emboss > 0) {
+                    context.filter = `blur(${emboss}px)`
+                    context.drawImage(hat, offsetX, offsetY + (i * dragGap), hat.width * scale, hat.height * scale)
+                    context.filter = 'none'
+                  } else {
+                    context.drawImage(hat, offsetX, offsetY + (i * dragGap), hat.width * scale, hat.height * scale)
+                  }
                 }
               } else {
-                context.drawImage(hat, offsetX, offsetY, hat.width * scale, hat.height * scale)
+                if (emboss > 0) {
+                  context.filter = `blur(${emboss}px)`
+                  context.drawImage(hat, offsetX, offsetY, hat.width * scale, hat.height * scale)
+                  context.filter = 'none'
+                } else {
+                  context.drawImage(hat, offsetX, offsetY, hat.width * scale, hat.height * scale)
+                }
               }
             } else {
               if (processedImageUrl != 'processing' && processedImageUrl) {
@@ -269,10 +301,22 @@ export default function HigherCombined() {
                   console.log('drawing foreground')
                   if (dragReps > 0) {
                     for (let i = 0; i < dragReps; i++) {
-                      context.drawImage(hat, offsetX, offsetY + (i * dragGap), hat.width * scale, hat.height * scale)
+                      if (emboss > 0) {
+                        context.filter = `blur(${emboss}px)`
+                        context.drawImage(hat, offsetX, offsetY + (i * dragGap), hat.width * scale, hat.height * scale)
+                        context.filter = 'none'
+                      } else {
+                        context.drawImage(hat, offsetX, offsetY + (i * dragGap), hat.width * scale, hat.height * scale)
+                      }
                     }
                   } else {
-                    context.drawImage(hat, offsetX, offsetY, hat.width * scale, hat.height * scale)
+                    if (emboss > 0) {
+                      context.filter = `blur(${emboss}px)`
+                      context.drawImage(hat, offsetX, offsetY, hat.width * scale, hat.height * scale)
+                      context.filter = 'none'
+                    } else {
+                      context.drawImage(hat, offsetX, offsetY, hat.width * scale, hat.height * scale)
+                    }
                   }
                   context.drawImage(foregroundImg, 0, 0, canvas.width, canvas.height)
                 }
@@ -280,6 +324,7 @@ export default function HigherCombined() {
               }
 
             }
+            context.globalAlpha = 1
             context.resetTransform()
           }
           let svgPath;
@@ -374,14 +419,14 @@ export default function HigherCombined() {
       switch (setting.type) {
         case 'checkbox':
           return (
-            <div key={setting.state} style={{ marginTop: '20px' }}>
-              <label>
+            <div key={setting.state} style={{ marginTop: '20px', display: 'flex' }}>
+              <label style={{ fontSize: 12, display: 'flex', alignItems: 'center' }} htmlFor={setting.state}>
                 <input
                   type="checkbox"
                   id={setting.state}
                   defaultValue={eval(setting.default)}
                   onChange={(e) => { tool.apply(image) }}
-                  style={{ marginRight: 10 }}
+                  style={{ marginRight: 10, fontSize: 12 }}
                 />
                 {setting.label}
               </label>
@@ -389,8 +434,8 @@ export default function HigherCombined() {
           )
         case 'range':
           return (
-            <div key={setting.id} style={{ marginTop: '20px' }}>
-              <label htmlFor={setting.state}>{setting.label}: </label>
+            <div key={setting.id} style={{ marginTop: '20px', display: 'flex', alignItems: 'center' }}>
+              <label style={{ flexBasis: '70%', fontSize: 12 }} htmlFor={setting.state}>{setting.label}: </label>
               <input
                 type="range"
                 id={setting.state}
@@ -401,8 +446,7 @@ export default function HigherCombined() {
                 onChange={(e) => {
                   document.querySelector(`#${setting.state}`).value = e.target.value
                   tool.apply(image)
-                }
-                }
+                }}
               />
             </div>
           )
@@ -422,13 +466,15 @@ export default function HigherCombined() {
           )
         case 'color':
           return (
-            <div key={setting.id} style={{ marginTop: '20px' }}>
-              <label htmlFor={setting.state}>{setting.label}: </label>
+            <div key={setting.id} style={{ marginTop: '20px', display: 'flex', alignItems: 'center', gap: 10 }}>
+              <label htmlFor={setting.state} style={{fontSize: 12}}>{setting.label}: </label>
               <input
                 type="color"
                 id={setting.state}
                 defaultValue={setting.default || '#000000'}
                 onChange={(e) => tool.apply(image)}
+                style={{
+                }}
               />
             </div>
           )
@@ -466,76 +512,105 @@ export default function HigherCombined() {
       <main style={{ maxWidth: '100%' }}>
         <h1>Higher Combined</h1>
         <h2 className={styles.description}>Apply both higher filter and higher hat on any image</h2>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginBottom: 20 }}>
-          {tools.map(tool => (
-            <button key={tool.id} onClick={() => setActiveTool(tool.id)}>
-              <tool.icon /> {tool.name}
-            </button>
-          ))}
-          {/* <button onClick={undo}>
+        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', gap:0, border: '1px solid #333', borderRadius: 10 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, borderTopLeftRadius: 10, borderBottomLeftRadius: 10 }}>
+            <canvas
+              id="canvas"
+              width="500"
+              height="700"
+              style={{ width: '100%', maxWidth: 500, height: 'auto', margin: 'auto' }}
+            />
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', gap: 20, background: '#101010', padding: 20, borderTopRightRadius: 10, borderBottomRightRadius: 10 }}>
+            <input type="file" accept="image/*" onChange={(e) => {
+              const file = e.target.files[0]
+              const reader = new FileReader()
+              reader.onload = () => {
+                const img = new Image()
+                img.onload = () => {
+                  console.log('image loaded')
+                  setImage(img)
+                  let canvas = document.getElementById('canvas')
+                  canvas.width = img.width
+                  canvas.height = img.height
+                  let context = canvas.getContext('2d')
+                  context.clearRect(0, 0, canvas.width, canvas.height)
+                  let drawimg = new Image()
+                  drawimg.onload = () => {
+                    console.log('drawing image')
+                    context.drawImage(img, 0, 0)
+                  }
+                  drawimg.src = reader.result
+                  // saveHistory()
+                }
+                img.src = reader.result
+              }
+              reader.readAsDataURL(file)
+            }} />
+            <div style={{ display: 'flex', gap: 20, marginBottom: 20 }}>
+              {tools.map(tool => (
+                <button key={tool.id} onClick={() => setActiveTool(tool.id)}>
+                  {tool.name}
+                </button>
+              ))}
+              {/* <button onClick={undo}>
             <FaUndo /> Undo
           </button> */}
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, margin: 'auto' }}>
-          <canvas
-            id="canvas"
-            style={{ width: '100%', maxWidth: 500, height: 'auto', }}
-          />
-        </div>
-        <input type="file" accept="image/*" onChange={(e) => {
-          const file = e.target.files[0]
-          const reader = new FileReader()
-          reader.onload = () => {
-            const img = new Image()
-            img.src = reader.result
-            img.onload = () => {
-              setImage(img)
-              let canvas = document.getElementById('canvas')
-              canvas.width = img.width
-              canvas.height = img.height
-              let context = canvas.getContext('2d')
+            </div>
+
+            <div id="tool-settings" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {renderSettings()}
+            </div>
+            <button onClick={() => {
+              setImage(null)
+              const canvas = document.getElementById('canvas')
+              const context = canvas.getContext('2d')
+              canvas.width = 500
+              canvas.height = 500
               context.clearRect(0, 0, canvas.width, canvas.height)
-              let drawimg = new Image()
-              drawimg.onload = () => {
-                console.log('drawing image')
-                context.drawImage(img, 0, 0)
+              setActiveTool('filter')
+            }}>Clear</button>
+            <button
+            id="save"
+             onClick={() => {
+              if (document.getElementById('canvas').toDataURL() !== '') {
+                const img = new Image()
+                img.src = document.getElementById('canvas').toDataURL()
+                setImage(img)
               }
-              drawimg.src = reader.result
-              // saveHistory()
-            }
-          }
-          reader.readAsDataURL(file)
-        }} />
-        <div id="tool-settings" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
-          {renderSettings()}
+              document.getElementById('save').innerText = 'Saved...'
+              setTimeout(() => {
+                document.getElementById('save').innerText = 'Save'
+              }, 2000)
+            }}>Save</button>
+            <button onClick={() => {
+              // Apply filter without selection rectangle
+              const canvas = document.getElementById('canvas')
+              const tempCanvas = document.createElement('canvas')
+              const tempContext = tempCanvas.getContext('2d')
+              tempCanvas.width = canvas.width
+              tempCanvas.height = canvas.height
+
+              // Draw black background
+              tempContext.fillStyle = 'black'
+              tempContext.fillRect(0, 0, tempCanvas.width, tempCanvas.height)
+
+              // Draw the filtered image on top
+              tempContext.drawImage(canvas, 0, 0)
+
+              const a = document.createElement('a')
+              a.href = tempCanvas.toDataURL('image/png')
+              a.download = 'higher_combined.png'
+              a.click()
+
+              // // Reapply filter with selection rectangle
+              // applyFilter()
+              // if (activeTool === 'hat') {
+              //   applyHat()
+              // }
+            }}>Download</button>
+          </div>
         </div>
-        <button onClick={() => setImage(null)}>Clear</button>
-        <button onClick={() => {
-          // Apply filter without selection rectangle
-          const canvas = document.getElementById('canvas')
-          const tempCanvas = document.createElement('canvas')
-          const tempContext = tempCanvas.getContext('2d')
-          tempCanvas.width = canvas.width
-          tempCanvas.height = canvas.height
-
-          // Draw black background
-          tempContext.fillStyle = 'black'
-          tempContext.fillRect(0, 0, tempCanvas.width, tempCanvas.height)
-
-          // Draw the filtered image on top
-          tempContext.drawImage(canvas, 0, 0)
-
-          const a = document.createElement('a')
-          a.href = tempCanvas.toDataURL('image/png')
-          a.download = 'higher_combined.png'
-          a.click()
-
-          // // Reapply filter with selection rectangle
-          // applyFilter()
-          // if (activeTool === 'hat') {
-          //   applyHat()
-          // }
-        }}>Download</button>
       </main>
     </>
   )
