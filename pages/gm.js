@@ -112,16 +112,17 @@ export default function GMSpeechBubble() {
           }
           reader.readAsDataURL(file)
         }} />
-        <div style={{ display: 'flex', gap: 20, margin: '20px 0' }}>
-          <canvas ref={canvasRef} id="canvas" width="800" height="800" style={{
+        <div style={{ display: 'flex', gap: 20, margin: '20px 0', flexWrap: 'wrap' }}>
+          <canvas ref={canvasRef} id="canvas" width="500" height="500" style={{
             border: '1px solid #333',
             borderRadius: 10,
             maxHeight: 500,
             height: 'auto',
-            flexBasis: '95%'
+            flexBasis: '95%',
+            width: '100%'
           }}></canvas>
 
-          <div>
+          <div style={{display: 'flex', gap: 10}}>
             {gmBubbles.map((bubble, index) => (
               <div key={index} style={{
                 width: 75,

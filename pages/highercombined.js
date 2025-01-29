@@ -513,7 +513,7 @@ export default function HigherCombined() {
         <h1>Higher Combined</h1>
         <h2 className={styles.description}>Apply both higher filter and higher hat on any image</h2>
         <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', gap:0, border: '1px solid #333', borderRadius: 10 }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, borderTopLeftRadius: 10, borderBottomLeftRadius: 10 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, borderTopLeftRadius: 10, borderBottomLeftRadius: 10, flexWrap: 'wrap' }}>
             <canvas
               id="canvas"
               width="500"
