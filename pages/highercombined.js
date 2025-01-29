@@ -547,9 +547,18 @@ export default function HigherCombined() {
               }
               reader.readAsDataURL(file)
             }} />
-            <div style={{ display: 'flex', gap: 20, marginBottom: 20 }}>
+            <div style={{ display: 'flex', marginBottom: 20, width: '100%', background: '#333', borderRadius: 5, borderWidth: 5, borderColor: '#000' }}>
               {tools.map(tool => (
-                <button key={tool.id} onClick={() => setActiveTool(tool.id)}>
+                <button key={tool.id} style={{
+                  flexBasis: `${100/tools.length}%`,
+                  // first one will have top left and bottom left border radius
+                  // anything in middle will have no border radius
+                  // last one will have top right and bottom right border radius
+                  border: 'none',
+                  background: activeTool === tool.id ? '#444' : '#333',
+                  color: activeTool === tool.id ? '#fff' : '#999',
+                  fontSize: 14,
+                  }} onClick={() => setActiveTool(tool.id)}>
                   {tool.name}
                 </button>
               ))}
