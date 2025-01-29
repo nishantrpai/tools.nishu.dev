@@ -142,7 +142,7 @@
 /* Mobile */
 @media (max-width: 700px) {
   .row {
-    flex-direction: column;
+    flex-direction: column !important;
   }
   .content {
     padding: 4rem;

@@ -512,8 +512,8 @@ export default function HigherCombined() {
       <main style={{ maxWidth: '100%' }}>
         <h1>Higher Combined</h1>
         <h2 className={styles.description}>Apply both higher filter and higher hat on any image</h2>
-        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', gap:0, border: '1px solid #333', borderRadius: 10 }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, borderTopLeftRadius: 10, borderBottomLeftRadius: 10, flexWrap: 'wrap' }}>
+        <div className={styles.row} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', gap:0, border: '1px solid #333', borderRadius: 10 }}>
+          <div style={{ flexBasis: '70%', display: 'flex', flexDirection: 'column', gap: 10, borderTopLeftRadius: 10, borderBottomLeftRadius: 10}}>
             <canvas
               id="canvas"
               width="500"
@@ -521,7 +521,7 @@ export default function HigherCombined() {
               style={{ width: '100%', maxWidth: 500, height: 'auto', margin: 'auto' }}
             />
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', gap: 20, background: '#101010', padding: 20, borderTopRightRadius: 10, borderBottomRightRadius: 10 }}>
+          <div style={{ flexBasis: '30%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', gap: 20, background: '#101010', padding: 20, borderTopRightRadius: 10, borderBottomRightRadius: 10 }}>
             <input type="file" accept="image/*" onChange={(e) => {
               const file = e.target.files[0]
               const reader = new FileReader()
