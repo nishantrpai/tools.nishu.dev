@@ -1826,6 +1826,12 @@ export const tools = [
     description: 'Doorknob Effect',
     publishDate: '30th Jan 2025',
     url: '/doorknobeffect'
+  },
+  {
+    title: 'Braille Checks',
+    description: 'Braille Checks',
+    publishDate: '31st Jan 2025',
+    url: '/braillechecks'
   }
 
 ]
