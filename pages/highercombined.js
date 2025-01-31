@@ -174,6 +174,22 @@ export default function HigherCombined() {
         },
         {
           type: 'range',
+          label: 'Skew X',
+          state: 'skewX',
+          min: -360,
+          max: 360,
+          default: 0,
+        },
+        {
+          type: 'range',
+          label: 'Skew Y',
+          state: 'skewY',
+          min: -360,
+          max: 360,
+          default: 0,
+        },
+        {
+          type: 'range',
           label: 'Rotate',
           state: 'offsetTheta',
           default: 0,
@@ -230,6 +246,11 @@ export default function HigherCombined() {
         const processedImageUrl = document.querySelector('#processedImageUrl')?.value;
         const emboss = parseInt(document.querySelector('#emboss')?.value || 0, 10);
         const opacity = parseInt(document.querySelector('#opacity')?.value || 0, 10);
+        const skewX = parseInt(document.querySelector('#skewX')?.value || 0, 10);
+        const skewY = parseInt(document.querySelector('#skewY')?.value || 0, 10);
+        const skewXRad = (skewX * Math.PI) / 180
+        const skewYRad = (skewY * Math.PI) / 180
+
         if (foreground && !processedImageUrl) {
           if (processedImageUrl !== 'processing') {
             document.querySelector('#processedImageUrl').value = 'processing';
@@ -269,6 +290,8 @@ export default function HigherCombined() {
           const hat = new Image()
           hat.onload = () => {
             context.translate(offsetX, offsetY)
+            // apply skew
+            context.transform(1, Math.tan(skewXRad), Math.tan(skewYRad), 1, 0, 0)
             context.rotate(offsetTheta * Math.PI / 180)
             // if foreground is checked, draw the hat then the foreground
             context.globalAlpha = opacity / 100
@@ -467,7 +490,7 @@ export default function HigherCombined() {
         case 'color':
           return (
             <div key={setting.id} style={{ marginTop: '20px', display: 'flex', alignItems: 'center', gap: 10 }}>
-              <label htmlFor={setting.state} style={{fontSize: 12}}>{setting.label}: </label>
+              <label htmlFor={setting.state} style={{ fontSize: 12 }}>{setting.label}: </label>
               <input
                 type="color"
                 id={setting.state}
@@ -512,8 +535,8 @@ export default function HigherCombined() {
       <main style={{ maxWidth: '100%' }}>
         <h1>Higher Combined</h1>
         <h2 className={styles.description}>Apply both higher filter and higher hat on any image</h2>
-        <div className={styles.row} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', gap:0, border: '1px solid #333', borderRadius: 10 }}>
-          <div style={{ flexBasis: '70%', display: 'flex', flexDirection: 'column', gap: 10, borderTopLeftRadius: 10, borderBottomLeftRadius: 10}}>
+        <div className={styles.row} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', gap: 0, border: '1px solid #333', borderRadius: 10 }}>
+          <div style={{ flexBasis: '70%', display: 'flex', flexDirection: 'column', gap: 10, borderTopLeftRadius: 10, borderBottomLeftRadius: 10 }}>
             <canvas
               id="canvas"
               width="500"
@@ -550,7 +573,7 @@ export default function HigherCombined() {
             <div style={{ display: 'flex', marginBottom: 20, width: '100%', background: '#333', borderRadius: 5, borderWidth: 5, borderColor: '#000' }}>
               {tools.map(tool => (
                 <button key={tool.id} style={{
-                  flexBasis: `${100/tools.length}%`,
+                  flexBasis: `${100 / tools.length}%`,
                   // first one will have top left and bottom left border radius
                   // anything in middle will have no border radius
                   // last one will have top right and bottom right border radius
@@ -558,7 +581,7 @@ export default function HigherCombined() {
                   background: activeTool === tool.id ? '#444' : '#333',
                   color: activeTool === tool.id ? '#fff' : '#999',
                   fontSize: 14,
-                  }} onClick={() => setActiveTool(tool.id)}>
+                }} onClick={() => setActiveTool(tool.id)}>
                   {tool.name}
                 </button>
               ))}
@@ -580,18 +603,18 @@ export default function HigherCombined() {
               setActiveTool('filter')
             }}>Clear</button>
             <button
-            id="save"
-             onClick={() => {
-              if (document.getElementById('canvas').toDataURL() !== '') {
-                const img = new Image()
-                img.src = document.getElementById('canvas').toDataURL()
-                setImage(img)
-              }
-              document.getElementById('save').innerText = 'Saved...'
-              setTimeout(() => {
-                document.getElementById('save').innerText = 'Save'
-              }, 2000)
-            }}>Save</button>
+              id="save"
+              onClick={() => {
+                if (document.getElementById('canvas').toDataURL() !== '') {
+                  const img = new Image()
+                  img.src = document.getElementById('canvas').toDataURL()
+                  setImage(img)
+                }
+                document.getElementById('save').innerText = 'Saved...'
+                setTimeout(() => {
+                  document.getElementById('save').innerText = 'Save'
+                }, 2000)
+              }}>Save</button>
             <button onClick={() => {
               // Apply filter without selection rectangle
               const canvas = document.getElementById('canvas')
