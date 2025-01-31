@@ -87,7 +87,11 @@ export default function Home() {
           style={{
             width: '100%',
             padding: '10px',
-            marginBottom: '20px'
+            marginBottom: '20px',
+            border: '1px solid #333',
+            color: '#fff',
+            backgroundColor: '#000',
+            borderRadius: '5px',
           }}
         />
 
