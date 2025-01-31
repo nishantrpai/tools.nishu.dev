@@ -27,10 +27,13 @@ export default function Home() {
   const [offsetY, setOffsetY] = useState(100)
   const [fillColor, setFillColor] = useState('#ffffff')
   const [emptyColor, setEmptyColor] = useState('#333333')
+  const [backgroundColor, setBackgroundColor] = useState('#000000')
 
   const generateChecks = () => {
     let svgContent = `
-    <svg viewBox="0 0 680 680" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 680 680" fill="${backgroundColor}"
+    style="background-color: ${backgroundColor};"
+    xmlns="http://www.w3.org/2000/svg">
       <defs>
       <path id="check" fill-rule="evenodd" d="M21.36 9.886A3.933 3.933 0 0 0 18 8c-1.423 0-2.67.755-3.36 1.887a3.935 3.935 0 0 0-4.753 4.753A3.933 3.933 0 0 0 8 18c0 1.423.755 2.669 1.886 3.36a3.935 3.935 0 0 0 4.753 4.753 3.933 3.933 0 0 0 4.863 1.59 3.953 3.953 0 0 0 1.858-1.589 3.935 3.935 0 0 0 4.753-4.754A3.933 3.933 0 0 0 28 18a3.933 3.933 0 0 0-1.887-3.36 3.934 3.934 0 0 0-1.042-3.711 3.934 3.934 0 0 0-3.71-1.043Zm-3.958 11.713 4.562-6.844c.566-.846-.751-1.724-1.316-.878l-4.026 6.043-1.371-1.368c-.717-.722-1.836.396-1.116 1.116l2.17 2.15a.788.788 0 0 0 1.097-.22Z"/>
       </defs>
@@ -61,7 +64,7 @@ export default function Home() {
 
   useEffect(() => {
     generateChecks()
-  }, [text, scale, offsetX, offsetY, fillColor, emptyColor])
+  }, [text, scale, offsetX, offsetY, fillColor, emptyColor, backgroundColor])
 
   return (
     <>
@@ -138,6 +141,14 @@ export default function Home() {
               onChange={(e) => setEmptyColor(e.target.value)}
             />
           </div>
+          <div>
+            <label>Background Color:</label>
+            <input
+              type="color"
+              value={backgroundColor}
+              onChange={(e) => setBackgroundColor(e.target.value)}
+            />
+          </div>
 
         </div>
 
@@ -150,17 +161,19 @@ export default function Home() {
               const canvas = document.createElement('canvas')
               const ctx = canvas.getContext('2d')
               const img = new Image()
-              img.src = outputSVG
               img.onload = () => {
-                canvas.width = img.width * 4
-                canvas.height = img.height * 4
-                ctx.drawImage(img, 0, 0, img.width * 4, img.height * 4)
+                const upscale = 16
+                canvas.width = img.width * upscale
+                canvas.height = img.height * upscale
+                // draw black background
+                ctx.drawImage(img, 0, 0, img.width * upscale, img.height * upscale)
                 const dataURL = canvas.toDataURL('image/png')
                 const a = document.createElement('a')
                 a.href = dataURL
                 a.download = 'braille-checks.png'
                 a.click()
               }
+              img.src = outputSVG
             }}>Download PNG</button>
           </div>
         )}
