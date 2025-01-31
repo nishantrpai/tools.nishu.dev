@@ -47,6 +47,10 @@ export default function Home() {
         xOffset = offsetX
         yOffset += 200 * scale
       }
+      // if char is '' just add offset, don't draw anything
+      if (char === '') {
+        xOffset += 100 * scale
+      }
       if (BRAILLE_MAP[char]) {
         BRAILLE_MAP[char].forEach((dot, index) => {
           const x = xOffset + (index % 2) * 40 * scale
