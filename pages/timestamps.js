@@ -116,11 +116,12 @@ export default function Timestamps() {
         </div>
       )} */}
 
-      {/* Modified progress bar */}
+      {/* Modified minimal progress bar */}
       <div 
         style={{ 
-          height: '40px', 
-          backgroundColor: '#fff', 
+          height: '10px', 
+          backgroundColor: '#e0e0e0',
+          borderRadius: '0px',
           cursor: 'pointer',
           position: 'relative',
           marginBottom: '20px',
@@ -140,6 +141,7 @@ export default function Timestamps() {
             height: '100%',
             width: `${duration ? (currentTime / duration) * 100 : 0}%`,
             backgroundColor: '#ff0000',
+            borderRadius: '0px',
             pointerEvents: 'none'
           }}
         />
@@ -150,9 +152,9 @@ export default function Timestamps() {
               position: 'absolute',
               left: `${duration ? (ts.time / duration) * 100 : 0}%`,
               top: '0',
-              width: '1px',
+              width: '2px',
               height: '100%',
-              backgroundColor: '#333'
+              backgroundColor: '#666'
             }}
             title={ts.description}
           />
