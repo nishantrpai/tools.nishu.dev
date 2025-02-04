@@ -1832,6 +1832,12 @@ export const tools = [
     description: 'Braille Checks',
     publishDate: '31st Jan 2025',
     url: '/braillechecks'
+  },
+  {
+    title: 'Time Stamp Generator',
+    description: 'Time Stamp Generator for youtube',
+    publishDate: '4th Feb 2025',
+    url: '/timestamps'
   }
 
 ]
