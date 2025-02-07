@@ -6,6 +6,10 @@ import { ethers } from 'ethers'
 
 export default function America() {
   const AMERICAN_FLAG = '/boe.png'
+  const AMERICAN_FLAG2 = '/boe2.png'
+
+  // New state to track flag variant
+  const [flagVariant, setFlagVariant] = useState('1')
 
   let RPC_CHAINS = {
     'ETHEREUM': {
@@ -159,9 +163,9 @@ export default function America() {
 
 
   useEffect(() => {
-    // when set blend 
-    blendUpdateCanvas(AMERICAN_FLAG, img)
-  }, [img, blendType, opacity])
+    // when set blend update, use variant based flag image
+    blendUpdateCanvas(flagVariant === '2' ? AMERICAN_FLAG2 : AMERICAN_FLAG, img)
+  }, [img, blendType, opacity, flagVariant])
 
 
   useEffect(() => {
@@ -230,6 +234,12 @@ export default function America() {
             }
             reader.readAsDataURL(file)
           }} />
+
+          {/* New selection for variant */}
+          <select onChange={(e) => setFlagVariant(e.target.value)} value={flagVariant}>
+            <option value="1">Variant 1</option>
+            <option value="2">Variant 2</option>
+          </select>
 
           <select onChange={handleBlendMode}>
             <option value="normal">Normal</option>
