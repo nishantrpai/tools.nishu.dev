@@ -1844,6 +1844,12 @@ export const tools = [
     description: 'Built on Ethereum badge',
     publishDate: '7th Feb 2025',
     url: '/boe'
+  },
+  {
+    title: 'Built on Ethereum Badge',
+    description: 'Built on Ethereum Badge',
+    publishDate: '7th Feb 2025',
+    url: '/boebadge'
   }
 
 ]
