@@ -1838,6 +1838,12 @@ export const tools = [
     description: 'Time Stamp Generator for youtube',
     publishDate: '4th Feb 2025',
     url: '/timestamps'
+  },
+  {
+    title: 'Built on Ethereum',
+    description: 'Built on Ethereum badge',
+    publishDate: '7th Feb 2025',
+    url: '/boe'
   }
 
 ]
