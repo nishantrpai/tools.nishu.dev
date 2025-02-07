@@ -296,7 +296,7 @@ export default function America() {
 
           {/* New selection for variant */}
 
-          <select onChange={handleBlendMode}>
+          {/* <select onChange={handleBlendMode}>
             <option value="normal">Normal</option>
             <option value="multiply">Multiply</option>
             <option value="screen">Screen</option>
@@ -313,8 +313,8 @@ export default function America() {
             <option value="saturation">Saturation</option>
             <option value="color">Color</option>
             <option value="luminosity">Luminosity</option>
-          </select>
-          <input type="range" min="0" max="1" step="0.01" value={opacity} onChange={handleOpacity} />
+          </select> */}
+          {/* <input type="range" min="0" max="1" step="0.01" value={opacity} onChange={handleOpacity} /> */}
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20, width: '100%' }}>
             <label>
