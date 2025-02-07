@@ -184,7 +184,7 @@ export default function America() {
 
       const badgeResponse = await fetch('/boebadge.svg')
       let svgText = await badgeResponse.text()
-      
+
       // Find rect with id="pfp" and replace it with a defs/pattern/image combination
       const rectRegex = /<rect[^>]*id="pfp"[^>]*\/>/
       const patternId = "pfpPattern"
@@ -203,7 +203,7 @@ export default function America() {
       const ctx = canvas.getContext('2d')
       const img = new Image()
       img.src = 'data:image/svg+xml;base64,' + btoa(svgText)
-      
+
       await new Promise((resolve) => {
         img.onload = () => {
           ctx.clearRect(0, 0, canvas.width, canvas.height)
@@ -264,7 +264,7 @@ export default function America() {
       <main>
         {/* blend  */}
         <h1 className={styles.title}>
-        Boe Ξ 
+          Boe Ξ
         </h1>
 
         <p className={styles.description}>
@@ -331,31 +331,29 @@ export default function America() {
                   setCollectionAddress(e.target.value)
                 }}
                 value={collectionAddress}
-                ></input>
-              </div>
-              <label>
-                Token ID
-              </label>
-              <div className={styles.searchContainer} style={{ marginTop: 0 }}>
-                <input 
-                  className={styles.search} 
-                  placeholder="Token ID"
-                  onChange={(e) => {
-                    setDebouncedToken(e.target.value)
-                  }}
-                  value={debouncedToken}
-                ></input>
-              </div>
-              <button style={{border: '1px solid #333'}} onClick={async () => {
-                if (img) {
-                  const svgUrl = await updateSVG(img);
-                  const a = document.createElement('a');
-                  a.href = svgUrl;
-                  a.download = 'boe.svg';
-                  a.click();
-                  URL.revokeObjectURL(svgUrl);
-                }
-              }}>Download</button>
+              ></input>
+            </div>
+            <label>
+              Token ID
+            </label>
+            <div className={styles.searchContainer} style={{ marginTop: 0 }}>
+              <input
+                className={styles.search}
+                placeholder="Token ID"
+                onChange={(e) => {
+                  setDebouncedToken(e.target.value)
+                }}
+                value={debouncedToken}
+              ></input>
+            </div>
+            <button style={{ border: '1px solid #333' }} onClick={async () => {
+              await new Promise(resolve => setTimeout(resolve, 500)); // Wait for canvas to update
+              let canvas = document.getElementById('canvas')
+              let a = document.createElement('a')
+              a.href = canvas.toDataURL('image/png')
+              a.download = 'boebadge.png'
+              a.click()
+            }}>Download</button>
 
           </div>
         </div>
