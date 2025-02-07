@@ -295,10 +295,6 @@ export default function America() {
           }} />
 
           {/* New selection for variant */}
-          <select onChange={(e) => setFlagVariant(e.target.value)} value={flagVariant}>
-            <option value="1">Variant 1</option>
-            <option value="2">Variant 2</option>
-          </select>
 
           <select onChange={handleBlendMode}>
             <option value="normal">Normal</option>
