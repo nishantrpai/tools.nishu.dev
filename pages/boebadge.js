@@ -214,7 +214,7 @@ export default function America() {
         const newElements = `
         <defs>
           <pattern id="${patternId}" patternUnits="objectBoundingBox" width="100%" height="100%">
-            <image href="${base64Image}" x="0" y="0" width="1300" height="1300" preserveAspectRatio="xMidYMid slice" crossOrigin="anonymous"/>
+            <image href="${base64Image}" x="0" y="0" width="1301" height="1301" preserveAspectRatio="xMidYMid slice" crossOrigin="anonymous"/>
           </pattern>
         </defs>
         <path id="pfp" stroke="#fff" stroke-width="16" d="M1991.38 1666.44h1309.23v1309.23H1991.38z" fill="url(#${patternId})" />
