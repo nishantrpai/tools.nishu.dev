@@ -6,6 +6,7 @@ import { ethers } from 'ethers'
 
 export default function America() {
   const AMERICAN_FLAG = '/boebadge.svg'
+  const AMERICAN_FLAG2 = '/boebadge2.svg'
 
   // New state to track flag variant
   const [flagVariant, setFlagVariant] = useState('1')
@@ -37,7 +38,7 @@ export default function America() {
 
   const [collectionAddress, setCollectionAddress] = useState('0x6339e5e072086621540d0362c4e3cea0d643e114')
   const [chain, setChain] = useState('ETHEREUM')
-  const [token1, setToken1] = useState('1')
+  const [token1, setToken1] = useState('2211')
   const [debouncedToken, setDebouncedToken] = useState(token1)
   const [img, setImg] = useState(null)
   const [blendType, setBlendType] = useState('lighten')
@@ -174,6 +175,8 @@ export default function America() {
         reader.readAsDataURL(blob2);
       });
 
+      // ssave as png
+
       // Verify image is valid
       await new Promise((resolve, reject) => {
         const tempImg = new Image();
@@ -182,39 +185,64 @@ export default function America() {
         tempImg.src = base64Image;
       });
 
-      const badgeResponse = await fetch('/boebadge.svg')
+      let badge = AMERICAN_FLAG
+      if (flagVariant === '2') {
+        badge = AMERICAN_FLAG2
+      }
+
+      const badgeResponse = await fetch(badge)
       let svgText = await badgeResponse.text()
 
       // Find rect with id="pfp" and replace it with a defs/pattern/image combination
-      const rectRegex = /<rect[^>]*id="pfp"[^>]*\/>/
-      const patternId = "pfpPattern"
-      const newElements = `
+      if (flagVariant === '1') {
+        const rectRegex = /<rect[^>]*id="pfp"[^>]*\/>/
+        const patternId = "pfpPattern"
+        const newElements = `
         <defs>
           <pattern id="${patternId}" patternUnits="objectBoundingBox" width="100%" height="100%">
-            <image href="${base64Image}" x="0" y="0" width="750" height="750" preserveAspectRatio="xMidYMid slice"/>
+            <image href="${base64Image}" x="0" y="0" width="750" height="750" preserveAspectRatio="xMidYMid slice" crossOrigin="anonymous"/>
           </pattern>
         </defs>
         <rect id="pfp" x="12" y="12" width="750" height="750" stroke="white" stroke-width="24" fill="url(#${patternId})"/>
       `
-      svgText = svgText.replace(rectRegex, newElements)
+        svgText = svgText.replace(rectRegex, newElements)
+      }
+
+      if (flagVariant === '2') {
+        const pathRegex = /<path[^>]*id="pfp"[^>]*\/>/
+        const patternId = "pfpPattern"
+        const newElements = `
+        <defs>
+          <pattern id="${patternId}" patternUnits="objectBoundingBox" width="100%" height="100%">
+            <image href="${base64Image}" x="0" y="0" width="1300" height="1300" preserveAspectRatio="xMidYMid slice" crossOrigin="anonymous"/>
+          </pattern>
+        </defs>
+        <path id="pfp" stroke="#fff" stroke-width="16" d="M1991.38 1666.44h1309.23v1309.23H1991.38z" fill="url(#${patternId})" />
+      `
+        svgText = svgText.replace(pathRegex, newElements)
+        console.log(svgText)
+      }
 
       // Draw the SVG on canvas for preview
-      const canvas = document.getElementById('canvas')
-      const ctx = canvas.getContext('2d')
-      const img = new Image()
-      img.src = 'data:image/svg+xml;base64,' + btoa(svgText)
+        const canvas = document.getElementById('canvas')
 
-      await new Promise((resolve) => {
-        img.onload = () => {
-          ctx.clearRect(0, 0, canvas.width, canvas.height)
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
-          resolve()
-        }
-      });
+        const ctx = canvas.getContext('2d')
+        const img = new Image()
+        img.src = 'data:image/svg+xml;base64,' + btoa(svgText)
 
-      // Return blob URL for download
-      const blob = new Blob([svgText], { type: 'image/svg+xml' })
-      return URL.createObjectURL(blob)
+        await new Promise((resolve) => {
+          img.onload = () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height)
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+            resolve()
+          }
+        });
+
+        // Return blob URL for download
+        const blob = new Blob([svgText], { type: 'image/svg+xml' })
+        return URL.createObjectURL(blob)
+      
+     
     } catch (error) {
       console.error('Error updating SVG:', error)
       return null
@@ -225,7 +253,7 @@ export default function America() {
     if (img) {
       updateSVG(img)
     }
-  }, [img])
+  }, [img, flagVariant])
 
   useEffect(() => {
     if (!collectionAddress || !token1) return
@@ -271,7 +299,7 @@ export default function America() {
           Add built on ethereum to any nft/image
         </p>
 
-        <canvas id="canvas" width="800" height="800"
+         <canvas id="canvas" width="800" height="800"
           style={{
             border: '1px solid #333',
             borderRadius: 10,
@@ -280,6 +308,7 @@ export default function America() {
             width: '100%'
           }}
         ></canvas>
+        {/* div to make svg bg */}
         <div style={{ margin: 0, marginBottom: 20, display: 'flex', flexDirection: 'column', gap: 20, width: '50%' }}>
           <input type="file" accept="image/*" onChange={(event) => {
             const file = event.target.files[0]
@@ -295,6 +324,11 @@ export default function America() {
           }} />
 
           {/* New selection for variant */}
+          <select onChange={(e) => setFlagVariant(e.target.value)} value={flagVariant}>
+            <option value="1">Variant 1</option>
+            <option value="2">Variant 2</option>
+          </select>
+
 
           {/* <select onChange={handleBlendMode}>
             <option value="normal">Normal</option>
@@ -343,6 +377,7 @@ export default function America() {
               ></input>
             </div>
             <button style={{ border: '1px solid #333' }} onClick={async () => {
+              
               await new Promise(resolve => setTimeout(resolve, 500)); // Wait for canvas to update
               let canvas = document.getElementById('canvas')
               let a = document.createElement('a')
