@@ -3,6 +3,7 @@ import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { useState, useEffect, useCallback } from 'react'
 import { ethers } from 'ethers'
+import GIF from 'gif.js'
 
 export default function America() {
   const AMERICAN_FLAG = '/boebadge.svg'
@@ -10,6 +11,10 @@ export default function America() {
 
   // New state to track flag variant
   const [flagVariant, setFlagVariant] = useState('1')
+  const [selectedFiles, setSelectedFiles] = useState([])
+  const [isProcessing, setIsProcessing] = useState(false)
+  const [frameDelay, setFrameDelay] = useState(500)
+  const [processingProgress, setProcessingProgress] = useState(0)
 
   let RPC_CHAINS = {
     'ETHEREUM': {
@@ -249,6 +254,66 @@ export default function America() {
     }
   }
 
+  const createGIF = async (imageUrls) => {
+    setIsProcessing(true)
+    setProcessingProgress(0)
+    
+    try {
+      const gif = new GIF({
+        workers: 2,
+        quality: 10,
+        width: 800,
+        height: 800,
+        workerScript: '/gif.worker.js' // Make sure this file exists in your public directory
+      })
+  
+      for (let i = 0; i < imageUrls.length; i++) {
+        const url = imageUrls[i]
+        const canvas = document.createElement('canvas')
+        canvas.width = 800
+        canvas.height = 800
+        const ctx = canvas.getContext('2d')
+        
+        // Process each frame with the badge
+        await updateSVG(url)
+        const mainCanvas = document.getElementById('canvas')
+        ctx.drawImage(mainCanvas, 0, 0)
+        
+        gif.addFrame(canvas, {delay: frameDelay})
+        
+        // Update progress
+        setProcessingProgress(Math.round(((i + 1) / imageUrls.length) * 100))
+      }
+  
+      return new Promise((resolve, reject) => {
+        gif.on('progress', progress => {
+          setProcessingProgress(Math.round(progress * 100))
+        })
+  
+        gif.on('finished', blob => {
+          setIsProcessing(false)
+          setProcessingProgress(0)
+          resolve(URL.createObjectURL(blob))
+        })
+  
+        gif.on('error', error => {
+          console.error('GIF creation error:', error)
+          setIsProcessing(false)
+          setProcessingProgress(0)
+          reject(error)
+        })
+  
+        // Start rendering
+        gif.render()
+      })
+    } catch (error) {
+      console.error('Error in createGIF:', error)
+      setIsProcessing(false)
+      setProcessingProgress(0)
+      throw error
+    }
+  }
+
   useEffect(() => {
     if (img) {
       updateSVG(img)
@@ -310,18 +375,36 @@ export default function America() {
         ></canvas>
         {/* div to make svg bg */}
         <div style={{ margin: 0, marginBottom: 20, display: 'flex', flexDirection: 'column', gap: 20, width: '50%' }}>
-          <input type="file" accept="image/*" onChange={(event) => {
-            const file = event.target.files[0]
-            const reader = new FileReader()
-            reader.onload = () => {
-              const img = new Image()
-              img.src = reader.result
-              img.onload = () => {
-                setImg(reader.result)
+          <input 
+            type="file" 
+            accept="image/*" 
+            multiple
+            onChange={(event) => {
+              const files = Array.from(event.target.files)
+              setSelectedFiles(files)
+              
+              if (files.length === 1) {
+                // Handle single file as before
+                const reader = new FileReader()
+                reader.onload = () => {
+                  setImg(reader.result)
+                }
+                reader.readAsDataURL(files[0])
+              } else if (files.length > 1) {
+                // Handle multiple files
+                Promise.all(files.map(file => {
+                  return new Promise((resolve) => {
+                    const reader = new FileReader()
+                    reader.onload = () => resolve(reader.result)
+                    reader.readAsDataURL(file)
+                  })
+                })).then(results => {
+                  setImg(results[0]) // Show first image preview
+                  setSelectedFiles(results)
+                })
               }
-            }
-            reader.readAsDataURL(file)
-          }} />
+            }} 
+          />
 
           {/* New selection for variant */}
           <select onChange={(e) => setFlagVariant(e.target.value)} value={flagVariant}>
@@ -385,6 +468,60 @@ export default function America() {
               a.download = 'boebadge.png'
               a.click()
             }}>Download</button>
+
+            {selectedFiles.length > 1 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <label>
+                  Frame Delay (ms)
+                </label>
+                <input
+                  type="number"
+                  min="100"
+                  max="5000"
+                  step="100"
+                  value={frameDelay}
+                  onChange={(e) => setFrameDelay(Number(e.target.value))}
+                  style={{
+                    padding: '8px',
+                    border: '1px solid #333',
+                    borderRadius: '4px'
+                  }}
+                />
+                <button 
+                  style={{ 
+                    border: '1px solid #333',
+                    opacity: isProcessing ? 0.7 : 1,
+                    cursor: isProcessing ? 'not-allowed' : 'pointer'
+                  }} 
+                  disabled={isProcessing}
+                  onClick={async () => {
+                    try {
+                      const gifUrl = await createGIF(selectedFiles)
+                      if (!gifUrl) {
+                        console.error('Failed to create GIF URL')
+                        return
+                      }
+                      
+                      const a = document.createElement('a')
+                      a.href = gifUrl
+                      a.download = 'boebadge.gif'
+                      document.body.appendChild(a)
+                      a.click()
+                      document.body.removeChild(a)
+                      URL.revokeObjectURL(gifUrl) // Clean up the blob URL
+                    } catch (error) {
+                      console.error('Error creating GIF:', error)
+                      setIsProcessing(false)
+                      setProcessingProgress(0)
+                    }
+                  }}
+                >
+                  {isProcessing 
+                    ? `Creating GIF... ${processingProgress}%` 
+                    : 'Download as GIF'}
+                </button>
+              </div>
+            )}
 
           </div>
         </div>

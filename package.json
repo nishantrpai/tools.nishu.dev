@@ -30,6 +30,7 @@
     "frames.js": "^0.15.2",
     "fs": "^0.0.1-security",
     "get-browser-fingerprint": "^3.2.0",
+    "gif.js": "^0.2.0",
     "gif.js.optimized": "^1.0.1",
     "gifshot": "^0.4.5",
     "gifuct-js": "^2.1.2",

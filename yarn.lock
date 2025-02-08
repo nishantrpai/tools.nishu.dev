@@ -2097,6 +2097,11 @@ gif.js.optimized@^1.0.1:
   resolved "https://registry.npmjs.org/gif.js.optimized/-/gif.js.optimized-1.0.1.tgz#20fa5403654dfec402ae5f41f2385bebd8099105"
   integrity sha512-IS0F42Xken6lp/iR4irgG4r52tvxRkEKsXGZmlUHUOb00SWNMezJOJwkVaJk2MLW53rqzMbPnnBtEhs9hcMJ9w==
 
+gif.js@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.npmjs.org/gif.js/-/gif.js-0.2.0.tgz#615e6e3788850cd3a20c85fe9f09539e784903e8"
+  integrity sha512-bYxCoT8OZKmbxY8RN4qDiYuj4nrQDTzgLRcFVovyona1PTWNePzI4nzOmotnlOFIzTk/ZxAHtv+TfVLiBWj/hw==
+
 gifshot@^0.4.5:
   version "0.4.5"
   resolved "https://registry.npmjs.org/gifshot/-/gifshot-0.4.5.tgz#e3cb570203a3b139ff3069d7578098a29c03b0f8"
