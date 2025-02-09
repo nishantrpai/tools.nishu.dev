@@ -129,10 +129,10 @@ button {
   padding: 0.25rem 0.75rem;
   color: #fff;
   background-color: #222;
-  border: none;
   outline: none;
   border-radius: 5px;
   font-size: 12px;
+  border: 1px solid #333;
 }
 
 @media screen and (max-width: 600px) {

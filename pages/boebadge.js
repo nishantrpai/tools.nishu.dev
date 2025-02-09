@@ -459,7 +459,7 @@ export default function America() {
                 value={debouncedToken}
               ></input>
             </div>
-            <button style={{ border: '1px solid #333' }} onClick={async () => {
+            <button onClick={async () => {
               
               await new Promise(resolve => setTimeout(resolve, 500)); // Wait for canvas to update
               let canvas = document.getElementById('canvas')

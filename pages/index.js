@@ -1850,6 +1850,12 @@ export const tools = [
     description: 'Built on Ethereum Badge',
     publishDate: '7th Feb 2025',
     url: '/boebadge'
+  },
+  {
+    title: 'Photocopy Filter',
+    description: 'Photocopy Filter',
+    publishDate: '9th Feb 2025',
+    url: '/photocopyfilter'
   }
 
 ]
