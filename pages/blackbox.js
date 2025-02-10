@@ -63,13 +63,13 @@ export default function XCopyFilter() {
   return (
     <>
       <Head>
-        <title>Reverse Diffusion</title>
-        <meta name="description" content="Reverse diffusion effect on images" />
+        <title>Black Box</title>
+        <meta name="description" content="See how black box works" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main style={{ maxWidth: '100%' }}>
-        <h1>Reverse Diffusion</h1>
-        <h2 className={styles.description}>See how your image looks in earlier generation steps</h2>
+        <h1>Black box</h1>
+        <h2 className={styles.description}>See how black box works</h2>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, margin: 'auto' }}>
           <canvas
             id="canvas"
@@ -94,7 +94,7 @@ export default function XCopyFilter() {
               type="range"
               id="reverseSteps"
               min="0"
-              max="500"
+              max="5000"
               value={reverseSteps}
               onChange={(e) => setReverseSteps(Number(e.target.value))}
             />
