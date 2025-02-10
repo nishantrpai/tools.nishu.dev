@@ -1856,6 +1856,12 @@ export const tools = [
     description: 'Photocopy Filter',
     publishDate: '9th Feb 2025',
     url: '/photocopyfilter'
+  },
+  {
+    title: 'Black box',
+    description: 'Black box',
+    publishDate: '10th Feb 2025',
+    url: '/blackbox'
   }
 
 ]
