@@ -69,13 +69,15 @@ export default function XCopyFilter() {
   return (
     <>
       <Head>
-        <title>Photocopy Filter</title>
-        <meta name="description" content="Transform your images into Photocopy style" />
+        <title>Intelligence Age Filter</title>
+        <meta name="description" content="Transform your images into Intelligence age filter like chatgpt superbowl ad" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main style={{ maxWidth: '100%' }}>
-        <h1>Photocopy Filter</h1>
-        <h2 className={styles.description}>Transform your images into Photocopy style</h2>
+        <h1>Intelligence Age Filter</h1>
+        <h2 className={styles.description}>
+          Transform your images into Intelligence age filter like chatgpt superbowl ad
+        </h2>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, margin: 'auto' }}>
           <canvas
             id="canvas"
