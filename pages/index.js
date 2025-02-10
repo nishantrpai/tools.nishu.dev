@@ -1862,6 +1862,12 @@ export const tools = [
     description: 'Black box',
     publishDate: '10th Feb 2025',
     url: '/blackbox'
+  },
+  {
+    title: 'Intelligence Age Filter',
+    description: 'From the superbowl ad of chatgpt',
+    publishDate: '10th Feb 2025',
+    url: '/iafilter'
   }
 
 ]
