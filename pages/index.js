@@ -1868,6 +1868,12 @@ export const tools = [
     description: 'From the superbowl ad of chatgpt',
     publishDate: '10th Feb 2025',
     url: '/iafilter'
+  },
+  {
+    title: 'Dithering Disintegration',
+    description: 'Dithering Disintegration',
+    publishDate: '11th Feb 2025',
+    url: '/dd'
   }
 
 ]
