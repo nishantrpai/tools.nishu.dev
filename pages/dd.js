@@ -29,6 +29,10 @@ export default function XCopyFilter() {
     // Clear canvas (no background fill so original colors appear)
     context.clearRect(0, 0, canvas.width, canvas.height)
 
+    // background canvas
+    context.fillStyle = 'black'
+    context.fillRect(0, 0, canvas.width, canvas.height)
+
     // Process the image in blocks of pixelSize
     for (let y = 0; y < canvas.height; y += pixelSize) {
       for (let x = 0; x < canvas.width; x += pixelSize) {
