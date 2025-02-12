@@ -291,6 +291,27 @@ export default function XCopyFilter() {
               onChange={(e) => setHalftoneSize(Number(e.target.value))}
             />
           </div>
+          {inputType === 'video' && (
+            <div style={{ marginTop: '20px', width: '100%' }}>
+              <label htmlFor="fpsValue">Video FPS: </label>
+              <input
+                type="number"
+                id="fpsValue"
+                min="1"
+                value={videoFps}
+                onChange={(e) => setVideoFps(Number(e.target.value))}
+                style={{
+                  width: 70,
+                  background: 'none',
+                  border: '1px solid #333',
+                  color: '#fff',
+                  borderRadius: 5,
+                  padding: 5,
+                  marginLeft: 10
+                }}
+              />
+            </div>
+          )}
           <button onClick={() => { setImage(null); setVideoSrc(null); if(videoAnimationRef.current){ cancelAnimationFrame(videoAnimationRef.current) } }}>
             Clear
           </button>
