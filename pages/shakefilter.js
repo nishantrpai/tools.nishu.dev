@@ -7,6 +7,7 @@ export default function ShakeFilter() {
   const [redIntensity, setRedIntensity] = useState(164)
   const [filterThreshold, setFilterThreshold] = useState(50)
   const [selectedAreaOnly, setSelectedAreaOnly] = useState(false)
+  const [unselectedArea, setUnselectedArea] = useState(false)
   const [selectionRect, setSelectionRect] = useState({ x: 50, y: 50, width: 200, height: 200 })
   const [reverseFilter, setReverseFilter] = useState(false)
   const isDragging = useRef(false)
@@ -37,14 +38,24 @@ export default function ShakeFilter() {
       for (let x = 0; x < canvas.width; x++) {
         const i = (y * canvas.width + x) * 4
         
-        const isInSelectedArea = selectedAreaOnly ? 
-          x >= selectionRect.x && 
-          x <= selectionRect.x + selectionRect.width && 
-          y >= selectionRect.y && 
-          y <= selectionRect.y + selectionRect.height : 
-          true
+        // Determine whether to apply the filter based on mode:
+        // When selectedAreaOnly is true:
+        //   - if unselectedArea is true, apply filter on pixels not inside the rectangle.
+        //   - otherwise, only apply filter on pixels inside the rectangle.
+        // When selectedAreaOnly is false, apply filter everywhere.
+        const shouldApply = selectedAreaOnly
+          ? (unselectedArea
+              ? !(x >= selectionRect.x &&
+                  x <= selectionRect.x + selectionRect.width &&
+                  y >= selectionRect.y &&
+                  y <= selectionRect.y + selectionRect.height)
+              : (x >= selectionRect.x &&
+                  x <= selectionRect.x + selectionRect.width &&
+                  y >= selectionRect.y &&
+                  y <= selectionRect.y + selectionRect.height))
+          : true
 
-        if (isInSelectedArea) {
+        if (shouldApply) {
           const avg = (data[i] + data[i + 1] + data[i + 2]) / 3
           if ((reverseFilter && avg <= filterThreshold) || (!reverseFilter && avg > filterThreshold)) {
             data[i] = redIntensity // Red channel
@@ -203,6 +214,16 @@ export default function ShakeFilter() {
             Apply to selected area only
           </label>
         </div>
+        {selectedAreaOnly ? <div style={{marginTop: '20px'}}>
+          <label>
+            <input
+              type="checkbox"
+              checked={unselectedArea}
+              onChange={(e) => setUnselectedArea(e.target.checked)}
+            />
+            Apply to unselected area 
+          </label>
+        </div> : null}
         <div style={{ marginTop: '20px' }}>
           <label>
             <input
