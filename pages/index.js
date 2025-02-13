@@ -1874,6 +1874,12 @@ export const tools = [
     description: 'Dithering Disintegration',
     publishDate: '11th Feb 2025',
     url: '/dd'
+  },
+  {
+    title: 'Sea Filter',
+    description: 'Sea Filter',
+    publishDate: '13th Feb 2025',
+    url: '/sea'
   }
 
 ]
