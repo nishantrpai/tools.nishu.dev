@@ -312,14 +312,23 @@ export default function XCopyFilter() {
               />
             </div>
           )}
-          <button onClick={() => { setImage(null); setVideoSrc(null); if(videoAnimationRef.current){ cancelAnimationFrame(videoAnimationRef.current) } }}>
+          <button onClick={() => { setImage(null); setVideoSrc(null); if (videoAnimationRef.current) { cancelAnimationFrame(videoAnimationRef.current) } }}>
             Clear
           </button>
         </div>
 
-        {inputType === 'video' && (
+        {inputType === 'video' ? (
           <video ref={videoRef} src={videoSrc} style={{ display: 'none' }} />
-        )}
+        ) :
+          <button onClick={() => {
+            const canvas = document.getElementById('canvas')
+            const a = document.createElement('a')
+            a.href = canvas.toDataURL('image/png')
+            a.download = 'iafilter.png'
+            a.click()
+          }}>Download</button>
+        }
+
       </main>
     </>
   )
