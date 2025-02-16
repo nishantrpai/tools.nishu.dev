@@ -61,7 +61,7 @@ export default function XCopyFilter() {
           context.beginPath()
           // context.arc(x + gridSpacing / 2, y + gridSpacing / 2, radius, 0, 2 * Math.PI)
           // draw a rectangle of radius size
-          context.rect(x, y, gridSpacing/2, gridSpacing/2)
+          context.rect(x, y, radius, radius)
           context.fillStyle = 'white'
           context.fill()
         }
