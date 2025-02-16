@@ -78,9 +78,6 @@ export default function XCopyFilter() {
       </Head>
       <main style={{ maxWidth: '100%' }}>
         <h1>Based Punk Filter</h1>
-        <h2 className={styles.description}>
-          Transform your images into Intelligence age filter like chatgpt superbowl ad
-        </h2>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, margin: 'auto' }}>
           <canvas
             id="canvas"
