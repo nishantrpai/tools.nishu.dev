@@ -1880,6 +1880,12 @@ export const tools = [
     description: 'Sea Filter',
     publishDate: '13th Feb 2025',
     url: '/sea'
+  },
+  {
+    title: 'Based Punk Filter',
+    description: 'Based Punk Filter',
+    publishDate: '16th Feb 2025',
+    url: '/basedpunkfilter'
   }
 
 ]
