@@ -54,8 +54,11 @@ export default function VisualizeValue() {
       const canvas = document.createElement('canvas')
       canvas.width = 960
       canvas.height = 960
-
+      
       const ctx = canvas.getContext('2d')
+      // fill canvas with #000 background
+      ctx.fillStyle = '#000'
+      ctx.fillRect(0, 0, 960, 960)
       ctx.drawImage(img, 0, 0, 960, 960)
 
       const pngBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'))
