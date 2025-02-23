@@ -94,6 +94,8 @@ export default function VisualizeValue() {
     canvas.width = 960;
     canvas.height = 1000;
     const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, 960, 1000);
     ctx.drawImage(img, 0, 0, 960, 1000);
 
     const pngBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
