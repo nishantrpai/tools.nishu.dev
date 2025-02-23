@@ -9,6 +9,7 @@ export default function EnhancedCollage() {
   const [imgBackground, setImgBackground] = useState('#ddd')
   // positions for interactive repositioning; keys will be `${rowIndex}-${colIndex}`
   const [positions, setPositions] = useState({})
+  const [selectedLayout, setSelectedLayout] = useState({ layoutName: 'basic', index: 0 })
   const canvasRefs = useRef({})
 
   // Add new collage options (feel free to add as many "nishus" as you like)
@@ -16,7 +17,7 @@ export default function EnhancedCollage() {
     basic: [
       [["1x1", "1x1"], ["1x1", "1x1"]],
       [["1x1", "1x1", "1x1"]],
-    [["1x1", "1x1", "1x1", "1x1"]],
+      [["1x1", "1x1", "1x1", "1x1"]],
       [["1x1", "1x1"]],
       [["1x1"], ["1x1"]],
       [["1x1"], ["1x1"], ["1x1"], ["1x1"]],
@@ -43,7 +44,7 @@ export default function EnhancedCollage() {
       [["1x1", "2x1", "1x1"], ["1x1", "1x1", "1x1"], ["1x1"]],
       [["1x1", "1x1", "1x1"], ["1x1", "2x2", "1x1"]],
       [["2x2", "1x1"], ["1x1", "1x1"], ["1x1", "1x1"]],
-[["2x2", "1x1", "1x1"], ["1x1", "1x1", "1x1"]],
+      [["2x2", "1x1", "1x1"], ["1x1", "1x1", "1x1"]],
       [["2x2", "1x1", "1x1"], ["1x1", "1x1", "2x2"]],
       [["1x1", "2x2", "1x1"], ["1x1", "1x1", "1x1"], ["1x1"]]
     ]
@@ -104,7 +105,7 @@ export default function EnhancedCollage() {
   // Render a grid cell with a draggable canvas for repositioning the drawn image
   const renderDraggableCell = (img, cellWidth, cellHeight, key) => {
     return (
-      <Draggable>
+      <Draggable key={key}>
         <div style={{
           width: cellWidth,
           height: cellHeight,
@@ -146,7 +147,7 @@ export default function EnhancedCollage() {
     let cellCounter = 0
     return (
       <div style={gridStyle}>
-        {layout.flat().map((cell, idx) => {
+        {layout.flat().map((cell) => {
           // Calculate dimensions based on cell definition
           const [colSpan, rowSpan] = cell.split('x').map(Number)
           const cellWidth = (500 - (layout[0].length - 1) * gap) / layout[0].length * colSpan
@@ -189,14 +190,16 @@ export default function EnhancedCollage() {
     ctx.fillRect(0, 0, canvasWidth, canvasHeight)
 
     let yOffset = 0
-    layout.forEach((row, rowIndex) => {
+    layout.forEach((row) => {
       let xOffset = 0
-      row.forEach((cell, colIndex) => {
+      row.forEach((cell) => {
         const [colSpan, rowSpan] = cell.split('x').map(Number)
         const cellWidth = cellSize * colSpan
         const cellHeight = cellSize * rowSpan
-        const imageIndex = rowIndex * row.length + colIndex
-        const img = images[imageIndex]
+        const imageIndex = yOffset === 0 ? xOffset / (cellSize + gap) : null
+        // Compute image index based on flatness (row-major order)
+        const flatIndex = layout.slice(0, layout.indexOf(row)).reduce((acc, cur) => acc + cur.length, 0) + row.indexOf(cell)
+        const img = images[flatIndex]
 
         if (img) {
           const imgRatio = img.width / img.height
@@ -266,19 +269,37 @@ export default function EnhancedCollage() {
           />
         </div>
 
-        {Object.entries(layouts).map(([layoutName, layoutOptions]) => (
-          <div key={layoutName} style={{ marginTop: '20px' }}>
-            <h2>{layoutName.charAt(0).toUpperCase() + layoutName.slice(1)} Layouts</h2>
-            {layoutOptions.map((layout, idx) => (
-              <div key={idx} style={{ marginBottom: '20px' }}>
-                {renderGrid(layout)}
-                <button onClick={() => downloadCollage(layoutName, idx)}>
-                  Download High-Quality Collage
-                </button>
-              </div>
-            ))}
-          </div>
-        ))}
+        {/* Main Preview Canvas */}
+        <div style={{ margin: '20px 0' }}>
+          {renderGrid(layouts[selectedLayout.layoutName][selectedLayout.index])}
+        </div>
+
+        {/* Layout Mockup Buttons */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center' }}>
+          {Object.entries(layouts).map(([layoutName, options]) => (
+            options.map((layout, idx) => (
+              <button
+                key={`${layoutName}-${idx}`}
+                onClick={() => setSelectedLayout({ layoutName, index: idx })}
+                style={{
+                  padding: '10px',
+                  border: selectedLayout.layoutName === layoutName && selectedLayout.index === idx ? '2px solid #fff' : '1px solid #333',
+                  backgroundColor: '#000',
+                  cursor: 'pointer'
+                }}
+              >
+                {layoutName} {idx + 1}
+              </button>
+            ))
+          ))}
+        </div>
+
+        {/* Download Button */}
+        <div style={{ marginTop: '20px' }}>
+          <button onClick={() => downloadCollage(selectedLayout.layoutName, selectedLayout.index)}>
+            Download High-Quality Collage
+          </button>
+        </div>
       </main>
     </>
   )

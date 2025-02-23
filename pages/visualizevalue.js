@@ -14,17 +14,18 @@ export default function VisualizeValue() {
 
   const generateImage = async () => {
     setLoading(true)
-    const prompt = `Generate a minimal, beautiful SVG image that explains the following complex system: "${description}". The image should be simple, symmetrical, and not contain any text or HTML tags. Use gradients or varying opacity to create depth if needed, but limit colors to grayscale. The SVG should be 480x480px with a black background. Don't add any additional shapes or objects. Ensure all elements are connected and not fragmented. Only provide the SVG code, starting with <svg> and ending with </svg>, without any additional characters or tags.`
+    const prompt = `Generate a minimal, beautiful SVG image in visualizevalue style that explains the following complex system: "${description}". The image should be simple, symmetrical, and not contain any text or HTML tags. Use gradients or varying opacity to create depth if needed, but limit colors to grayscale (white is allowed, but very graciously). The SVG should be 480x480px with a black background visualizevalue style. Don't add any additional shapes or objects. Ensure all elements are connected and not fragmented. Only provide the SVG code, starting with <svg> and ending with </svg>, without any additional characters or tags. Just svg string without any html/xml tags or code blocks.`
     
     try {
       const res = await fetch(`/api/gpt`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt, model: 'gpt-4o' })
+        body: JSON.stringify({ prompt, model: 'gemini-1.5-flash' })
       })
       const data = await res.json()
       // Remove any ```svg or ``` tags from the response
-      const cleanedResponse = data.response.replace(/^```svg\s*|\s*```$/g, '').trim()
+      // remove xml codeblocks as we well
+      const cleanedResponse = data.response.replace(/^```svg\s+|```|<\?xml[\s\S]+?\?>|<!DOCTYPE[\s\S]+?>/g, '')
       setImageSvg(cleanedResponse)
     } catch (error) {
       console.error("Error generating image:", error)
