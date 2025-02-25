@@ -168,6 +168,7 @@ export default function HigherCombined() {
           type: 'range',
           label: 'Scale',
           state: 'scale',
+          default: 1,
           min: 0,
           max: 10,
           step: 0.01,
