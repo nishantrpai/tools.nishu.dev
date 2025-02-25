@@ -290,18 +290,19 @@ export default function HigherCombined() {
         if (image) {
           const hat = new Image()
           hat.onload = () => {
-            context.translate(offsetX, offsetY)
-            // apply skew
-            context.transform(1, Math.tan(skewXRad), Math.tan(skewYRad), 1, 0, 0)
-            context.rotate(offsetTheta * Math.PI / 180)
-            // if foreground is checked, draw the hat then the foreground
-            context.globalAlpha = opacity / 100
-            console.log('foreground', foreground)
+            context.save() // Save the current state
             if (!foreground) {
+              context.translate(offsetX, offsetY)
+              context.transform(1, Math.tan(skewXRad), Math.tan(skewYRad), 1, 0, 0)
+              context.rotate(offsetTheta * Math.PI / 180)
+              context.globalAlpha = opacity / 100
+              
               if (dragReps > 0) {
                 for (let i = 0; i < dragReps; i++) {
                   if (emboss > 0) {
                     context.filter = `blur(${emboss}px)`
+                    context.transform(1, Math.tan(skewXRad), Math.tan(skewYRad), 1, 0, 0)
+                    context.rotate(offsetTheta * Math.PI / 180)
                     context.drawImage(hat, offsetX, offsetY + (i * dragGap), hat.width * scale, hat.height * scale)
                     context.filter = 'none'
                   } else {
@@ -311,6 +312,8 @@ export default function HigherCombined() {
               } else {
                 if (emboss > 0) {
                   context.filter = `blur(${emboss}px)`
+                  context.transform(1, Math.tan(skewXRad), Math.tan(skewYRad), 1, 0, 0)
+                  context.rotate(offsetTheta * Math.PI / 180)
                   context.drawImage(hat, offsetX, offsetY, hat.width * scale, hat.height * scale)
                   context.filter = 'none'
                 } else {
@@ -319,37 +322,52 @@ export default function HigherCombined() {
               }
             } else {
               if (processedImageUrl != 'processing' && processedImageUrl) {
-                // first draw the hat then fetch the foreground and draw it
                 let foregroundImg = new Image()
                 foregroundImg.onload = () => {
-                  console.log('drawing foreground')
+                  context.save() // Save state before any transformations
+                  context.globalAlpha = opacity / 100
+
                   if (dragReps > 0) {
                     for (let i = 0; i < dragReps; i++) {
+                      context.save() // Save state for each iteration
+                      context.translate(offsetX, offsetY)
+                      context.transform(1, Math.tan(skewXRad), Math.tan(skewYRad), 1, 0, 0)
+                      context.rotate(offsetTheta * Math.PI / 180)
+                      
                       if (emboss > 0) {
                         context.filter = `blur(${emboss}px)`
-                        context.drawImage(hat, offsetX, offsetY + (i * dragGap), hat.width * scale, hat.height * scale)
+                        context.drawImage(hat, 0, i * dragGap, hat.width * scale, hat.height * scale)
                         context.filter = 'none'
                       } else {
-                        context.drawImage(hat, offsetX, offsetY + (i * dragGap), hat.width * scale, hat.height * scale)
+                        context.drawImage(hat, 0, i * dragGap, hat.width * scale, hat.height * scale)
                       }
+                      context.restore() // Restore state after each iteration
                     }
                   } else {
+                    context.save() // Save state before single draw
+                    context.translate(offsetX, offsetY)
+                    context.transform(1, Math.tan(skewXRad), Math.tan(skewYRad), 1, 0, 0)
+                    context.rotate(offsetTheta * Math.PI / 180)
+                    
                     if (emboss > 0) {
                       context.filter = `blur(${emboss}px)`
-                      context.drawImage(hat, offsetX, offsetY, hat.width * scale, hat.height * scale)
+                      context.drawImage(hat, 0, 0, hat.width * scale, hat.height * scale)
                       context.filter = 'none'
                     } else {
-                      context.drawImage(hat, offsetX, offsetY, hat.width * scale, hat.height * scale)
+                      context.drawImage(hat, 0, 0, hat.width * scale, hat.height * scale)
                     }
+                    context.restore() // Restore state after drawing
                   }
+                  
+                  context.restore() // Restore initial state
                   context.drawImage(foregroundImg, 0, 0, canvas.width, canvas.height)
                 }
                 foregroundImg.src = processedImageUrl
               }
 
             }
+            context.restore() // Restore the context state
             context.globalAlpha = 1
-            context.resetTransform()
           }
           let svgPath;
           switch (selectFont) {
