@@ -4,20 +4,19 @@ import styles from '@/styles/Home.module.css'
 import { useState, useEffect } from 'react'
 
 export default function Home() {
-  const [images1, setImages1] = useState([])
-  const [images2, setImages2] = useState([])
-  const [blendMode, setBlendMode] = useState('normal')
+  const [images, setImages] = useState([])
   const [opacity, setOpacity] = useState(1)
-  const [canvas, setCanvas] = useState(null)
-  const [ctx, setCtx] = useState(null)
   const allBlends = ['normal', 'multiply', 'screen', 'overlay', 'darken', 'lighten', 'color-dodge', 'color-burn', 'hard-light', 'soft-light', 'difference', 'exclusion', 'hue', 'saturation', 'color', 'luminosity']
-  const handleImage1 = async (e) => {
-    const files = e.target.files
-    setImages1([])
-    if (!files) return
-    for (let i = 0; i < files.length; i++) {
-      const image = await loadImage(files[i])
-      setImages1(prevImages => [...prevImages, image])
+  const [files, setFiles] = useState([])
+
+  const handleImages = async (e) => {
+    const fileList = e.target.files
+    setFiles(Array.from(fileList))
+    setImages([])
+    if (!fileList) return
+    for (let i = 0; i < fileList.length; i++) {
+      const image = await loadImage(fileList[i])
+      setImages(prevImages => [...prevImages, image])
     }
   }
 
@@ -36,69 +35,62 @@ export default function Home() {
     })
   }
 
-  const handleImage2 = async (e) => {
-    const files = e.target.files
-    setImages2([])
-    if (!files) return
-    for (let i = 0; i < files.length; i++) {
-      const image = await loadImage(files[i])
-      setImages2(prevImages => [...prevImages, image])
+  // Get all unique combinations of images
+  const getImageCombinations = () => {
+    const combinations = []
+    for (let i = 0; i < images.length; i++) {
+      for (let j = i + 1; j < images.length; j++) {
+        combinations.push({
+          img1: images[i],
+          img2: images[j],
+          name1: files[i].name,
+          name2: files[j].name,
+          index1: i,
+          index2: j
+        })
+      }
     }
-  }
-
-
-  const handleBlendMode = (e) => {
-    setBlendMode(e.target.value)
+    return combinations
   }
 
   const handleOpacity = (e) => {
     setOpacity(e.target.value)
   }
 
-  const downloadImage = (i, j, k) => {
-    // get higher resolution image
-    const canvas = document.getElementById(`canvas-${i}-${j}-${k}`)
+  const downloadImage = (canvas) => {
     const dataURL = canvas.toDataURL('image/png')
     const a = document.createElement('a')
     a.href = dataURL
-    a.download = 'blended-image-' + i + '.png'
+    a.download = `blended-image-${Date.now()}.png`
     a.click()
   }
 
-  const renderCanvas = (image1, image2, i, j, k) => {
-    const canvas = document.getElementById(`canvas-${i}-${j}-${k}`)
+  const renderCanvas = (image1, image2, canvasId, blendMode) => {
+    const canvas = document.getElementById(canvasId)
     const ctx = canvas.getContext('2d')
     canvas.width = image1.width
     canvas.height = image1.height
     ctx.globalAlpha = opacity
-    ctx.globalCompositeOperation = allBlends[k]
+    ctx.globalCompositeOperation = blendMode
     const scaleFactor = canvas.width / image2.height
     const scaledWidth = image2.width * scaleFactor
     const center = (canvas.width - scaledWidth) / 2
 
-    // draw rectangle to not add transparency to the image
     ctx.drawImage(image1, 0, 0, canvas.width, canvas.height)
     ctx.drawImage(image2, center, 0, scaledWidth, canvas.height)
   }
 
   useEffect(() => {
-    console.log(images1.length, images2.length)
-    if (images1.length > 0 && images2.length > 0) {
-      allBlends.forEach((blend, k) => {
-        images1.forEach((image1, i) => {
-          images2.forEach((image2, j) => {
-            console.log(i, j)
-            renderCanvas(image1, image2, i, j, k)
-          })
+    if (images.length >= 2) {
+      const combinations = getImageCombinations()
+      combinations.forEach((combo, i) => {
+        allBlends.forEach((blend, k) => {
+          const canvasId = `canvas-${i}-${k}`
+          renderCanvas(combo.img1, combo.img2, canvasId, blend)
         })
       })
-
     }
-  }, [images1, images2, blendMode, opacity])
-
-  // we'll need a grid of canvas and each canvas will have image for image1 and image2 i,j
-  // we'll blend image1 onto image2 and show the result in canvas
-  // we'll also have a download button for each canvas on click
+  }, [images, opacity])
 
   return (
     <>
@@ -108,50 +100,63 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Blend Layer
-        </h1>
-
-        <p className={styles.description}>
-          Blend multiple images together
-        </p>
+      <main className={styles.main} style={{maxWidth: '100vw', padding: '0 1rem'}}>
+        <h1 className={styles.title}>Blend Layer</h1>
+        <p className={styles.description}>Select multiple images to see all possible blend combinations</p>
 
         <div className={styles.searchContainer}>
-          <input type='file' onChange={handleImage1} multiple />
-          <input type='file' onChange={handleImage2} multiple />
-          {/* <select onChange={handleBlendMode}>
-            <option value='normal'>Normal</option>
-            <option value='multiply'>Multiply</option>
-            <option value='screen'>Screen</option>
-            <option value='overlay'>Overlay</option>
-            <option value='darken'>Darken</option>
-            <option value='lighten'>Lighten</option>
-            <option value='color-dodge'>Color Dodge</option>
-            <option value='color-burn'>Color Burn</option>
-            <option value='hard-light'>Hard Light</option>
-            <option value='soft-light'>Soft Light</option>
-            <option value='difference'>Difference</option>
-            <option value='exclusion'>Exclusion</option>
-            <option value='hue'>Hue</option>
-            <option value='saturation'>Saturation</option>
-            <option value='color'>Color</option>
-            <option value='luminosity'>Luminosity</option>
-          </select> */}
-          <input type='range' min='0' max='1' step='0.01' onChange={handleOpacity} />
+          <input type='file' onChange={handleImages} multiple />
+          <input type='range' min='0' max='1' step='0.01' value={opacity} onChange={handleOpacity} />
         </div>
-        <div className='grid'>
-          {allBlends.map((blend, k) => (
-            (images1.map((image1, i) => (
-              images2.map((image2, j) => (
-                <div key={i + j} className={styles.gridItem}>
-                  <canvas id={`canvas-${i}-${j}-${k}`} style={{ width: '500px' }} ref={setCanvas} />
-                  <button onClick={() => downloadImage(i, j, k)}>Download</button>
-                </div>
-              ))
-            )))
-          ))}
 
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))',
+          gap: '0.5rem',
+          padding: '0.5rem',
+          width: '100%',
+          maxWidth: '2400px',
+          margin: '0 auto'
+        }}>
+          {images.length >= 2 && getImageCombinations().map((combo, i) => (
+            allBlends.map((blend, k) => (
+              <div key={`${i}-${k}`} style={{
+                border: '1px solid #333',
+                borderRadius: '4px',
+                padding: '0.25rem',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                fontSize: '0.7rem'
+              }}>
+                <canvas 
+                  id={`canvas-${i}-${k}`} 
+                  style={{ 
+                    width: '100%', 
+                    height: 'auto',
+                    cursor: 'pointer',
+                    borderRadius: '2px'
+                  }} 
+                  onDoubleClick={(e) => downloadImage(e.target)}
+                  title={`Double click to download`}
+                />
+                <div style={{
+                  width: '100%',
+                  marginTop: '0.25rem',
+                  textAlign: 'center',
+                  lineHeight: '1.2'
+                }}>
+                  <div style={{fontWeight: 'bold'}}>{blend}</div>
+                  <div style={{color: '#666', fontSize: '0.65rem'}}>
+                    {combo.name1.slice(0, 10)}... + {combo.name2.slice(0, 10)}...
+                  </div>
+                  <div style={{color: '#888', fontSize: '0.65rem'}}>
+                    {Math.round(opacity * 100)}% opacity
+                  </div>
+                </div>
+              </div>
+            ))
+          ))}
         </div>
       </main>
     </>
