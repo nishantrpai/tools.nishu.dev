@@ -47,26 +47,26 @@ export default function Home() {
 
   const getImageCombinations = (batchNum) => {
     const combinations = []
-    const previousResults = blendBatches.length > 0 
+    const previousResults = blendBatches.length > 0
       ? blendBatches.flatMap(batch => batch.results || [])
       : [];
     const allSources = [...images, ...previousResults];
-    
-    // For new opacity on existing images/results
-    const currentOpacity = opacity
-    
+
     if (batchNum === 1) {
-      // First batch logic remains the same
+      // Generate all possible combinations for first batch
       for (let i = 0; i < images.length; i++) {
-        for (let j = i + 1; j < images.length; j++) {
-          combinations.push({
-            img1: images[i],
-            img2: images[j],
-            name1: files[i].name,
-            name2: files[j].name,
-            index1: i,
-            index2: j
-          })
+        for (let j = 0; j < images.length; j++) {
+          if (i !== j) { // Exclude self-blending
+            combinations.push({
+              img1: images[i],
+              img2: images[j],
+              name1: files[i].name,
+              name2: files[j].name,
+              index1: i,
+              index2: j,
+              opacity: opacity
+            })
+          }
         }
       }
     } else {
@@ -76,11 +76,11 @@ export default function Home() {
           combinations.push({
             img1: allSources[i],
             img2: allSources[j],
-            name1: i < images.length ? files[i].name : `Blend${Math.floor(i/images.length)}_${i%images.length}`,
-            name2: j < images.length ? files[j].name : `Blend${Math.floor(j/images.length)}_${j%images.length}`,
+            name1: i < images.length ? files[i].name : `Blend${Math.floor(i / images.length)}_${i % images.length}`,
+            name2: j < images.length ? files[j].name : `Blend${Math.floor(j / images.length)}_${j % images.length}`,
             index1: i,
             index2: j,
-            opacity: currentOpacity
+            opacity: opacity
           })
         }
       }
@@ -109,20 +109,20 @@ export default function Home() {
     const ctx = canvas.getContext('2d')
     canvas.width = 1000 // Set fixed width for better performance
     canvas.height = 1000 // Set fixed height for better performance
-    
+
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height)
-    
+
     // First image
     ctx.globalAlpha = 1
     ctx.globalCompositeOperation = 'source-over'
     ctx.drawImage(image1, 0, 0, canvas.width, canvas.height)
-    
+
     // Second image
     ctx.globalAlpha = opacityValue
     ctx.globalCompositeOperation = blendMode
     ctx.drawImage(image2, 0, 0, canvas.width, canvas.height)
-    
+
     return canvas
   }
 
@@ -168,14 +168,14 @@ export default function Home() {
           const batchResults = []
           const canvas = document.createElement('canvas')
           let processedCount = 0
-          
+
           for (const combo of combinations) {
             for (const blend of allBlends) {
               renderCanvas(combo.img1, combo.img2, canvas, blend, combo.opacity || opacity)
               const blendResult = await createBlendResult(canvas)
               batchResults.push(blendResult)
               processedCount++
-              
+
               // Add to current processing results immediately
               setCurrentProcessing(prev => [...prev, {
                 result: blendResult,
@@ -185,7 +185,7 @@ export default function Home() {
                 batchNum: batchCount,
                 index: processedCount - 1
               }])
-              
+
               setCurrentBatchInfo(`Processing batch ${batchCount}: ${processedCount}/${combinations.length * allBlends.length} blends complete`)
               // Small delay to allow UI to update
               await new Promise(resolve => setTimeout(resolve, 10))
@@ -219,19 +219,19 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className={styles.main} style={{maxWidth: '100vw', padding: '0 1rem', height: '200vh'}}>
+      <main className={styles.main} style={{ maxWidth: '100vw', padding: '0 1rem', height: '200vh' }}>
         <h1 className={styles.title}>Blend Layer</h1>
         <p className={styles.description}>Select multiple images to see all possible blend combinations</p>
 
         <div className={styles.searchContainer}>
           <input type='file' onChange={handleImages} multiple />
-          <input 
-            type='range' 
-            min='0' 
-            max='1' 
-            step='0.01' 
-            value={opacity} 
-            onChange={handleOpacity} 
+          <input
+            type='range'
+            min='0'
+            max='1'
+            step='0.01'
+            value={opacity}
+            onChange={handleOpacity}
           />
           {loading && (
             <div style={{
@@ -272,14 +272,14 @@ export default function Home() {
                     alignItems: 'center',
                     fontSize: '0.7rem'
                   }}>
-                    <img 
+                    <img
                       src={result.src}
-                      style={{ 
-                        width: '100%', 
+                      style={{
+                        width: '100%',
                         height: 'auto',
                         cursor: 'pointer',
                         borderRadius: '2px'
-                      }} 
+                      }}
                       onDoubleClick={(e) => {
                         const canvas = document.createElement('canvas')
                         renderCanvas(combo.img1, combo.img2, canvas, blend, batch.opacity)
@@ -293,11 +293,11 @@ export default function Home() {
                       textAlign: 'center',
                       lineHeight: '1.2'
                     }}>
-                      <div style={{fontWeight: 'bold'}}>{blend}</div>
-                      <div style={{color: '#666', fontSize: '0.65rem'}}>
+                      <div style={{ fontWeight: 'bold' }}>{blend}</div>
+                      <div style={{ color: '#666', fontSize: '0.65rem' }}>
                         Batch {batch.batchNum}: {combo.name1.slice(0, 10)}... + {combo.name2.slice(0, 10)}...
                       </div>
-                      <div style={{color: '#888', fontSize: '0.65rem'}}>
+                      <div style={{ color: '#888', fontSize: '0.65rem' }}>
                         {Math.round(batch.opacity * 100)}% opacity
                       </div>
                     </div>
@@ -320,14 +320,14 @@ export default function Home() {
               animation: 'fadeIn 0.3s ease-in',
               background: '#000'
             }}>
-              <img 
+              <img
                 src={item.result.src}
-                style={{ 
-                  width: '100%', 
+                style={{
+                  width: '100%',
                   height: 'auto',
                   cursor: 'pointer',
                   borderRadius: '2px'
-                }} 
+                }}
                 onDoubleClick={() => {
                   const canvas = document.createElement('canvas')
                   renderCanvas(item.combo.img1, item.combo.img2, canvas, item.blend, item.opacity)
@@ -341,21 +341,21 @@ export default function Home() {
                 textAlign: 'center',
                 lineHeight: '1.2'
               }}>
-                <div style={{fontWeight: 'bold'}}>{item.blend}</div>
-                <div style={{color: '#666', fontSize: '0.65rem'}}>
-                  {item.combo.name1.slice(0, 10)}... + {item.combo.name2.slice(0, 10)}...
+                <div style={{ fontWeight: 'bold' }}>{item.blend}</div>
+                <div style={{ color: '#666', fontSize: '0.65rem' }}>
+                  Processing {index} {item.combo.name1.slice(0, 10)}... + {item.combo.name2.slice(0, 10)}...
                 </div>
-                <div style={{color: '#888', fontSize: '0.65rem'}}>
+                <div style={{ color: '#888', fontSize: '0.65rem' }}>
                   {Math.round(item.opacity * 100)}% opacity
                 </div>
               </div>
             </div>
           ))}
-          
+
           <div ref={containerRef} style={{ height: '20px' }} />
         </div>
       </main>
-      
+
       <style jsx global>{`
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(10px); }
