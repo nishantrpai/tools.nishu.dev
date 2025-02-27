@@ -121,7 +121,7 @@ export default function Home() {
           {images.length >= 2 && getImageCombinations().map((combo, i) => (
             allBlends.map((blend, k) => (
               <div key={`${i}-${k}`} style={{
-                border: '1px solid #333',
+                border: '1px solid #111',
                 borderRadius: '4px',
                 padding: '0.25rem',
                 display: 'flex',
