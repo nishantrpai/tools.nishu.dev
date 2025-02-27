@@ -337,7 +337,7 @@ export default function Home() {
               }}>
                 <div style={{fontWeight: 'bold'}}>{item.blend}</div>
                 <div style={{color: '#666', fontSize: '0.65rem'}}>
-                  Processing Batch {item.batchNum}: {item.combo.name1.slice(0, 10)}... + {item.combo.name2.slice(0, 10)}...
+                  {item.combo.name1.slice(0, 10)}... + {item.combo.name2.slice(0, 10)}...
                 </div>
                 <div style={{color: '#888', fontSize: '0.65rem'}}>
                   {Math.round(opacity * 100)}% opacity
