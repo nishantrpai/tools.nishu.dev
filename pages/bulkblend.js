@@ -107,8 +107,8 @@ export default function Home() {
 
   const renderCanvas = (image1, image2, canvas, blendMode, opacityValue) => {
     const ctx = canvas.getContext('2d')
-    canvas.width = 400 // Set fixed width for better performance
-    canvas.height = 400 // Set fixed height for better performance
+    canvas.width = 1000 // Set fixed width for better performance
+    canvas.height = 1000 // Set fixed height for better performance
     
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height)
