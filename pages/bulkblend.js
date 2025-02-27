@@ -13,8 +13,10 @@ export default function Home() {
   const containerRef = useRef(null)
   const [loading, setLoading] = useState(false)
   const [currentBatchInfo, setCurrentBatchInfo] = useState('')
+  const [currentProcessing, setCurrentProcessing] = useState([])
 
   const handleImages = async (e) => {
+    setCurrentProcessing([])
     const fileList = e.target.files
     setFiles(Array.from(fileList))
     setImages([])
@@ -158,7 +160,7 @@ export default function Home() {
             return
           }
 
-          setCurrentBatchInfo(`Processing batch ${batchCount}: Blending ${combinations.length} combinations...`)
+          setCurrentBatchInfo(`Processing batch ${batchCount}: Starting...`)
           const batchResults = []
           const canvas = document.createElement('canvas')
           let processedCount = 0
@@ -169,15 +171,29 @@ export default function Home() {
               const blendResult = await createBlendResult(canvas)
               batchResults.push(blendResult)
               processedCount++
+              
+              // Add to current processing results immediately
+              setCurrentProcessing(prev => [...prev, {
+                result: blendResult,
+                combo,
+                blend,
+                batchNum: batchCount,
+                index: processedCount - 1
+              }])
+              
               setCurrentBatchInfo(`Processing batch ${batchCount}: ${processedCount}/${combinations.length * allBlends.length} blends complete`)
+              // Small delay to allow UI to update
+              await new Promise(resolve => setTimeout(resolve, 10))
             }
           }
 
+          // Move current processing to completed batch
           setBlendBatches(prev => [...prev, {
             batchNum: batchCount,
             combinations,
             results: batchResults
           }])
+          setCurrentProcessing([])
           setCurrentBatchInfo('')
         } catch (error) {
           console.error('Blend processing error:', error)
@@ -187,7 +203,7 @@ export default function Home() {
       }
     }
     processNewBatch()
-  }, [batchCount, images, opacity])
+  }, [batchCount, images])
 
   return (
     <>
@@ -234,6 +250,7 @@ export default function Home() {
           maxWidth: '2400px',
           margin: '0 auto'
         }}>
+          {/* Show completed batches */}
           {blendBatches.map((batch, batchIndex) => (
             batch.combinations.map((combo, i) => (
               allBlends.map((blend, k) => {
@@ -283,9 +300,62 @@ export default function Home() {
               })
             ))
           ))}
+
+          {/* Show currently processing blends */}
+          {currentProcessing.map((item, index) => (
+            <div key={`processing-${index}`} style={{
+              border: '1px solid #111',
+              borderRadius: '4px',
+              padding: '0.25rem',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              fontSize: '0.7rem',
+              animation: 'fadeIn 0.3s ease-in',
+              background: '#000'
+            }}>
+              <img 
+                src={item.result.src}
+                style={{ 
+                  width: '100%', 
+                  height: 'auto',
+                  cursor: 'pointer',
+                  borderRadius: '2px'
+                }} 
+                onDoubleClick={() => {
+                  const canvas = document.createElement('canvas')
+                  renderCanvas(item.combo.img1, item.combo.img2, canvas, item.blend)
+                  downloadImage(canvas)
+                }}
+                title={`Double click to download`}
+              />
+              <div style={{
+                width: '100%',
+                marginTop: '0.25rem',
+                textAlign: 'center',
+                lineHeight: '1.2'
+              }}>
+                <div style={{fontWeight: 'bold'}}>{item.blend}</div>
+                <div style={{color: '#666', fontSize: '0.65rem'}}>
+                  Processing Batch {item.batchNum}: {item.combo.name1.slice(0, 10)}... + {item.combo.name2.slice(0, 10)}...
+                </div>
+                <div style={{color: '#888', fontSize: '0.65rem'}}>
+                  {Math.round(opacity * 100)}% opacity
+                </div>
+              </div>
+            </div>
+          ))}
+          
           <div ref={containerRef} style={{ height: '20px' }} />
         </div>
       </main>
+      
+      <style jsx global>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </>
   )
 }
