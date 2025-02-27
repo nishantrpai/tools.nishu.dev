@@ -14,6 +14,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false)
   const [currentBatchInfo, setCurrentBatchInfo] = useState('')
   const [currentProcessing, setCurrentProcessing] = useState([])
+  const [usedOpacities, setUsedOpacities] = useState(new Set([1])) // Track used opacity values
 
   const handleImages = async (e) => {
     setCurrentProcessing([])
@@ -46,14 +47,16 @@ export default function Home() {
 
   const getImageCombinations = (batchNum) => {
     const combinations = []
-    // Only include previous results if we have any batches
     const previousResults = blendBatches.length > 0 
       ? blendBatches.flatMap(batch => batch.results || [])
       : [];
     const allSources = [...images, ...previousResults];
     
-    // For first batch, only combine original images
-    if (batchNum === 1 || blendBatches.length === 0) {
+    // For new opacity on existing images/results
+    const currentOpacity = opacity
+    
+    if (batchNum === 1) {
+      // First batch logic remains the same
       for (let i = 0; i < images.length; i++) {
         for (let j = i + 1; j < images.length; j++) {
           combinations.push({
@@ -67,22 +70,18 @@ export default function Home() {
         }
       }
     } else {
-      // For subsequent batches, blend previous results with everything
-      const lastBatchIndex = blendBatches.length - 1;
-      const previousBatch = blendBatches[lastBatchIndex]?.results || [];
-      
-      if (previousBatch.length > 0) {
-        for (let i = 0; i < previousBatch.length; i++) {
-          for (let j = 0; j < allSources.length; j++) {
-            combinations.push({
-              img1: previousBatch[i],
-              img2: allSources[j],
-              name1: `Blend${batchNum-1}_${i}`,
-              name2: j < images.length ? files[j].name : `Blend${Math.floor(j/images.length)}_${j%images.length}`,
-              index1: i,
-              index2: j
-            })
-          }
+      // For subsequent batches, include all previous results with new opacity
+      for (let i = 0; i < allSources.length; i++) {
+        for (let j = i + 1; j < allSources.length; j++) {
+          combinations.push({
+            img1: allSources[i],
+            img2: allSources[j],
+            name1: i < images.length ? files[i].name : `Blend${Math.floor(i/images.length)}_${i%images.length}`,
+            name2: j < images.length ? files[j].name : `Blend${Math.floor(j/images.length)}_${j%images.length}`,
+            index1: i,
+            index2: j,
+            opacity: currentOpacity
+          })
         }
       }
     }
@@ -90,7 +89,12 @@ export default function Home() {
   }
 
   const handleOpacity = (e) => {
-    setOpacity(e.target.value)
+    const newOpacity = parseFloat(e.target.value)
+    setOpacity(newOpacity)
+    if (!usedOpacities.has(newOpacity)) {
+      setUsedOpacities(prev => new Set([...prev, newOpacity]))
+      setBatchCount(prev => prev + 1) // Trigger new batch for new opacity
+    }
   }
 
   const downloadImage = (canvas) => {
@@ -101,7 +105,7 @@ export default function Home() {
     a.click()
   }
 
-  const renderCanvas = (image1, image2, canvas, blendMode) => {
+  const renderCanvas = (image1, image2, canvas, blendMode, opacityValue) => {
     const ctx = canvas.getContext('2d')
     canvas.width = 400 // Set fixed width for better performance
     canvas.height = 400 // Set fixed height for better performance
@@ -115,7 +119,7 @@ export default function Home() {
     ctx.drawImage(image1, 0, 0, canvas.width, canvas.height)
     
     // Second image
-    ctx.globalAlpha = opacity
+    ctx.globalAlpha = opacityValue
     ctx.globalCompositeOperation = blendMode
     ctx.drawImage(image2, 0, 0, canvas.width, canvas.height)
     
@@ -160,14 +164,14 @@ export default function Home() {
             return
           }
 
-          setCurrentBatchInfo(`Processing batch ${batchCount}: Starting...`)
+          setCurrentBatchInfo(`Processing batch ${batchCount} with opacity ${opacity}: Starting...`)
           const batchResults = []
           const canvas = document.createElement('canvas')
           let processedCount = 0
           
           for (const combo of combinations) {
             for (const blend of allBlends) {
-              renderCanvas(combo.img1, combo.img2, canvas, blend)
+              renderCanvas(combo.img1, combo.img2, canvas, blend, combo.opacity || opacity)
               const blendResult = await createBlendResult(canvas)
               batchResults.push(blendResult)
               processedCount++
@@ -177,6 +181,7 @@ export default function Home() {
                 result: blendResult,
                 combo,
                 blend,
+                opacity: combo.opacity || opacity,
                 batchNum: batchCount,
                 index: processedCount - 1
               }])
@@ -191,7 +196,8 @@ export default function Home() {
           setBlendBatches(prev => [...prev, {
             batchNum: batchCount,
             combinations,
-            results: batchResults
+            results: batchResults,
+            opacity: opacity
           }])
           setCurrentProcessing([])
           setCurrentBatchInfo('')
@@ -276,7 +282,7 @@ export default function Home() {
                       }} 
                       onDoubleClick={(e) => {
                         const canvas = document.createElement('canvas')
-                        renderCanvas(combo.img1, combo.img2, canvas, blend)
+                        renderCanvas(combo.img1, combo.img2, canvas, blend, batch.opacity)
                         downloadImage(canvas)
                       }}
                       title={`Double click to download`}
@@ -292,7 +298,7 @@ export default function Home() {
                         Batch {batch.batchNum}: {combo.name1.slice(0, 10)}... + {combo.name2.slice(0, 10)}...
                       </div>
                       <div style={{color: '#888', fontSize: '0.65rem'}}>
-                        {Math.round(opacity * 100)}% opacity
+                        {Math.round(batch.opacity * 100)}% opacity
                       </div>
                     </div>
                   </div>
@@ -324,7 +330,7 @@ export default function Home() {
                 }} 
                 onDoubleClick={() => {
                   const canvas = document.createElement('canvas')
-                  renderCanvas(item.combo.img1, item.combo.img2, canvas, item.blend)
+                  renderCanvas(item.combo.img1, item.combo.img2, canvas, item.blend, item.opacity)
                   downloadImage(canvas)
                 }}
                 title={`Double click to download`}
@@ -340,7 +346,7 @@ export default function Home() {
                   {item.combo.name1.slice(0, 10)}... + {item.combo.name2.slice(0, 10)}...
                 </div>
                 <div style={{color: '#888', fontSize: '0.65rem'}}>
-                  {Math.round(opacity * 100)}% opacity
+                  {Math.round(item.opacity * 100)}% opacity
                 </div>
               </div>
             </div>
