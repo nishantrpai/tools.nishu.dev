@@ -1886,6 +1886,12 @@ export const tools = [
     description: 'Based Punk Filter',
     publishDate: '16th Feb 2025',
     url: '/basedpunkfilter'
+  },
+  {
+    title: 'Add colors',
+    description: 'Add multiple colors',
+    publishDate: '22nd Feb 2025',
+    url: '/addcolors'
   }
 
 ]
