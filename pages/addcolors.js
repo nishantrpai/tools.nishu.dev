@@ -2,6 +2,85 @@ import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { useState, useEffect } from 'react'
 import html2canvas from 'html2canvas'
+import { ethers } from 'ethers'
+
+// Contract details
+const contractAddress = '0x7bc1c072742d8391817eb4eb2317f98dc72c61db';
+const abi = [
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "color",
+        "type": "string"
+      }
+    ],
+    "name": "mint",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "ownerOf",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "color",
+        "type": "string"
+      }
+    ],
+    "name": "getColorData",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "tokenId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "isUsed",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint256",
+            "name": "nameChangeCount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "string[]",
+            "name": "modifiableTraits",
+            "type": "string[]"
+          }
+        ],
+        "internalType": "struct IBaseColors.ColorData",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+];
 
 export default function Home() {
   const [colors, setColors] = useState([{ id: 1, hex: '#FF0000' }, { id: 2, hex: '#0000FF' }])
@@ -10,12 +89,168 @@ export default function Home() {
   const [blendedColor, setBlendedColor] = useState('#000000')
   const [blendMethod, setBlendMethod] = useState('average') // average, additive, subtractive
   
+  // Wallet and contract state
+  const [provider, setProvider] = useState(null);
+  const [signer, setSigner] = useState(null);
+  const [contract, setContract] = useState(null);
+  const [isMinting, setIsMinting] = useState(false);
+  const [colorOwner, setColorOwner] = useState(null);
+  const [colorTokenId, setColorTokenId] = useState(null);
+  const [isChecking, setIsChecking] = useState(false);
+  
+  // Calculate blended color whenever colors array changes
   useEffect(() => {
-    // Calculate blended color whenever colors array changes
     if (colors.length > 0) {
       calculateBlendedColor()
     }
   }, [colors, blendMethod])
+
+  // Check if the color is already owned whenever blendedColor changes
+  useEffect(() => {
+    const checkOwnership = async () => {
+      if (!blendedColor || !isValidHexColor(blendedColor)) {
+        setColorOwner(null);
+        setColorTokenId(null);
+        return;
+      }
+      
+      setIsChecking(true);
+      
+      try {
+        // Create a one-time provider for this check
+        const tempProvider = new ethers.JsonRpcProvider('https://base.llamarpc.com');
+        const tempContract = new ethers.Contract(contractAddress, abi, tempProvider);
+        
+        // Get the color value without the # prefix
+        const colorValue = blendedColor.trim();
+        
+        // First check if the color exists and get its token ID using getColorData
+        const colorData = await tempContract.getColorData(colorValue);
+
+        console.log('Color data:', colorData);  
+        
+        // Check if the color is used (minted)
+        if (colorData.isUsed) {
+          setColorTokenId(colorData.tokenId);
+          
+          // Now get the owner using the token ID
+          const owner = await tempContract.ownerOf(colorData.tokenId);
+          setColorOwner(owner);
+        } else {
+          // Color exists in the system but isn't minted/used
+          setColorOwner(null);
+        }
+      } catch (error) {
+        // If the color doesn't exist or there's an error
+        console.error('Error checking color ownership:', error);
+        setColorOwner(null);
+        setColorTokenId(null);
+      } finally {
+        setIsChecking(false);
+      }
+    };
+    
+    checkOwnership();
+  }, [blendedColor]);
+
+  // Connect to the user's wallet
+  const connectWallet = async () => {
+    if (typeof window !== 'undefined' && window.ethereum) {
+      try {
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const walletProvider = new ethers.providers.Web3Provider(window.ethereum);
+        setProvider(walletProvider);
+        const walletSigner = walletProvider.getSigner();
+        setSigner(walletSigner);
+        const walletContract = new ethers.Contract(contractAddress, abi, walletSigner);
+        setContract(walletContract);
+      } catch (error) {
+        console.error('Wallet connection failed:', error);
+        alert('Failed to connect wallet.');
+      }
+    } else {
+      alert('Please install MetaMask to use this feature.');
+    }
+  };
+
+  // Ensure the user is on the Base chain (chainId: 8453)
+  const checkNetwork = async () => {
+    if (!provider) return false;
+    
+    const network = await provider.getNetwork();
+    if (network.chainId !== 8453) {
+      try {
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: '0x2105' }], // 8453 in hex
+        });
+        return true;
+      } catch (error) {
+        console.error('Network switch failed:', error);
+        alert('Please switch to the Base chain.');
+        return false;
+      }
+    }
+    return true;
+  };
+
+  // Mint the blended color
+  const mintColor = async () => {
+    if (!isValidHexColor(blendedColor)) {
+      alert('Invalid color format. Please blend a valid color.');
+      return;
+    }
+
+    if (colorOwner) {
+      alert('This color is already owned and cannot be minted again.');
+      return;
+    }
+
+    if (!contract) {
+      alert('Please connect your wallet first.');
+      return;
+    }
+
+    setIsMinting(true);
+    try {
+      const networkReady = await checkNetwork();
+      if (!networkReady) {
+        setIsMinting(false);
+        return;
+      }
+      
+      const colorToMint = blendedColor.replace('#', '');
+      const tx = await contract.mint(colorToMint);
+      console.log('Transaction hash:', tx.hash);
+      await tx.wait();
+      alert('Color minted successfully!');
+      
+      // Refresh ownership status
+      try {
+        const tempProvider = new ethers.providers.JsonRpcProvider('https://base.llamarpc.com');
+        const tempContract = new ethers.Contract(contractAddress, abi, tempProvider);
+        
+        const colorData = await tempContract.getColorData(colorToMint);
+        if (colorData.isUsed) {
+          setColorTokenId(colorData.tokenId);
+          const owner = await tempContract.ownerOf(colorData.tokenId);
+          setColorOwner(owner);
+        }
+      } catch (error) {
+        console.error('Error checking new ownership:', error);
+      }
+    } catch (error) {
+      console.error('Minting failed:', error);
+      alert('Minting failed. ' + (error.message || 'Check console for details.'));
+    } finally {
+      setIsMinting(false);
+    }
+  };
+
+  // Validate hex color format
+  const isValidHexColor = (color) => {
+    return /^#[0-9A-F]{6}$/i.test(color);
+  };
 
   const calculateBlendedColor = () => {
     if (colors.length === 0) return '#000000'
@@ -95,11 +330,13 @@ export default function Home() {
   }
   
   const copyToClipboard = (text) => {
-    navigator.clipboard.writeText(text).then(() => {
-      // Copied successfully
-    }, (err) => {
-      console.error('Could not copy text: ', err)
-    })
+    if (typeof navigator !== 'undefined') {
+      navigator.clipboard.writeText(text).then(() => {
+        // Copied successfully
+      }, (err) => {
+        console.error('Could not copy text: ', err)
+      })
+    }
   }
 
   const hexToRgb = (hex) => {
@@ -130,6 +367,19 @@ export default function Home() {
       a.click()
     })
   }
+
+  // Generate OpenSea link for the current blended color
+  const getOpenSeaLink = () => {
+    if (!colorTokenId) {
+      // If we don't have a token ID from the contract, calculate it from the hex
+      if (!blendedColor || !isValidHexColor(blendedColor)) return '';
+      const calculatedTokenId = parseInt(blendedColor.replace('#', ''), 16);
+      return `https://opensea.io/assets/base/${contractAddress}/${calculatedTokenId}`;
+    }
+    
+    // Use the token ID from the contract if available
+    return `https://opensea.io/assets/base/${contractAddress}/${colorTokenId}`;
+  };
 
   return (
     <>
@@ -224,6 +474,95 @@ export default function Home() {
                 <div style={{ marginTop: '0.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <h4 style={{ margin: '0' }}>Result: {blendedColor}</h4>
                   <button onClick={() => copyToClipboard(blendedColor)}>Copy Hex</button>
+                </div>
+              </div>
+              
+              {/* NFT Minting Section */}
+              <div style={{ 
+                padding: '1rem', 
+                border: '1px solid #333', 
+                borderRadius: '8px',
+                backgroundColor: '#000' 
+              }}>
+                <h3>NFT Status</h3>
+                <div>
+                  {isChecking ? (
+                    <p style={{ margin: '0.5rem 0', color: '#ffffff' }}>Checking ownership status...</p>
+                  ) : colorOwner ? (
+                    <div>
+                      <p style={{ margin: '0.5rem 0', color: '#e53e3e' }}>
+                        This color is already owned by:{' '}
+                        <a
+                          href={`https://basescan.org/address/${colorOwner}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{ textDecoration: 'underline', color: '#0070f3' }}
+                        >
+                          {colorOwner.slice(0, 6)}...{colorOwner.slice(-4)}
+                        </a>
+                      </p>
+                      {colorTokenId && (
+                        <p style={{ margin: '0.5rem 0', color: '#ffffff' }}>
+                          Token ID: {colorTokenId.toString()}
+                        </p>
+                      )}
+                    </div>
+                  ) : (
+                    <p style={{ margin: '0.5rem 0', color: '#38a169' }}>
+                      This color is available to mint as an NFT
+                    </p>
+                  )}
+                  
+                  {isValidHexColor(blendedColor) && (
+                    <div style={{ marginTop: '0.5rem' }}>
+                      <a
+                        href={getOpenSeaLink()}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ 
+                          display: 'inline-block', 
+                          margin: '0.5rem 0', 
+                          color: '#0070f3', 
+                          textDecoration: 'underline'
+                        }}
+                      >
+                        View on OpenSea
+                      </a>
+                    </div>
+                  )}
+                  
+                  <div style={{ marginTop: '1rem' }}>
+                    {!signer ? (
+                      <button 
+                        onClick={connectWallet} 
+                        style={{
+                          backgroundColor: '#0070f3',
+                          color: 'white',
+                          border: 'none',
+                          padding: '0.5rem 1rem',
+                          borderRadius: '4px',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Connect Wallet to Mint
+                      </button>
+                    ) : (
+                      <button 
+                        onClick={mintColor} 
+                        disabled={isMinting || colorOwner || isChecking}
+                        style={{
+                          backgroundColor: colorOwner || isChecking ? '#cccccc' : '#0070f3',
+                          color: 'white',
+                          border: 'none',
+                          padding: '0.5rem 1rem',
+                          borderRadius: '4px',
+                          cursor: colorOwner || isChecking ? 'not-allowed' : 'pointer'
+                        }}
+                      >
+                        {isMinting ? 'Minting...' : isChecking ? 'Checking...' : colorOwner ? 'Already Minted' : 'Mint Color'}
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
               
