@@ -498,15 +498,7 @@ export default function NaturalGradient() {
           ))}
         </div>
         </div>
-        <button style={{
-          marginTop: '30px',
-          padding: '10px 20px',
-          borderRadius: '5px',
-          backgroundColor: '#0070f3',
-          color: 'white',
-          border: 'none',
-          cursor: 'pointer'
-        }} onClick={() => {
+        <button  onClick={() => {
           const paletteCard = document.getElementById('palette-card')
           html2canvas(paletteCard, {
             backgroundColor: '#000',
