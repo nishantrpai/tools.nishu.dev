@@ -86,7 +86,7 @@ export default function Home() {
   const [colors, setColors] = useState([{ id: 1, hex: '#FF0000' }, { id: 2, hex: '#0000FF' }])
   const [selectedColor, setSelectedColor] = useState('#FF0000')
   const [nextId, setNextId] = useState(3)
-  const [blendedColor, setBlendedColor] = useState('#000000')
+  const [blendedColor, setBlendedColor] = useState('')
   const [blendMethod, setBlendMethod] = useState('average') // average, additive, subtractive
   
   // Wallet and contract state
@@ -128,7 +128,7 @@ export default function Home() {
         // First check if the color exists and get its token ID using getColorData
         const colorData = await tempContract.getColorData(colorValue);
 
-        console.log('Color data:', colorData);  
+        console.log('Color data:', colorValue, colorData, colorData.isUsed, colorData.tokenId);
         
         // Check if the color is used (minted)
         if (colorData.isUsed) {
@@ -232,13 +232,22 @@ export default function Home() {
         const tempContract = new ethers.Contract(contractAddress, abi, tempProvider);
         
         const colorData = await tempContract.getColorData(colorToMint);
-        if (colorData.isUsed) {
-          setColorTokenId(colorData.tokenId);
+        let tokenId = colorData.tokenId.toString();
+        if (tokenId !== '0') {
+          // big number to string
+          setColorTokenId(tokenId);
           const owner = await tempContract.ownerOf(colorData.tokenId);
           setColorOwner(owner);
+        } else {
+          setColorTokenId(null);
+          setColorOwner(null);
         }
       } catch (error) {
         console.error('Error checking new ownership:', error);
+        if(error.message.includes('color not used')) {
+          setColorTokenId(null);
+          setColorOwner(null);
+        }
       }
     } catch (error) {
       console.error('Minting failed:', error);
@@ -375,22 +384,9 @@ export default function Home() {
 
   // Generate OpenSea link for the current blended color
   const getOpenSeaLink = () => {
-    if (!colorTokenId) {
-      // If we don't have a token ID from the contract, calculate it from the hex
-      if (!blendedColor || !isValidHexColor(blendedColor)) return '';
-      const calculatedTokenId = parseInt(blendedColor.replace('#', ''), 16);
-      return `https://opensea.io/assets/base/${contractAddress}/${calculatedTokenId}`;
-    }
     
     // Use the token ID from the contract if available
     return `https://opensea.io/assets/base/${contractAddress}/${colorTokenId}`;
-  };
-
-  // Generate link to mint on BaseColors.com
-  const getBaseColorsLink = () => {
-    if (!blendedColor || !isValidHexColor(blendedColor)) return '';
-    const colorWithoutHash = blendedColor.replace('#', '');
-    return `https://www.basecolors.com/mint/${colorWithoutHash}`;
   };
 
   return (
@@ -507,7 +503,7 @@ export default function Home() {
                 <div>
                   {isChecking ? (
                     <p style={{ margin: '0.5rem 0', color: '#ffffff' }}>Checking ownership status...</p>
-                  ) : colorOwner ? (
+                  ) : colorTokenId ? (
                     <div>
                       <p style={{ margin: '0.5rem 0', color: '#e53e3e' }}>
                         This color is already owned by:{' '}
@@ -525,7 +521,7 @@ export default function Home() {
                           Token ID: {colorTokenId.toString()}
                         </p>
                       )}
-                      {isValidHexColor(blendedColor) && (
+                      {colorTokenId && (
                         <div style={{ marginTop: '0.5rem' }}>
                           <a
                             href={getOpenSeaLink()}
@@ -553,101 +549,22 @@ export default function Home() {
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1rem' }}>
                         {/* Option 1: Mint directly here with wallet */}
                         <div>
-                          <h4 style={{ margin: '0 0 0.5rem 0', color: '#ffffff' }}>Option 1: Mint here</h4>
-                          {!signer ? (
-                            <button 
-                              onClick={connectWallet} 
-                              style={{
-                                backgroundColor: '#0070f3',
-                                color: 'white',
-                                border: 'none',
-                                padding: '0.5rem 1rem',
-                                borderRadius: '4px',
-                                cursor: 'pointer'
-                              }}
-                            >
-                              Connect Wallet to Mint
-                            </button>
-                          ) : (
-                            <button 
-                              onClick={mintColor} 
-                              disabled={isMinting || colorOwner || isChecking}
-                              style={{
-                                backgroundColor: colorOwner || isChecking ? '#cccccc' : '#0070f3',
-                                color: 'white',
-                                border: 'none',
-                                padding: '0.5rem 1rem',
-                                borderRadius: '4px',
-                                cursor: colorOwner || isChecking ? 'not-allowed' : 'pointer'
-                              }}
-                            >
-                              {isMinting ? 'Minting...' : isChecking ? 'Checking...' : 'Mint Color'}
-                            </button>
-                          )}
+                          <a href='https://www.basecolors.com' target="_blank" rel="noopener noreferrer" style={{ 
+                              display: 'inline-block', 
+                              margin: '0.5rem 0', 
+                              color: '#0070f3', 
+                              textDecoration: 'underline'
+                            }}>
+                            Mint on BaseColors.com
+                          </a>
+
                         </div>
                         
-                        {/* Option 2: Mint on BaseColors.com */}
-                        <div>
-                          <h4 style={{ margin: '0 0 0.5rem 0', color: '#ffffff' }}>Option 2: Mint on BaseColors.com</h4>
-                          <div style={{ display: 'flex', gap: '0.5rem' }}>
-                            <a
-                              href={getBaseColorsLink()}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              style={{
-                                backgroundColor: '#38a169',
-                                color: 'white',
-                                border: 'none',
-                                padding: '0.5rem 1rem',
-                                borderRadius: '4px',
-                                cursor: 'pointer',
-                                textDecoration: 'none',
-                                display: 'inline-block'
-                              }}
-                            >
-                              Go to BaseColors
-                            </a>
-                            <button
-                              onClick={() => copyToClipboard(blendedColor.replace('#', ''))}
-                              style={{
-                                backgroundColor: '#f0f0f0',
-                                color: '#333',
-                                border: 'none',
-                                padding: '0.5rem 1rem',
-                                borderRadius: '4px',
-                                cursor: 'pointer'
-                              }}
-                            >
-                              Copy Color Code
-                            </button>
-                          </div>
-                          {copySuccess && (
-                            <p style={{ fontSize: '0.8rem', color: '#38a169', margin: '0.5rem 0 0 0' }}>
-                              {copySuccess}
-                            </p>
-                          )}
-                        </div>
+                        
                       </div>
                     </div>
                   )}
                   
-                  {/* Always show OpenSea link */}
-                  {isValidHexColor(blendedColor) && !colorOwner && (
-                    <div style={{ marginTop: '1rem' }}>
-                      <a
-                        href={getOpenSeaLink()}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{ 
-                          display: 'inline-block', 
-                          color: '#0070f3', 
-                          textDecoration: 'underline'
-                        }}
-                      >
-                        View on OpenSea
-                      </a>
-                    </div>
-                  )}
                 </div>
               </div>
               
