@@ -499,7 +499,7 @@ export default function Home() {
                 borderRadius: '8px',
                 backgroundColor: '#000' 
               }}>
-                <h3>NFT Status</h3>
+                <h3>Is this available on basecolors?</h3>
                 <div>
                   {isChecking ? (
                     <p style={{ margin: '0.5rem 0', color: '#ffffff' }}>Checking ownership status...</p>
