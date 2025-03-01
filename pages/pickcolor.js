@@ -7,12 +7,99 @@ import styles from '@/styles/Home.module.css'
 import { useState, useEffect } from 'react'
 import Draggable from 'react-draggable'
 import html2canvas from 'html2canvas'
+import { ethers } from 'ethers'
+
+// Contract details
+const contractAddress = '0x7bc1c072742d8391817eb4eb2317f98dc72c61db';
+const abi = [
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "color",
+        "type": "string"
+      }
+    ],
+    "name": "mint",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "ownerOf",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "color",
+        "type": "string"
+      }
+    ],
+    "name": "getColorData",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "tokenId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "isUsed",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint256",
+            "name": "nameChangeCount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "string[]",
+            "name": "modifiableTraits",
+            "type": "string[]"
+          }
+        ],
+        "internalType": "struct IBaseColors.ColorData",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+];
 
 export default function NaturalGradient() {
   const [canvas, setCanvas] = useState(null)
   const [context, setContext] = useState(null)
   const [image, setImage] = useState(null)
   const [palette, setPalette] = useState(['#000', '#000', '#000', '#000', '#000'])
+  const [colorStates, setColorStates] = useState([
+    { isChecking: false, owner: null, tokenId: null },
+    { isChecking: false, owner: null, tokenId: null },
+    { isChecking: false, owner: null, tokenId: null },
+    { isChecking: false, owner: null, tokenId: null },
+    { isChecking: false, owner: null, tokenId: null }
+  ])
+  const [selectedColorIndex, setSelectedColorIndex] = useState(null)
 
   useEffect(() => {
     const canvas = document.getElementById('canvas')
@@ -44,8 +131,16 @@ export default function NaturalGradient() {
         }
       }
     })
-  }
-  , [canvas, context])
+  }, [canvas, context])
+
+  // Check if the color is already owned whenever palette changes
+  useEffect(() => {
+    palette.forEach((color, index) => {
+      if (color !== '#000') {
+        checkOwnership(color, index);
+      }
+    });
+  }, [palette]);
 
   const handleImage = (event) => {
     const file = event.target.files[0]
@@ -64,11 +159,75 @@ export default function NaturalGradient() {
     reader.readAsDataURL(file)
   }
 
+  // Check if the color is owned
+  const checkOwnership = async (colorHex, index) => {
+    if (!colorHex || !isValidHexColor(colorHex)) {
+      return;
+    }
+    
+    setColorStates(prevStates => {
+      const newStates = [...prevStates];
+      newStates[index] = { ...newStates[index], isChecking: true };
+      return newStates;
+    });
+    
+    try {
+      // Create a one-time provider for this check
+      const tempProvider = new ethers.JsonRpcProvider('https://base.llamarpc.com');
+      const tempContract = new ethers.Contract(contractAddress, abi, tempProvider);
+      
+      // Get the color value without the # prefix
+      const colorValue = colorHex.trim();
+      
+      // First check if the color exists and get its token ID using getColorData
+      const colorData = await tempContract.getColorData(colorValue);
+      
+      // Check if the color is used (minted)
+      if (colorData.isUsed) {
+        // Now get the owner using the token ID
+        const owner = await tempContract.ownerOf(colorData.tokenId);
+        
+        setColorStates(prevStates => {
+          const newStates = [...prevStates];
+          newStates[index] = { 
+            isChecking: false, 
+            owner: owner, 
+            tokenId: colorData.tokenId.toString() 
+          };
+          return newStates;
+        });
+      } else {
+        // Color exists in the system but isn't minted/used
+        setColorStates(prevStates => {
+          const newStates = [...prevStates];
+          newStates[index] = { isChecking: false, owner: null, tokenId: null };
+          return newStates;
+        });
+      }
+    } catch (error) {
+      // If the color doesn't exist or there's an error
+      console.error('Error checking color ownership:', error);
+      setColorStates(prevStates => {
+        const newStates = [...prevStates];
+        newStates[index] = { isChecking: false, owner: null, tokenId: null };
+        return newStates;
+      });
+    }
+  };
+
+  // Validate hex color format
+  const isValidHexColor = (color) => {
+    return /^#[0-9A-F]{6}$/i.test(color);
+  };
+
+  // Generate OpenSea link for a selected color
+  const getOpenSeaLink = (tokenId) => {
+    return `https://opensea.io/assets/base/${contractAddress}/${tokenId}`;
+  };
   
   const pickColor = (x, y) => {
-    console.log(x, y);
     const imgData = context.getImageData(x, y, 5, 5).data
-  // pick dominant color from a 5x5 pixel area
+    // pick dominant color from a 5x5 pixel area
     let dominantColor = [0, 0, 0]
     let maxCount = 0
     const colorCount = {}
@@ -87,8 +246,9 @@ export default function NaturalGradient() {
         dominantColor = [r, g, b]
       }
     }
-    const color = `rgb(${dominantColor[0]}, ${dominantColor[1]}, ${dominantColor[2]})`
-    return color
+    // Convert RGB to HEX
+    const hexColor = rgbToHex(dominantColor)
+    return hexColor
   }
 
   const handleStop = (index, data) => {
@@ -98,22 +258,30 @@ export default function NaturalGradient() {
     const x = data.x * scaleX
     const y = data.y * scaleY
 
-    console.log(x, y)
     const color = pickColor(x, y)
     setPalette((prevPalette) => {
       const newPalette = [...prevPalette]
       newPalette[index] = color
       return newPalette
     })
-
+    
+    setSelectedColorIndex(index)
   }
 
-  const rgbToHex = ([r, g, b]) => {
-    console.log(r, g, b)
+  const rgbToHex = (rgb) => {
+    const [r, g, b] = rgb
     return '#' + [r, g, b].map((x) => {
       const hex = x.toString(16)
       return hex.length === 1 ? '0' + hex : hex
     }).join('')
+  }
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text).then(() => {
+      alert(`Copied ${text} to clipboard!`)
+    }, (err) => {
+      console.error('Could not copy text: ', err)
+    })
   }
 
   let initialPositions = [
@@ -123,13 +291,6 @@ export default function NaturalGradient() {
     { x: 30, y: 0 },
     { x: 40, y: 0 },
   ]
-
-  // initialPositions = initialPositions.map((pos) => {
-  //   return {
-  //     x: pos.x + window.innerWidth / 2,
-  //     y: pos.y + window.innerHeight / 2,
-  //   }
-  // })
 
   return (
     <div className={styles.container}>
@@ -146,7 +307,6 @@ export default function NaturalGradient() {
         <h2 className={styles.description}>
           Pick colors from an image
         </h2>
-
 
         <input type="file" onChange={handleImage} />
         <div id="palette-card" style={{
@@ -232,9 +392,120 @@ export default function NaturalGradient() {
             </div>
           ))}
         </div>
+
+        {/* Color Details and BaseColors Availability */}
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',  // Changed to column layout
+          alignItems: 'center',
+          marginTop: '30px',
+          gap: '20px',
+          width: '100%'
+        }}>
+          {palette.map((color, index) => (
+            color !== '#000' && (
+              <div key={`details-${index}`} style={{
+                width: '100%',  // Full width for column layout
+                maxWidth: '500px', // Limit max width for better readability
+                display: 'flex',  // Make each color card a row
+                border: '1px solid #333',
+                borderRadius: '8px',
+                overflow: 'hidden',
+                backgroundColor: '#111'
+              }}>
+                {/* Color Display - Left side */}
+                <div style={{
+                  width: '120px',  // Fixed width for the color square
+                  height: '120px',
+                  backgroundColor: color,
+                  position: 'relative',
+                  flexShrink: 0, // Prevent shrinking
+                }}>
+                  <div style={{
+                    position: 'absolute',
+                    top: '10px',
+                    left: '10px',
+                    backgroundColor: 'rgba(0,0,0,0.6)',
+                    padding: '3px 8px',
+                    borderRadius: '4px',
+                    fontSize: '14px',
+                    color: '#fff'
+                  }}>
+                    {color}
+                  </div>
+                </div>
+                
+                {/* Color Availability - Right side */}
+                <div style={{
+                  padding: '15px',
+                  color: '#fff',
+                  flex: 1,  // Take remaining space
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center'
+                }}>
+                  <h4 style={{ margin: '0 0 10px 0' }}>BaseColors Status</h4>
+                  
+                  {colorStates[index].isChecking ? (
+                    <p style={{ fontSize: '14px', color: '#999' }}>Checking availability...</p>
+                  ) : colorStates[index].owner ? (
+                    <>
+                      <p style={{ fontSize: '14px', color: '#e53e3e', margin: '5px 0' }}>
+                        Already owned by:
+                      </p>
+                      <a
+                        href={`https://basescan.org/address/${colorStates[index].owner}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ fontSize: '13px', color: '#0070f3', wordBreak: 'break-all' }}
+                      >
+                        {colorStates[index].owner.slice(0, 6)}...{colorStates[index].owner.slice(-4)}
+                      </a>
+                      {colorStates[index].tokenId && (
+                        <>
+                          <p style={{ fontSize: '14px', margin: '10px 0 5px 0' }}>
+                            Token ID: {colorStates[index].tokenId}
+                          </p>
+                          <a
+                            href={getOpenSeaLink(colorStates[index].tokenId)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ fontSize: '13px', color: '#0070f3' }}
+                          >
+                            View on OpenSea
+                          </a>
+                        </>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <p style={{ fontSize: '14px', color: '#38a169', margin: '5px 0' }}>
+                        Available to mint
+                      </p>
+                      <a
+                        href="https://www.basecolors.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ fontSize: '13px', color: '#0070f3' }}
+                      >
+                        Mint on BaseColors.com
+                      </a>
+                    </>
+                  )}
+                </div>
+              </div>
+            )
+          ))}
+        </div>
         </div>
         <button style={{
-          marginTop: '10px',
+          marginTop: '30px',
+          padding: '10px 20px',
+          borderRadius: '5px',
+          backgroundColor: '#0070f3',
+          color: 'white',
+          border: 'none',
+          cursor: 'pointer'
         }} onClick={() => {
           const paletteCard = document.getElementById('palette-card')
           html2canvas(paletteCard, {
@@ -248,7 +519,7 @@ export default function NaturalGradient() {
           })
         }}>
           Download Palette
-          </button>
+        </button>
       </main>
     </div>
   )
