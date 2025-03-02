@@ -211,7 +211,7 @@ export default function Home() {
         <h2 className={styles.description}>
           Merge 8pepen and Images
         </h2>
-        <canvas id="canvas" width="800" height="800"
+        <canvas id="canvas" width="1500" height="1500"
           style={{
             border: '1px solid #333',
             borderRadius: 10,
