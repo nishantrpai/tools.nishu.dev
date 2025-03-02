@@ -1,4 +1,4 @@
-// merge one day punks and scapes
+// merge any image file and blend it
 import Head from 'next/head'
 import { ethers } from 'ethers'
 import { useState, useEffect } from 'react'
@@ -22,8 +22,10 @@ export default function Home() {
 
 
   const [scapeID, setScapesId] = useState(1)
+  const [selectedImage, setSelectedImage] = useState(null)
   const [punkID, setPunkId] = useState(1)
   const [scapeImg, setScapeImg] = useState('')
+  const [imageToBlend, setImageToBlend] = useState(null)
   const [punkImg, setPunkImg] = useState('/8pepen.png')
   const [chain, setChain] = useState('ETHEREUM')
   const [status, setStatus] = useState('')
@@ -32,6 +34,7 @@ export default function Home() {
   const [scapeScale, setScapeScale] = useState(1)
   const punkContract = '0x5537d90a4a2dc9d9b37bab49b490cf67d4c54e91'
   const scapeContract = '0xb7def63a9040ad5dc431aff79045617922f4023a'
+  const [blendMode, setBlendMode] = useState('source-over')
 
   const changeSVG2PNG = async (svg) => {
     return new Promise((resolve, reject) => {
@@ -141,7 +144,7 @@ export default function Home() {
 
           // draw punk
           ctx.globalAlpha = 1
-          ctx.globalCompositeOperation = 'darken'
+          ctx.globalCompositeOperation = blendMode
           let scaleFactor = canvas.width / img2.width
           const scaledHeight = img2.height * scaleFactor
           const center = (canvas.height - scaledHeight) / 2
@@ -164,9 +167,9 @@ export default function Home() {
     setStatus('fetching scape...')
     getNFTData(scapeContract, scapeID).then(scape => {
       if (scape.image)
-        setScapeImg(scape.image)
+        setScapeImg(scape.image);
     });
-  }, [scapeID])
+  }, [scapeID]);
 
 
   useEffect(() => {
@@ -176,7 +179,7 @@ export default function Home() {
     setStatus('blending...')
 
     blendUpdateCanvas(punkImg, scapeImg)
-  }, [scapeImg, punkImg, scapeOffsetX, scapeOffsetY, scapeScale])
+  }, [scapeImg, punkImg, scapeOffsetX, scapeOffsetY, scapeScale, blendMode])
 
   return (
     <>
@@ -193,7 +196,7 @@ export default function Home() {
           color: '#333',
           fontSize: 12
         }}>
-          Merge 8pepen and Scapes
+          Merge 8pepen and Images
         </h2>
         <canvas id="canvas" width="500" height="500"
           style={{
@@ -206,16 +209,24 @@ export default function Home() {
         ></canvas>
         <div style={{ margin: 0, marginBottom: 20, display: 'flex', flexDirection: 'column', gap: 20, width: '50%' }}>
           <label>
-            Enter Scapes ID
+            Select Image to Blend
           </label>
-          <input type="text" value={scapeID} onChange={(e) => setScapesId(e.target.value)} placeholder='Enter Scapes ID' style={{
+          <input type="file" accept="image/*" onChange={(e) => {
+            const file = e.target.files[0];
+            if (file) {
+              setSelectedImage(file);
+              setImageToBlend(URL.createObjectURL(file));
+            }
+          }} style={{
+            border: '1px solid #333', width: '100%', fontSize: 16, borderRadius: 10, padding: 5
+          }} />
             border: '1px solid #333', width: '100%', fontSize: 16, borderRadius: 10, padding: 5
           }} />
           <div style={{
             display: 'flex', gap: 20, margin: 'auto', justifyContent: 'flex-start', alignItems: 'center', flexDirection: 'column'
           }}>
             <label>
-              Scape Offset X
+              Image Offset X
             </label>
             <div style={{display: 'flex', gap: 20, width: '100%'}}>
             <input type="range" min={-1000} max={1000} step={0.01} value={scapeOffsetX} onChange={(e) => setScapeOffsetX(e.target.value)} />
@@ -225,7 +236,7 @@ export default function Home() {
             </div>
             
             <label>
-              Scape Offset Y
+              Image Offset Y
             </label>
             <div style={{display: 'flex', gap: 20, width: '100%'}}>
             <input type="range" min="-500" max="500" value={scapeOffsetY} onChange={(e) => setScapeOffsetY(e.target.value)} />
@@ -235,7 +246,7 @@ export default function Home() {
 </div>
             
             <label>
-              Scape Scale
+              Image Scale
             </label>
             <div style={{display: 'flex', gap: 20, width: '100%'}}>
             
@@ -251,7 +262,28 @@ export default function Home() {
             color: '#eee'
           }}>{status}</span>
         </div>
-        
+        <label>
+          Blend Mode:
+          <select value={blendMode} onChange={(e) => setBlendMode(e.target.value)}>
+            <option value="source-over">Normal</option>
+            <option value="multiply">Multiply</option>
+            <option value="screen">Screen</option>
+            <option value="overlay">Overlay</option>
+            <option value="darken">Darken</option>
+            <option value="lighten">Lighten</option>
+            <option value="color-dodge">Color Dodge</option>
+            <option value="color-burn">Color Burn</option>
+            <option value="hard-light">Hard Light</option>
+            <option value="soft-light">Soft Light</option>
+            <option value="difference">Difference</option>
+            <option value="exclusion">Exclusion</option>
+            <option value="hue">Hue</option>
+            <option value="saturation">Saturation</option>
+            <option value="color">Color</option>
+            <option value="luminosity">Luminosity</option>
+          </select>
+        </label>
+
         <button onClick={() => {
           analytics({
             event: 'download',
