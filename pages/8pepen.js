@@ -7,6 +7,7 @@ import {analytics} from '@/utils/analytics'
 
 
 export default function Home() {
+  const [selectedImage, setSelectedImage] = useState(null);
   let RPC_CHAINS = {
     'ETHEREUM': {
       'rpc': 'https://ethereum-rpc.publicnode.com',
@@ -22,7 +23,6 @@ export default function Home() {
 
 
   const [scapeID, setScapesId] = useState(1)
-  const [selectedImage, setSelectedImage] = useState(null)
   const [punkID, setPunkId] = useState(1)
   const [scapeImg, setScapeImg] = useState('')
   const [imageToBlend, setImageToBlend] = useState(null)
@@ -122,8 +122,8 @@ export default function Home() {
 
 
     console.log(image1, image2)
-    if (!image1) return
-    if (!image2) return
+    if (!image1) return;
+    if (!image2) return;
 
     getImgFromURL(image1).then(img1 => {
       getImgFromURL(image2).then(img2 => {
@@ -133,28 +133,28 @@ export default function Home() {
           // draw black rectangle
 
           // draw punk
-          const canvas = document.getElementById('canvas')
-          const ctx = canvas.getContext('2d')
-          console.log('clearing canvas')
-          ctx.beginPath()
-          ctx.clearRect(0, 0, canvas.width, canvas.height)
+          const canvas = document.getElementById('canvas');
+          const ctx = canvas.getContext('2d');
+          console.log('clearing canvas');
+          ctx.beginPath();
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
 
           console.log('draw image1')
           ctx.drawImage(img1, 0, 0, canvas.width, canvas.height)
 
           // draw punk
           ctx.globalAlpha = 1
-          ctx.globalCompositeOperation = blendMode
-          let scaleFactor = canvas.width / img2.width
-          const scaledHeight = img2.height * scaleFactor
-          const center = (canvas.height - scaledHeight) / 2
+          ctx.globalCompositeOperation = blendMode;
+          let scaleFactor = canvas.width / img2.width;
+          const scaledHeight = img2.height * scaleFactor;
+          const center = (canvas.height - scaledHeight) / 2;
 
           console.log('draw image2')
 
-          ctx.drawImage(img2, scapeOffsetX, scapeOffsetY, img2.width * scapeScale, img2.height * scapeScale)
-          setStatus('')
+          ctx.drawImage(img2, scapeOffsetX, scapeOffsetY, img2.width * scapeScale, img2.height * scapeScale);
+          setStatus('');
           ctx.globalCompositeOperation = 'source-over';
-          ctx.closePath()
+          ctx.closePath();
         }
       });
     })
@@ -162,7 +162,7 @@ export default function Home() {
 
   useEffect(() => {
 
-    if (!scapeID) return
+    if (!scapeID) return;
 
     setStatus('fetching scape...')
     getNFTData(scapeContract, scapeID).then(scape => {
@@ -171,15 +171,21 @@ export default function Home() {
     });
   }, [scapeID]);
 
+  useEffect(() => {
+    if (imageToBlend) {
+      blendUpdateCanvas(punkImg, imageToBlend);
+    }
+  }, [imageToBlend]);
+
 
   useEffect(() => {
-    if (!scapeID) return
-    if (!punkID) return
+    if (!scapeID) return;
+    if (!punkID) return;
 
-    setStatus('blending...')
+    setStatus('blending...');
 
-    blendUpdateCanvas(punkImg, scapeImg)
-  }, [scapeImg, punkImg, scapeOffsetX, scapeOffsetY, scapeScale, blendMode])
+    blendUpdateCanvas(punkImg, scapeImg);
+  }, [scapeImg, punkImg, scapeOffsetX, scapeOffsetY, scapeScale, blendMode]);
 
   return (
     <>
@@ -220,40 +226,38 @@ export default function Home() {
           }} style={{
             border: '1px solid #333', width: '100%', fontSize: 16, borderRadius: 10, padding: 5
           }} />
-            border: '1px solid #333', width: '100%', fontSize: 16, borderRadius: 10, padding: 5
-          }} />
           <div style={{
             display: 'flex', gap: 20, margin: 'auto', justifyContent: 'flex-start', alignItems: 'center', flexDirection: 'column'
           }}>
             <label>
               Image Offset X
             </label>
-            <div style={{display: 'flex', gap: 20, width: '100%'}}>
-            <input type="range" min={-1000} max={1000} step={0.01} value={scapeOffsetX} onChange={(e) => setScapeOffsetX(e.target.value)} />
-            <input type='number' value={scapeOffsetX} onChange={(e) => setScapeOffsetX(e.target.value)} style={{
-              border: '1px solid #333', width: '30%', fontSize: 16, borderRadius: 10, padding: 5
-            }} />
+            <div style={{ display: 'flex', gap: 20, width: '100%' }}>
+              <input type="range" min={-1000} max={1000} step={0.01} value={scapeOffsetX} onChange={(e) => setScapeOffsetX(e.target.value)} />
+              <input type='number' value={scapeOffsetX} onChange={(e) => setScapeOffsetX(e.target.value)} style={{
+                border: '1px solid #333', width: '30%', fontSize: 16, borderRadius: 10, padding: 5
+              }} />
             </div>
             
             <label>
               Image Offset Y
             </label>
-            <div style={{display: 'flex', gap: 20, width: '100%'}}>
-            <input type="range" min="-500" max="500" value={scapeOffsetY} onChange={(e) => setScapeOffsetY(e.target.value)} />
-            <input type='number' value={scapeOffsetY} onChange={(e) => setScapeOffsetY(e.target.value)} style={{
-              border: '1px solid #333', width: '30%', fontSize: 16, borderRadius: 10, padding: 5
-            }} />
-</div>
+            <div style={{ display: 'flex', gap: 20, width: '100%' }}>
+              <input type="range" min="-500" max="500" value={scapeOffsetY} onChange={(e) => setScapeOffsetY(e.target.value)} />
+              <input type='number' value={scapeOffsetY} onChange={(e) => setScapeOffsetY(e.target.value)} style={{
+                border: '1px solid #333', width: '30%', fontSize: 16, borderRadius: 10, padding: 5
+              }} />
+            </div>
             
             <label>
               Image Scale
             </label>
-            <div style={{display: 'flex', gap: 20, width: '100%'}}>
-            
-            <input type="range" min="0" max="2" step="0.01" value={scapeScale} onChange={(e) => setScapeScale(e.target.value)} />
-            <input type='number' value={scapeScale} onChange={(e) => setScapeScale(e.target.value)} style={{
-              border: '1px solid #333', width: '30%', fontSize: 16, borderRadius: 10, padding: 5
-            }} />
+            <div style={{ display: 'flex', gap: 20, width: '100%' }}>
+
+              <input type="range" min="0" max="2" step="0.01" value={scapeScale} onChange={(e) => setScapeScale(e.target.value)} />
+              <input type='number' value={scapeScale} onChange={(e) => setScapeScale(e.target.value)} style={{
+                border: '1px solid #333', width: '30%', fontSize: 16, borderRadius: 10, padding: 5
+              }} />
             </div>
           </div>
           <span style={{
