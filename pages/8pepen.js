@@ -205,7 +205,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <h1>
+        <h1 className={styles.title}>
           8pepen Blender
         </h1>
         <h2 className={styles.description}>
