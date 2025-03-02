@@ -208,10 +208,7 @@ export default function Home() {
         <h1>
           8pepen Blender
         </h1>
-        <h2 style={{
-          color: '#333',
-          fontSize: 12
-        }}>
+        <h2 className={styles.description}>
           Merge 8pepen and Images
         </h2>
         <canvas id="canvas" width="800" height="800"
