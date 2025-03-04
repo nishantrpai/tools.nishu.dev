@@ -28,26 +28,58 @@ export default function Home() {
   const [imageScale, setImageScale] = useState(1)
   const [blendMode, setBlendMode] = useState('source-over')
   const [invertBase, setInvertBase] = useState(false)
-  
+
+  // Text customization states
+  const [topText, setTopText] = useState('')
+  const [middleText, setMiddleText] = useState('')
+  const [fontFamily, setFontFamily] = useState('Arial, sans-serif')
+  const [fontSize, setFontSize] = useState(48)
+  const [textColor, setTextColor] = useState('#FFFFFF')
+  const [shadowSize, setShadowSize] = useState(2)
+  const [shadowColor, setShadowColor] = useState('#000000')
+  const [textOffsetX, setTextOffsetX] = useState(0)
+  const [textOffsetY, setTextOffsetY] = useState(0)
+
   // Generate 8pepen SVG
   const generate8pepenSVG = () => {
     const bg = invertBase ? "#FFFFFF" : "#000000";
     const fg = invertBase ? "#000000" : "#FFFFFF";
-    
+
     // Create pattern definition
     const pattern = `
       <defs>
         <pattern id="pattern" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
           <rect x="0" y="0" width="100" height="100" fill="${fg}"/>
         </pattern>
+        <filter id="textShadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="0" stdDeviation="${shadowSize}" flood-color="${shadowColor}" />
+        </filter>
       </defs>
     `;
-    
+
+    // Process text to handle line breaks
+    const processedMiddleText = middleText
+      .split('\n')
+      .map((line, i) => {
+        // Calculate vertical position for each line with appropriate spacing
+        const yPos = 650 + parseInt(textOffsetY) + (i * (parseInt(fontSize) * 1.2));
+        const xPos = 400 + parseInt(textOffsetX);
+
+        return `<text x="${xPos}" y="${yPos}" 
+          font-family="${fontFamily}" 
+          font-size="${fontSize}" 
+          fill="${textColor}" 
+          text-anchor="middle" 
+          filter="url(#textShadow)">${line}</text>`;
+      })
+      .join('');
+
     // Complete SVG with pattern applied to all rectangles
     const svgContent = `
       <svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800" xml:space="preserve" style="background:${bg}">
-        ${pattern}
-        <g fill="url(#pattern)">
+      ${pattern}
+      <g fill="url(#pattern)">
+        <g id="head">
           <rect x="-50" y="-50" rx="0" ry="0" width="100" height="100" transform="translate(450 350)"/>
           <rect x="-50" y="-50" rx="0" ry="0" width="100" height="100" transform="translate(350 350)"/>
           <rect x="-50" y="-50" rx="0" ry="0" width="100" height="100" transform="translate(250 350)"/>
@@ -59,19 +91,22 @@ export default function Home() {
           <rect x="-50" y="-50" rx="0" ry="0" width="100" height="100" transform="translate(450 550)"/>
           <rect x="-50" y="-50" rx="0" ry="0" width="100" height="100" transform="translate(350 550)"/>
           <rect x="-50" y="-50" rx="0" ry="0" width="100" height="100" transform="translate(250 550)"/>
+          <rect x="-50" y="-50" rx="0" ry="0" width="100" height="100" transform="translate(450 250)"/>
+          <rect x="-50" y="-50" rx="0" ry="0" width="100" height="100" transform="translate(250 250)"/>
+          <rect x="-50" y="-50" rx="0" ry="0" width="100" height="100" transform="translate(550 250)"/>
+          <rect x="-50" y="-50" rx="0" ry="0" width="100" height="100" transform="translate(550 350)"/>
+          <rect x="-50" y="-50" rx="0" ry="0" width="100" height="100" transform="translate(350 250)"/>
+        </g>
+        <g id="body">
           <rect x="-50" y="-50" rx="0" ry="0" width="100" height="100" transform="translate(550 750)"/>
           <rect x="-50" y="-50" rx="0" ry="0" width="100" height="100" transform="translate(450 750)"/>
           <rect x="-50" y="-50" rx="0" ry="0" width="100" height="100" transform="translate(350 750)"/>
           <rect x="-50" y="-50" rx="0" ry="0" width="100" height="100" transform="translate(250 750)"/>
-          <rect x="-50" y="-50" rx="0" ry="0" width="100" height="100" transform="translate(450 250)"/>
-          <rect x="-50" y="-50" rx="0" ry="0" width="100" height="100" transform="translate(350 250)"/>
-          <rect x="-50" y="-50" rx="0" ry="0" width="100" height="100" transform="translate(250 250)"/>
-          <rect x="-50" y="-50" rx="0" ry="0" width="100" height="100" transform="translate(550 350)"/>
-          <rect x="-50" y="-50" rx="0" ry="0" width="100" height="100" transform="translate(550 250)"/>
         </g>
-      </svg>
-    `;
-    
+      </g>
+      ${processedMiddleText}
+    </svg>`;
+
     // Convert SVG to data URL
     return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgContent);
   };
@@ -156,7 +191,7 @@ export default function Home() {
 
     // Generate the current 8pepen SVG based on invert state
     const baseImageSvg = generate8pepenSVG();
-    
+
     getImgFromURL(baseImageSvg).then(img1 => {
       getImgFromURL(overlayImage).then(img2 => {
         setStatus('loading images...')
@@ -188,7 +223,7 @@ export default function Home() {
     if (imageToBlend) {
       blendUpdateCanvas(imageToBlend);
     }
-  }, [imageToBlend, invertBase]);
+  }, [imageToBlend, invertBase, topText, middleText, fontFamily, fontSize, textColor, shadowSize, shadowColor, textOffsetX, textOffsetY]);
 
   useEffect(() => {
     if (imageToBlend) {
@@ -221,7 +256,9 @@ export default function Home() {
             maxWidth: '1500px'
           }}
         ></canvas>
-        <div style={{ margin: 0, marginBottom: 20, display: 'flex', flexDirection: 'column', gap: 20, width: '50%' }}>
+
+
+        <div style={{ margin: 0, marginBottom: 20, display: 'flex', flexDirection: 'column', gap: 20 }}>
           <label>
             Select Image to Blend
           </label>
@@ -258,7 +295,6 @@ export default function Home() {
 
           <div style={{
             display: 'flex',
-            alignItems: 'center',
             gap: 10,
             marginBottom: 10
           }}>
@@ -272,7 +308,7 @@ export default function Home() {
           </div>
 
           <div style={{
-            display: 'flex', gap: 20, margin: 'auto', justifyContent: 'flex-start', alignItems: 'center', flexDirection: 'column'
+            display: 'flex', gap: 20, margin: 'auto', justifyContent: 'flex-start', flexDirection: 'column'
           }}>
             <label>
               Image Offset X
@@ -288,28 +324,131 @@ export default function Home() {
               Image Offset Y
             </label>
             <div style={{ display: 'flex', gap: 20, width: '100%' }}>
-              <input type="range" min="-500" max="500" value={imageOffsetY} onChange={(e) => setImageOffsetY(e.target.value)} />
-              <input type='number' value={imageOffsetY} onChange={(e) => setImageOffsetY(e.target.value)} style={{
-                border: '1px solid #333', width: '30%', fontSize: 16, borderRadius: 10, padding: 5
-              }} />
-            </div>
-
-            <label>
-              Image Scale
-            </label>
-            <div style={{ display: 'flex', gap: 20, width: '100%' }}>
-              <input type="range" min="0" max="2" step="0.01" value={imageScale} onChange={(e) => setImageScale(e.target.value)} />
-              <input type='number' value={imageScale} onChange={(e) => setImageScale(e.target.value)} style={{
-                border: '1px solid #333', width: '30%', fontSize: 16, borderRadius: 10, padding: 5
-              }} />
+            <input type="range" min="-500" max="500" value={imageOffsetY} onChange={(e) => setImageOffsetY(e.target.value)} />
+            <input type='number' value={imageOffsetY} onChange={(e) => setImageOffsetY(e.target.value)} style={{
+              border: '1px solid #333', width: '30%', fontSize: 16, borderRadius: 10, padding: 5
+            }} />
             </div>
           </div>
-          <span style={{
-            height: 10,
-            fontFamily: 'monospace',
-            color: '#eee'
-          }}>{status}</span>
+
+          <label>
+            Image Scale
+          </label>
+          <div style={{ display: 'flex', gap: 20, width: '100%' }}>
+            <input type="range" min="0" max="2" step="0.01" value={imageScale} onChange={(e) => setImageScale(e.target.value)} />
+            <input type='number' value={imageScale} onChange={(e) => setImageScale(e.target.value)} style={{
+              border: '1px solid #333', width: '30%', fontSize: 16, borderRadius: 10, padding: 5
+            }} />
+          </div>
+          {/* Text customization panel */}
+        <div style={{
+          margin: '0 0 20px 0',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 20,
+        }}>
+          <h3 style={{ margin: '0 0 10px 0' }}>Text Customization</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <label htmlFor="middleText">Text:</label>
+            <textarea
+              id="middleText"
+              value={middleText}
+              onChange={(e) => setMiddleText(e.target.value)}
+              placeholder="Enter text to display in the middle"
+              rows="4"
+            />
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap', gap: 20, marginTop: 10 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 5, minWidth: '200px' }}>
+              <label htmlFor="fontFamily">Font Family:</label>
+              <select
+                id="fontFamily"
+                value={fontFamily}
+                onChange={(e) => setFontFamily(e.target.value)}
+              >
+                <option value="Arial, sans-serif">Arial</option>
+                <option value="'Times New Roman', serif">Times New Roman</option>
+                <option value="'Courier New', monospace">Courier New</option>
+                <option value="Impact, fantasy">Impact</option>
+                <option value="'Comic Sans MS', cursive">Comic Sans MS</option>
+                <option value="'Verdana', sans-serif">Verdana</option>
+                <option value="'Georgia', serif">Georgia</option>
+              </select>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 5, minWidth: '120px' }}>
+              <label htmlFor="fontSize">Font Size:</label>
+              <input
+                type="range"
+                id="fontSize"
+                value={fontSize}
+                onChange={(e) => setFontSize(Number(e.target.value))}
+                min="10"
+                max="120"
+              />
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 5, minWidth: '120px' }}>
+              <label htmlFor="textColor">Text Color:</label>
+              <input
+                type="color"
+                id="textColor"
+                value={textColor}
+                onChange={(e) => setTextColor(e.target.value)}
+              />
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 5, minWidth: '120px' }}>
+              <label htmlFor="shadowSize">Shadow Size:</label>
+              <input
+                type="range"
+                id="shadowSize"
+                value={shadowSize}
+                onChange={(e) => setShadowSize(Number(e.target.value))}
+                min="0"
+                max="10"
+                step="0.1"
+              />
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 5, minWidth: '120px' }}>
+              <label htmlFor="shadowColor">Shadow Color:</label>
+              <input
+                type="color"
+                id="shadowColor"
+                value={shadowColor}
+                onChange={(e) => setShadowColor(e.target.value)}
+              />
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 5, minWidth: '120px' }}>
+              <label htmlFor="textOffsetX">Text X Position:</label>
+              <input
+                type="range"
+                id="textOffsetX"
+                value={textOffsetX}
+                onChange={(e) => setTextOffsetX(e.target.value)}
+                min="-300"
+                max="300"
+              />
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 5, minWidth: '120px' }}>
+              <label htmlFor="textOffsetY">Text Y Position:</label>
+              <input
+                type="range"
+                id="textOffsetY"
+                value={textOffsetY}
+                onChange={(e) => setTextOffsetY(e.target.value)}
+                min="-300"
+                max="300"
+              />
+            </div>
+          </div>
         </div>
+        </div>
+        
 
         <button onClick={() => {
           analytics({

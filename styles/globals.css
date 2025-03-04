@@ -209,3 +209,15 @@ input[type="color"]::-webkit-color-swatch-wrapper {
 input[type="color"]::-webkit-color-swatch {
 	border: none;
 }
+
+label {
+  font-size: 12px;
+  color: #888;
+}
+
+textarea {
+  border: 1px solid #333;
+  border-radius: 10px;
+  padding: 10px;
+  outline: none;
+}
