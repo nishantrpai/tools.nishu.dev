@@ -14,7 +14,14 @@ const ThreeScene = ({ modelData }) => {
     
     // Setup scene
     const scene = new THREE.Scene()
-    scene.background = new THREE.Color(0xffffff)
+    
+    // If hasTransparency is true, set scene background to transparent
+    if (modelData.hasTransparency) {
+      scene.background = null // This makes the background transparent
+    } else {
+      scene.background = new THREE.Color(0xffffff)
+    }
+    
     sceneRef.current = scene
     
     // Setup camera
@@ -26,8 +33,17 @@ const ThreeScene = ({ modelData }) => {
     )
     camera.position.z = 5
     
-    // Setup renderer
-    const renderer = new THREE.WebGLRenderer({ antialias: true })
+    // Setup renderer with alpha support for transparency
+    const renderer = new THREE.WebGLRenderer({ 
+      antialias: true,
+      alpha: true // Enable alpha channel for transparent rendering
+    })
+    
+    // Set clear color with alpha 0 for transparency
+    if (modelData.hasTransparency) {
+      renderer.setClearColor(0x000000, 0) // Second parameter 0 is alpha (fully transparent)
+    }
+    
     renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight)
     containerRef.current.innerHTML = ''
     containerRef.current.appendChild(renderer.domElement)
@@ -52,7 +68,8 @@ const ThreeScene = ({ modelData }) => {
       modelData.width, 
       modelData.height, 
       modelData.depthStrength,
-      modelData.resolution
+      modelData.resolution,
+      modelData.hasTransparency
     )
     
     // Animation loop
@@ -103,7 +120,7 @@ const ThreeScene = ({ modelData }) => {
   }, [modelData])
 
   // Create 3D mesh from depth map
-  const createMeshFromDepthMap = (imageUrl, depthMapUrl, width, height, depthStrength, resolution) => {
+  const createMeshFromDepthMap = (imageUrl, depthMapUrl, width, height, depthStrength, resolution, hasTransparency) => {
     // Create a new TextureLoader
     const textureLoader = new THREE.TextureLoader()
     
@@ -158,7 +175,9 @@ const ThreeScene = ({ modelData }) => {
         displacementMap: depthTexture,
         displacementScale: 0, // We already displaced vertices
         side: THREE.DoubleSide,
-        flatShading: false
+        flatShading: false,
+        transparent: hasTransparency,
+        alphaTest: hasTransparency ? 0.1 : 0 // Use alphaTest to determine which pixels to render
       })
       
       // Remove existing mesh if any
@@ -175,7 +194,19 @@ const ThreeScene = ({ modelData }) => {
     depthImage.src = depthMapUrl
   }
 
-  return <div ref={containerRef} style={{ width: '100%', height: '100%' }}></div>
+  // Add a CSS class to the container if transparency is enabled
+  const containerStyle = {
+    width: '100%',
+    height: '100%',
+    ...(modelData?.hasTransparency && { 
+      backgroundColor: 'transparent',
+      // backgroundImage: 'linear-gradient(45deg, #fff 25%, transparent 25%), linear-gradient(-45deg, #fff 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #fff 75%), linear-gradient(-45deg, transparent 75%, #f0f0f0 75%)',
+      backgroundSize: '20px 20px',
+      backgroundPosition: '0 0, 0 10px, 10px -10px, -10px 0px'
+    })
+  }
+
+  return <div ref={containerRef} style={containerStyle}></div>
 }
 
 export default ThreeScene
