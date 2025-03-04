@@ -30,7 +30,8 @@ export default function Image2Model3D() {
     smoothingLevel: 3,
     resolution: 128,
     enable360View: false,
-    removeBackgroundEnabled: false
+    removeBackgroundEnabled: false,
+    invertDepth: false  // Add the new invertDepth setting
   });
 
   // Create a separate state for lighting settings that can be updated without re-processing
@@ -453,7 +454,13 @@ export default function Image2Model3D() {
       const grayscale = 0.3 * data[i] + 0.59 * data[i + 1] + 0.11 * data[i + 2]
 
       // Invert and adjust based on depth strength (darker areas will appear closer)
-      const depth = 255 - grayscale
+      // If invertDepth is enabled, flip the depth calculation
+      let depth;
+      if (depthSettings.invertDepth) {
+        depth = grayscale; // Non-inverted: lighter areas appear closer
+      } else {
+        depth = 256 - grayscale; // Default: darker areas appear closer
+      }
 
       // Set depth pixel values
       depthPixels[i] = depth
@@ -761,6 +768,18 @@ export default function Image2Model3D() {
                     style={{ marginRight: '8px' }}
                   />
                   <label htmlFor="enable-360-view">Enable 360° View</label>
+                </div>
+
+                {/* Add the invert depth checkbox */}
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <input
+                    type="checkbox"
+                    id="invert-depth"
+                    checked={depthSettings.invertDepth}
+                    onChange={(e) => handleDepthSettingChange('invertDepth', e.target.checked)}
+                    style={{ marginRight: '8px' }}
+                  />
+                  <label htmlFor="invert-depth">Invert Depth (Inside Out)</label>
                 </div>
 
                 <div>
