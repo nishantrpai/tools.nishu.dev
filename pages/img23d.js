@@ -414,6 +414,7 @@ export default function Image2Model3D() {
           resolution: depthSettings.resolution,
           hasTransparency,
           enable360View: depthSettings.enable360View,
+          invertDepth: depthSettings.invertDepth, // Pass the invertDepth setting to ThreeScene
           lighting: lightingSettings
         });
 

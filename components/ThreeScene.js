@@ -251,6 +251,7 @@ const ThreeScene = ({ modelData }) => {
 
       // Track the maximum depth for proper mirror positioning
       let maxDepth = 0
+      const isInverted = modelData.invertDepth === true; // Check if depth is inverted
 
       for (let i = 0; i < positions.length; i += 3) {
         const x = (positions[i] + 2) / 4  // normalize from [-2, 2] to [0, 1]
@@ -310,11 +311,20 @@ const ThreeScene = ({ modelData }) => {
         // Create the mirror mesh
         const mirrorMesh = new THREE.Mesh(mirrorGeometry, mirrorMaterial)
 
-        // horizontally flip the mirrored mesh
-        mirrorMesh.rotation.y = Math.PI
-        mirrorMesh.scale.x = -1  // Flip horizontally 
+        // Rotate it to face the correct direction
+        mirrorMesh.rotation.y = Math.PI;
+        mirrorMesh.scale.x = -1;  // Flip horizontally 
 
-        mirrorMesh.position.z += maxDepth;
+        // Position the mirror mesh based on depth inversion
+        // When inverted, place behind the original mesh (negative z)
+        // When not inverted, place in front of the original mesh (positive z)
+        if (isInverted) {
+          // For inverted depth, place behind (negative z)
+          mirrorMesh.position.z = maxDepth * 2;
+        } else {
+          // For normal depth, place in front (positive z)
+          mirrorMesh.position.z = maxDepth;
+        }
 
         // Add to scene
         sceneRef.current.add(mirrorMesh)
