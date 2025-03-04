@@ -1,0 +1,15 @@
+{
+  "accountAssociation": {
+    "header": "YOUR_HEADER_FROM_WARPCAST_DEV_TOOLS",
+    "payload": "YOUR_PAYLOAD_FROM_WARPCAST_DEV_TOOLS",
+    "signature": "YOUR_SIGNATURE_FROM_WARPCAST_DEV_TOOLS"
+  },
+  "frame": {
+    "name": "Color Blender",
+    "version": "1.0.0",
+    "iconUrl": "https://tools.nishu.dev/favicon.ico",
+    "homeUrl": "https://tools.nishu.dev/addcolors",
+    "splashImageUrl": "https://tools.nishu.dev/color-blender-splash.png",
+    "splashBackgroundColor": "#000000"
+  }
+}
