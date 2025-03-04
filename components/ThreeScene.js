@@ -296,7 +296,6 @@ const ThreeScene = ({ modelData }) => {
         sceneRef.current.remove(mirrorMeshRef.current)
         mirrorMeshRef.current = null
       }
-
       // Create mesh and add to scene
       const mesh = new THREE.Mesh(geometry, material)
       sceneRef.current.add(mesh)
@@ -311,12 +310,11 @@ const ThreeScene = ({ modelData }) => {
         // Create the mirror mesh
         const mirrorMesh = new THREE.Mesh(mirrorGeometry, mirrorMaterial)
 
-        // Rotate it to face backward
-        mirrorMesh.rotation.y = Math.PI * -1;
+        // horizontally flip the mirrored mesh
+        mirrorMesh.rotation.y = Math.PI
+        mirrorMesh.scale.x = -1  // Flip horizontally 
 
-        // Position it based on the maximum depth to create a seamless 360° model
-        // Multiply by 2 to account for the full thickness of the model
-        mirrorMesh.position.z += maxDepth // Small additional offset to prevent z-fighting
+        mirrorMesh.position.z += maxDepth;
 
         // Add to scene
         sceneRef.current.add(mirrorMesh)
