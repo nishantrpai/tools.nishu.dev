@@ -72,9 +72,9 @@ const ThreeScene = ({ modelData }) => {
     scene.add(directionalLight)
     directionalLightRef.current = directionalLight
 
-    // Add helper to visualize light position (optional)
-    const lightHelper = new THREE.DirectionalLightHelper(directionalLight, 0.5)
-    scene.add(lightHelper)
+    // Remove the light helper - we don't want to see the white directional lines
+    // const lightHelper = new THREE.DirectionalLightHelper(directionalLight, 0.5)
+    // scene.add(lightHelper)
 
     // Add OrbitControls
     const controls = new OrbitControls(camera, renderer.domElement)
@@ -97,7 +97,7 @@ const ThreeScene = ({ modelData }) => {
     const animate = () => {
       requestAnimationFrame(animate)
       controls.update()
-      lightHelper.update() // Update the helper to show light direction
+      // Remove the lightHelper.update() call as we're no longer using the helper
       renderer.render(scene, camera)
     }
     animate()
