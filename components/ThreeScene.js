@@ -320,7 +320,9 @@ const ThreeScene = ({ modelData }) => {
         // When not inverted, place in front of the original mesh (positive z)
         if (isInverted) {
           // For inverted depth, place behind (negative z)
-          mirrorMesh.position.z = maxDepth * 2;
+          // mirrorMesh.position.z = maxDepth * -1;
+          mirrorMesh.scale.x = -1; // Flip vertically
+          mirrorMesh.position.z += 0.1;
         } else {
           // For normal depth, place in front (positive z)
           mirrorMesh.position.z = maxDepth;
