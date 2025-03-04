@@ -702,52 +702,7 @@ export default function Image2Model3D() {
                   
                   <div style={{ textAlign: 'center', margin: '8px 0' }}>- OR -</div>
                   
-                  {/* NFT Input Section */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <label style={{ display: 'block', marginBottom: '5px' }}>Import from NFT:</label>
-                    
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <select 
-                        value={chain}
-                        onChange={(e) => setChain(e.target.value)}
-                        style={{ 
-                          flex: '1',
-                          padding: '8px',
-                          borderRadius: '4px',
-                        }}
-                      >
-                        {Object.keys(RPC_CHAINS).map(chainName => (
-                          <option key={chainName} value={chainName}>{chainName}</option>
-                        ))}
-                      </select>
-                    </div>
-                    
-                    <input 
-                      type="text"
-                      placeholder="Collection Address (0x...)"
-                      value={collectionAddress}
-                      onChange={(e) => setCollectionAddress(e.target.value)}
-                    />
-                    
-                    <input 
-                      type="text"
-                      placeholder="Token ID"
-                      value={tokenId}
-                      onChange={(e) => setTokenId(e.target.value)}
-                    />
-                    
-                    <button 
-                      onClick={handleNftFetch}
-                    >
-                      {nftFetchStatus || (processing ? 'Processing...' : 'Import NFT')}
-                    </button>
-                    
-                    {nftFetchError && (
-                      <div style={{ color: 'red', fontSize: '0.9em', marginTop: '5px' }}>
-                        Error: {nftFetchError}
-                      </div>
-                    )}
-                  </div>
+                  
                 
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                   <input
@@ -936,6 +891,52 @@ export default function Image2Model3D() {
                     </button>
                   </div>
                 )}
+                {/* NFT Input Section */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: 20 }}>
+                    <label style={{ display: 'block', marginBottom: '5px' }}>Import from NFT:</label>
+                    
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <select 
+                        value={chain}
+                        onChange={(e) => setChain(e.target.value)}
+                        style={{ 
+                          flex: '1',
+                          padding: '8px',
+                          borderRadius: '4px',
+                        }}
+                      >
+                        {Object.keys(RPC_CHAINS).map(chainName => (
+                          <option key={chainName} value={chainName}>{chainName}</option>
+                        ))}
+                      </select>
+                    </div>
+                    
+                    <input 
+                      type="text"
+                      placeholder="Collection Address (0x...)"
+                      value={collectionAddress}
+                      onChange={(e) => setCollectionAddress(e.target.value)}
+                    />
+                    
+                    <input 
+                      type="text"
+                      placeholder="Token ID"
+                      value={tokenId}
+                      onChange={(e) => setTokenId(e.target.value)}
+                    />
+                    
+                    <button 
+                      onClick={handleNftFetch}
+                    >
+                      {nftFetchStatus || (processing ? 'Processing...' : 'Import NFT')}
+                    </button>
+                    
+                    {nftFetchError && (
+                      <div style={{ color: 'red', fontSize: '0.9em', marginTop: '5px' }}>
+                        Error: {nftFetchError}
+                      </div>
+                    )}
+                  </div>
               </div>
             </div>
           </div>
