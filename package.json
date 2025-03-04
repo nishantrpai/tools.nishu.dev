@@ -63,6 +63,7 @@
     "remark-gfm": "^4.0.0",
     "sevm": "^0.6.15",
     "socket.io-client": "^4.7.5",
+    "three": "^0.174.0",
     "tone": "^15.0.4",
     "viem": "^2.9.16",
     "watermark-remover": "^1.6.0",

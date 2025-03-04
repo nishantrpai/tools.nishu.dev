@@ -4446,6 +4446,11 @@ text-segmentation@^1.0.3:
   dependencies:
     utrie "^1.0.2"
 
+three@^0.174.0:
+  version "0.174.0"
+  resolved "https://registry.npmjs.org/three/-/three-0.174.0.tgz#53f46d6fd27515231b2af321f798f1e0ecf3f905"
+  integrity sha512-p+WG3W6Ov74alh3geCMkGK9NWuT62ee21cV3jEnun201zodVF4tCE5aZa2U122/mkLRmhJJUQmLLW1BH00uQJQ==
+
 timm@^1.6.1:
   version "1.7.1"
   resolved "https://registry.npmjs.org/timm/-/timm-1.7.1.tgz#96bab60c7d45b5a10a8a4d0f0117c6b7e5aff76f"

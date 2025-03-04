@@ -1892,8 +1892,13 @@ export const tools = [
     description: 'Add multiple colors',
     publishDate: '22nd Feb 2025',
     url: '/addcolors'
+  },
+  {
+    title: 'Image to 3d',
+    description: 'Image to 3d',
+    publishDate: '4th Mar 2025',
+    url: '/img23d'
   }
-
 ]
 
 export default function Home() {
