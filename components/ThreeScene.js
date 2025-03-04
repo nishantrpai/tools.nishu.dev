@@ -8,6 +8,8 @@ const ThreeScene = ({ modelData }) => {
   const sceneRef = useRef(null)
   const meshRef = useRef(null)
   const mirrorMeshRef = useRef(null)
+  const ambientLightRef = useRef(null)
+  const directionalLightRef = useRef(null)
 
   // Initialize and update Three.js scene
   useEffect(() => {
@@ -49,13 +51,30 @@ const ThreeScene = ({ modelData }) => {
     containerRef.current.innerHTML = ''
     containerRef.current.appendChild(renderer.domElement)
 
-    // Add lighting
-    const ambientLight = new THREE.AmbientLight(0x707070)
-    scene.add(ambientLight)
+    // Get lighting settings from modelData or use defaults
+    const lightConfig = modelData.lighting || {
+      ambientIntensity: 0.5,
+      directionalIntensity: 1,
+      position: { x: 1, y: 1, z: 1 }
+    }
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1)
-    directionalLight.position.set(1, 1, 1)
+    // Add lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, lightConfig.ambientIntensity)
+    scene.add(ambientLight)
+    ambientLightRef.current = ambientLight
+
+    const directionalLight = new THREE.DirectionalLight(0xffffff, lightConfig.directionalIntensity)
+    directionalLight.position.set(
+      lightConfig.position.x,
+      lightConfig.position.y,
+      lightConfig.position.z
+    )
     scene.add(directionalLight)
+    directionalLightRef.current = directionalLight
+
+    // Add helper to visualize light position (optional)
+    const lightHelper = new THREE.DirectionalLightHelper(directionalLight, 0.5)
+    scene.add(lightHelper)
 
     // Add OrbitControls
     const controls = new OrbitControls(camera, renderer.domElement)
@@ -78,6 +97,7 @@ const ThreeScene = ({ modelData }) => {
     const animate = () => {
       requestAnimationFrame(animate)
       controls.update()
+      lightHelper.update() // Update the helper to show light direction
       renderer.render(scene, camera)
     }
     animate()
@@ -181,6 +201,22 @@ const ThreeScene = ({ modelData }) => {
       }
     }
   }, [modelData])
+
+  // Update lighting when modelData changes
+  useEffect(() => {
+    if (!modelData?.lighting || !ambientLightRef.current || !directionalLightRef.current) return
+
+    // Update light intensities and positions based on the new settings
+    ambientLightRef.current.intensity = modelData.lighting.ambientIntensity
+
+    directionalLightRef.current.intensity = modelData.lighting.directionalIntensity
+    directionalLightRef.current.position.set(
+      modelData.lighting.position.x,
+      modelData.lighting.position.y,
+      modelData.lighting.position.z
+    )
+
+  }, [modelData?.lighting])
 
   // Create 3D mesh from depth map
   const createMeshFromDepthMap = (imageUrl, depthMapUrl, width, height, depthStrength, resolution, hasTransparency, enable360View) => {

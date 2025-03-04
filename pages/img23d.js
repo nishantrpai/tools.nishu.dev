@@ -14,15 +14,162 @@ export default function Image2Model3D() {
   const [processing, setProcessing] = useState(false)
   const [imgWidth, setImgWidth] = useState(0)
   const [imgHeight, setImgHeight] = useState(0)
-  const [depthStrength, setDepthStrength] = useState(50)
-  const [smoothingLevel, setSmoothingLevel] = useState(3)
-  const [resolution, setResolution] = useState(128)
-  const [modelData, setModelData] = useState(null)
-  const [removeBackgroundEnabled, setRemoveBackgroundEnabled] = useState(false)
-  const [enable360View, setEnable360View] = useState(false)
   const [originalImageData, setOriginalImageData] = useState(null)
   const [screenshotWidth, setScreenshotWidth] = useState(1920)
   const [screenshotHeight, setScreenshotHeight] = useState(1080)
+  const [showLightingSettings, setShowLightingSettings] = useState(true)
+  const [modelData, setModelData] = useState(null)
+
+  // Use debounce to prevent too many updates
+  const debounceTimeoutRef = useRef(null);
+
+  // Group settings that require regenerating the depth map
+  const [depthSettings, setDepthSettings] = useState({
+    depthStrength: 50,
+    smoothingLevel: 3,
+    resolution: 128,
+    enable360View: false,
+    removeBackgroundEnabled: false
+  });
+
+  // Create a separate state for lighting settings that can be updated without re-processing
+  const [lightingSettings, setLightingSettings] = useState({
+    ambientIntensity: 0.5,
+    directionalIntensity: 1,
+    position: {
+      x: 1,
+      y: 1,
+      z: 1
+    }
+  });
+
+  // Process image when first uploaded
+  const handleFileUpload = async (event) => {
+    const file = event.target.files[0]
+    if (!file) return
+
+    const reader = new FileReader()
+    reader.onload = async (e) => {
+      // Store the original image data
+      setOriginalImageData(e.target.result)
+      setProcessing(true)
+
+      // Process the image with current settings
+      await processImage(e.target.result)
+    }
+    reader.readAsDataURL(file)
+  }
+
+  // Apply depth settings changes with debounce
+  useEffect(() => {
+    if (!originalImageData) return;
+
+    // Clear any existing timeout
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+    }
+
+    // Set new timeout for debounced processing
+    debounceTimeoutRef.current = setTimeout(async () => {
+      setProcessing(true);
+      await processImage(originalImageData);
+    }, 300); // 300ms debounce
+
+    // Cleanup timeout when component unmounts or settings change again
+    return () => {
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
+    };
+  }, [depthSettings, originalImageData]);
+
+  // Update lighting in real-time without re-processing the image
+  useEffect(() => {
+    if (!modelData) return;
+
+    // Update lighting settings in the modelData
+    setModelData(prevData => ({
+      ...prevData,
+      lighting: lightingSettings
+    }));
+  }, [lightingSettings]);
+
+  // Handler for depth settings changes
+  const handleDepthSettingChange = (setting, value) => {
+    setDepthSettings(prev => ({
+      ...prev,
+      [setting]: value
+    }));
+  };
+
+  // Handler for lighting settings changes
+  const handleLightingChange = (setting, value) => {
+    if (setting.includes('.')) {
+      // Handle nested properties like 'position.x'
+      const [parent, child] = setting.split('.');
+      setLightingSettings(prev => ({
+        ...prev,
+        [parent]: {
+          ...prev[parent],
+          [child]: value
+        }
+      }));
+    } else {
+      // Handle top-level properties
+      setLightingSettings(prev => ({
+        ...prev,
+        [setting]: value
+      }));
+    }
+  };
+
+  const processImage = async (imageData) => {
+    try {
+      // Process image based on current settings
+      let processedImageUrl = imageData;
+
+      // If background removal is enabled, process the image
+      // In a real application, you would integrate with a background removal service
+      // For now, we'll just set a flag to simulate this functionality
+      const hasTransparency = depthSettings.removeBackgroundEnabled;
+
+      const img = new Image();
+      img.onload = async () => {
+        setImage(img);
+        setImageUrl(processedImageUrl);
+        setImgWidth(img.width);
+        setImgHeight(img.height);
+
+        // Generate depth map
+        const depthMapUrl = generateDepthMap(img);
+        setDepthMap(depthMapUrl);
+
+        // Generate normal map
+        const normalMapUrl = await generateNormalMap(depthMapUrl);
+        setNormalMap(normalMapUrl);
+
+        // Create model data for ThreeScene component
+        setModelData({
+          imageUrl: processedImageUrl,
+          depthMapUrl,
+          normalMapUrl,
+          width: img.width,
+          height: img.height,
+          depthStrength: depthSettings.depthStrength,
+          resolution: depthSettings.resolution,
+          hasTransparency,
+          enable360View: depthSettings.enable360View,
+          lighting: lightingSettings
+        });
+
+        setProcessing(false);
+      };
+      img.src = processedImageUrl;
+    } catch (error) {
+      console.error("Error processing image:", error);
+      setProcessing(false);
+    }
+  };
 
   // Generate depth map from image using grayscale as simple approximation
   const generateDepthMap = (img) => {
@@ -55,8 +202,8 @@ export default function Image2Model3D() {
     }
 
     // Apply Gaussian blur for smoothing if needed
-    if (smoothingLevel > 0) {
-      for (let s = 0; s < smoothingLevel; s++) {
+    if (depthSettings.smoothingLevel > 0) {
+      for (let s = 0; s < depthSettings.smoothingLevel; s++) {
         applyGaussianBlur(depthPixels, canvas.width, canvas.height)
       }
     }
@@ -204,78 +351,6 @@ export default function Image2Model3D() {
     }
   };
 
-  const handleFileUpload = async (event) => {
-    const file = event.target.files[0]
-    if (!file) return
-
-    const reader = new FileReader()
-    reader.onload = async (e) => {
-      // Store the original image data
-      setOriginalImageData(e.target.result)
-      setProcessing(true)
-
-      // Process the image with current settings
-      await processImage(e.target.result)
-    }
-    reader.readAsDataURL(file)
-  }
-
-  const processImage = async (imageData) => {
-    try {
-      // Process image based on current settings
-      let processedImageUrl = imageData;
-
-      // If background removal is enabled, process the image
-      // In a real application, you would integrate with a background removal service
-      // For now, we'll just set a flag to simulate this functionality
-      const hasTransparency = removeBackgroundEnabled;
-
-      const img = new Image();
-      img.onload = async () => {
-        setImage(img);
-        setImageUrl(processedImageUrl);
-        setImgWidth(img.width);
-        setImgHeight(img.height);
-
-        // Generate depth map
-        const depthMapUrl = generateDepthMap(img);
-        setDepthMap(depthMapUrl);
-
-        // Generate normal map
-        const normalMapUrl = await generateNormalMap(depthMapUrl);
-        setNormalMap(normalMapUrl);
-
-        // Create model data for ThreeScene component
-        setModelData({
-          imageUrl: processedImageUrl,
-          depthMapUrl,
-          normalMapUrl,
-          width: img.width,
-          height: img.height,
-          depthStrength,
-          resolution,
-          hasTransparency, // Pass this flag to the ThreeScene component
-          enable360View // Pass the 360 view flag to the ThreeScene component
-        });
-
-        setProcessing(false);
-      };
-      img.src = processedImageUrl;
-    } catch (error) {
-      console.error("Error processing image:", error);
-      setProcessing(false);
-    }
-  };
-
-  const applyUpdatedSettings = async () => {
-    if (!originalImageData) return
-
-    setProcessing(true)
-
-    // Process the image with updated settings
-    await processImage(originalImageData)
-  }
-
   const downloadMap = (dataURL, type) => {
     const a = document.createElement('a')
     a.href = dataURL
@@ -356,8 +431,8 @@ export default function Image2Model3D() {
                   <input
                     type="checkbox"
                     id="remove-background"
-                    checked={removeBackgroundEnabled}
-                    onChange={(e) => setRemoveBackgroundEnabled(e.target.checked)}
+                    checked={depthSettings.removeBackgroundEnabled}
+                    onChange={(e) => handleDepthSettingChange('removeBackgroundEnabled', e.target.checked)}
                     style={{ marginRight: '8px' }}
                   />
                   <label htmlFor="remove-background">Transparent Background</label>
@@ -367,56 +442,127 @@ export default function Image2Model3D() {
                   <input
                     type="checkbox"
                     id="enable-360-view"
-                    checked={enable360View}
-                    onChange={(e) => setEnable360View(e.target.checked)}
+                    checked={depthSettings.enable360View}
+                    onChange={(e) => handleDepthSettingChange('enable360View', e.target.checked)}
                     style={{ marginRight: '8px' }}
                   />
                   <label htmlFor="enable-360-view">Enable 360° View</label>
                 </div>
 
                 <div>
-                  <label>Depth Strength: {depthStrength}</label>
+                  <label>Depth Strength: {depthSettings.depthStrength}</label>
                   <input
                     type="range"
                     min="0"
                     max="100"
-                    value={depthStrength}
-                    onChange={(e) => setDepthStrength(parseInt(e.target.value))}
+                    value={depthSettings.depthStrength}
+                    onChange={(e) => handleDepthSettingChange('depthStrength', parseInt(e.target.value))}
                     style={{ width: '100%' }}
                   />
                 </div>
 
                 <div>
-                  <label>Smoothing: {smoothingLevel}</label>
+                  <label>Smoothing: {depthSettings.smoothingLevel}</label>
                   <input
                     type="range"
                     min="0"
                     max="10"
-                    value={smoothingLevel}
-                    onChange={(e) => setSmoothingLevel(parseInt(e.target.value))}
+                    value={depthSettings.smoothingLevel}
+                    onChange={(e) => handleDepthSettingChange('smoothingLevel', parseInt(e.target.value))}
                     style={{ width: '100%' }}
                   />
                 </div>
 
                 <div>
-                  <label>Resolution: {resolution}</label>
+                  <label>Resolution: {depthSettings.resolution}</label>
                   <input
                     type="range"
                     min="32"
                     max="2048"
                     step="16"
-                    value={resolution}
-                    onChange={(e) => setResolution(parseInt(e.target.value))}
+                    value={depthSettings.resolution}
+                    onChange={(e) => handleDepthSettingChange('resolution', parseInt(e.target.value))}
                     style={{ width: '100%' }}
                   />
                 </div>
 
-                <button
-                  onClick={applyUpdatedSettings}
-                  disabled={!originalImageData || processing}
-                >
-                  {processing ? 'Processing...' : 'Apply Settings'}
-                </button>
+
+                {showLightingSettings && (
+                  <div style={{
+                    borderRadius: '5px',
+                    marginTop: '5px'
+                  }}>
+                    <div>
+                      <label>Ambient Light: {lightingSettings.ambientIntensity.toFixed(2)}</label>
+                      <input
+                        type="range"
+                        min="0"
+                        max="1"
+                        step="0.05"
+                        value={lightingSettings.ambientIntensity}
+                        onChange={(e) => handleLightingChange('ambientIntensity', parseFloat(e.target.value))}
+                        style={{ width: '100%' }}
+                      />
+                    </div>
+
+                    <div style={{ marginTop: '8px' }}>
+                      <label>Directional Light: {lightingSettings.directionalIntensity.toFixed(2)}</label>
+                      <input
+                        type="range"
+                        min="0"
+                        max="3"
+                        step="0.1"
+                        value={lightingSettings.directionalIntensity}
+                        onChange={(e) => handleLightingChange('directionalIntensity', parseFloat(e.target.value))}
+                        style={{ width: '100%' }}
+                      />
+                    </div>
+
+                    <div style={{ marginTop: '12px' }}>
+                      <label>Light Position:</label>
+                      <div style={{ display: 'flex', gap: '10px', marginTop: '5px' }}>
+                        <div style={{ flex: 1 }}>
+                          <label style={{ fontSize: '0.8em' }}>X: {lightingSettings.position.x.toFixed(1)}</label>
+                          <input
+                            type="range"
+                            min="-3"
+                            max="3"
+                            step="0.1"
+                            value={lightingSettings.position.x}
+                            onChange={(e) => handleLightingChange('position.x', parseFloat(e.target.value))}
+                            style={{ width: '100%' }}
+                          />
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <label style={{ fontSize: '0.8em' }}>Y: {lightingSettings.position.y.toFixed(1)}</label>
+                          <input
+                            type="range"
+                            min="-3"
+                            max="3"
+                            step="0.1"
+                            value={lightingSettings.position.y}
+                            onChange={(e) => handleLightingChange('position.y', parseFloat(e.target.value))}
+                            style={{ width: '100%' }}
+                          />
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <label style={{ fontSize: '0.8em' }}>Z: {lightingSettings.position.z.toFixed(1)}</label>
+                          <input
+                            type="range"
+                            min="0"
+                            max="5"
+                            step="0.1"
+                            value={lightingSettings.position.z}
+                            onChange={(e) => handleLightingChange('position.z', parseFloat(e.target.value))}
+                            style={{ width: '100%' }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+
 
                 {/* Screenshot resolution settings */}
                 {modelData && (
