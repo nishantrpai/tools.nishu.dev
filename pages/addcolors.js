@@ -389,42 +389,12 @@ export default function Home() {
     return `https://opensea.io/assets/base/${contractAddress}/${colorTokenId}`;
   };
 
-  const shareToWarpcast = async () => {
-    // Convert colors array to URL-friendly format
-    const colorParams = colors.map(c => c.hex.replace('#', '')).join(',');
-    const shareUrl = `https://tools.nishu.dev/addcolors?colors=${colorParams}`;
-    
-    // Open Warpcast with pre-filled cast
-    const warpcastUrl = `https://warpcast.com/~/compose?text=Check%20out%20these%20colors!%0A%0A&embeds[]=${encodeURIComponent(shareUrl)}`;
-    window.open(warpcastUrl, '_blank');
-  };
-
   return (
     <>
       <Head>
         <title>Color Blender</title>
         <meta name="description" content="Blend multiple colors together" />
         <link rel="icon" href="/favicon.ico" />
-        
-        {/* Dynamic Farcaster Frame metadata */}
-        <meta name="fc:frame" content={JSON.stringify({
-          version: "vNext",
-          image: {
-            src: `https://tools.nishu.dev/api/og/addcolors?colors=${colors.map(c => c.hex.replace('#', '')).join(',')}`,
-            aspectRatio: "1.91:1"
-          },
-          buttons: [
-            {
-              label: "Blend Colors",
-              action: "post"
-            }
-          ]
-        })} />
-        <meta 
-          name="fc:frame:image" 
-          content={`https://tools.nishu.dev/api/og/addcolors?colors=${colors.map(c => c.hex.replace('#', '')).join(',')}`} 
-        />
-        <meta name="fc:frame:post_url" content="https://tools.nishu.dev/api/frame/addcolors" />
       </Head>
 
       <main className={styles.container}>
@@ -674,26 +644,12 @@ export default function Home() {
               </div>
             </div>
             
-            <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
-              <button 
-                onClick={downloadImage}
-              >
-                Download Result
-              </button>
-              <button 
-                onClick={shareToWarpcast}
-                style={{
-                  backgroundColor: '#8B5CF6',
-                  color: 'white',
-                  padding: '0.5rem 1rem',
-                  borderRadius: '0.375rem',
-                  border: 'none',
-                  cursor: 'pointer'
-                }}
-              >
-                Share on Warpcast
-              </button>
-            </div>
+            <button 
+              onClick={downloadImage}
+              style={{ marginTop: '1.5rem' }}
+            >
+              Download Result
+            </button>
           </div>
         </div>
       </main>
