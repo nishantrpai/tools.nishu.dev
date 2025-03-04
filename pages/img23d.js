@@ -2,6 +2,7 @@ import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { useState, useEffect, useRef } from 'react'
 import dynamic from 'next/dynamic'
+import { ethers } from 'ethers' // Add ethers for NFT data fetching
 
 // Import Three.js components dynamically with ssr: false
 const ThreeScene = dynamic(() => import('../components/ThreeScene'), { ssr: false })
@@ -42,6 +43,258 @@ export default function Image2Model3D() {
       z: 1
     }
   });
+
+  // Add NFT fetching functionality
+  const [collectionAddress, setCollectionAddress] = useState('0x5537d90a4a2dc9d9b37bab49b490cf67d4c54e91')
+  const [tokenId, setTokenId] = useState('2')
+  const [chain, setChain] = useState('ETHEREUM')
+  const [nftFetchError, setNftFetchError] = useState(null)
+  const [nftFetchStatus, setNftFetchStatus] = useState('')
+
+  // Define RPC endpoints for different chains
+  const RPC_CHAINS = {
+    'ETHEREUM': {
+      'rpc': 'https://eth-pokt.nodies.app',
+      'chainId': 1,
+      'network': 'mainnet',
+    },
+    'ZORA': {
+      'rpc': 'https://rpc.zora.energy',
+      'chainId': 7777777,
+      'network': 'mainnet',
+    },
+    'BASE': {
+      'rpc': 'https://mainnet.base.org',
+      'chainId': 8453,
+      'network': 'mainnet',
+    }
+  }
+
+  // Function to fetch NFT data
+  const getNFTData = async (collection_address, id) => {
+    setNftFetchStatus('Fetching NFT data...')
+    setNftFetchError(null)
+    
+    try {
+      // Validate inputs
+      if (!collection_address || !id) {
+        throw new Error('Collection address and token ID are required')
+      }
+      
+      // Get provider for selected chain
+      const provider = new ethers.JsonRpcProvider(RPC_CHAINS[chain].rpc)
+      const contract = new ethers.Contract(
+        collection_address, 
+        ['function tokenURI(uint256) view returns (string)'], 
+        provider
+      )
+      
+      // Fetch token URI
+      setNftFetchStatus('Fetching token URI...')
+      const tokenURI = await contract.tokenURI(id)
+      
+      // Parse metadata based on URI type
+      let metadata
+      if (tokenURI.startsWith('data:')) {
+        // Handle base64 encoded data URI
+        setNftFetchStatus('Processing on-chain data...')
+        metadata = JSON.parse(atob(tokenURI.split('data:application/json;base64,')[1]))
+      }
+      else if (tokenURI.startsWith('http')) {
+        // Handle HTTP URL
+        setNftFetchStatus('Fetching metadata from URL...')
+        const response = await fetch(tokenURI)
+        metadata = await response.json()
+      } else {
+        // Handle IPFS URI
+        setNftFetchStatus('Fetching metadata from IPFS...')
+        const ipfsHash = tokenURI.split('ipfs://')[1]
+        const ipfsUrl = `https://ipfs.io/ipfs/${ipfsHash}`
+        const response = await fetch(ipfsUrl)
+        metadata = await response.json()
+      }
+      
+      if (!metadata.image) {
+        throw new Error('No image found in NFT metadata')
+      }
+      
+      // Process IPFS image URLs
+      let imageUrl = metadata.image
+      if (imageUrl.startsWith('ipfs://')) {
+        imageUrl = `https://ipfs.io/ipfs/${imageUrl.split('ipfs://')[1]}`
+      }
+      
+      setNftFetchStatus('Processing image...')
+      
+      // Handle SVG images
+      if (imageUrl.startsWith('data:image/svg+xml')) {
+        imageUrl = await convertSvgToPng(imageUrl)
+      }
+      
+      setNftFetchStatus('')
+      return imageUrl
+      
+    } catch (error) {
+      setNftFetchError(error.message || 'Error fetching NFT data')
+      setNftFetchStatus('')
+      console.error('Error fetching NFT:', error)
+      return null
+    }
+  }
+  
+  // Convert SVG to PNG
+  const convertSvgToPng = (svgUrl) => {
+    return new Promise(async (resolve, reject) => {
+      if (!svgUrl.startsWith('data:image/svg+xml')) {
+        resolve(svgUrl);
+        return;
+      }
+      
+      try {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        img.crossOrigin = "anonymous"; // Ensure CORS is enabled
+        
+        img.onload = () => {
+          try {
+
+          
+          canvas.width = img.width || 1000;
+          canvas.height = img.height || 1000;
+          ctx.drawImage(img, 0, 0);
+          const pngUrl = canvas.toDataURL('image/png');
+          resolve(pngUrl);
+          } catch (error) {
+            reject(error);
+          }
+        };
+        
+        img.onerror = (e) => {
+          reject(new Error('Failed to convert SVG to PNG'));
+        };
+        
+        img.src = svgUrl;
+      } catch (error) {
+        reject(error);
+      }
+    });
+  };
+
+  // Function to load an image with proper CORS handling
+  const loadImageWithCORS = (url) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = "anonymous"; // Enable CORS
+      
+      img.onload = () => {
+        resolve(img);
+      };
+      
+      img.onerror = (error) => {
+        console.error("Error loading image:", error);
+        
+        // Try with a CORS proxy as fallback for images that don't support CORS
+        const corsProxyUrl = `https://corsproxy.io/?${encodeURIComponent(url)}`;
+        console.log("Attempting with CORS proxy:", corsProxyUrl);
+        
+        const proxyImg = new Image();
+        proxyImg.crossOrigin = "anonymous";
+        
+        proxyImg.onload = () => {
+          resolve(proxyImg);
+        };
+        
+        proxyImg.onerror = () => {
+          reject(new Error("Failed to load image, even with CORS proxy"));
+        };
+        
+        proxyImg.src = corsProxyUrl;
+      };
+      
+      img.src = url;
+    });
+  };
+
+  // Process NFT image URL
+  const processNftImageUrl = async (imageUrl) => {
+    try {
+      // Handle IPFS URLs
+      if (imageUrl.startsWith('ipfs://')) {
+        imageUrl = `https://ipfs.io/ipfs/${imageUrl.split('ipfs://')[1]}`;
+      }
+      
+      // Handle SVG images
+      if (imageUrl.startsWith('data:image/svg+xml')) {
+        imageUrl = await convertSvgToPng(imageUrl);
+      }
+      
+      return imageUrl;
+    } catch (error) {
+      console.error("Error processing NFT image URL:", error);
+      throw error;
+    }
+  };
+
+  // Handle NFT fetch button click
+  const handleNftFetch = async () => {
+    if (processing) return;
+    
+    setProcessing(true);
+    try {
+      // Clear any previous errors
+      setNftFetchError(null);
+      
+      // Get NFT metadata
+      const imageUrl = await getNFTData(collectionAddress, tokenId);
+      
+      if (imageUrl) {
+        // Process the image URL (handle IPFS, SVG, etc.)
+        const processedUrl = await processNftImageUrl(imageUrl);
+        
+        // Store the URL for reference
+        setOriginalImageData(processedUrl);
+        
+        // Load the image with CORS handling
+        await processImageFromUrl(processedUrl);
+      } else {
+        setProcessing(false);
+      }
+    } catch (error) {
+      console.error('Error in NFT fetch handler:', error);
+      setNftFetchError(error.message || 'Failed to fetch NFT');
+      setProcessing(false);
+    }
+  };
+
+  // Process image from URL with CORS handling
+  const processImageFromUrl = async (imageUrl) => {
+    try {
+      // Load the image with CORS handling
+      const img = await loadImageWithCORS(imageUrl);
+      
+      // Create a canvas to safely work with the image
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      
+      const ctx = canvas.getContext('2d');
+      // allow crossorigin anonymous
+
+      ctx.drawImage(img, 0, 0);
+      
+      // Get a safe data URL that we can use without CORS issues
+      const safeImageUrl = canvas.toDataURL('image/png');
+      
+      // Process the safe image URL
+      await processImage(safeImageUrl);
+      
+    } catch (error) {
+      console.error("Error processing image from URL:", error);
+      setNftFetchError(`Error processing image: ${error.message}`);
+      setProcessing(false);
+    }
+  };
 
   // Process image when first uploaded
   const handleFileUpload = async (event) => {
@@ -134,6 +387,7 @@ export default function Image2Model3D() {
       const hasTransparency = depthSettings.removeBackgroundEnabled;
 
       const img = new Image();
+      img.crossOrigin = "anonymous"; // Enable CORS
       img.onload = async () => {
         setImage(img);
         setImageUrl(processedImageUrl);
@@ -164,6 +418,13 @@ export default function Image2Model3D() {
 
         setProcessing(false);
       };
+      
+      img.onerror = (error) => {
+        console.error("Error loading image:", error);
+        setNftFetchError("Failed to load the image");
+        setProcessing(false);
+      };
+      
       img.src = processedImageUrl;
     } catch (error) {
       console.error("Error processing image:", error);
@@ -390,8 +651,7 @@ export default function Image2Model3D() {
 
             {imageUrl && (
               <div style={{ marginTop: '20px' }}>
-                <h3>Original Image</h3>
-                <img src={imageUrl} alt="Original" style={{ maxWidth: '100%', maxHeight: '300px' }} />
+                <img src={imageUrl} alt="Original" style={{ maxWidth: '100%', maxHeight: '300px', border: '1px solid #333', borderRadius: 5 }} />
               </div>
             )}
 
@@ -424,9 +684,63 @@ export default function Image2Model3D() {
 
             <div style={{ marginTop: '20px' }}>
               <h3>Settings</h3>
-              <input type="file" accept="image/*" onChange={handleFileUpload} />
-
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '10px' }}>
+                  
+                  {/* Image Upload */}
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '5px' }}>Upload an image:</label>
+                    <input type="file" accept="image/*" onChange={handleFileUpload} />
+                  </div>
+                  
+                  <div style={{ textAlign: 'center', margin: '8px 0' }}>- OR -</div>
+                  
+                  {/* NFT Input Section */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <label style={{ display: 'block', marginBottom: '5px' }}>Import from NFT:</label>
+                    
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <select 
+                        value={chain}
+                        onChange={(e) => setChain(e.target.value)}
+                        style={{ 
+                          flex: '1',
+                          padding: '8px',
+                          borderRadius: '4px',
+                        }}
+                      >
+                        {Object.keys(RPC_CHAINS).map(chainName => (
+                          <option key={chainName} value={chainName}>{chainName}</option>
+                        ))}
+                      </select>
+                    </div>
+                    
+                    <input 
+                      type="text"
+                      placeholder="Collection Address (0x...)"
+                      value={collectionAddress}
+                      onChange={(e) => setCollectionAddress(e.target.value)}
+                    />
+                    
+                    <input 
+                      type="text"
+                      placeholder="Token ID"
+                      value={tokenId}
+                      onChange={(e) => setTokenId(e.target.value)}
+                    />
+                    
+                    <button 
+                      onClick={handleNftFetch}
+                    >
+                      {nftFetchStatus || (processing ? 'Processing...' : 'Import NFT')}
+                    </button>
+                    
+                    {nftFetchError && (
+                      <div style={{ color: 'red', fontSize: '0.9em', marginTop: '5px' }}>
+                        Error: {nftFetchError}
+                      </div>
+                    )}
+                  </div>
+                
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                   <input
                     type="checkbox"
