@@ -19,6 +19,7 @@ export default function Image2Model3D() {
   const [resolution, setResolution] = useState(128)
   const [modelData, setModelData] = useState(null)
   const [removeBackgroundEnabled, setRemoveBackgroundEnabled] = useState(false)
+  const [enable360View, setEnable360View] = useState(false)
   const [originalImageData, setOriginalImageData] = useState(null)
 
   // Generate depth map from image using grayscale as simple approximation
@@ -251,7 +252,8 @@ export default function Image2Model3D() {
           height: img.height,
           depthStrength,
           resolution,
-          hasTransparency // Pass this flag to the ThreeScene component
+          hasTransparency, // Pass this flag to the ThreeScene component
+          enable360View // Pass the 360 view flag to the ThreeScene component
         });
 
         setProcessing(false);
@@ -350,6 +352,17 @@ export default function Image2Model3D() {
                     style={{ marginRight: '8px' }}
                   />
                   <label htmlFor="remove-background">Transparent Background</label>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <input
+                    type="checkbox"
+                    id="enable-360-view"
+                    checked={enable360View}
+                    onChange={(e) => setEnable360View(e.target.checked)}
+                    style={{ marginRight: '8px' }}
+                  />
+                  <label htmlFor="enable-360-view">Enable 360° View</label>
                 </div>
 
                 <div>

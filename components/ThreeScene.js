@@ -7,6 +7,7 @@ const ThreeScene = ({ modelData }) => {
   const containerRef = useRef(null)
   const sceneRef = useRef(null)
   const meshRef = useRef(null)
+  const mirrorMeshRef = useRef(null)
   
   // Initialize and update Three.js scene
   useEffect(() => {
@@ -69,7 +70,8 @@ const ThreeScene = ({ modelData }) => {
       modelData.height, 
       modelData.depthStrength,
       modelData.resolution,
-      modelData.hasTransparency
+      modelData.hasTransparency,
+      modelData.enable360View
     )
     
     // Animation loop
@@ -95,7 +97,17 @@ const ThreeScene = ({ modelData }) => {
         if (!meshRef.current) return
         
         const exporter = new STLExporter()
-        const stl = exporter.parse(meshRef.current, { binary: true })
+        
+        // If we have a 360 view with a mirror mesh, create a group containing both meshes
+        let exportObject = meshRef.current;
+        if (modelData.enable360View && mirrorMeshRef.current) {
+          const group = new THREE.Group();
+          group.add(meshRef.current.clone());
+          group.add(mirrorMeshRef.current.clone());
+          exportObject = group;
+        }
+        
+        const stl = exporter.parse(exportObject, { binary: true })
         
         const blob = new Blob([stl], { type: 'application/octet-stream' })
         const url = URL.createObjectURL(blob)
@@ -120,7 +132,7 @@ const ThreeScene = ({ modelData }) => {
   }, [modelData])
 
   // Create 3D mesh from depth map
-  const createMeshFromDepthMap = (imageUrl, depthMapUrl, width, height, depthStrength, resolution, hasTransparency) => {
+  const createMeshFromDepthMap = (imageUrl, depthMapUrl, width, height, depthStrength, resolution, hasTransparency, enable360View) => {
     // Create a new TextureLoader
     const textureLoader = new THREE.TextureLoader()
     
@@ -150,6 +162,9 @@ const ThreeScene = ({ modelData }) => {
       const positions = geometry.attributes.position.array
       const depthScale = depthStrength / 100
       
+      // Track the maximum depth for proper mirror positioning
+      let maxDepth = 0
+      
       for (let i = 0; i < positions.length; i += 3) {
         const x = (positions[i] + 2) / 4  // normalize from [-2, 2] to [0, 1]
         const y = 1 - ((positions[i + 1] + 2) / 4) // normalize and flip y
@@ -160,7 +175,11 @@ const ThreeScene = ({ modelData }) => {
         const pixelIndex = (pixelY * canvas.width + pixelX) * 4
         
         // Use depth value to displace vertex along z-axis
-        positions[i + 2] = (depthData[pixelIndex] / 255) * depthScale
+        const depth = (depthData[pixelIndex] / 255) * depthScale
+        positions[i + 2] = depth
+        
+        // Track maximum depth for mirror positioning
+        maxDepth = Math.max(maxDepth, depth)
       }
       
       // Update vertex positions
@@ -185,10 +204,37 @@ const ThreeScene = ({ modelData }) => {
         sceneRef.current.remove(meshRef.current)
       }
       
+      // If we have a mirror mesh, remove it too
+      if (mirrorMeshRef.current && sceneRef.current) {
+        sceneRef.current.remove(mirrorMeshRef.current)
+        mirrorMeshRef.current = null
+      }
+      
       // Create mesh and add to scene
       const mesh = new THREE.Mesh(geometry, material)
       sceneRef.current.add(mesh)
       meshRef.current = mesh
+      
+      // If 360 view is enabled, create a mirrored mesh for the back
+      if (enable360View) {
+        // Clone the geometry and material
+        const mirrorGeometry = geometry.clone()
+        const mirrorMaterial = material.clone()
+        
+        // Create the mirror mesh
+        const mirrorMesh = new THREE.Mesh(mirrorGeometry, mirrorMaterial)
+        
+        // Rotate it to face backward
+        mirrorMesh.rotation.y = Math.PI * -1;
+        
+        // Position it based on the maximum depth to create a seamless 360° model
+        // Multiply by 2 to account for the full thickness of the model
+        mirrorMesh.position.z += maxDepth // Small additional offset to prevent z-fighting
+        
+        // Add to scene
+        sceneRef.current.add(mirrorMesh)
+        mirrorMeshRef.current = mirrorMesh
+      }
     }
     
     depthImage.src = depthMapUrl
@@ -200,7 +246,6 @@ const ThreeScene = ({ modelData }) => {
     height: '100%',
     ...(modelData?.hasTransparency && { 
       backgroundColor: 'transparent',
-      // backgroundImage: 'linear-gradient(45deg, #fff 25%, transparent 25%), linear-gradient(-45deg, #fff 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #fff 75%), linear-gradient(-45deg, transparent 75%, #f0f0f0 75%)',
       backgroundSize: '20px 20px',
       backgroundPosition: '0 0, 0 10px, 10px -10px, -10px 0px'
     })
