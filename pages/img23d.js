@@ -21,6 +21,8 @@ export default function Image2Model3D() {
   const [removeBackgroundEnabled, setRemoveBackgroundEnabled] = useState(false)
   const [enable360View, setEnable360View] = useState(false)
   const [originalImageData, setOriginalImageData] = useState(null)
+  const [screenshotWidth, setScreenshotWidth] = useState(1920)
+  const [screenshotHeight, setScreenshotHeight] = useState(1080)
 
   // Generate depth map from image using grayscale as simple approximation
   const generateDepthMap = (img) => {
@@ -164,33 +166,33 @@ export default function Image2Model3D() {
       // For demonstration purposes, using a placeholder for background removal
       // Normally you would use a library like remove.bg API or ML-based solutions
       console.log('Removing background...');
-      
+
       // Create a new Image to load the image data
       const img = new Image();
       img.src = imageData;
-      
+
       return new Promise((resolve) => {
         img.onload = () => {
           const canvas = document.createElement('canvas');
           canvas.width = img.width;
           canvas.height = img.height;
-          
+
           const ctx = canvas.getContext('2d');
-          
+
           // Draw the original image
           ctx.drawImage(img, 0, 0);
-          
+
           // Get pixel data
           const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
           const data = imageData.data;
-          
+
           // Simple background removal (this is just a placeholder)
           // In reality, you would use a proper background removal service or algorithm
           // ... background removal code would go here ...
-          
+
           // For demonstration, using a simulated result:
           // In a real implementation, you'd replace this with actual background removal
-          
+
           // Return the canvas data URL
           const processedDataUrl = canvas.toDataURL('image/png');
           resolve(processedDataUrl);
@@ -222,12 +224,12 @@ export default function Image2Model3D() {
     try {
       // Process image based on current settings
       let processedImageUrl = imageData;
-      
+
       // If background removal is enabled, process the image
       // In a real application, you would integrate with a background removal service
       // For now, we'll just set a flag to simulate this functionality
       const hasTransparency = removeBackgroundEnabled;
-      
+
       const img = new Image();
       img.onload = async () => {
         setImage(img);
@@ -279,6 +281,13 @@ export default function Image2Model3D() {
     a.href = dataURL
     a.download = `${type}.png`
     a.click()
+  }
+
+  // Function to take screenshot
+  const takeScreenshot = () => {
+    if (window.ThreeSceneExport && window.ThreeSceneExport.takeScreenshot) {
+      window.ThreeSceneExport.takeScreenshot(screenshotWidth, screenshotHeight)
+    }
   }
 
   return (
@@ -408,6 +417,45 @@ export default function Image2Model3D() {
                 >
                   {processing ? 'Processing...' : 'Apply Settings'}
                 </button>
+
+                {/* Screenshot resolution settings */}
+                {modelData && (
+                  <div style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', maxWidth: '300px', margin: '0 auto' }}>
+                    <h4>Screenshot Settings</h4>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                      <label htmlFor="width-input">Width: </label>
+                      <input
+                        id="width-input"
+                        type="number"
+                        min="400"
+                        max="4096"
+                        value={screenshotWidth}
+                        onChange={(e) => setScreenshotWidth(Math.max(400, parseInt(e.target.value) || 400))}
+                      />
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <label htmlFor="height-input">Height: </label>
+                      <input
+                        id="height-input"
+                        type="number"
+                        min="400"
+                        max="4096"
+                        value={screenshotHeight}
+                        onChange={(e) => setScreenshotHeight(Math.max(400, parseInt(e.target.value) || 400))}
+                      />
+                    </div>
+                    <div style={{ fontSize: '0.8em', color: '#666', marginTop: '4px' }}>
+                      Higher resolution screenshots may take longer to generate
+                    </div>
+                    <button
+                      onClick={takeScreenshot}
+                      disabled={processing || !modelData}
+                      style={{ marginTop: '10px' }}
+                    >
+                      Download Screenshot
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -415,12 +463,14 @@ export default function Image2Model3D() {
 
         <div style={{ display: 'flex', gap: '10px', marginTop: '20px', justifyContent: 'center' }}>
           {modelData && (
-            <button
-              onClick={() => window.ThreeSceneExport && window.ThreeSceneExport.downloadSTL()}
-              disabled={processing}
-            >
-              Download STL
-            </button>
+            <>
+              <button
+                onClick={() => window.ThreeSceneExport && window.ThreeSceneExport.downloadSTL()}
+                disabled={processing}
+              >
+                Download STL
+              </button>
+            </>
           )}
 
           <button
@@ -437,6 +487,8 @@ export default function Image2Model3D() {
             Download Normal Map
           </button>
         </div>
+
+
       </main>
     </>
   )
