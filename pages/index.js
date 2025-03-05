@@ -1898,6 +1898,12 @@ export const tools = [
     description: 'Image to 3d',
     publishDate: '4th Mar 2025',
     url: '/img23d'
+  },
+  {
+    title: 'Hope',
+    description: 'Hope for Eissa',
+    publishDate: '5th Mar 2025',
+    url: '/hope'
   }
 ]
 
