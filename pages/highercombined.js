@@ -544,6 +544,46 @@ export default function HigherCombined() {
     }
   }, [activeTool])
 
+  useEffect(() => {
+    // Handle paste events
+    const handlePaste = (e) => {
+      const items = e.clipboardData?.items;
+      if (!items) return;
+  
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf('image') !== -1) {
+          const blob = items[i].getAsFile();
+          const reader = new FileReader();
+          
+          reader.onload = (event) => {
+            const img = new Image();
+            img.onload = () => {
+              const canvas = document.getElementById('canvas');
+              canvas.width = img.width;
+              canvas.height = img.height;
+              const context = canvas.getContext('2d');
+              context.clearRect(0, 0, canvas.width, canvas.height);
+              context.drawImage(img, 0, 0);
+              setImage(img);
+            };
+            img.src = event.target.result;
+          };
+          
+          reader.readAsDataURL(blob);
+          break;
+        }
+      }
+    };
+  
+    // Add the paste event listener
+    window.addEventListener('paste', handlePaste);
+  
+    // Clean up
+    return () => {
+      window.removeEventListener('paste', handlePaste);
+    };
+  }, []);
+
   return (
     <>
       <Head>
