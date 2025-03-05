@@ -515,7 +515,7 @@ const BlendLayer = () => {
                         style={{
                           position: 'relative',
                           borderRadius: '5px',
-                          border: '1px solid #333',
+                          border: '1px solid #222',
                           padding: 5,
                         }}
                       >
