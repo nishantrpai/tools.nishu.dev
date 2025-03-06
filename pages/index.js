@@ -1904,6 +1904,12 @@ export const tools = [
     description: 'Hope for Eissa',
     publishDate: '5th Mar 2025',
     url: '/hope'
+  },
+  {
+    title: 'Basic Collage',
+    description: 'Add multiple images to a collage',
+    publishDate: '6th Mar 2025',
+    url: '/basiccollage'
   }
 ]
 
