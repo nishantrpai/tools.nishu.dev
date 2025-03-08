@@ -18,6 +18,58 @@ export default function LibrevoxPlayer() {
   const proxy = 'https://api.codetabs.com/v1/proxy/?quest='
   const [timeLeft, setTimeLeft] = useState(null)
   const [chapterProgress, setChapterProgress] = useState({})
+  const [bookHistory, setBookHistory] = useState([])
+
+  const saveProgress = () => {
+    const progress = {
+      url,
+      bookTitle,
+      currentChapter,
+      chapterProgress,
+      lastAccessed: Date.now()
+    }
+    localStorage.setItem('currentBook', JSON.stringify(progress))
+    
+    // Update history
+    const history = JSON.parse(localStorage.getItem('bookHistory') || '[]')
+    const existingIndex = history.findIndex(b => b.url === url)
+    if (existingIndex > -1) {
+      history.splice(existingIndex, 1)
+    }
+    history.unshift(progress)
+    history.splice(10) // Keep only last 10 books
+    localStorage.setItem('bookHistory', JSON.stringify(history))
+    setBookHistory(history)
+  }
+
+  const loadProgress = () => {
+    const progress = JSON.parse(localStorage.getItem('currentBook'))
+    if (progress) {
+      setUrl(progress.url)
+      setBookTitle(progress.bookTitle)
+      setCurrentChapter(progress.currentChapter)
+      setChapterProgress(progress.chapterProgress || {})
+    }
+    const history = JSON.parse(localStorage.getItem('bookHistory') || '[]')
+    setBookHistory(history)
+  }
+
+  const resumeBook = (book) => {
+    setUrl(book.url)
+    setBookTitle(book.bookTitle)
+    setCurrentChapter(book.currentChapter)
+    setChapterProgress(book.chapterProgress || {})
+  }
+
+  useEffect(() => {
+    loadProgress()
+  }, [])
+
+  useEffect(() => {
+    if (url && bookTitle) {
+      saveProgress()
+    }
+  }, [url, currentChapter, chapterProgress])
 
   const fetchChapters = async () => {
     try {
@@ -154,6 +206,8 @@ export default function LibrevoxPlayer() {
       <main>
         <h1>LibriVox Audiobook Player</h1>
 
+       
+
         <div style={{ marginBottom: '40px', width: '100%' }}>
           <label htmlFor="url">LibriVox URL</label>
           <br />
@@ -246,6 +300,29 @@ export default function LibrevoxPlayer() {
             </div>
           ))}
         </div>
+
+         {/* Add history section before URL input */}
+         {bookHistory.length > 0 && (
+          <div style={{ marginBottom: '20px' }}>
+            <h4>Recent Books</h4>
+            {bookHistory.map((book, index) => (
+              <div 
+                key={index}
+                onClick={() => resumeBook(book)}
+                style={{
+                  cursor: 'pointer',
+                  margin: '10px 0',
+                  borderRadius: '4px',
+                }}
+              >
+                <div style={{color: '#888'}}>{book.bookTitle || 'Untitled Book'}</div>
+                <div style={{ fontSize: '10px', color: '#555', marginTop: 5 }}>
+                  Chapter {book.currentChapter + 1}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
       </main>
     </>
