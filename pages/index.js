@@ -1910,6 +1910,12 @@ export const tools = [
     description: 'Add multiple images to a collage',
     publishDate: '6th Mar 2025',
     url: '/basiccollage'
+  },
+  {
+    title: 'LibreVox player',
+    description: 'Play all chapters of a book from librevox',
+    publishDate: '8th Mar 2025',
+    url: '/librevox'
   }
 ]
 
