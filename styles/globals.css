@@ -213,6 +213,7 @@ input[type="color"]::-webkit-color-swatch {
 label {
   font-size: 12px;
   color: #888;
+  width: 100%;
 }
 
 textarea, input {
