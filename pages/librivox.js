@@ -167,7 +167,7 @@ export default function LibrevoxPlayer() {
           {loading && <div style={{ marginTop: '10px' }}>Loading chapters...</div>}
         </div>
 
-        <div style={{ marginBottom: '20px', border: '1px solid #333', width: '100%' }}>
+        <div style={{ marginBottom: '20px', width: '100%' }}>
           <audio 
             ref={audioRef} 
             onEnded={() => currentChapter < chapters.length - 1 && playChapter(currentChapter + 1)}
