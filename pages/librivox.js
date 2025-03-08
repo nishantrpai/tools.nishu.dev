@@ -257,7 +257,7 @@ export default function LibrevoxPlayer() {
           )}
         </div>
 
-        <div style={{  width: '100%', padding: 20 }}>
+        <div style={{  width: '100%'}}>
           <h2 style={{ fontSize: 16, marginBottom: 12 }}>{bookTitle}</h2>
           <div style={{
             color: '#666',
