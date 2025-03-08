@@ -1912,10 +1912,10 @@ export const tools = [
     url: '/basiccollage'
   },
   {
-    title: 'LibreVox player',
-    description: 'Play all chapters of a book from librevox',
+    title: 'Librivox player',
+    description: 'Play all chapters of a book from librivox',
     publishDate: '8th Mar 2025',
-    url: '/librevox'
+    url: '/librivox'
   }
 ]
 
