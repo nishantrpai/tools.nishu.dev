@@ -1,7 +1,8 @@
 import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { useState, useEffect, useRef } from 'react'
-import { FiPlay, FiPause, FiSkipForward, FiSkipBack, FiClock } from 'react-icons/fi'
+import { FiPlay, FiPause, FiClock } from 'react-icons/fi'
+import { FaHistory } from "react-icons/fa";
 
 export default function LibrevoxPlayer() {
   const [url, setUrl] = useState('')
@@ -29,7 +30,7 @@ export default function LibrevoxPlayer() {
       lastAccessed: Date.now()
     }
     localStorage.setItem('currentBook', JSON.stringify(progress))
-    
+
     // Update history
     const history = JSON.parse(localStorage.getItem('bookHistory') || '[]')
     const existingIndex = history.findIndex(b => b.url === url)
@@ -206,7 +207,7 @@ export default function LibrevoxPlayer() {
       <main>
         <h1>LibriVox Audiobook Player</h1>
 
-       
+
 
         <div style={{ marginBottom: '40px', width: '100%' }}>
           <label htmlFor="url">LibriVox URL</label>
@@ -256,57 +257,59 @@ export default function LibrevoxPlayer() {
           )}
         </div>
 
-        <div style={{ maxHeight: '800px', overflow: 'auto', width: '100%', padding: 20 }}>
+        <div style={{  width: '100%', padding: 20 }}>
           <h2 style={{ fontSize: 16, marginBottom: 12 }}>{bookTitle}</h2>
           <div style={{
-            color: '#888',
+            color: '#666',
             marginBottom: '10px',
             fontSize: 12
           }} dangerouslySetInnerHTML={{ __html: bookDescription }} />
-          {chapters.map((chapter, index) => (
-            <div
-              key={index}
-              style={{
-                padding: '10px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                backgroundColor: currentChapter === index ? '#111' : 'transparent',
-                color: currentChapter === index ? '#fff' : '#888',
-                marginBottom: '5px',
-                borderRadius: '4px',
-                fontSize: 12
-              }}
-            >
-              <div style={{ flexGrow: 1, cursor: 'pointer' }} onClick={() => playChapter(index)}>
-                {chapter.title}
+          <div style={{ marginBottom: '10px', fontSize: 12, width: '100%', border: '1px solid #333', borderRadius: '4px', maxHeight: '400px', overflow: 'auto', }}>
+            {chapters.map((chapter, index) => (
+              <div
+                key={index}
+                style={{
+                  padding: '10px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  backgroundColor: currentChapter === index ? '#111' : 'transparent',
+                  color: currentChapter === index ? '#fff' : '#888',
+                  marginBottom: '5px',
+                  borderRadius: '4px',
+                  fontSize: 12
+                }}
+              >
+                <div style={{ flexGrow: 1, cursor: 'pointer' }} onClick={() => playChapter(index)}>
+                  {chapter.title}
+                </div>
+                {currentChapter === index && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      togglePlay()
+                    }}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      color: 'inherit'
+                    }}
+                  >
+                    {isPlaying ? <FiPause /> : <FiPlay />}
+                  </button>
+                )}
               </div>
-              {currentChapter === index && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    togglePlay()
-                  }}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    color: 'inherit'
-                  }}
-                >
-                  {isPlaying ? <FiPause /> : <FiPlay />}
-                </button>
-              )}
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
-         {/* Add history section before URL input */}
-         {bookHistory.length > 0 && (
-          <div style={{ marginBottom: '20px' }}>
-            <h4>Recent Books</h4>
+        {/* Add history section before URL input */}
+        {bookHistory.length > 0 && (
+          <div style={{ marginBottom: 40, width: '100%', opacity: 0.75 }}>
+            <h4 style={{fontSize: 14, display: 'flex', gap: 5, alignItems: 'center'}}><FaHistory/>Recent Books</h4>
             {bookHistory.map((book, index) => (
-              <div 
+              <div
                 key={index}
                 onClick={() => resumeBook(book)}
                 style={{
@@ -315,9 +318,9 @@ export default function LibrevoxPlayer() {
                   borderRadius: '4px',
                 }}
               >
-                <div style={{color: '#888'}}>{book.bookTitle || 'Untitled Book'}</div>
-                <div style={{ fontSize: '10px', color: '#555', marginTop: 5 }}>
-                  Chapter {book.currentChapter + 1}
+                <div style={{ color: '#ccc', fontSize: 14}}>{book.bookTitle || 'Untitled Book'}</div>
+                <div style={{ fontSize: 12, color: '#aaa', marginTop: 5 }}>
+                  Chapter {book.currentChapter + 1} {book.chapterProgress[book.currentChapter] ? `(${Math.floor(book.chapterProgress[book.currentChapter] / 60)}m)` : ''}
                 </div>
               </div>
             ))}
