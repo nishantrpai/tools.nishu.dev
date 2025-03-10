@@ -1,8 +1,10 @@
 import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { FiSearch } from 'react-icons/fi'
 import { useRouter } from 'next/router'
+import MiniSearch from 'minisearch'
+
 
 export const tools = [
   {
@@ -187,7 +189,9 @@ export const tools = [
       "publishDate": "17th April 2024",
       "url": "/higherarrow",
       "icon": "↑",
-      "tags": ['higher']
+      "tags": [
+          "higher"
+      ]
   },
   {
       "title": "Rep Aloud",
@@ -238,8 +242,8 @@ export const tools = [
       "tags": []
   },
   {
-      "title": "Blend layer onto image",
-      "description": "Blend a layer onto an image",
+      "title": "Blend 2 images",
+      "description": "Blend two images",
       "publishDate": "25th April 2024",
       "url": "/blend",
       "icon": "🎨",
@@ -614,7 +618,9 @@ export const tools = [
       "description": "Add \"↑\" hat on any image",
       "publishDate": "20th June 2024",
       "url": "/higherhat",
-      "tags": ['higher']
+      "tags": [
+          "higher"
+      ]
   },
   {
       "title": "Intl Meme Fund Hats",
@@ -740,7 +746,9 @@ export const tools = [
       "description": "Add higher eyes on any image",
       "publishDate": "4th July 2024",
       "url": "/higherpilled",
-      "tags": ['higher']
+      "tags": [
+          "higher"
+      ]
   },
   {
       "title": "Opepen Chat Cover",
@@ -768,7 +776,9 @@ export const tools = [
       "description": "Add Higher Scanner on any image",
       "publishDate": "8th July 2024",
       "url": "/higherscanner",
-      "tags": ['higher']
+      "tags": [
+          "higher"
+      ]
   },
   {
       "title": "8pepeblend",
@@ -824,14 +834,18 @@ export const tools = [
       "description": "Add Higher TM on any image",
       "publishDate": "16th July 2024",
       "url": "/highertm",
-      "tags": ['higher']
+      "tags": [
+          "higher"
+      ]
   },
   {
       "title": "Higher Banner",
       "description": "Make your own higher banner",
       "publishDate": "17th July 2024",
       "url": "/higherbanner",
-      "tags": ['higher']
+      "tags": [
+          "higher"
+      ]
   },
   {
       "title": "ELI5",
@@ -908,7 +922,9 @@ export const tools = [
       "description": "Make your gifs higher",
       "publishDate": "25th July 2024",
       "url": "/highergifs",
-      "tags": ['higher']
+      "tags": [
+          "higher"
+      ]
   },
   {
       "title": "Permissionless Ideas",
@@ -1076,7 +1092,9 @@ export const tools = [
       "description": "Create higher athletics poster",
       "publishDate": "15th Aug 2024",
       "url": "/higherathletics",
-      "tags": ['higher']
+      "tags": [
+          "higher"
+      ]
   },
   {
       "title": "Coby",
@@ -1230,7 +1248,9 @@ export const tools = [
       "description": "Add higherfm on any image",
       "publishDate": "6th Sep 2024",
       "url": "/higherfm",
-      "tags": ['higher']
+      "tags": [
+          "higher"
+      ]
   },
   {
       "title": "Colors",
@@ -1251,7 +1271,9 @@ export const tools = [
       "description": "Generate higher confessions",
       "publishDate": "13th Sep 2024",
       "url": "/higherconfessions",
-      "tags": ['higher']
+      "tags": [
+          "higher"
+      ]
   },
   {
       "title": "Prompt Editor",
@@ -1426,519 +1448,651 @@ export const tools = [
       "description": "Apply higher filter to your image",
       "publishDate": "18th Oct 2024",
       "url": "/higherfilter",
-      "tags": ['higher']
+      "tags": [
+          "higher"
+      ]
   },
   {
-    title: 'Diamond Filter',
-    description: 'Click the area you want to fill with diamond texture',
-    publishDate: '20th Oct 2024',
-    url: '/diamondfilter',
-    tags: []
+      "title": "Diamond Filter",
+      "description": "Click the area you want to fill with diamond texture",
+      "publishDate": "20th Oct 2024",
+      "url": "/diamondfilter",
+      "tags": []
   },
   {
-    title: 'Custom Texture',
-    description: 'Click the area you want to fill with custom texture',
-    publishDate: '21th Oct 2024',
-    url: '/customtexture',
-    tags: []
+      "title": "Custom Texture",
+      "description": "Click the area you want to fill with custom texture",
+      "publishDate": "21th Oct 2024",
+      "url": "/customtexture",
+      "tags": []
   },
   {
-    title: 'Add Image',
-    description: 'Add image to your image',
-    publishDate: '22th Oct 2024',
-    url: '/addimage',
-    tags: []
+      "title": "Add Image",
+      "description": "Add image to your image",
+      "publishDate": "22th Oct 2024",
+      "url": "/addimage",
+      "tags": []
   },
   {
-    title: 'Higher Filter Gif',
-    description: 'Apply higher filter to your gif',
-    publishDate: '23th Oct 2024',
-    url: '/higherfiltergif',
-    tags: ['higher']
+      "title": "Higher Filter Gif",
+      "description": "Apply higher filter to your gif",
+      "publishDate": "23th Oct 2024",
+      "url": "/higherfiltergif",
+      "tags": [
+          "higher"
+      ]
   },
   {
-    title: 'Invert Colors',
-    description: 'Invert colors of your image',
-    publishDate: '24th Oct 2024',
-    url: '/invert',
-    tags: []
+      "title": "Invert Colors",
+      "description": "Invert colors of your image",
+      "publishDate": "24th Oct 2024",
+      "url": "/invert",
+      "tags": []
   },
   {
-    title: 'Wow',
-    description: 'Wow',
-    publishDate: '25th Oct 2024',
-    url: '/wow',
-    tags: []
+      "title": "Wow",
+      "description": "Wow",
+      "publishDate": "25th Oct 2024",
+      "url": "/wow",
+      "tags": []
   },
   {
-    title: 'Collage',
-    description: 'Create collage',
-    publishDate: '26th Oct 2024',
-    url: '/collage',
-    tags: []
+      "title": "Collage",
+      "description": "Create collage",
+      "publishDate": "26th Oct 2024",
+      "url": "/collage",
+      "tags": []
   },
   {
-    title: 'Misprint',
-    description: 'Misprint your image',
-    publishDate: '27th Oct 2024',
-    url: '/misprint',
-    tags: []
+      "title": "Misprint",
+      "description": "Misprint your image",
+      "publishDate": "27th Oct 2024",
+      "url": "/misprint",
+      "tags": []
   },
   {
-    title: 'Higher Gradient',
-    description: 'Add higher gradient filter on any image',
-    publishDate: '28th Oct 2024',
-    url: '/highergradient',
-    tags: ['higher']
+      "title": "Higher Gradient",
+      "description": "Add higher gradient filter on any image",
+      "publishDate": "28th Oct 2024",
+      "url": "/highergradient",
+      "tags": [
+          "higher"
+      ]
   },
   {
-    title: 'Visualize Value',
-    description: 'Visualize value',
-    publishDate: '31st Oct 2024',
-    url: '/visualizevalue',
-    tags: []
+      "title": "Visualize Value",
+      "description": "Visualize value",
+      "publishDate": "31st Oct 2024",
+      "url": "/visualizevalue",
+      "tags": []
   },
   {
-    title: 'Color Filter',
-    description: 'Color filter',
-    publishDate: '1st Nov 2024',
-    url: '/colorfilter',
-    tags: []
+      "title": "Color Filter",
+      "description": "Color filter",
+      "publishDate": "1st Nov 2024",
+      "url": "/colorfilter",
+      "tags": []
   },
   {
-    title: 'Text to Palette',
-    description: 'Suggest a color palette for your prompt',
-    publishDate: '2nd Nov 2024',
-    url: '/text2palette',
-    tags: []
+      "title": "Text to Palette",
+      "description": "Suggest a color palette for your prompt",
+      "publishDate": "2nd Nov 2024",
+      "url": "/text2palette",
+      "tags": []
   },
   {
-    title: 'Gradient Mobile Wallpaper',
-    description: 'Create mobile wallpaper from gradient',
-    publishDate: '2nd Nov 2024',
-    url: '/text2mobilewallpaper',
-    tags: []
+      "title": "Gradient Mobile Wallpaper",
+      "description": "Create mobile wallpaper from gradient",
+      "publishDate": "2nd Nov 2024",
+      "url": "/text2mobilewallpaper",
+      "tags": []
   },
   {
-    title: 'Image to Mobile Wallpaper',
-    description: 'Create mobile wallpaper from image',
-    publishDate: '2nd Nov 2024',
-    url: '/img2mobilewallpaper',
-    tags: []
+      "title": "Image to Mobile Wallpaper",
+      "description": "Create mobile wallpaper from image",
+      "publishDate": "2nd Nov 2024",
+      "url": "/img2mobilewallpaper",
+      "tags": []
   },
   {
-    title: 'Gradient Punks',
-    description: 'Generate gradient punks',
-    publishDate: '2nd Nov 2024',
-    url: '/gradientpunks',
-    tags: []
+      "title": "Gradient Punks",
+      "description": "Generate gradient punks",
+      "publishDate": "2nd Nov 2024",
+      "url": "/gradientpunks",
+      "tags": []
   },
   {
-    title: "Punk Wallpaper",
-    description: "Generate punk wallpaper",
-    publishDate: "2n Nov 2024",
-    url: "/punkwallpaper",
-    tags: []
+      "title": "Punk Wallpaper",
+      "description": "Generate punk wallpaper",
+      "publishDate": "2n Nov 2024",
+      "url": "/punkwallpaper",
+      "tags": []
   },
   {
-    title: 'Clip YT',
-    description: 'Clip YouTube video',
-    publishDate: '2nd Nov 2024',
-    url: '/clipyt',
-    tags: []
+      "title": "Clip YT",
+      "description": "Clip YouTube video",
+      "publishDate": "2nd Nov 2024",
+      "url": "/clipyt",
+      "tags": []
   },
   {
-    title: 'HTML to PDF',
-    description: 'Convert HTML to PDF',
-    publishDate: '2nd Nov 2024',
-    url: '/html2pdf',
-    tags: []
+      "title": "HTML to PDF",
+      "description": "Convert HTML to PDF",
+      "publishDate": "2nd Nov 2024",
+      "url": "/html2pdf",
+      "tags": []
   },
   {
-    title: 'Haze Effect',
-    description: 'Add haze effect to your image',
-    publishDate: '7th Nov 2024',
-    url: '/haze',
-    tags: []
+      "title": "Haze Effect",
+      "description": "Add haze effect to your image",
+      "publishDate": "7th Nov 2024",
+      "url": "/haze",
+      "tags": []
   },
   {
-    title: 'Higher Italic',
-    description: 'Add higher italic on any image',
-    publishDate: '7th Nov 2024',
-    url: '/higheritalic',
-    tags: []
+      "title": "Higher Italic",
+      "description": "Add higher italic on any image",
+      "publishDate": "7th Nov 2024",
+      "url": "/higheritalic",
+      "tags": []
   },
   {
-    title: 'Classical Filter',
-    description: 'Classical filter',
-    publishDate: '11th Nov 2024',
-    url: '/classicalfilter',
-    tags: []
+      "title": "Classical Filter",
+      "description": "Classical filter",
+      "publishDate": "11th Nov 2024",
+      "url": "/classicalfilter",
+      "tags": []
   },
   {
-    title: 'Anime Filter',
-    description: 'Anime filter',
-    publishDate: '12th Nov 2024',
-    url: '/animefilter',
-    tags: []
+      "title": "Anime Filter",
+      "description": "Anime filter",
+      "publishDate": "12th Nov 2024",
+      "url": "/animefilter",
+      "tags": []
   },
   {
-    title: 'Dither Filter',
-    description: 'Dither Filter',
-    publishDate: '14th Nov 2024',
-    url: '/ditherfilter',
-    tags: []
+      "title": "Dither Filter",
+      "description": "Dither Filter",
+      "publishDate": "14th Nov 2024",
+      "url": "/ditherfilter",
+      "tags": []
   },
   {
-    title: 'Img to Pallete',
-    description: 'Img to Pallete',
-    publishDate: '14th Nov 2024',
-    url: '/img2palette',
-    tags: []
+      "title": "Img to Pallete",
+      "description": "Img to Pallete",
+      "publishDate": "14th Nov 2024",
+      "url": "/img2palette",
+      "tags": []
   },
   {
-    title: 'Unblur',
-    description: 'Unblur out specific area',
-    publishDate: '17th Nov 2024',
-    url: '/unblur',
-    tags: []
+      "title": "Unblur",
+      "description": "Unblur out specific area",
+      "publishDate": "17th Nov 2024",
+      "url": "/unblur",
+      "tags": []
   },
   {
-    title: 'Spotlight',
-    description: 'Spotlight',
-    publishDate: '17th Nov 2024',
-    url: '/spotlight',
-    tags: []
+      "title": "Spotlight",
+      "description": "Spotlight",
+      "publishDate": "17th Nov 2024",
+      "url": "/spotlight",
+      "tags": []
   },
   {
-    title: 'Silence',
-    description: 'Silence',
-    publishDate: '17th Nov 2024',
-    url: '/silence',
-    tags: []
+      "title": "Silence",
+      "description": "Silence",
+      "publishDate": "17th Nov 2024",
+      "url": "/silence",
+      "tags": []
   },
   {
-    title: 'Matrix Effect',
-    description: 'Matrix Effect',
-    publishDate: '25th Nov 2024',
-    url: '/matrixeffect',
-    tags: []
+      "title": "Matrix Effect",
+      "description": "Matrix Effect",
+      "publishDate": "25th Nov 2024",
+      "url": "/matrixeffect",
+      "tags": []
   },
   {
-    title: 'Knitting Filter',
-    description: 'Knitting Filter',
-    publishDate: '26th Nov 2024',
-    url: '/knittingfilter',
-    tags: []
+      "title": "Knitting Filter",
+      "description": "Knitting Filter",
+      "publishDate": "26th Nov 2024",
+      "url": "/knittingfilter",
+      "tags": []
   },
   {
-    title: 'Web3 Filter',
-    description: 'Web3 Filter',
-    publishDate: '26th Nov 2024',
-    url: '/web3filter',
-    tags: []
+      "title": "Web3 Filter",
+      "description": "Web3 Filter",
+      "publishDate": "26th Nov 2024",
+      "url": "/web3filter",
+      "tags": []
   },
   {
-    title: 'Camcorder Filter',
-    description: 'Camcorder Filter',
-    publishDate: '26th Nov 2024',
-    url: '/camfilter',
-    tags: []
+      "title": "Camcorder Filter",
+      "description": "Camcorder Filter",
+      "publishDate": "26th Nov 2024",
+      "url": "/camfilter",
+      "tags": []
   },
   {
-    title: 'Bulk Resize Images',
-    description: 'Bulk resize images to specific dimensions',
-    publishDate: '4th Dec 2024',
-    url: '/bulkresize',
-    tags: []
+      "title": "Bulk Resize Images",
+      "description": "Bulk resize images to specific dimensions",
+      "publishDate": "4th Dec 2024",
+      "url": "/bulkresize",
+      "tags": []
   },
   {
-    title: 'Text 2 Chonks',
-    description: 'Text 2 Chonks',
-    publishDate: '5th Dec 2024',
-    url: '/text2chonks',
-    tags: []
+      "title": "Text 2 Chonks",
+      "description": "Text 2 Chonks",
+      "publishDate": "5th Dec 2024",
+      "url": "/text2chonks",
+      "tags": []
   },
   {
-    title: 'Motion Blur',
-    description: 'Motion Blur Effect',
-    publishDate: '6th Dec 2024',
-    url: '/motionblur',
-    tags: []
+      "title": "Motion Blur",
+      "description": "Motion Blur Effect",
+      "publishDate": "6th Dec 2024",
+      "url": "/motionblur",
+      "tags": []
   },
   {
-    title: 'Comic Sans',
-    description: 'Comic Sans',
-    publishDate: '6th Dec 2024',
-    url: '/comicsans',
-    tags: []
+      "title": "Comic Sans",
+      "description": "Comic Sans",
+      "publishDate": "6th Dec 2024",
+      "url": "/comicsans",
+      "tags": []
   },
   {
-    title: 'Comic Sans Blob',
-    description: 'Comic Sans Blob',
-    publishDate: '6th Dec 2024',
-    url: '/comicsansblob',
-    tags: []
+      "title": "Comic Sans Blob",
+      "description": "Comic Sans Blob",
+      "publishDate": "6th Dec 2024",
+      "url": "/comicsansblob",
+      "tags": []
   },
   {
-    title: 'Higher Glasses',
-    description: 'Add higher glasses on any image',
-    publishDate: '7th Dec 2024',
-    url: '/higherglasses',
-    tags: []
+      "title": "Higher Glasses",
+      "description": "Add higher glasses on any image",
+      "publishDate": "7th Dec 2024",
+      "url": "/higherglasses",
+      "tags": []
   },
   {
-    title: 'Helvetica Blob',
-    description: 'Helvetica Blob',
-    publishDate: '8th Dec 2024',
-    url: '/helveticablob',
-    tags: []
+      "title": "Helvetica Blob",
+      "description": "Helvetica Blob",
+      "publishDate": "8th Dec 2024",
+      "url": "/helveticablob",
+      "tags": []
   },
   {
-    title: 'TLDR img',
-    description: 'TLDR text in img',
-    publishDate: '10th Dec 2024',
-    url: '/tldrimg',
-    tags: []
+      "title": "TLDR img",
+      "description": "TLDR text in img",
+      "publishDate": "10th Dec 2024",
+      "url": "/tldrimg",
+      "tags": []
   },
   {
-    title: 'Higher Italic Video',
-    description: 'Add higher italic on any video',
-    publishDate: '10th Dec 2024',
-    url: '/higheritalicvideo',
-    tags: []
+      "title": "Higher Italic Video",
+      "description": "Add higher italic on any video",
+      "publishDate": "10th Dec 2024",
+      "url": "/higheritalicvideo",
+      "tags": []
   },
   {
-    title: 'Blonde',
-    description: 'Add blonde color to any image',
-    publishDate: '11th Dec 2024',
-    url: '/blonde',
-    tags: []
+      "title": "Blonde",
+      "description": "Add blonde color to any image",
+      "publishDate": "11th Dec 2024",
+      "url": "/blonde",
+      "tags": []
   },
   {
-    title: 'Comic Sans or not',
-    description: 'Comic sans or not',
-    publishDate: '12th Dec 2024',
-    url: '/comicsansornot',
-    tags: []
+      "title": "Comic Sans or not",
+      "description": "Comic sans or not",
+      "publishDate": "12th Dec 2024",
+      "url": "/comicsansornot",
+      "tags": []
   },
   {
-    title: 'Website to gpt data',
-    description: 'Website to gpt data',
-    publishDate: '13th Dec 2024',
-    url: '/website2gptdata',
-    tags: []
+      "title": "Website to gpt data",
+      "description": "Website to gpt data",
+      "publishDate": "13th Dec 2024",
+      "url": "/website2gptdata",
+      "tags": []
   },
   {
-    title: 'Helvetica or not',
-    description: 'Helvetica or not',
-    publishDate: '14th Dec 2024',
-    url: '/helveticaornot',
-    tags: []
+      "title": "Helvetica or not",
+      "description": "Helvetica or not",
+      "publishDate": "14th Dec 2024",
+      "url": "/helveticaornot",
+      "tags": []
   },
   {
-    title: 'Line Art',
-    description: 'Line Art',
-    publishDate: '15th Dec 2024',
-    url: '/lineart',
-    tags: []
+      "title": "Line Art",
+      "description": "Line Art",
+      "publishDate": "15th Dec 2024",
+      "url": "/lineart",
+      "tags": []
   },
   {
-    title: 'Higher Italic Thin',
-    description: 'Add higher italic thin on any image',
-    publishDate: '16th Dec 2024',
-    url: '/higheritalicthin',
+      "title": "Higher Italic Thin",
+      "description": "Add higher italic thin on any image",
+      "publishDate": "16th Dec 2024",
+      "url": "/higheritalicthin",
+      "tags": []
   },
   {
-    title: 'Higher Helvetica',
-    description: 'Add higher helvetica on any image',
-    publishDate: '17th Dec 2024',
-    url: '/higherhelvetica',
+      "title": "Higher Helvetica",
+      "description": "Add higher helvetica on any image",
+      "publishDate": "17th Dec 2024",
+      "url": "/higherhelvetica",
+      "tags": []
   },
   {
-    title: 'Part Combine',
-    description: 'Combine parts of two images',
-    publishDate: '18th Dec 2024',
-    url: '/2parts',
+      "title": "Part Combine",
+      "description": "Combine parts of two images",
+      "publishDate": "18th Dec 2024",
+      "url": "/2parts",
+      "tags": []
   },
   {
-    title: 'Part Motion Blur',
-    description: 'Part motion blur',
-    publishDate: '19th Dec 2024',
-    url: '/partmotionblur',
+      "title": "Part Motion Blur",
+      "description": "Part motion blur",
+      "publishDate": "19th Dec 2024",
+      "url": "/partmotionblur",
+      "tags": []
   },
   {
-    title: 'Word Axis',
-    description: 'Word Axis',
-    publishDate: '1st Jan 2025',
-    url: '/wordaxis'
+      "title": "Word Axis",
+      "description": "Word Axis",
+      "publishDate": "1st Jan 2025",
+      "url": "/wordaxis",
+      "tags": []
   },
   {
-    title: 'Text Frames',
-    description: 'Text Frames',
-    publishDate: '2nd Jan 2025',
-    url: '/textframes'
+      "title": "Text Frames",
+      "description": "Text Frames",
+      "publishDate": "2nd Jan 2025",
+      "url": "/textframes",
+      "tags": []
   },
   {
-    title: "Don't Die",
-    description: "Don't Die",
-    publishDate: '2nd Jan 2025',
-    url: '/dontdie'
+      "title": "Don't Die",
+      "description": "Don't Die",
+      "publishDate": "2nd Jan 2025",
+      "url": "/dontdie",
+      "tags": []
   },
   {
-    title: 'Anyone 2 Jack',
-    description: 'Anyone 2 Jack',
-    publishDate: '3rd Jan 2025',
-    url: '/anyone2jack'
+      "title": "Anyone 2 Jack",
+      "description": "Anyone 2 Jack",
+      "publishDate": "3rd Jan 2025",
+      "url": "/anyone2jack",
+      "tags": []
   },
   {
-    title: 'Images to PDF',
-    description: 'Images to PDF',
-    publishDate: '8th Jan 2025',
-    url: '/img2pdf'
+      "title": "Images to PDF",
+      "description": "Images to PDF",
+      "publishDate": "8th Jan 2025",
+      "url": "/img2pdf",
+      "tags": []
   },
   {
-    title: 'Text to Video',
-    description: 'Text to Video',
-    publishDate: '9th Jan 2025',
-    url: '/text2video'
+      "title": "Text to Video",
+      "description": "Text to Video",
+      "publishDate": "9th Jan 2025",
+      "url": "/text2video",
+      "tags": []
   },
   {
-    title: 'Combine Multiple Images',
-    description: 'Combine Multiple Images',
-    publishDate: '22nd Jan 2025',
-    url: '/nparts'
+      "title": "Combine Multiple Images",
+      "description": "Combine Multiple Images",
+      "publishDate": "22nd Jan 2025",
+      "url": "/nparts",
+      "tags": []
   },
   {
-    title: 'Pixel Brush',
-    description: 'Pixel Brush',
-    publishDate: '23rd Jan 2025',
-    url: '/pixelbrush'
+      "title": "Pixel Brush",
+      "description": "Pixel Brush",
+      "publishDate": "23rd Jan 2025",
+      "url": "/pixelbrush",
+      "tags": []
   },
   {
-    title: 'GM',
-    description: 'GM',
-    publishDate: '27th Jan 2025',
-    url: '/gm'
+      "title": "GM",
+      "description": "GM",
+      "publishDate": "27th Jan 2025",
+      "url": "/gm",
+      "tags": []
   },
   {
-    title: 'Doorknob Effect',
-    description: 'Doorknob Effect',
-    publishDate: '30th Jan 2025',
-    url: '/doorknobeffect'
+      "title": "Doorknob Effect",
+      "description": "Doorknob Effect",
+      "publishDate": "30th Jan 2025",
+      "url": "/doorknobeffect",
+      "tags": []
   },
   {
-    title: 'Braille Checks',
-    description: 'Braille Checks',
-    publishDate: '31st Jan 2025',
-    url: '/braillechecks'
+      "title": "Braille Checks",
+      "description": "Braille Checks",
+      "publishDate": "31st Jan 2025",
+      "url": "/braillechecks",
+      "tags": []
   },
   {
-    title: 'Time Stamp Generator',
-    description: 'Time Stamp Generator for youtube',
-    publishDate: '4th Feb 2025',
-    url: '/timestamps'
+      "title": "Time Stamp Generator",
+      "description": "Time Stamp Generator for youtube",
+      "publishDate": "4th Feb 2025",
+      "url": "/timestamps",
+      "tags": []
   },
   {
-    title: 'Built on Ethereum',
-    description: 'Built on Ethereum badge',
-    publishDate: '7th Feb 2025',
-    url: '/boe'
+      "title": "Built on Ethereum",
+      "description": "Built on Ethereum badge",
+      "publishDate": "7th Feb 2025",
+      "url": "/boe",
+      "tags": []
   },
   {
-    title: 'Built on Ethereum Badge',
-    description: 'Built on Ethereum Badge',
-    publishDate: '7th Feb 2025',
-    url: '/boebadge'
+      "title": "Built on Ethereum Badge",
+      "description": "Built on Ethereum Badge",
+      "publishDate": "7th Feb 2025",
+      "url": "/boebadge",
+      "tags": []
   },
   {
-    title: 'Photocopy Filter',
-    description: 'Photocopy Filter',
-    publishDate: '9th Feb 2025',
-    url: '/photocopyfilter'
+      "title": "Photocopy Filter",
+      "description": "Photocopy Filter",
+      "publishDate": "9th Feb 2025",
+      "url": "/photocopyfilter",
+      "tags": []
   },
   {
-    title: 'Black box',
-    description: 'Black box',
-    publishDate: '10th Feb 2025',
-    url: '/blackbox'
+      "title": "Black box",
+      "description": "Black box",
+      "publishDate": "10th Feb 2025",
+      "url": "/blackbox",
+      "tags": []
   },
   {
-    title: 'Intelligence Age Filter',
-    description: 'From the superbowl ad of chatgpt',
-    publishDate: '10th Feb 2025',
-    url: '/iafilter'
+      "title": "Intelligence Age Filter",
+      "description": "From the superbowl ad of chatgpt",
+      "publishDate": "10th Feb 2025",
+      "url": "/iafilter",
+      "tags": []
   },
   {
-    title: 'Dithering Disintegration',
-    description: 'Dithering Disintegration',
-    publishDate: '11th Feb 2025',
-    url: '/dd'
+      "title": "Dithering Disintegration",
+      "description": "Dithering Disintegration",
+      "publishDate": "11th Feb 2025",
+      "url": "/dd",
+      "tags": []
   },
   {
-    title: 'Sea Filter',
-    description: 'Sea Filter',
-    publishDate: '13th Feb 2025',
-    url: '/sea'
+      "title": "Sea Filter",
+      "description": "Sea Filter",
+      "publishDate": "13th Feb 2025",
+      "url": "/sea",
+      "tags": []
   },
   {
-    title: 'Based Punk Filter',
-    description: 'Based Punk Filter',
-    publishDate: '16th Feb 2025',
-    url: '/basedpunkfilter'
+      "title": "Based Punk Filter",
+      "description": "Based Punk Filter",
+      "publishDate": "16th Feb 2025",
+      "url": "/basedpunkfilter",
+      "tags": []
   },
   {
-    title: 'Add colors',
-    description: 'Add multiple colors',
-    publishDate: '22nd Feb 2025',
-    url: '/addcolors'
+      "title": "Add colors",
+      "description": "Add multiple colors",
+      "publishDate": "22nd Feb 2025",
+      "url": "/addcolors",
+      "tags": []
   },
   {
-    title: 'Image to 3d',
-    description: 'Image to 3d',
-    publishDate: '4th Mar 2025',
-    url: '/img23d'
+      "title": "Image to 3d",
+      "description": "Image to 3d",
+      "publishDate": "4th Mar 2025",
+      "url": "/img23d",
+      "tags": []
   },
   {
-    title: 'Hope',
-    description: 'Hope for Eissa',
-    publishDate: '5th Mar 2025',
-    url: '/hope'
+      "title": "Hope",
+      "description": "Hope for Eissa",
+      "publishDate": "5th Mar 2025",
+      "url": "/hope",
+      "tags": []
   },
   {
-    title: 'Basic Collage',
-    description: 'Add multiple images to a collage',
-    publishDate: '6th Mar 2025',
-    url: '/basiccollage'
+      "title": "Basic Collage",
+      "description": "Add multiple images to a collage",
+      "publishDate": "6th Mar 2025",
+      "url": "/basiccollage",
+      "tags": []
   },
   {
-    title: 'Librivox player',
-    description: 'Play all chapters of a book from librivox',
-    publishDate: '8th Mar 2025',
-    url: '/librivox'
+      "title": "Librivox player",
+      "description": "Play all chapters of a book from librivox",
+      "publishDate": "8th Mar 2025",
+      "url": "/librivox",
+      "tags": []
   },
   {
-    title: 'Add NFT QR code',
-    description: 'Add NFT QR code to your image',
-    publishDate: '9th Mar 2025',
-    url: '/nftqr'
+      "title": "Add QR code to nft image",
+      "description": "Add qr code to nft image",
+      "publishDate": "9th Mar 2025",
+      "url": "/nftqr",
+      "tags": []
   }
-]
+];
 
 export default function Home() {
   const router = useRouter();
-  const { tags } = router.query; // Get tags from query params
-  const [search, setSearch] = useState('')
-  const [filteredTools, setFilteredTools] = useState(tools)
+  const { tags } = router.query;
+  const [search, setSearch] = useState('');
+  const [filteredTools, setFilteredTools] = useState(tools);
+  const [isSearching, setIsSearching] = useState(false);
+
+  // Create and configure MiniSearch instance
+  const miniSearch = useMemo(() => {
+    const ms = new MiniSearch({
+      fields: ['title', 'description'], 
+      storeFields: ['title', 'description', 'publishDate', 'icon', 'url', 'tags'], 
+      searchOptions: {
+        boost: { title: 2, description: 2 }, 
+        fuzzy: 0.3,
+        prefix: true
+      },
+    });
+
+    ms.addAll(tools.map((tool, id) => ({ ...tool, id })));
+    
+    return ms;
+  }, []);
 
   useEffect(() => {
-    const tagArray = tags ? tags.split(',') : []; // Split tags into an array
-    setFilteredTools(tools.filter(tool => 
-      (tool.title.toLowerCase().includes(search.toLowerCase()) || 
-      tool.description.toLowerCase().includes(search.toLowerCase())) &&
-      (tagArray.length === 0 || tagArray.some(tag => tool.tags.includes(tag)))
-    ).reverse());  // reverse to show latest first
-  }, [search, tags]) // Add tags to dependency array
+    const tagArray = tags ? tags.split(',') : [];
+    setIsSearching(true);
+
+    // Debounce for performance
+    const timer = setTimeout(() => {
+      // If search is empty, just show all tools filtered by tags
+      if (!search.trim()) {
+        setFilteredTools(tools.filter(tool => 
+          tagArray.length === 0 || tagArray.some(tag => tool.tags.includes(tag))
+        ).reverse());
+        setIsSearching(false);
+        return;
+      }
+
+      // Extract quoted phrases from the search query
+      const quoteRegex = /"([^"]*)"/g;
+      const quotedPhrases = [];
+      let match;
+      while ((match = quoteRegex.exec(search)) !== null) {
+        quotedPhrases.push(match[1].toLowerCase());
+      }
+
+      // Create a clean search term without the quotes
+      const cleanSearch = search.replace(/"([^"]*)"/g, '$1');
+      
+      // Perform search with MiniSearch
+      const results = miniSearch.search(cleanSearch);
+      
+      // Add regular keyword search results for the best coverage
+      const keywordResults = tools.filter(tool => 
+        (tool.title.toLowerCase().includes(cleanSearch.toLowerCase()) || 
+         tool.description.toLowerCase().includes(cleanSearch.toLowerCase())) &&
+        (tagArray.length === 0 || tagArray.some(tag => tool.tags.includes(tag)))
+      );
+
+      // Merge results, removing duplicates by URL
+      const mergedResults = [...keywordResults];
+      results.forEach(result => {
+        if (!mergedResults.find(item => item.url === result.url)) {
+          mergedResults.push(tools.find(tool => tool.url === result.url));
+        }
+      });
+
+      // Apply tag filtering to the merged results
+      let filteredResults = mergedResults.filter(tool => 
+        tagArray.length === 0 || tagArray.some(tag => tool.tags.includes(tag))
+      );
+
+      // Add priority scores for quoted phrase exact matches
+      if (quotedPhrases.length > 0) {
+        filteredResults = filteredResults.map(tool => {
+          const titleLower = tool.title.toLowerCase();
+          const descLower = tool.description.toLowerCase();
+          
+          // Calculate priority score based on exact matches of quoted phrases
+          let priorityScore = 0;
+          quotedPhrases.forEach(phrase => {
+            // Exact match in title is highest priority
+            if (titleLower.includes(phrase)) {
+              priorityScore += 100;
+            }
+            // Exact match in description is high priority
+            if (descLower.includes(phrase)) {
+              priorityScore += 50;
+            }
+          });
+
+          return { ...tool, priorityScore };
+        });
+
+        // Sort by priority score first (higher scores first), then by original order
+        filteredResults.sort((a, b) => {
+          if (b.priorityScore !== a.priorityScore) {
+            return b.priorityScore - a.priorityScore;
+          }
+          return tools.indexOf(a) - tools.indexOf(b);
+        });
+      }
+      
+      setFilteredTools(filteredResults);
+      setIsSearching(false);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [search, tags, miniSearch]);
 
   return (
     <>
@@ -1963,9 +2117,16 @@ export default function Home() {
         </a>
         <div className={styles.searchContainer}>
           <FiSearch className={styles.searchIcon} />
-          <input className={styles.search} onChange={(e) => {
-            setSearch(e.target.value)
-          }} placeholder="Search for tools... for e.g., 'nft'" />
+          <input 
+            className={styles.search} 
+            onChange={(e) => {
+              setSearch(e.target.value)
+            }} 
+            placeholder='Search for tools... try "calculator" or nft' 
+          />
+          {isSearching && (
+            <span className={styles.searchStatus}>Searching...</span>
+          )}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', width: '100%', gap: '20px', marginBottom: 30 }}>
           {filteredTools.map((tool, index) => (
@@ -1985,7 +2146,6 @@ export default function Home() {
             </a>
           ))}
         </div>
-
       </main>
     </>
   )
