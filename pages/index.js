@@ -1916,6 +1916,12 @@ export const tools = [
     description: 'Play all chapters of a book from librivox',
     publishDate: '8th Mar 2025',
     url: '/librivox'
+  },
+  {
+    title: 'Add NFT QR code',
+    description: 'Add NFT QR code to your image',
+    publishDate: '9th Mar 2025',
+    url: '/nftqr'
   }
 ]
 
