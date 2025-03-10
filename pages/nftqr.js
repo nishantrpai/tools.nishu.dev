@@ -230,7 +230,7 @@ export default function NFTQRCode() {
             <label style={{ display: 'block', marginBottom: '5px' }}>QR Code Position:</label>
             <div style={{ display: 'flex', gap: '10px' }}>
               {['top-left', 'top-right', 'bottom-left', 'bottom-right'].map(position => (
-                <label key={position} style={{ display: 'flex', alignItems: 'center' }}>
+                <label key={position} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                   <input
                     type="radio"
                     name="position"
