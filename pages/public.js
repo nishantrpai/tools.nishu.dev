@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import styles from '@/styles/Home.module.css'
 import Head from 'next/head'
 
 export default function PublicDraft() {
@@ -83,6 +84,7 @@ export default function PublicDraft() {
       </Head>
       <main style={{ padding: 20 }}>
         <h1>Public Draft Composer</h1>
+        <h2 className={styles.description}>Compose a public draft</h2>
         <textarea
           value={draftText}
           onChange={(e) => setDraftText(e.target.value)}
