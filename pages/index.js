@@ -2098,7 +2098,30 @@ export default function Home() {
     <>
       <Head>
         <title>Tools by Nishu</title>
-        <meta name="description" content="tools.nishu.dev" />
+        <meta name="description" content="A collection of tools by Nishu" />
+        <meta name="keywords" content="tools, nishu, nishant, painishant, painishu" />
+        <meta name="author" content="Nishant Pai" />
+        <meta name="robots" content="index, follow" />
+        <meta name="theme-color" content="#000000" />
+        <meta name="msapplication-TileColor" content="#000000" />
+        {/* twitter */}
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:site" content="@PaiNishant" />
+        <meta name="twitter:creator" content="@PaiNishant" />
+        <meta name="twitter:title" content="Tools by Nishu" />
+        <meta name="twitter:description" content="A collection of tools by Nishu" />
+        <meta name="twitter:image" content="https://nishu.dev/favicon.ico" />
+        {/* open graph */}
+        <meta property="og:url" content="https://nishu.dev" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Tools by Nishu" /> 
+        <meta property="og:description" content="A collection of tools by Nishu" />
+        <meta property="og:image" content="https://tools.nishu.dev/og.png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:site_name" content="Tools by Nishu" />
+        <meta property="og:locale" content="en_US" />
+        
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
@@ -2135,7 +2158,7 @@ export default function Home() {
                 fontSize: '1rem',
                 color: '#eee',
                 marginBottom: '10px',
-              }}>{filteredTools.length - (index + 1)}. {tool.title}</p>
+              }}>{filteredTools.length - (index)}. {tool.title}</p>
               <p style={{
                 fontSize: '0.8rem',
                 display: 'flex',
