@@ -198,8 +198,9 @@ input[type='range']::-webkit-slider-runnable-track {
 /* change the input color select */
 input[type="color"] {
 	border: none;
-	width: 14px;
-	height: 14px;
+	width: 16px;
+	height: 16px;
+  padding: 0px !important;
   border-radius: 2px;
   border: 1px solid #333;
 }
