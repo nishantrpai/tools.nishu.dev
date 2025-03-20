@@ -1980,6 +1980,13 @@ export const tools = [
       "publishDate": "9th Mar 2025",
       "url": "/nftqr",
       "tags": []
+  },
+  {
+    "title": "Public",
+    "description": "Add arial text in caps on white background",
+    "publishDate": "14th Mar 2025",
+    "url": "/public",
+    "tags": []
   }
 ];
 
