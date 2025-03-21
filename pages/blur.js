@@ -112,7 +112,7 @@ export default function BlurArea() {
             applyBlur(ctx, img, true)
             const a = document.createElement('a')
             a.href = canvas.toDataURL()
-            a.download = 'unblur_area.png'
+            a.download = 'blur_area.png'
             a.click()
             // Redraw the canvas with the selection rectangle
             applyBlur(ctx, img)
