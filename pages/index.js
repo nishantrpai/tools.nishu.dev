@@ -1987,6 +1987,13 @@ export const tools = [
     "publishDate": "14th Mar 2025",
     "url": "/public",
     "tags": []
+  },
+  {
+    "title": "Blur",
+    "description": "Blur specific parts of an image online",
+    "publishDate": "21st Mar 2025",
+    "url": "/blur",
+    "tags": []
   }
 ];
 
