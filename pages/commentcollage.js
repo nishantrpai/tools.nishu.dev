@@ -85,7 +85,7 @@ export default function CommentCollage() {
     
     const bgImg = await loadImage(bgImage)
     // Reduce target area to 5% of background
-    const targetArea = (bgImg.width * bgImg.height) * 0.2
+    const targetArea = (bgImg.width * bgImg.height) * 0.15
 
     const commentImages = await Promise.all(
       comments.map(comment => loadImage(comment.file))
@@ -309,7 +309,7 @@ export default function CommentCollage() {
           <div style={{ maxWidth: '100%', overflowX: 'auto' }}>
             {templateButtons}
             <p style={{ color: '#666', fontSize: '12px', marginBottom: '10px' }}>
-            💡 Tip: When done selecting images press the <FiRepeat/> button.
+            💡 Tip: When done selecting comments press the <FiRepeat/> button.
               </p>
 
 
