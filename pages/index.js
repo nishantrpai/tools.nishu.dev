@@ -1994,6 +1994,13 @@ export const tools = [
     "publishDate": "21st Mar 2025",
     "url": "/blur",
     "tags": []
+  },
+  {
+    "title": "Comment Collage",
+    "description": "Create a collage from comments",
+    "publishDate": "22nd Mar 2025",
+    "url": "/commentcollage",
+    "tags": []
   }
 ];
 
