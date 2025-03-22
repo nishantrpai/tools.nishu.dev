@@ -234,14 +234,14 @@ export default function CommentCollage() {
             <label style={{ color: '#888' }}>Add Comments</label>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <input type="file" multiple accept="image/*" onChange={handleCommentImagesChange} />
-              <p style={{ color: '#666', fontSize: '14px', margin: 0 }}>
-                💡 Tip: You can also paste images directly (Ctrl/Cmd + V)
+              <p style={{ color: '#666', fontSize: '12px', margin: 0 }}>
+                💡 Tip: You can also paste images directly (Ctrl/Cmd + V).
               </p>
             </div>
           </div>
 
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', height: 'max-content' }}>
             <div style={{ display: 'flex', gap: '10px' }}>
             {comments.map((comment, index) => (
               <button onClick={() => {
@@ -307,6 +307,11 @@ export default function CommentCollage() {
 
           <div style={{ maxWidth: '100%', overflowX: 'auto' }}>
             {templateButtons}
+            <p style={{ color: '#666', fontSize: '12px', marginBottom: '10px' }}>
+            💡 Tip: When done selecting images press the <FiRepeat/> button.
+              </p>
+
+
             <canvas
               ref={canvasRef}
               width={canvasWidth}
