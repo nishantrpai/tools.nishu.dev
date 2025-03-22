@@ -8,11 +8,12 @@ export default function PublicDraft() {
   const [scale, setScale] = useState(1)
   const [baseFontSize, setBaseFontSize] = useState(48)
   const [fontColor, setFontColor] = useState("#000000")
+  const [backgroundColor, setBackgroundColor] = useState("#FFFFFF")
   const canvasRef = useRef(null)
 
   const drawCanvas = (ctx, width, height, lines, scaleFactor, fontSize) => {
     ctx.clearRect(0, 0, width, height)
-    ctx.fillStyle = "#FFFFFF"
+    ctx.fillStyle = backgroundColor
     ctx.fillRect(0, 0, width, height)
     ctx.save()
     ctx.scale(scaleFactor, scaleFactor)
@@ -61,18 +62,18 @@ export default function PublicDraft() {
     const newText = e.target.value
     setCurrentText(newText)
     
-    // Split into lines and preserve colors
-    const newLines = newText.split('\n').map((text, index) => {
-      // Use existing color if line exists, otherwise use current color
-      const existingLine = draftLines[index]
-      return {
-        text,
-        color: existingLine ? existingLine.color : fontColor
-      }
-    })
     
-
-    console.log(newLines)
+    // Split into lines and only preserve colors for lines that exist
+    const lines = newText.split('\n')
+    if (lines.length === 0) {
+      setDraftLines([])
+      return
+    }
+    const newLines = lines.map((text, index) => ({
+      text,
+      color: index < draftLines.length ? draftLines[index].color : fontColor
+    }))
+    
     setDraftLines(newLines)
   }
 
@@ -83,7 +84,7 @@ export default function PublicDraft() {
     canvas.height = 1000
     const ctx = canvas.getContext('2d')
     drawCanvas(ctx, canvas.width, canvas.height, draftLines, scale, baseFontSize)
-  }, [draftLines, scale, baseFontSize])
+  }, [draftLines, scale, baseFontSize, backgroundColor])
 
   const downloadImage = () => {
     const offscreen = document.createElement('canvas')
@@ -91,7 +92,7 @@ export default function PublicDraft() {
     offscreen.width = 1000 * multiplier
     offscreen.height = 1000 * multiplier
     const ctx = offscreen.getContext('2d')
-    ctx.fillStyle = "#FFFFFF"
+    ctx.fillStyle = backgroundColor
     ctx.fillRect(0, 0, offscreen.width, offscreen.height)
     drawCanvas(ctx, offscreen.width, offscreen.height, draftLines, scale, baseFontSize)
     const dataURL = offscreen.toDataURL('image/png')
@@ -128,6 +129,15 @@ export default function PublicDraft() {
               type="color" 
               value={fontColor} 
               onChange={(e) => setFontColor(e.target.value)} 
+              style={{ marginLeft: 10, verticalAlign: 'middle' }} 
+            />
+          </label>
+          <label>
+            Background Color: 
+            <input 
+              type="color" 
+              value={backgroundColor} 
+              onChange={(e) => setBackgroundColor(e.target.value)} 
               style={{ marginLeft: 10, verticalAlign: 'middle' }} 
             />
           </label>
