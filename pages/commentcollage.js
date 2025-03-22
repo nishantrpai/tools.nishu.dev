@@ -223,6 +223,7 @@ export default function CommentCollage() {
 
       <main className={styles.main}>
         <h1 className={styles.title}>Comment Collage</h1>
+        <h2 className={styles.description}>Create a collage with comments</h2>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '100%' }}>
           <div style={{ display: 'flex', gap: '5px', flexDirection: 'column' }}>
