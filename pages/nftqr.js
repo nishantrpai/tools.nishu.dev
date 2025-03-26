@@ -6,7 +6,7 @@ import QRCode from 'qrcode'
 export default function NFTQRCode() {
   const [image, setImage] = useState(null)
   const [mintLink, setMintLink] = useState('')
-  const [qrPosition, setQrPosition] = useState('top-left') // top-left, top-right, bottom-left, bottom-right
+  const [qrPosition, setQrPosition] = useState('top-left') // top-left, top-right, bottom-left, bottom-right, center-top, center-bottom
   const [qrColor, setQrColor] = useState('#000000')
   const [qrOpacity, setQrOpacity] = useState(0.8) // 0-1
   const [qrSize, setQrSize] = useState(100) // px
@@ -114,6 +114,14 @@ export default function NFTQRCode() {
           break
         case 'bottom-right':
           x = canvas.width - qrSize - 20
+          y = canvas.height - qrSize - 20
+          break
+        case 'center-top':
+          x = (canvas.width - qrSize) / 2
+          y = 20
+          break
+        case 'center-bottom':
+          x = (canvas.width - qrSize) / 2
           y = canvas.height - qrSize - 20
           break
       }
@@ -228,8 +236,8 @@ export default function NFTQRCode() {
           
           <div>
             <label style={{ display: 'block', marginBottom: '5px' }}>QR Code Position:</label>
-            <div style={{ display: 'flex', gap: '10px' }}>
-              {['top-left', 'top-right', 'bottom-left', 'bottom-right'].map(position => (
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+              {['top-left', 'center-top', 'top-right', 'bottom-left', 'center-bottom', 'bottom-right'].map(position => (
                 <label key={position} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                   <input
                     type="radio"
