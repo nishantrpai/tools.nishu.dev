@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { FaDownload } from 'react-icons/fa'
 
 export default function VisualRecipe() {
@@ -46,7 +46,7 @@ export default function VisualRecipe() {
       const cleanedResponse = data.response.replace(/^```svg\s+|```|<\?xml[\s\S]+?\?>|<!DOCTYPE[\s\S]+?>/g, '')
       
       // Now we need to find ingredients and add image URLs
-      // const enhancedSvg = await addIngredientImages(cleanedResponse)
+      const enhancedSvg = await addIngredientImages(cleanedResponse)
       setRecipeSvg(enhancedSvg)
     } catch (error) {
       console.error("Error generating recipe:", error)
@@ -113,13 +113,12 @@ export default function VisualRecipe() {
           const imageTag = imageTagMatches[i]
           const ingredient = ingredientTexts[i]
           
-          // Clean the ingredient name (remove quantities, etc.)
+          // Clean the ingredient name
           const cleanName = ingredient.replace(/^\d+\s*[a-zA-Z]+\s+/, '').trim()
           
-          // Find an image for this ingredient
           const imageUrl = await searchIngredientImage(cleanName)
           
-          // Replace the placeholder image tag with one that includes the href
+          // Simply update the image tag with the URL, no download button
           const updatedImageTag = imageTag.replace(/\/?>$/, ` href="${imageUrl}" />`)
           updatedSvg = updatedSvg.replace(imageTag, updatedImageTag)
         } catch (err) {
@@ -146,16 +145,38 @@ export default function VisualRecipe() {
       console.error("Failed to find final dish image:", err)
     }
     
+    // Add a download button at the bottom of SVG
+    // const downloadButtonSvg = `
+    //   <g transform="translate(350, 920)" style="cursor: pointer" onclick="downloadFullRecipe()">
+    //     <rect width="100" height="30" fill="#4CAF50" rx="4"/>
+    //     <text x="20" y="20" fill="white" font-size="14">Download</text>
+    //   </g>
+    // `
+    // updatedSvg = updatedSvg.replace('</svg>', `${downloadButtonSvg}</svg>`)
+    
     return updatedSvg
   }
 
   const searchIngredientImage = async (ingredient) => {
-    // Use a SearX instance or another image search API
     try {
-      const searchQuery = ingredient.toLowerCase() + " ingredient top view isolated"
-      const res = await fetch(`/api/search-image?q=${encodeURIComponent(searchQuery)}`)
+      const searchQuery = ingredient.toLowerCase() + " ingredient food white background isolated top view"
+      const res = await fetch(`https://serpapi.com/search.json?q=${encodeURIComponent(searchQuery)}&engine=google_images&ijn=0`)
       const data = await res.json()
-      return data.imageUrl || `https://via.placeholder.com/100x100?text=${encodeURIComponent(ingredient)}`
+      
+      // Find first valid image from images_results
+      if (data.images_results && data.images_results.length > 0) {
+        for (const img of data.images_results) {
+          try {
+            const response = await fetch(img.original)
+            if (response.ok && response.headers.get('content-type').startsWith('image/')) {
+              return img.original
+            }
+          } catch (err) {
+            continue
+          }
+        }
+      }
+      return `https://via.placeholder.com/100x100?text=${encodeURIComponent(ingredient)}`
     } catch (error) {
       console.error("Error searching for image:", error)
       return `https://via.placeholder.com/100x100?text=${encodeURIComponent(ingredient)}`
@@ -197,6 +218,14 @@ export default function VisualRecipe() {
       URL.revokeObjectURL(url)
     }
   }
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.downloadFullRecipe = () => {
+        downloadPNG()
+      }
+    }
+  }, [])
 
   return (
     <div className={styles.container}>
