@@ -2001,6 +2001,13 @@ export const tools = [
     "publishDate": "22nd Mar 2025",
     "url": "/commentcollage",
     "tags": []
+  },
+  {
+    "title": "Visual Recipe",
+    "description": "Visualize your recipe",
+    "publishDate": "7th April 2025",
+    "url": "/visualrecipe",
+    "tags": []
   }
 ];
 

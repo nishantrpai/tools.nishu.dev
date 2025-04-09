@@ -20,7 +20,7 @@ export default function VisualizeValue() {
       const res = await fetch(`/api/gpt`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt, model: 'gemini-1.5-flash' })
+        body: JSON.stringify({ prompt, model: 'gpt-4o' })
       })
       const data = await res.json()
       // Remove any ```svg or ``` tags from the response
