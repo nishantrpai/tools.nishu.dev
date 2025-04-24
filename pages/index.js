@@ -2008,6 +2008,13 @@ export const tools = [
     "publishDate": "7th April 2025",
     "url": "/visualrecipe",
     "tags": []
+  },
+  {
+    "title": "Dalle Watermark",
+    "description": "Add dalle watermark to your image",
+    "publishDate": "24th April 2025",
+    "url": "/aiwatermark",
+    "tags": []
   }
 ];
 
