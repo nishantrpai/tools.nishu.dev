@@ -152,6 +152,13 @@ export default function AskAll() {
         <div style={{ marginTop: '20px', fontSize: '14px', color: '#777' }}>
           <p>Tip: You can share a link that automatically opens AI assistants by adding <code>?q=your question&engines=chatgpt,claude&auto=true</code> to the URL.</p>
           <p>The <code>engines</code> parameter lets you specify which AI assistants to open (comma-separated).</p>
+          <br/>
+          <p>
+            To add this as your default search engine in your browser, use the following URL:
+            <br/>
+            https://tools.nishu.dev/askall?q=%s&engines=chatgpt,claude&auto=true
+          </p>
+
         </div>
       </main>
     </>
