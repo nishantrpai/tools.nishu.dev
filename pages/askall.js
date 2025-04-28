@@ -18,6 +18,22 @@ export default function AskAll() {
     // Check URL params for query
     if (router.query.q) {
       setQuery(router.query.q)
+      
+      // Check if engine parameters exist in the URL
+      if (router.query.engines) {
+        try {
+          const selectedEngines = router.query.engines.split(',');
+          // Update aiServices based on URL params
+          const updatedServices = aiServices.map(service => ({
+            ...service,
+            checked: selectedEngines.includes(service.name.toLowerCase())
+          }));
+          setAiServices(updatedServices);
+        } catch (e) {
+          console.error("Error parsing engines parameter:", e);
+        }
+      }
+      
       if (router.query.auto === 'true') {
         // Auto-open tabs if ?auto=true is set
         openTabs(router.query.q)
@@ -51,8 +67,20 @@ export default function AskAll() {
 
   const copyShareableLink = () => {
     const baseUrl = `${window.location.protocol}//${window.location.host}/askall`
-    const queryParam = query ? `?q=${encodeURIComponent(query)}&auto=true` : ''
-    const fullUrl = baseUrl + queryParam
+    
+    // Get selected engines
+    const selectedEngines = aiServices
+      .filter(service => service.checked)
+      .map(service => service.name.toLowerCase())
+      .join(',')
+    
+    // Build query parameters
+    let queryParams = []
+    if (query) queryParams.push(`q=${encodeURIComponent(query)}`)
+    if (selectedEngines) queryParams.push(`engines=${selectedEngines}`)
+    queryParams.push('auto=true')
+    
+    const fullUrl = baseUrl + (queryParams.length ? `?${queryParams.join('&')}` : '')
     
     navigator.clipboard.writeText(fullUrl)
     alert('Shareable link copied to clipboard!')
@@ -122,7 +150,8 @@ export default function AskAll() {
         </form>
 
         <div style={{ marginTop: '20px', fontSize: '14px', color: '#777' }}>
-          <p>Tip: You can share a link that automatically opens AI assistants by adding <code>?q=your question&auto=true</code> to the URL.</p>
+          <p>Tip: You can share a link that automatically opens AI assistants by adding <code>?q=your question&engines=chatgpt,claude&auto=true</code> to the URL.</p>
+          <p>The <code>engines</code> parameter lets you specify which AI assistants to open (comma-separated).</p>
         </div>
       </main>
     </>
