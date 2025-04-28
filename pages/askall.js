@@ -156,7 +156,7 @@ export default function AskAll() {
           <p>
             To add this as your default search engine in your browser, use the following URL:
             <br/>
-            https://tools.nishu.dev/askall?q=%s&engines=chatgpt,claude&auto=true
+            https://tools.nishu.dev/askall?q=%25s&engines=grok,chatgpt,perplexity,claude,mistral&auto=true
           </p>
 
         </div>
