@@ -2015,6 +2015,13 @@ export const tools = [
     "publishDate": "24th April 2025",
     "url": "/aiwatermark",
     "tags": []
+  },
+  {
+    "title": "Ask all AIs",
+    "description": "Ask all AIs",
+    "publishDate": "25th April 2025",
+    "url": "/askall",
+    "tags": [],
   }
 ];
 
