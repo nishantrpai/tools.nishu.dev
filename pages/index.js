@@ -2022,6 +2022,13 @@ export const tools = [
     "publishDate": "25th April 2025",
     "url": "/askall",
     "tags": [],
+  },
+  {
+    "title": "Favicon set",
+    "description": "Generate favicons from svg",
+    "publishDate": "6th May 2025",
+    "url": "/faviconset",
+    "tags": []
   }
 ];
 
