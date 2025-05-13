@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { useState, useEffect } from 'react'
-import { FiMail, FiSearch, FiCheckCircle, FiXCircle, FiLoader } from 'react-icons/fi'
+import { FiMail, FiSearch, FiCheckCircle, FiXCircle, FiLoader, FiCopy } from 'react-icons/fi'
 
 export default function FindEmail() {
   const [domain, setDomain] = useState('')
@@ -107,11 +107,28 @@ export default function FindEmail() {
     setLoading(false)
   }
 
+  const copyToClipboard = async (email) => {
+    try {
+      await navigator.clipboard.writeText(email)
+    } catch (err) {
+      console.error('Failed to copy text: ', err)
+    }
+  }
+
   const getStatusIcon = (email) => {
     const status = verificationStatus[email]
     if (!status) return null
     if (status.isValid === null) return <FiLoader className="animate-spin" />
-    if (status.isValid) return <FiCheckCircle style={{ color: '#4ade80' }} />
+    if (status.isValid) {
+      return (
+        <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
+          <FiCheckCircle style={{ color: '#4ade80' }} />
+          <a href={`mailto:${email}`} target="_blank" rel="noopener noreferrer">
+            <FiMail style={{ color: '#4ade80' }} />
+          </a>
+        </div>
+      )
+    }
     return <FiXCircle style={{ color: '#ef4444' }} />
   }
 
@@ -191,7 +208,9 @@ export default function FindEmail() {
                     borderBottom: index < emails.length - 1 ? '1px solid #333' : 'none',
                     display: 'flex',
                     justifyContent: 'space-between',
-                    alignItems: 'center'
+                    alignItems: 'center',
+                    color: verificationStatus[email]?.isValid ? '#fff' : '#333',
+                    fontSize: 12
                   }}>
                     <span>{email}</span>
                     <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
@@ -209,7 +228,7 @@ export default function FindEmail() {
             </div>
 
             <div>
-              <h3 style={{ marginBottom: '10px', fontSize: '14px' }}>
+              <h3 style={{ marginBottom: '10px', fontSize: '12px' }}>
                 Emails Found on Website:
                 {loading && ' (Loading...)'}
               </h3>
@@ -217,6 +236,7 @@ export default function FindEmail() {
                 border: '1px solid #333', 
                 borderRadius: '5px', 
                 padding: '10px',
+                fontSize: 12,
                 maxHeight: '200px',
                 overflowY: 'auto'
               }}>
