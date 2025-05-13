@@ -2029,6 +2029,12 @@ export const tools = [
     "publishDate": "6th May 2025",
     "url": "/faviconset",
     "tags": []
+  },
+  {
+    "title": "Find Email Address",
+    "description": "Enter list of names and company domain to find email addresses",
+    "publishDate": "13th May 2025",
+    "url": "/findemail",
   }
 ];
 
