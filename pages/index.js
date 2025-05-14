@@ -2035,6 +2035,13 @@ export const tools = [
     "description": "Enter list of names and company domain to find email addresses",
     "publishDate": "13th May 2025",
     "url": "/findemail",
+  },
+  {
+    "title": "Replace em dash",
+    "description": "Replace em dash with , or .",
+    "publishDate": "14th May 2025",
+    "url": "/replacem",
+    "tags": []
   }
 ];
 

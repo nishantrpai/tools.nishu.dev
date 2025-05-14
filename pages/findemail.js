@@ -123,6 +123,9 @@ export default function FindEmail() {
       return (
         <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
           <FiCheckCircle style={{ color: '#4ade80' }} />
+          <button onClick={() => copyToClipboard(email)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+            <FiCopy style={{ color: '#4ade80' }} />
+          </button>
           <a href={`mailto:${email}`} target="_blank" rel="noopener noreferrer">
             <FiMail style={{ color: '#4ade80' }} />
           </a>
