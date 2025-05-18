@@ -102,6 +102,8 @@ export default async function handler(req, res) {
       prompt = req.body.prompt;
       model = req.body.model;
       image_url = req.body.image_url;
+      const system = req.body.system;
+      const response_format = req.body.response_format;
     }
     if (!model) {
       model = 'gpt-3.5-turbo';
@@ -139,17 +141,25 @@ export default async function handler(req, res) {
     }
 
     const chatCompletion = await openai.chat.completions.create({
-      messages: [{ role: 'user', content: prompt }],
-      model
+      messages: [
+        ...(req.body.system ? [{ role: 'system', content: req.body.system }] : []),
+        { role: 'user', content: prompt }
+      ],
+      model,
+      ...(req.body.response_format ? { response_format: req.body.response_format } : {})
     });
     res.status(200).json({ response: chatCompletion.choices[0].message.content });
     return;
   }
   else {
-    let { prompt, model = 'gpt-3.5-turbo', image_url = '' } = req.query;
+    let { prompt, model = 'gpt-3.5-turbo', image_url = '', system = '', response_format = null } = req.query;
     const chatCompletion = await openai.chat.completions.create({
-      messages: [{ role: 'user', content: prompt }],
-      model
+      messages: [
+        ...(system ? [{ role: 'system', content: system }] : []),
+        { role: 'user', content: prompt }
+      ],
+      model,
+      ...(response_format ? { response_format: JSON.parse(response_format) } : {})
     });
     res.status(200).json({ response: chatCompletion.choices[0].message.content });
     return;
