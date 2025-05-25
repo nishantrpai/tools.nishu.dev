@@ -1,25 +1,38 @@
 import dns from 'dns';
 import net from 'net';
 
-// List of valid TLDs - this is a simplified list, you might want to use a more complete one
+// List of valid TLDs
 const validTLDs = new Set([
   'com', 'org', 'net', 'edu', 'gov', 'mil', 'io', 'co', 'ai', 'app',
   'dev', 'xyz', 'info', 'biz', 'me', 'tv', 'uk', 'de', 'fr', 'jp', 'cn', 'au'
 ]);
 
-// Check basic email format
+// Email pattern generator
+function generateEmailPatterns(firstName, lastName, companyDomain) {
+  const patterns = [
+    `${firstName.toLowerCase()}@${companyDomain}`,
+    `${firstName.toLowerCase()}.${lastName.toLowerCase()}@${companyDomain}`,
+    `${firstName.toLowerCase()[0]}${lastName.toLowerCase()}@${companyDomain}`,
+    `${lastName.toLowerCase()}${firstName.toLowerCase()[0]}@${companyDomain}`,
+    `${firstName.toLowerCase()}_${lastName.toLowerCase()}@${companyDomain}`,
+    `${firstName.toLowerCase()}-${lastName.toLowerCase()}@${companyDomain}`,
+    `${lastName.toLowerCase()}.${firstName.toLowerCase()}@${companyDomain}`,
+    `${lastName.toLowerCase()}@${companyDomain}`,
+  ];
+  return patterns;
+}
+
+// Email verification functions remain the same
 function isValidEmailFormat(email) {
   const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
   return emailRegex.test(email);
 }
 
-// Check if domain TLD is valid
 function isValidTLD(domain) {
   const tld = domain.split('.').pop().toLowerCase();
   return validTLDs.has(tld);
 }
 
-// Check MX records
 function checkMXRecord(domain) {
   return new Promise((resolve) => {
     dns.resolveMx(domain, (err, addresses) => {
@@ -32,7 +45,6 @@ function checkMXRecord(domain) {
   });
 }
 
-// Check SMTP connection and email existence
 async function checkSMTP(domain, mxRecords, email) {
   return new Promise((resolve) => {
     const socket = net.createConnection(25, mxRecords[0].exchange);
@@ -48,7 +60,7 @@ async function checkSMTP(domain, mxRecords, email) {
       }
     };
 
-    socket.setTimeout(10000); // 10 second timeout
+    socket.setTimeout(10000);
     socket.on('timeout', cleanup);
     socket.on('error', cleanup);
 
@@ -86,36 +98,35 @@ async function checkSMTP(domain, mxRecords, email) {
   });
 }
 
+// Modified handler for the new use case
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { email } = req.body;
-  if (!email) {
-    return res.status(400).json({ error: 'Email is required' });
+  const { firstName, lastName, company } = req.body;
+  if (!firstName || !lastName || !company) {
+    return res.status(400).json({ error: 'First name, last name, and company are required' });
   }
 
   try {
-    // Step 1: Check email format
-    if (!isValidEmailFormat(email)) {
-      return res.status(200).json({
-        isValid: false,
-        reason: 'Invalid email format'
-      });
+    // Clean company name to get domain
+    let companyDomain = company.toLowerCase();
+    // If company doesn't have a domain extension, assume .com
+    if (!companyDomain.includes('.')) {
+      companyDomain += '.com';
     }
 
-    // Step 2: Check domain TLD
-    const [, domain] = email.split('@');
-    if (!isValidTLD(domain)) {
+    // Check if domain is valid
+    if (!isValidTLD(companyDomain)) {
       return res.status(200).json({
         isValid: false,
-        reason: 'Invalid domain TLD'
+        reason: 'Invalid company domain TLD'
       });
     }
 
     // Step 3: Check MX records
-    const mxResult = await checkMXRecord(domain);
+    const mxResult = await checkMXRecord(companyDomain);
     if (!mxResult.valid) {
       return res.status(200).json({
         isValid: false,
@@ -123,25 +134,36 @@ export default async function handler(req, res) {
       });
     }
 
-    // Step 4: Check SMTP connection
-    const smtpResult = await checkSMTP(domain, mxResult.mxRecords, email);
-    if (!smtpResult.valid) {
-      return res.status(200).json({
-        isValid: false,
-        reason: smtpResult.reason
-      });
+    // Generate email patterns and check each one
+    const emailPatterns = generateEmailPatterns(firstName, lastName, companyDomain);
+    const results = [];
+
+    for (const emailPattern of emailPatterns) {
+      if (!isValidEmailFormat(emailPattern)) {
+        continue;
+      }
+
+      // Check SMTP connection
+      const smtpResult = await checkSMTP(companyDomain, mxResult.mxRecords, emailPattern);
+      if (smtpResult.valid) {
+        results.push({
+          email: emailPattern,
+          isValid: true
+        });
+      }
     }
 
-    // All checks passed
     return res.status(200).json({
-      isValid: true,
-      reason: 'Email is valid'
+      validEmails: results,
+      firstName,
+      lastName,
+      company: companyDomain
     });
 
   } catch (error) {
-    console.error('Error verifying email:', error);
+    console.error('Error verifying emails:', error);
     return res.status(500).json({
-      error: 'Error verifying email',
+      error: 'Error verifying emails',
       details: error.message
     });
   }
