@@ -2042,6 +2042,13 @@ export const tools = [
     "publishDate": "14th May 2025",
     "url": "/replacem",
     "tags": []
+  },
+  {
+    "title": "Oppette Avatar",
+    "description": "Generate Oppette Avatar",
+    "publishDate": "26th May 2025",
+    "url": "/oppette",
+    "tags": []
   }
 ];
 
