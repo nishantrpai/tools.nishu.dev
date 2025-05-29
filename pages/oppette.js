@@ -237,7 +237,7 @@ export default function Oppette() {
                 <input 
                 type="range"
                 min="1"
-                max="100"
+                max="500"
                 value={brushSize}
                 onChange={(e) => setBrushSize(Number(e.target.value))}
                 style={{ width: 150 }}
