@@ -8,6 +8,10 @@ const DEFAULT_GLASS_COLOR = '#000000';
 const GLASSES_STYLES = ['none', 'round', 'square', 'sunglasses'];
 const BRUSH_SIZES = [5, 10, 20, 30];
 
+// High resolution PNG size for download
+const HIGH_RES_PNG_WIDTH = 2000;
+const HIGH_RES_PNG_HEIGHT = 2000;
+
 function OppetteAvatar({ skinColor, mouthColor, backgroundColor, drawingRef }) {
   return (
     <svg
@@ -70,6 +74,7 @@ export default function Oppette() {
   const [isDrawing, setIsDrawing] = useState(false);
   const [drawingMode, setDrawingMode] = useState('draw'); // 'draw' or 'erase'
   const [lastPoint, setLastPoint] = useState(null); // Store last point for smooth drawing
+  const [isDownloading, setIsDownloading] = useState(false); // Track download state
   
   const svgRef = useRef(null);
   const drawingLayerRef = useRef(null);
@@ -196,6 +201,60 @@ export default function Oppette() {
     }
   };
 
+  // Function to download SVG as PNG with high resolution
+  const downloadPng = (highRes = false) => {
+    setIsDownloading(true);
+    
+    // Get the SVG element
+    const svg = document.querySelector('#opepette');
+    const serializer = new XMLSerializer();
+    const svgStr = serializer.serializeToString(svg);
+    
+    // Create a Blob from SVG string
+    const svgBlob = new Blob([svgStr], {type: 'image/svg+xml;charset=utf-8'});
+    const svgUrl = URL.createObjectURL(svgBlob);
+    
+    // Determine dimensions
+    const width = highRes ? HIGH_RES_PNG_WIDTH : 800;
+    const height = highRes ? HIGH_RES_PNG_HEIGHT : 800;
+    
+    // Create an Image element to load the SVG
+    const img = new Image();
+    img.onload = () => {
+      // Create canvas to convert to PNG
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      
+      // Draw the image on the canvas
+      ctx.drawImage(img, 0, 0, width, height);
+      
+      // Get the PNG as data URL
+      const pngUrl = canvas.toDataURL('image/png');
+      
+      // Create a link and trigger download
+      const a = document.createElement('a');
+      a.href = pngUrl;
+      a.download = highRes ? 'my-oppette-highres.png' : 'my-oppette.png';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      
+      // Clean up resources
+      URL.revokeObjectURL(svgUrl);
+      setIsDownloading(false);
+    };
+    
+    img.onerror = (error) => {
+      console.error("Error generating PNG:", error);
+      setIsDownloading(false);
+    };
+    
+    // Load the SVG into the image
+    img.src = svgUrl;
+  };
+
   return (
     <div style={{ maxWidth: 800, margin: '0 auto', padding: 24 }}>
       <h1 style={{ textAlign: 'center', marginBottom: 20 }}>Oppette Avatar Creator</h1>
@@ -301,8 +360,9 @@ export default function Oppette() {
         </div>
       </div>
 
-      <div style={{ marginTop: 30, textAlign: 'center' }}>
+      <div style={{ marginTop: 30, textAlign: 'center', display: 'flex', justifyContent: 'center', gap: 15 }}>
         <button
+          disabled={isDownloading}
           onClick={() => {
             // Get the SVG element
             const svg = document.querySelector('#opepette');
@@ -324,7 +384,22 @@ export default function Oppette() {
             setTimeout(() => URL.revokeObjectURL(svgUrl), 100);
           }}
         >
-          Download Avatar
+          Download SVG
+        </button>
+        
+        <button 
+          disabled={isDownloading}
+          onClick={() => downloadPng(false)}
+        >
+          Download PNG
+        </button>
+        
+        <button 
+          disabled={isDownloading}
+          onClick={() => downloadPng(true)}
+          style={{ backgroundColor: isDownloading ? '#555' : '#4CAF50' }}
+        >
+          Download High-Res PNG
         </button>
       </div>
     </div>
