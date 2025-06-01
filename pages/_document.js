@@ -28,7 +28,7 @@ export default function Document() {
           <a href="https://etherscan.io/address/0x5A8064F8249D079f02bfb688f4AA86B6b2C65359" target="_blank" style={{
             display: 'flex',
           }}>
-            <img src="https://cryptologos.cc/logos/ethereum-eth-logo.svg?v=040" style={{
+            <img src="/ethereum-eth-logo.svg" style={{
               width: 25,
               height: 25,
               borderRadius: 20
@@ -37,7 +37,7 @@ export default function Document() {
           <a href="https://www.blockchain.com/explorer/addresses/btc/BC1QD3ADA3NSL86FR33YTJL372QH63HX9R0APULGLE" target="_blank" style={{
             display: 'flex',
           }}>
-            <img src="https://cryptologos.cc/logos/bitcoin-btc-logo.svg?v=040" style={{
+            <img src="/bitcoin-btc-logo.svg" style={{
               width: 25,
               height: 25,
               borderRadius: 20
@@ -46,7 +46,7 @@ export default function Document() {
           <a href="https://explorer.solana.com/address/9dPN7gdN9cyGhjiQn5gBU9DQDBxUJafvS873BcW3mpFT" target="_blank" style={{
             display: 'flex',
           }}>
-            <img src="https://cryptologos.cc/logos/solana-sol-logo.svg?v=040" style={{
+            <img src="/solana-sol-logo.svg" style={{
               width: 25,
               height: 25,
               borderRadius: 20
@@ -56,7 +56,7 @@ export default function Document() {
           <a href="https://twitter.com/PaiNishant" target="_blank" style={{
             display: 'flex',
           }}>
-            <img src="https://abs.twimg.com/favicons/twitter.3.ico" style={{
+            <img src="/twitter.3.ico" style={{
               width: 25,
               height: 25,
               borderRadius: 20
@@ -66,7 +66,7 @@ export default function Document() {
           <a href="https://warpcast.com/nishu" target="_blank" style={{
             display: 'flex',
           }}>
-            <img src="https://warpcast.com/favicon.png" style={{
+            <img src="/farcaster.png" style={{
               width: 25,
               height: 25,
               borderRadius: 20
