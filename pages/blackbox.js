@@ -67,7 +67,7 @@ export default function XCopyFilter() {
         <meta name="description" content="See how black box works" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main style={{ maxWidth: '100%' }}>
+      <main>
         <h1>Black box</h1>
         <h2 className={styles.description}>See how black box works</h2>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, margin: 'auto' }}>

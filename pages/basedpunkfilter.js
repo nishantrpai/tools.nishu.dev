@@ -76,7 +76,7 @@ export default function XCopyFilter() {
         <meta name="description" content="Transform your images into based punk filter" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main style={{ maxWidth: '100%' }}>
+      <main>
         <h1>Based Punk Filter</h1>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, margin: 'auto' }}>
           <canvas

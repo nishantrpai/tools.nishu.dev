@@ -591,7 +591,7 @@ export default function HigherCombined() {
         <meta name="description" content="Higher Combined" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main style={{ maxWidth: '100%' }}>
+      <main>
         <h1>Higher Combined</h1>
         <h2 className={styles.description}>Apply both higher filter and higher hat on any image</h2>
         <div className={styles.row} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', gap: 0, border: '1px solid #333', borderRadius: 10 }}>

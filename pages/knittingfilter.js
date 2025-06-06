@@ -98,7 +98,7 @@ export default function KnittingFilter() {
         <meta name="description" content="Transform your images into knitted patterns" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main style={{ maxWidth: '100%' }}>
+      <main>
         <h1>Knitting Filter</h1>
         <h2 className={styles.description}>Transform your images into knitted patterns</h2>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, margin: 'auto' }}>

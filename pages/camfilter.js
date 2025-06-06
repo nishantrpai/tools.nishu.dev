@@ -87,7 +87,7 @@ export default function CamcorderFilter() {
         <meta name="description" content="2000s Camcorder Filter" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main style={{ maxWidth: '100%' }}>
+      <main>
         <h1>2000s Camcorder Filter</h1>
         <h2 className={styles.description}>Transform your images with a 2000s camcorder effect</h2>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, margin: 'auto' }}>

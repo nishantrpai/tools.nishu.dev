@@ -69,7 +69,7 @@ export default function PosterizeFilter() {
         <meta name="description" content="Poster Style Filter" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main style={{ maxWidth: '100%' }}>
+      <main>
         <h1>Poster Filter</h1>
         <h2 className={styles.description}>Transform your image into poster style</h2>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, margin: 'auto' }}>

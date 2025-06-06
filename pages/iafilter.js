@@ -243,7 +243,7 @@ export default function XCopyFilter() {
         <meta name="description" content="Transform your images or videos into Intelligence Age Filter" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main style={{ maxWidth: '100%' }}>
+      <main>
         <h1>Intelligence Age Filter</h1>
         <h2 className={styles.description}>
           Transform your images or videos into Intelligence Age Filter

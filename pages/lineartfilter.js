@@ -100,7 +100,7 @@ export default function AnimeFilter() {
         <meta name="description" content="Line Art Filter" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main style={{ maxWidth: '100%' }}>
+      <main>
         <h1>Line Art</h1>
         <h2 className={styles.description}>Transform your images into line art</h2>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, margin: 'auto' }}>

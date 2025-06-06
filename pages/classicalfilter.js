@@ -163,7 +163,7 @@ export default function ClassicalFilter() {
         <meta name="description" content="Classical Painting Filter" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main style={{ maxWidth: '100%' }}>
+      <main>
         <h1>Classical Filter</h1>
         <h2 className={styles.description}>Transform your images into classical paintings</h2>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, margin: 'auto' }}>

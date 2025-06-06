@@ -69,7 +69,7 @@ export default function Web3Filter() {
         <meta name="description" content="Transform your images with a cyberpunk web3 aesthetic" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main style={{ maxWidth: '100%' }}>
+      <main>
         <h1>Web3 Filter</h1>
         <h2 className={styles.description}>Transform your images with a cyberpunk web3 aesthetic</h2>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, margin: 'auto' }}>

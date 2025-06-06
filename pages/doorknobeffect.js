@@ -163,7 +163,7 @@ export default function DoorknobEffect() {
         <meta name="description" content="Peephole Camera Effect" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main style={{ maxWidth: '100%' }}>
+      <main>
         <h1>Doorknob Effect</h1>
         <h2 className={styles.description}>Create a peephole camera effect</h2>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, margin: 'auto' }}>

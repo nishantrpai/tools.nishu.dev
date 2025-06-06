@@ -214,7 +214,7 @@ export default function DitherFilter() {
         <meta name="description" content="Ordered, Gradient, and Diamond Dithering Filter with Block Characters" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main style={{ maxWidth: '100%' }}>
+      <main>
         <h1>Dither Filter</h1>
         <h2 className={styles.description}>Transform your images using ordered, gradient, or diamond dithering with block characters</h2>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, margin: 'auto' }}>

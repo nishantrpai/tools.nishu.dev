@@ -90,7 +90,7 @@ export default function XCopyFilter() {
         <meta name="description" content="Apply a dithering disintegration effect to your images" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main style={{ maxWidth: '100%' }}>
+      <main>
         <h1>Dithering Disintegration Filter</h1>
         <h2 className={styles.description}>
           Transform your images with a pixelated dithering disintegration effect.

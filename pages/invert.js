@@ -64,10 +64,7 @@ export default function InvertColors() {
         <meta name="description" content="Invert colors of your image" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main style={{
-        maxWidth: '100%',
-        padding: '0 20px',
-      }}>
+      <main>
         <h1>Invert Colors</h1>
         <h2 className={styles.description}>Invert colors of your image</h2>
         <input type="file" onChange={(e) => setImage(e.target.files[0])} />
