@@ -296,7 +296,7 @@ export default function HigherCombined() {
               context.transform(1, Math.tan(skewXRad), Math.tan(skewYRad), 1, 0, 0)
               context.rotate(offsetTheta * Math.PI / 180)
               context.globalAlpha = opacity / 100
-              
+
               if (dragReps > 0) {
                 for (let i = 0; i < dragReps; i++) {
                   if (emboss > 0) {
@@ -333,7 +333,7 @@ export default function HigherCombined() {
                       context.translate(offsetX, offsetY)
                       context.transform(1, Math.tan(skewXRad), Math.tan(skewYRad), 1, 0, 0)
                       context.rotate(offsetTheta * Math.PI / 180)
-                      
+
                       if (emboss > 0) {
                         context.filter = `blur(${emboss}px)`
                         context.drawImage(hat, 0, i * dragGap, hat.width * scale, hat.height * scale)
@@ -348,7 +348,7 @@ export default function HigherCombined() {
                     context.translate(offsetX, offsetY)
                     context.transform(1, Math.tan(skewXRad), Math.tan(skewYRad), 1, 0, 0)
                     context.rotate(offsetTheta * Math.PI / 180)
-                    
+
                     if (emboss > 0) {
                       context.filter = `blur(${emboss}px)`
                       context.drawImage(hat, 0, 0, hat.width * scale, hat.height * scale)
@@ -358,7 +358,7 @@ export default function HigherCombined() {
                     }
                     context.restore() // Restore state after drawing
                   }
-                  
+
                   context.restore() // Restore initial state
                   context.drawImage(foregroundImg, 0, 0, canvas.width, canvas.height)
                 }
@@ -549,12 +549,12 @@ export default function HigherCombined() {
     const handlePaste = (e) => {
       const items = e.clipboardData?.items;
       if (!items) return;
-  
+
       for (let i = 0; i < items.length; i++) {
         if (items[i].type.indexOf('image') !== -1) {
           const blob = items[i].getAsFile();
           const reader = new FileReader();
-          
+
           reader.onload = (event) => {
             const img = new Image();
             img.onload = () => {
@@ -568,16 +568,16 @@ export default function HigherCombined() {
             };
             img.src = event.target.result;
           };
-          
+
           reader.readAsDataURL(blob);
           break;
         }
       }
     };
-  
+
     // Add the paste event listener
     window.addEventListener('paste', handlePaste);
-  
+
     // Clean up
     return () => {
       window.removeEventListener('paste', handlePaste);
@@ -591,7 +591,7 @@ export default function HigherCombined() {
         <meta name="description" content="Higher Combined" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main>
+      <main style={{ maxWidth: '100%' }}>
         <h1>Higher Combined</h1>
         <h2 className={styles.description}>Apply both higher filter and higher hat on any image</h2>
         <div className={styles.row} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', gap: 0, border: '1px solid #333', borderRadius: 10 }}>
