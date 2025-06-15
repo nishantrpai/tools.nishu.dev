@@ -2056,6 +2056,13 @@ export const tools = [
     "publishDate": "27th May 2025",
     "url": "/htmltable2csv",
     "tags": []
+  },
+  {
+    "title": "Image to HTML",
+    "description": "Convert image to HTML",
+    "publishDate": "14th June 2025",
+    "url": "/img2html",
+    "tags": []
   }
 ];
 
