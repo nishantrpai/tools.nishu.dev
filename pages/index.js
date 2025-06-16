@@ -2063,6 +2063,14 @@ export const tools = [
     "publishDate": "14th June 2025",
     "url": "/img2html",
     "tags": []
+  },
+  {
+    "title": "Markdown to Telegram Markdown",
+    "description": "Convert Markdown to Telegram Markdown",
+    "publishDate": "15th June 2025",
+    "url": "/markdown2tg",
+    "tags": []
+    
   }
 ];
 
