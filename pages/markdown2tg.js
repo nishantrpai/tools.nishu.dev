@@ -45,7 +45,7 @@ export default function Home() {
     result = result.replace(/\[(.*?)\]\((.*?)\)/g, '$1 $2');
     
     // Handle headers: replace # text with bold text
-    result = result.replace(/^#+\s+(.*?)$/gm, '*$1*');
+    result = result.replace(/^#+\s+(.*?)$/gm, '**$1**');
     
     // Handle blockquotes: keep > text for quotes in Telegram
     // Telegram supports quotes with > prefix
