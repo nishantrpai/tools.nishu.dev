@@ -25,14 +25,14 @@ export default function Home() {
     });
     
     // Handle bold: replace **text** or __text__ with *text*
-    result = result.replace(/\*\*(.*?)\*\*/g, '*$1*');
+    result = result.replace(/\*\*(.*?)\*\*/g, '**$1**');
     
     // Handle italic: replace *text* or _text_ with _text_
-    result = result.replace(/(?<!\*)\*(?!\*)(.*?)(?<!\*)\*(?!\*)/g, '_$1_');
-    result = result.replace(/(?<!_)_(.*?)(?<!_)_(?!_)/g, '_$1_');
+    result = result.replace(/(?<!\*)\*(?!\*)(.*?)(?<!\*)\*(?!\*)/g, '__$1__');
+    result = result.replace(/(?<!_)_(.*?)(?<!_)_(?!_)/g, '__$1__');
     
     // Handle strikethrough: replace ~~text~~ with ~text~
-    result = result.replace(/~~(.*?)~~/g, '~$1~');
+    result = result.replace(/~~(.*?)~~/g, '~~$1~~');
     
     // Handle underline: use __text__
     // This might conflict with bold in markdown, but in Telegram it's for underline
