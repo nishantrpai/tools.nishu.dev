@@ -10,29 +10,55 @@ export default function Home() {
     // Perform the conversion from Markdown to Telegram Markdown
     let result = markdownText;
     
+    // Store all code blocks to prevent formatting inside them
+    const codeBlocks = [];
+    result = result.replace(/```([\s\S]*?)```/g, (match) => {
+      codeBlocks.push(match);
+      return `__CODE_BLOCK_${codeBlocks.length - 1}__`;
+    });
+    
+    // Store all inline code to prevent formatting inside them
+    const inlineCodes = [];
+    result = result.replace(/`([^`]+)`/g, (match) => {
+      inlineCodes.push(match);
+      return `__INLINE_CODE_${inlineCodes.length - 1}__`;
+    });
+    
     // Handle bold: replace **text** or __text__ with *text*
-    result = result.replace(/(\*\*|__)(.*?)(\*\*|__)/g, '*$2*');
+    result = result.replace(/\*\*(.*?)\*\*/g, '*$1*');
     
     // Handle italic: replace *text* or _text_ with _text_
-    result = result.replace(/(\*|_)(.*?)(\*|_)/g, '_$2_');
+    result = result.replace(/(?<!\*)\*(?!\*)(.*?)(?<!\*)\*(?!\*)/g, '_$1_');
+    result = result.replace(/(?<!_)_(.*?)(?<!_)_(?!_)/g, '_$1_');
     
-    // Handle code blocks: replace ```text``` with ```text```
-    // Telegram already uses ```text``` for code blocks, so keep as is
+    // Handle strikethrough: replace ~~text~~ with ~text~
+    result = result.replace(/~~(.*?)~~/g, '~$1~');
     
-    // Handle inline code: replace `text` with `text`
-    // Telegram already uses `text` for inline code, so keep as is
+    // Handle underline: use __text__
+    // This might conflict with bold in markdown, but in Telegram it's for underline
+    result = result.replace(/__([^_]+)__/g, '__$1__');
     
-    // Handle links: replace [text](url) with [text](url)
-    // Telegram doesn't support markdown links in the same way, so we'll convert them to plain text
-    result = result.replace(/\[(.*?)\]\((.*?)\)/g, '$1 ($2)');
+    // Handle spoiler: replace ||text|| with ||text||
+    result = result.replace(/\|\|(.*?)\|\|/g, '||$1||');
+    
+    // Handle links: replace [text](url) with text (linktext)
+    result = result.replace(/\[(.*?)\]\((.*?)\)/g, '$1 $2');
     
     // Handle headers: replace # text with bold text
     result = result.replace(/^#+\s+(.*?)$/gm, '*$1*');
     
-    // Handle lists: keep as is
+    // Handle blockquotes: keep > text for quotes in Telegram
+    // Telegram supports quotes with > prefix
     
-    // Handle blockquotes: replace > text with text
-    result = result.replace(/^\s*>\s(.*?)$/gm, '$1');
+    // Restore code blocks
+    codeBlocks.forEach((block, i) => {
+      result = result.replace(`__CODE_BLOCK_${i}__`, block);
+    });
+    
+    // Restore inline code
+    inlineCodes.forEach((code, i) => {
+      result = result.replace(`__INLINE_CODE_${i}__`, code);
+    });
     
     setTelegramMarkdown(result);
   }
