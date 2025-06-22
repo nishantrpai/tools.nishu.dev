@@ -85,13 +85,13 @@ export default function ExtractImages() {
           <input type="file" onChange={handleFileChange} style={{border: '1px solid #333'}}/>
         </div>
         <div>
-          <label style={{
+          {/*<label style={{
             marginBottom: '10px',
             fontSize: '16px',
             display: 'flex',
             color: '#888',
           }}>Number of duplicates</label>
-          {/* <input type="number" value={numberOfDuplicates} onChange={handleDuplicateChange}  style={{
+           <input type="number" value={numberOfDuplicates} onChange={handleDuplicateChange}  style={{
             fontSize: '16px',
             padding: '5px',
             borderRadius: '5px',
