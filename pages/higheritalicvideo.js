@@ -12,20 +12,51 @@ export default function HigherItalicVideo() {
   const [videoHeight, setVideoHeight] = useState(0)
   const [maxScale, setMaxScale] = useState(1)
   const [isRecording, setIsRecording] = useState(false)
+  const [selectedAsset, setSelectedAsset] = useState('Times New Roman')
+  const [assetColor, setAssetColor] = useState('#54FF56')
+  const [startTime, setStartTime] = useState(0)
+  const [endTime, setEndTime] = useState(0)
+  const [videoDuration, setVideoDuration] = useState(0)
   const canvasRef = useRef(null)
   const videoRef = useRef(null)
   const animationRef = useRef(null)
   const italicRef = useRef(typeof window !== 'undefined' ? new window.Image() : null)
   const mediaRecorderRef = useRef(null)
 
-  const higherItalic = '/higheritalic.svg'
+  // Asset paths
+  const assetPaths = {
+    'Helvetica': '/higherhelvetica.svg',
+    'Times New Roman': '/higheritalic.svg',
+    'Comic Sans': '/highercomicsans.svg',
+    'Higher TM': '/highertm.svg',
+    'Arrow': '/higherarrow.svg',
+    'Scanner': '/higherscanner.svg',
+    'Adidagh': '/adidagh.svg'
+  }
 
   useEffect(() => {
-    // Preload the italic image
+    // Preload the italic image with the selected asset
     if (italicRef.current) {
-      italicRef.current.src = higherItalic
+      const assetPath = assetPaths[selectedAsset] || '/higheritalic.svg'
+      
+      // For colored SVG assets
+      if (assetPath !== '/higherscanner.svg') {
+        fetch(assetPath)
+          .then(response => response.text())
+          .then(svgText => {
+            const coloredSvg = svgText.replace(/fill="[^"]*"/g, `fill="${assetColor}"`);
+            const blob = new Blob([coloredSvg], { type: 'image/svg+xml' });
+            italicRef.current.src = URL.createObjectURL(blob);
+          })
+          .catch(error => {
+            console.error('Error fetching SVG:', error);
+            italicRef.current.src = assetPath;
+          });
+      } else {
+        italicRef.current.src = assetPath;
+      }
     }
-  }, [])
+  }, [selectedAsset, assetColor])
 
   const drawFrame = () => {
     const canvas = canvasRef.current
@@ -38,17 +69,21 @@ export default function HigherItalicVideo() {
       // Draw video frame
       context.drawImage(videoElement, 0, 0, canvas.width, canvas.height)
       
-      // Draw higher italic centered
-      const italic = italicRef.current
-      if (italic && italic.complete) {
-        context.save()
-        // Calculate center position
-        const centerX = (canvas.width - italic.width * scale) / 2
-        const centerY = (canvas.height - italic.height * scale) / 2
-        context.translate(centerX + offsetX, centerY + offsetY)
-        context.rotate(offsetTheta * Math.PI / 180)
-        context.drawImage(italic, 0, 0, italic.width * scale, italic.height * scale)
-        context.restore()
+      // Check if we should display the asset based on time
+      const currentTime = videoElement.currentTime
+      if (currentTime >= startTime && currentTime <= endTime) {
+        // Draw higher italic centered
+        const italic = italicRef.current
+        if (italic && italic.complete) {
+          context.save()
+          // Calculate center position
+          const centerX = (canvas.width - italic.width * scale) / 2
+          const centerY = (canvas.height - italic.height * scale) / 2
+          context.translate(centerX + offsetX, centerY + offsetY)
+          context.rotate(offsetTheta * Math.PI / 180)
+          context.drawImage(italic, 0, 0, italic.width * scale, italic.height * scale)
+          context.restore()
+        }
       }
 
       animationRef.current = requestAnimationFrame(drawFrame)
@@ -81,6 +116,8 @@ export default function HigherItalicVideo() {
       videoElement.onloadedmetadata = () => {
         setVideoWidth(videoElement.videoWidth)
         setVideoHeight(videoElement.videoHeight)
+        setVideoDuration(videoElement.duration)
+        setEndTime(videoElement.duration) // Default end time to full video duration
         canvasRef.current.width = videoElement.videoWidth
         canvasRef.current.height = videoElement.videoHeight
 
@@ -162,15 +199,19 @@ export default function HigherItalicVideo() {
       // Draw video frame
       hqContext.drawImage(videoElement, 0, 0, hqCanvas.width, hqCanvas.height);
   
-      // Draw higher italic
-      hqContext.save();
-      const italic = italicRef.current;
-      const centerX = (hqCanvas.width - italic.width * scale) / 2;
-      const centerY = (hqCanvas.height - italic.height * scale) / 2;
-      hqContext.translate(centerX + offsetX, centerY + offsetY);
-      hqContext.rotate(offsetTheta * Math.PI / 180);
-      hqContext.drawImage(italic, 0, 0, italic.width * scale, italic.height * scale);
-      hqContext.restore();
+      // Check if we should display the asset based on time
+      const currentTime = videoElement.currentTime
+      if (currentTime >= startTime && currentTime <= endTime) {
+        // Draw higher italic
+        hqContext.save();
+        const italic = italicRef.current;
+        const centerX = (hqCanvas.width - italic.width * scale) / 2;
+        const centerY = (hqCanvas.height - italic.height * scale) / 2;
+        hqContext.translate(centerX + offsetX, centerY + offsetY);
+        hqContext.rotate(offsetTheta * Math.PI / 180);
+        hqContext.drawImage(italic, 0, 0, italic.width * scale, italic.height * scale);
+        hqContext.restore();
+      }
     };
   
     // Capture frames at original video frame rate
@@ -191,6 +232,13 @@ export default function HigherItalicVideo() {
     
     videoElement.currentTime = 0;
     videoElement.play();
+  };
+
+  // Format seconds to MM:SS format
+  const formatTime = (timeInSeconds) => {
+    const minutes = Math.floor(timeInSeconds / 60);
+    const seconds = Math.floor(timeInSeconds % 60);
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   };
 
 
@@ -240,6 +288,57 @@ export default function HigherItalicVideo() {
         </div>
 
         <div style={{ display: 'flex', gap: 20, flexDirection: 'column', width: '50%' }}>
+          <label htmlFor="assetSelect">
+            Select Asset
+          </label>
+          <select 
+            id="assetSelect" 
+            value={selectedAsset} 
+            onChange={(e) => setSelectedAsset(e.target.value)}
+          >
+            {Object.keys(assetPaths).map(asset => (
+              <option key={asset} value={asset}>{asset}</option>
+            ))}
+          </select>
+          
+          <label htmlFor="assetColor">
+            Asset Color
+          </label>
+          <input 
+            type="color" 
+            id="assetColor"
+            value={assetColor}
+            onChange={(e) => setAssetColor(e.target.value)}
+          />
+          
+          <label>
+            Asset Display Time: {formatTime(startTime)} - {formatTime(endTime)}
+          </label>
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+            <span>Start:</span>
+            <input 
+              type="range" 
+              min={0} 
+              max={videoDuration} 
+              step={0.1}
+              value={startTime} 
+              onChange={(e) => setStartTime(Number(e.target.value))}
+            />
+            <span>{formatTime(startTime)}</span>
+          </div>
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+            <span>End:</span>
+            <input 
+              type="range" 
+              min={0} 
+              max={videoDuration} 
+              step={0.1}
+              value={endTime} 
+              onChange={(e) => setEndTime(Number(e.target.value))}
+            />
+            <span>{formatTime(endTime)}</span>
+          </div>
+          
           <label>
             Offset X
           </label>
