@@ -70,6 +70,10 @@ export default function HigherItalicVideo() {
     'bounce': {
       name: 'Bounce',
       description: 'Bounce in/out'
+    },
+    'flicker': {
+      name: 'Flicker',
+      description: 'Glitchy tube light turning on/off effect'
     }
   }
 
@@ -228,6 +232,76 @@ export default function HigherItalicVideo() {
         context.translate(centerX + offsetX, centerY + offsetY - bounceOffset);
         context.rotate(offsetTheta * Math.PI / 180);
         context.drawImage(italic, 0, 0, italic.width * scale, italic.height * scale);
+        break;
+        
+      case 'flicker':
+        // Generate flickering effect like a glitchy tube light
+        context.translate(centerX + offsetX, centerY + offsetY);
+        context.rotate(offsetTheta * Math.PI / 180);
+        
+        // Use noise patterns for flickering
+        const flickerSeed = Date.now(); // Use current time to generate randomness
+        const flickerNoiseValue = Math.sin(flickerSeed * 0.01);
+        
+        // Create flicker frequency that changes based on progress
+        // Early flickering is fast and erratic, then stabilizes
+        const flickerSpeed = isEntering ? 
+          20 - (15 * progress) : // Goes from fast to slow for entrance
+          5 + (15 * progress);   // Goes from slow to fast for exit
+          
+        // Calculate flicker intensity based on progress
+        const flickerIntensity = isEntering ?
+          (1 - progress) * 0.8 : // Gradually less intense for entrance
+          progress * 0.8;        // Gradually more intense for exit
+          
+        // Determine if visible this frame based on noise patterns
+        const noiseSum = 
+          Math.sin(progress * flickerSpeed) + 
+          Math.sin(progress * flickerSpeed * 2.5) * 0.4 + 
+          Math.sin(progress * flickerSpeed * 4.7) * 0.2 +
+          Math.sin(flickerSeed * 0.01) * 0.1;
+          
+        const isVisible = 
+          // Initial dimming (entrance) or final dimming (exit)
+          (isEntering && progress < 0.2 && Math.random() < progress * 3) ||
+          (!isEntering && progress > 0.8 && Math.random() < progress) ||
+          // Stable visibility with occasional flicker
+          (noiseSum > -0.2 - flickerIntensity);
+          
+        // Subtle position jitter during strong flickers
+        if (Math.abs(noiseSum) > 0.5 && isVisible) {
+          const jitterX = (Math.random() - 0.5) * 5 * flickerIntensity;
+          const jitterY = (Math.random() - 0.5) * 5 * flickerIntensity;
+          context.translate(jitterX, jitterY);
+          
+          // Subtle color distortion for electrical glitch effect
+          if (Math.random() < 0.3 * flickerIntensity) {
+            context.globalCompositeOperation = 'screen';
+            context.globalAlpha = 0.2 * flickerIntensity;
+            context.drawImage(italic, 0, 0, italic.width * scale, italic.height * scale);
+            context.globalCompositeOperation = 'source-over';
+            context.globalAlpha = progress;
+          }
+        }
+        
+        // Draw only if visible this frame
+        if (isVisible) {
+          // Adjust opacity based on flicker intensity
+          const baseAlpha = isEntering ? progress : 1 - progress;
+          const flickerAlpha = baseAlpha * (0.4 + (Math.random() * 0.6));
+          context.globalAlpha = flickerAlpha;
+          
+          // Main draw
+          context.drawImage(italic, 0, 0, italic.width * scale, italic.height * scale);
+          
+          // Occasionally add slight motion blur for extra effect
+          if (Math.random() < flickerIntensity * 0.3) {
+            context.globalAlpha = flickerAlpha * 0.3;
+            context.drawImage(italic, 
+              Math.random() * 2 - 1, Math.random() * 2 - 1, 
+              italic.width * scale, italic.height * scale);
+          }
+        }
         break;
 
       case 'none':
@@ -569,7 +643,7 @@ export default function HigherItalicVideo() {
           </button>
         </div>
 
-        <div style={{ display: 'flex', gap: 20, flexDirection: 'column', width: '50%' }}>
+        <div style={{ display: 'flex', gap: '10px', flexDirection: 'column', width: '50%' }}>
           <label htmlFor="assetSelect">
             Select Asset
           </label>
