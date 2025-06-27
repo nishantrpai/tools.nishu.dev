@@ -19,11 +19,59 @@ export default function HigherItalicVideo() {
   const [startTimeInput, setStartTimeInput] = useState('00:00.000')
   const [endTimeInput, setEndTimeInput] = useState('00:00.000')
   const [videoDuration, setVideoDuration] = useState(0)
+  const [enterAnimation, setEnterAnimation] = useState('fade')
+  const [exitAnimation, setExitAnimation] = useState('fade')
+  const [animationDuration, setAnimationDuration] = useState(0.5) // in seconds
   const canvasRef = useRef(null)
   const videoRef = useRef(null)
   const animationRef = useRef(null)
   const italicRef = useRef(typeof window !== 'undefined' ? new window.Image() : null)
   const mediaRecorderRef = useRef(null)
+  const lastRenderTimeRef = useRef(0)
+
+  // Available animations
+  const animations = {
+    'none': {
+      name: 'None',
+      description: 'No animation'
+    },
+    'fade': {
+      name: 'Fade',
+      description: 'Fade in/out'
+    },
+    'slide-left': {
+      name: 'Slide Left',
+      description: 'Slide from/to left'
+    },
+    'slide-right': {
+      name: 'Slide Right',
+      description: 'Slide from/to right'
+    },
+    'slide-up': {
+      name: 'Slide Up',
+      description: 'Slide from/to bottom'
+    },
+    'slide-down': {
+      name: 'Slide Down',
+      description: 'Slide from/to top'
+    },
+    'scale-up': {
+      name: 'Scale Up',
+      description: 'Grow from small/Shrink to small'
+    },
+    'scale-down': {
+      name: 'Scale Down',
+      description: 'Shrink from large/Grow to large'
+    },
+    'rotate-in': {
+      name: 'Rotate In',
+      description: 'Spin while fading in/out'
+    },
+    'bounce': {
+      name: 'Bounce',
+      description: 'Bounce in/out'
+    }
+  }
 
   // Asset paths
   const assetPaths = {
@@ -69,6 +117,132 @@ export default function HigherItalicVideo() {
     setEndTimeInput(formatTimeWithMs(endTime));
   }, [endTime]);
 
+  // Calculate animation progress
+  const calculateAnimationProgress = (currentTime) => {
+    // For entrance animation
+    if (currentTime >= startTime && currentTime < startTime + animationDuration) {
+      // Calculate progress from 0 to 1
+      return (currentTime - startTime) / animationDuration;
+    }
+    // For exit animation
+    else if (currentTime > endTime - animationDuration && currentTime <= endTime) {
+      // Calculate progress from 1 to 0
+      return (endTime - currentTime) / animationDuration;
+    }
+    // Middle part - fully visible
+    else if (currentTime >= startTime + animationDuration && currentTime <= endTime - animationDuration) {
+      return 1;
+    }
+    // Outside time range - not visible
+    return 0;
+  }
+
+  // Apply animation effect based on progress (0-1)
+  const applyAnimation = (context, italic, progress, isEntering) => {
+    // Skip if not visible
+    if (progress <= 0) return false;
+
+    // Default position and scale calculations
+    const centerX = (canvasRef.current.width - italic.width * scale) / 2;
+    const centerY = (canvasRef.current.height - italic.height * scale) / 2;
+
+    // Save the context state before applying transformations
+    context.save();
+
+    // Get the animation type (entrance or exit)
+    const animationType = isEntering ? enterAnimation : exitAnimation;
+
+    // Apply transformations based on selected animation type
+    switch (animationType) {
+      case 'fade':
+        context.translate(centerX + offsetX, centerY + offsetY);
+        context.rotate(offsetTheta * Math.PI / 180);
+        context.globalAlpha = progress;
+        context.drawImage(italic, 0, 0, italic.width * scale, italic.height * scale);
+        break;
+
+      case 'slide-left':
+        const xOffsetLeft = isEntering ? 
+          (1 - progress) * canvasRef.current.width * -1 : 
+          progress * canvasRef.current.width * -1;
+        context.translate(centerX + offsetX + xOffsetLeft, centerY + offsetY);
+        context.rotate(offsetTheta * Math.PI / 180);
+        context.drawImage(italic, 0, 0, italic.width * scale, italic.height * scale);
+        break;
+
+      case 'slide-right':
+        const xOffsetRight = isEntering ? 
+          (1 - progress) * canvasRef.current.width : 
+          progress * canvasRef.current.width;
+        context.translate(centerX + offsetX + xOffsetRight, centerY + offsetY);
+        context.rotate(offsetTheta * Math.PI / 180);
+        context.drawImage(italic, 0, 0, italic.width * scale, italic.height * scale);
+        break;
+
+      case 'slide-up':
+        const yOffsetUp = isEntering ? 
+          (1 - progress) * canvasRef.current.height : 
+          progress * canvasRef.current.height;
+        context.translate(centerX + offsetX, centerY + offsetY + yOffsetUp);
+        context.rotate(offsetTheta * Math.PI / 180);
+        context.drawImage(italic, 0, 0, italic.width * scale, italic.height * scale);
+        break;
+
+      case 'slide-down':
+        const yOffsetDown = isEntering ? 
+          (1 - progress) * canvasRef.current.height * -1 : 
+          progress * canvasRef.current.height * -1;
+        context.translate(centerX + offsetX, centerY + offsetY + yOffsetDown);
+        context.rotate(offsetTheta * Math.PI / 180);
+        context.drawImage(italic, 0, 0, italic.width * scale, italic.height * scale);
+        break;
+
+      case 'scale-up':
+        const scaleUpFactor = isEntering ? progress : 1 - progress;
+        context.translate(centerX + offsetX, centerY + offsetY);
+        context.rotate(offsetTheta * Math.PI / 180);
+        context.scale(scaleUpFactor, scaleUpFactor);
+        context.drawImage(italic, 0, 0, italic.width * scale, italic.height * scale);
+        break;
+
+      case 'scale-down':
+        const scaleDownFactor = isEntering ? 2 - progress : 1 + progress;
+        context.translate(centerX + offsetX, centerY + offsetY);
+        context.rotate(offsetTheta * Math.PI / 180);
+        context.scale(scaleDownFactor, scaleDownFactor);
+        context.drawImage(italic, 0, 0, italic.width * scale, italic.height * scale);
+        break;
+
+      case 'rotate-in':
+        const rotationAngle = isEntering ? (1 - progress) * Math.PI * 2 : progress * Math.PI * 2;
+        context.translate(centerX + offsetX, centerY + offsetY);
+        context.rotate(rotationAngle + (offsetTheta * Math.PI / 180));
+        context.globalAlpha = progress;
+        context.drawImage(italic, 0, 0, italic.width * scale, italic.height * scale);
+        break;
+
+      case 'bounce':
+        const bounceOffset = isEntering ?
+          Math.sin(progress * Math.PI) * (1 - progress) * 50 :
+          Math.sin(progress * Math.PI) * progress * 50;
+        context.translate(centerX + offsetX, centerY + offsetY - bounceOffset);
+        context.rotate(offsetTheta * Math.PI / 180);
+        context.drawImage(italic, 0, 0, italic.width * scale, italic.height * scale);
+        break;
+
+      case 'none':
+      default:
+        context.translate(centerX + offsetX, centerY + offsetY);
+        context.rotate(offsetTheta * Math.PI / 180);
+        context.drawImage(italic, 0, 0, italic.width * scale, italic.height * scale);
+        break;
+    }
+
+    // Restore the context state after drawing
+    context.restore();
+    return true;
+  }
+
   const drawFrame = () => {
     const canvas = canvasRef.current
     const context = canvas.getContext('2d')
@@ -82,18 +256,18 @@ export default function HigherItalicVideo() {
       
       // Check if we should display the asset based on time
       const currentTime = videoElement.currentTime
+      lastRenderTimeRef.current = currentTime;
+      
       if (currentTime >= startTime && currentTime <= endTime) {
-        // Draw higher italic centered
+        // Draw higher italic centered with animation
         const italic = italicRef.current
         if (italic && italic.complete) {
-          context.save()
-          // Calculate center position
-          const centerX = (canvas.width - italic.width * scale) / 2
-          const centerY = (canvas.height - italic.height * scale) / 2
-          context.translate(centerX + offsetX, centerY + offsetY)
-          context.rotate(offsetTheta * Math.PI / 180)
-          context.drawImage(italic, 0, 0, italic.width * scale, italic.height * scale)
-          context.restore()
+          // Check if this is an entrance or exit animation
+          const isEntering = currentTime < startTime + animationDuration;
+          const progress = calculateAnimationProgress(currentTime);
+          
+          // Apply animation with calculated progress
+          applyAnimation(context, italic, progress, isEntering);
         }
       }
 
@@ -114,7 +288,7 @@ export default function HigherItalicVideo() {
 
   useEffect(() => {
     drawFrame()
-  }, [offsetX, offsetY, scale, offsetTheta])
+  }, [offsetX, offsetY, scale, offsetTheta, enterAnimation, exitAnimation, animationDuration])
 
   const handleVideoUpload = (event) => {
     const file = event.target.files[0]
@@ -212,17 +386,16 @@ export default function HigherItalicVideo() {
       hqContext.drawImage(videoElement, 0, 0, hqCanvas.width, hqCanvas.height);
   
       // Check if we should display the asset based on time
-      const currentTime = videoElement.currentTime
+      const currentTime = videoElement.currentTime;
+      
       if (currentTime >= startTime && currentTime <= endTime) {
-        // Draw higher italic
-        hqContext.save();
         const italic = italicRef.current;
-        const centerX = (hqCanvas.width - italic.width * scale) / 2;
-        const centerY = (hqCanvas.height - italic.height * scale) / 2;
-        hqContext.translate(centerX + offsetX, centerY + offsetY);
-        hqContext.rotate(offsetTheta * Math.PI / 180);
-        hqContext.drawImage(italic, 0, 0, italic.width * scale, italic.height * scale);
-        hqContext.restore();
+        // Check if this is an entrance or exit animation
+        const isEntering = currentTime < startTime + animationDuration;
+        const progress = calculateAnimationProgress(currentTime);
+          
+        // Apply animation with calculated progress
+        applyAnimation(hqContext, italic, progress, isEntering);
       }
     };
   
@@ -312,7 +485,43 @@ export default function HigherItalicVideo() {
   const jumpToTime = (timeInSeconds) => {
     if (videoRef.current) {
       videoRef.current.currentTime = timeInSeconds;
+      
+      // If video is paused, redraw the frame to show the current time
+      if (videoRef.current.paused) {
+        const canvas = canvasRef.current;
+        const context = canvas.getContext('2d');
+        
+        // Draw the video frame
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+        
+        // Check if we should display the asset
+        if (timeInSeconds >= startTime && timeInSeconds <= endTime) {
+          const italic = italicRef.current;
+          if (italic && italic.complete) {
+            // Check if this is an entrance or exit animation
+            const isEntering = timeInSeconds < startTime + animationDuration;
+            const progress = calculateAnimationProgress(timeInSeconds);
+            
+            // Apply animation with calculated progress
+            applyAnimation(context, italic, progress, isEntering);
+          }
+        }
+      }
     }
+  };
+
+  // Preview animation at a specific time point
+  const previewAnimationAtTime = (previewType) => {
+    let timeToPreview;
+    
+    if (previewType === 'enter') {
+      timeToPreview = startTime + (animationDuration / 2);
+    } else { // exit
+      timeToPreview = endTime - (animationDuration / 2);
+    }
+    
+    jumpToTime(timeToPreview);
   };
 
   return (
@@ -383,6 +592,81 @@ export default function HigherItalicVideo() {
             value={assetColor}
             onChange={(e) => setAssetColor(e.target.value)}
           />
+          
+          <div style={{ 
+            borderRadius: '5px', 
+            marginTop: '10px',
+          }}>
+            <h3 style={{ margin: '0 0 15px 0' }}>Animation Settings</h3>
+            
+            <div style={{ marginBottom: '15px' }}>
+              <label htmlFor="animationDuration">
+                Animation Duration (seconds)
+              </label>
+              <input 
+                type="number" 
+                id="animationDuration"
+                value={animationDuration}
+                onChange={(e) => setAnimationDuration(Number(e.target.value))}
+                min={0.1}
+                max={2}
+                step={0.1}
+                style={{ width: '80px', marginLeft: '10px' }}
+              />
+            </div>
+            
+            <div style={{ display: 'flex', gap: '20px', marginBottom: '15px' }}>
+              <div style={{ flex: 1 }}>
+                <label htmlFor="enterAnimation">
+                  Enter Animation
+                </label>
+                <select 
+                  id="enterAnimation" 
+                  value={enterAnimation} 
+                  onChange={(e) => setEnterAnimation(e.target.value)}
+                  style={{ width: '100%', marginTop: '5px' }}
+                >
+                  {Object.entries(animations).map(([key, animation]) => (
+                    <option key={key} value={key}>{animation.name}</option>
+                  ))}
+                </select>
+                <p style={{ fontSize: '12px', color: '#666', margin: '5px 0 0 0' }}>
+                  {animations[enterAnimation]?.description}
+                </p>
+                <button 
+                  onClick={() => previewAnimationAtTime('enter')} 
+                  style={{ marginTop: '5px', padding: '4px 8px' }}
+                >
+                  Preview Enter
+                </button>
+              </div>
+              
+              <div style={{ flex: 1 }}>
+                <label htmlFor="exitAnimation">
+                  Exit Animation
+                </label>
+                <select 
+                  id="exitAnimation" 
+                  value={exitAnimation} 
+                  onChange={(e) => setExitAnimation(e.target.value)}
+                  style={{ width: '100%', marginTop: '5px' }}
+                >
+                  {Object.entries(animations).map(([key, animation]) => (
+                    <option key={key} value={key}>{animation.name}</option>
+                  ))}
+                </select>
+                <p style={{ fontSize: '12px', color: '#666', margin: '5px 0 0 0' }}>
+                  {animations[exitAnimation]?.description}
+                </p>
+                <button 
+                  onClick={() => previewAnimationAtTime('exit')} 
+                  style={{ marginTop: '5px', padding: '4px 8px' }}
+                >
+                  Preview Exit
+                </button>
+              </div>
+            </div>
+          </div>
           
           <label>
             Asset Display Time Control (MM:SS.mmm format)
