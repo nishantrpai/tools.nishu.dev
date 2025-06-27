@@ -16,6 +16,8 @@ export default function HigherItalicVideo() {
   const [assetColor, setAssetColor] = useState('#54FF56')
   const [startTime, setStartTime] = useState(0)
   const [endTime, setEndTime] = useState(0)
+  const [startTimeInput, setStartTimeInput] = useState('00:00.000')
+  const [endTimeInput, setEndTimeInput] = useState('00:00.000')
   const [videoDuration, setVideoDuration] = useState(0)
   const canvasRef = useRef(null)
   const videoRef = useRef(null)
@@ -57,6 +59,15 @@ export default function HigherItalicVideo() {
       }
     }
   }, [selectedAsset, assetColor])
+
+  // Update input fields when slider values change
+  useEffect(() => {
+    setStartTimeInput(formatTimeWithMs(startTime));
+  }, [startTime]);
+
+  useEffect(() => {
+    setEndTimeInput(formatTimeWithMs(endTime));
+  }, [endTime]);
 
   const drawFrame = () => {
     const canvas = canvasRef.current
@@ -118,6 +129,7 @@ export default function HigherItalicVideo() {
         setVideoHeight(videoElement.videoHeight)
         setVideoDuration(videoElement.duration)
         setEndTime(videoElement.duration) // Default end time to full video duration
+        setEndTimeInput(formatTimeWithMs(videoElement.duration))
         canvasRef.current.width = videoElement.videoWidth
         canvasRef.current.height = videoElement.videoHeight
 
@@ -234,13 +246,74 @@ export default function HigherItalicVideo() {
     videoElement.play();
   };
 
-  // Format seconds to MM:SS format
-  const formatTime = (timeInSeconds) => {
+  // Format seconds to MM:SS.mmm format (minutes, seconds, milliseconds)
+  const formatTimeWithMs = (timeInSeconds) => {
     const minutes = Math.floor(timeInSeconds / 60);
     const seconds = Math.floor(timeInSeconds % 60);
-    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    const milliseconds = Math.floor((timeInSeconds % 1) * 1000);
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${milliseconds.toString().padStart(3, '0')}`;
   };
 
+  // Parse time string in MM:SS.mmm format to seconds
+  const parseTimeInput = (timeString) => {
+    try {
+      // Handle different formats
+      let minutes = 0;
+      let seconds = 0;
+      let milliseconds = 0;
+
+      if (timeString.includes(':')) {
+        const [minutesPart, secondsPart] = timeString.split(':');
+        minutes = parseInt(minutesPart, 10) || 0;
+
+        if (secondsPart.includes('.')) {
+          const [secPart, msPart] = secondsPart.split('.');
+          seconds = parseInt(secPart, 10) || 0;
+          milliseconds = parseInt(msPart, 10) || 0;
+        } else {
+          seconds = parseInt(secondsPart, 10) || 0;
+        }
+      } else if (timeString.includes('.')) {
+        const [secPart, msPart] = timeString.split('.');
+        seconds = parseInt(secPart, 10) || 0;
+        milliseconds = parseInt(msPart, 10) || 0;
+      } else {
+        seconds = parseInt(timeString, 10) || 0;
+      }
+
+      return minutes * 60 + seconds + milliseconds / 1000;
+    } catch (error) {
+      console.error('Error parsing time input:', error);
+      return 0;
+    }
+  };
+
+  const handleStartTimeChange = (e) => {
+    const inputValue = e.target.value;
+    setStartTimeInput(inputValue);
+    
+    const newTime = parseTimeInput(inputValue);
+    if (!isNaN(newTime) && newTime >= 0 && newTime <= endTime) {
+      setStartTime(newTime);
+    }
+  };
+
+  const handleEndTimeChange = (e) => {
+    const inputValue = e.target.value;
+    setEndTimeInput(inputValue);
+    
+    const newTime = parseTimeInput(inputValue);
+    if (!isNaN(newTime) && newTime >= startTime && newTime <= videoDuration) {
+      setEndTime(newTime);
+    }
+  };
+
+  // Jump to specific time in video
+  const jumpToTime = (timeInSeconds) => {
+    if (videoRef.current) {
+      videoRef.current.currentTime = timeInSeconds;
+    }
+  };
 
   return (
     <>
@@ -265,7 +338,7 @@ export default function HigherItalicVideo() {
         <input type="file" accept="video/*" onChange={handleVideoUpload} />
         
         <div style={{ display: 'none' }}>
-          <video ref={videoRef}  />
+          <video ref={videoRef} />
         </div>
 
         <canvas 
@@ -312,31 +385,62 @@ export default function HigherItalicVideo() {
           />
           
           <label>
-            Asset Display Time: {formatTime(startTime)} - {formatTime(endTime)}
+            Asset Display Time Control (MM:SS.mmm format)
           </label>
           <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
             <span>Start:</span>
             <input 
-              type="range" 
-              min={0} 
-              max={videoDuration} 
-              step={0.1}
-              value={startTime} 
-              onChange={(e) => setStartTime(Number(e.target.value))}
+              type="text" 
+              value={startTimeInput}
+              onChange={handleStartTimeChange}
+              style={{ width: '100px' }}
+              placeholder="MM:SS.mmm"
             />
-            <span>{formatTime(startTime)}</span>
-          </div>
-          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-            <span>End:</span>
+            <button 
+              onClick={() => jumpToTime(startTime)}
+              style={{ padding: '4px 8px' }}
+            >
+              Jump to
+            </button>
             <input 
               type="range" 
               min={0} 
               max={videoDuration} 
-              step={0.1}
+              step={0.001}
+              value={startTime} 
+              onChange={(e) => setStartTime(Number(e.target.value))}
+              style={{ flex: 1 }}
+            />
+          </div>
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+            <span>End:</span>
+            <input 
+              type="text" 
+              value={endTimeInput}
+              onChange={handleEndTimeChange}
+              style={{ width: '100px' }}
+              placeholder="MM:SS.mmm"
+            />
+            <button 
+              onClick={() => jumpToTime(endTime)}
+              style={{ padding: '4px 8px' }}
+            >
+              Jump to
+            </button>
+            <input 
+              type="range" 
+              min={0} 
+              max={videoDuration} 
+              step={0.001}
               value={endTime} 
               onChange={(e) => setEndTime(Number(e.target.value))}
+              style={{ flex: 1 }}
             />
-            <span>{formatTime(endTime)}</span>
+          </div>
+          
+          <div style={{ display: 'flex', justifyContent: 'space-between', margin: '10px 0' }}>
+            <span>Video Duration: {formatTimeWithMs(videoDuration)}</span>
+            <span>Current Range: {formatTimeWithMs(endTime - startTime)}</span>
           </div>
           
           <label>
