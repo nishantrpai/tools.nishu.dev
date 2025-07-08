@@ -2077,6 +2077,13 @@ export const tools = [
     "publishDate": "16th June 2025",
     "url": "/scene2frames",
     "tags": []
+  },
+  {
+    "title": "TCRE",
+    "description": "generate highly effective prompt using TCRE method",
+    "publishDate": "8th July 2025",
+    "url": "/tcre",
+    "tags": []
   }
 ];
 
