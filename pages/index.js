@@ -2084,6 +2084,13 @@ export const tools = [
     "publishDate": "8th July 2025",
     "url": "/tcre",
     "tags": []
+  },
+  {
+    "title": "Inspiration",
+    "description": "Generate inspiration",
+    "publishDate": "16th July 2025",
+    "url": "/inspiration",
+    "tags": []
   }
 ];
 
