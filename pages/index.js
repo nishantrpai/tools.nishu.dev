@@ -1730,10 +1730,10 @@ export const tools = [
       "tags": []
   },
   {
-      "title": "Higher Italic Video",
-      "description": "Add higher italic on any video",
+      "title": "Higher Video",
+      "description": "Make higher videos",
       "publishDate": "10th Dec 2024",
-      "url": "/higheritalicvideo",
+      "url": "/highervideo",
       "tags": []
   },
   {
