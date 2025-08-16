@@ -601,13 +601,13 @@ export default function HigherItalicVideo() {
   return (
     <>
       <Head>
-        <title>Higher Italic Video</title>
-        <meta name="description" content="Higher Italic Video" />
+        <title>Higher Video</title>
+        <meta name="description" content="Higher Video" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
         <h1 className={styles.title}>
-          Higher Italic Video
+          Higher Video
         </h1>
         <span style={{
           width: '100%',
@@ -615,7 +615,7 @@ export default function HigherItalicVideo() {
           color: '#666',
           fontSize: '14px'
         }}>
-          Add higher italic on any video
+          Make higher videos
         </span>
 
         <input type="file" accept="video/*" onChange={handleVideoUpload} />
