@@ -2091,6 +2091,13 @@ export const tools = [
     "publishDate": "16th July 2025",
     "url": "/inspiration",
     "tags": []
+  },
+  {
+    "title": "Background Color",
+    "description": "Change background color of a transparent image",
+    "publishDate": "5th Sept 2025",
+    "url": "/bgcolor",
+    "tags": []
   }
 ];
 
