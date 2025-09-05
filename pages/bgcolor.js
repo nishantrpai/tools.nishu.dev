@@ -1,5 +1,6 @@
 import Head from 'next/head'
 import { useState, useEffect, useRef } from 'react'
+import JSZip from 'jszip'
 
 export default function BackgroundColor() {
   const [image, setImage] = useState(null)
@@ -7,6 +8,9 @@ export default function BackgroundColor() {
   const [imgHeight, setImgHeight] = useState(0)
   const [backgroundColor, setBackgroundColor] = useState('#0000')
   const [opacity, setOpacity] = useState(1)
+  const [selectedColors, setSelectedColors] = useState([])
+  const [isGenerating, setIsGenerating] = useState(false)
+  const [progress, setProgress] = useState(0)
   const canvasRef = useRef(null)
   
   // Predefined color palette
@@ -95,13 +99,76 @@ export default function BackgroundColor() {
     reader.readAsDataURL(file)
   }
 
+  const toggleColorSelection = (color) => {
+    if (selectedColors.includes(color)) {
+      setSelectedColors(selectedColors.filter(c => c !== color))
+    } else {
+      setSelectedColors([...selectedColors, color])
+    }
+  }
+
   const downloadImage = () => {
     const canvas = canvasRef.current
     const dataURL = canvas.toDataURL('image/png')
     const a = document.createElement('a')
     a.href = dataURL
-    a.download = `image-with-bg-${Date.now()}.png`
+    a.download = `image-with-bg-${backgroundColor.replace('#', '')}-${Date.now()}.png`
     a.click()
+  }
+  
+  const downloadBulk = async () => {
+    if (!image || selectedColors.length === 0) return
+    
+    setIsGenerating(true)
+    setProgress(0)
+    
+    const canvas = document.createElement('canvas')
+    canvas.width = imgWidth
+    canvas.height = imgHeight
+    const context = canvas.getContext('2d')
+    
+    const zip = new JSZip()
+    const folder = zip.folder("background-variations")
+    
+    for (let i = 0; i < selectedColors.length; i++) {
+      // Update progress
+      setProgress(Math.floor((i / selectedColors.length) * 100))
+      
+      const color = selectedColors[i]
+      
+      // Clear the canvas
+      context.clearRect(0, 0, canvas.width, canvas.height)
+      
+      // Draw background color
+      context.fillStyle = color
+      context.fillRect(0, 0, canvas.width, canvas.height)
+      
+      // Draw image
+      context.globalAlpha = opacity
+      context.drawImage(image, 0, 0, imgWidth, imgHeight)
+      
+      // Get the image data
+      const dataURL = canvas.toDataURL('image/png').split(',')[1]
+      
+      // Add to zip
+      folder.file(`image-with-bg-${color.replace('#', '')}.png`, dataURL, {base64: true})
+      
+      // Small delay to allow UI updates
+      await new Promise(resolve => setTimeout(resolve, 10))
+    }
+    
+    // Generate and download the zip file
+    const content = await zip.generateAsync({ type: "blob" })
+    const link = document.createElement("a")
+    link.href = URL.createObjectURL(content)
+    link.download = "background-variations.zip"
+    link.click()
+    
+    setIsGenerating(false)
+    setProgress(100)
+    
+    // Reset progress after a short delay
+    setTimeout(() => setProgress(0), 2000)
   }
 
   return (
@@ -203,7 +270,8 @@ export default function BackgroundColor() {
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center'
+                  justifyContent: 'center',
+                  border: backgroundColor === color ? '3px solid #fff' : 'none',
                 }}
                 onClick={() => setBackgroundColor(color)}
                 title={color}
@@ -212,12 +280,127 @@ export default function BackgroundColor() {
           </div>
         </div>
         
+        <div style={{ marginBottom: '20px', gap: 10, display: 'flex', flexDirection: 'column' }}>
+          <label>Bulk Download - Select Multiple Colors</label>
+          <p style={{ fontSize: '14px', color: '#666', margin: '0 0 10px 0' }}>
+            Click to select multiple colors for bulk download
+          </p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', border: '1px solid #333', background: '#222', padding: '10px', borderRadius: '8px', width: '100%' }}>
+            {colorPalette.map((color, index) => (
+              <div 
+                key={index}
+                style={{ 
+                  width: '50px', 
+                  height: '50px', 
+                  backgroundColor: color,
+                  borderRadius: 10,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  border: selectedColors.includes(color) ? '3px solid #fff' : 'none',
+                  position: 'relative',
+                }}
+                onClick={() => toggleColorSelection(color)}
+                title={color}
+              >
+                {selectedColors.includes(color) && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '5px',
+                    right: '5px',
+                    width: '15px',
+                    height: '15px',
+                    borderRadius: '50%',
+                    backgroundColor: '#fff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '10px',
+                    fontWeight: 'bold',
+                    color: '#000'
+                  }}>
+                    ✓
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+          
+          {/* Custom color input for bulk selection */}
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '10px',
+            marginTop: '10px'
+          }}>
+            <input 
+              type="color" 
+              value="#ffffff"
+              id="customColorPicker"
+              style={{ width: '50px', height: '30px' }}
+            />
+            <button
+              onClick={() => {
+                const customColor = document.getElementById('customColorPicker').value;
+                if (customColor && !selectedColors.includes(customColor)) {
+                  toggleColorSelection(customColor);
+                }
+              }}
+              style={{
+                padding: '5px 10px',
+                backgroundColor: '#444',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+              }}
+            >
+              Add Custom Color
+            </button>
+          </div>
+          
+          {selectedColors.length > 0 && (
+            <div style={{ marginTop: '10px' }}>
+              <p>{selectedColors.length} color(s) selected for bulk download</p>
+            </div>
+          )}
+        </div>
         
-        <button 
-          onClick={downloadImage}
-        >
-          Download Image
-        </button>
+        {isGenerating && (
+          <div style={{ marginBottom: '20px', width: '100%' }}>
+            <p>Generating images: {progress}% complete</p>
+            <div style={{
+              width: '100%',
+              height: '2px',
+              backgroundColor: '#333',
+              borderRadius: '5px',
+              overflow: 'hidden',
+              marginTop: '5px'
+            }}>
+              <div style={{
+                width: `${progress}%`,
+                height: '100%',
+                backgroundColor: '#0070f3',
+                transition: 'width 0.3s ease'
+              }} />
+            </div>
+          </div>
+        )}
+        
+        <div style={{ display: 'flex', gap: '20px' }}>
+          <button 
+            onClick={downloadImage}          >
+            Download Current Image
+          </button>
+          
+          <button 
+            onClick={downloadBulk}
+            disabled={selectedColors.length === 0 || isGenerating || !image}
+          >
+            Download {selectedColors.length} Background Variations
+          </button>
+        </div>
       </main>
     </>
   )
