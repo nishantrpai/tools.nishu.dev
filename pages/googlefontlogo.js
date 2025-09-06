@@ -17,6 +17,9 @@ export default function FontLogo() {
   const [fontWeight, setFontWeight] = useState(400)
   const [isItalic, setIsItalic] = useState(false)
   const [isUnderlined, setIsUnderlined] = useState(false)
+  const [skewX, setSkewX] = useState(0)
+  const [skewY, setSkewY] = useState(0)
+  const [rotation, setRotation] = useState(0)
   
   // Canvas and image state
   const canvasRef = useRef(null)
@@ -100,22 +103,47 @@ export default function FontLogo() {
     const x = canvas.width / 2 + textOffsetX
     const y = canvas.height / 2 + textOffsetY
     
+    // Apply transformations (save the current state first)
+    ctx.save()
+    
+    // Move to the center point where we want to draw the text
+    ctx.translate(x, y)
+    
+    // Apply transformations (skew and rotation)
+    if (rotation !== 0) {
+      ctx.rotate(rotation * Math.PI / 180) // Convert degrees to radians
+    }
+    if (skewX !== 0) {
+      ctx.transform(1, 0, Math.tan(skewX * Math.PI / 180), 1, 0, 0)
+    }
+    if (skewY !== 0) {
+      ctx.transform(1, Math.tan(skewY * Math.PI / 180), 0, 1, 0, 0)
+    }
+    
+    // Reset to draw at the origin (since we already translated)
+    const transformedX = 0
+    const transformedY = 0
+    
     // Calculate width for wrapping if needed
     if (textWidth < canvas.width) {
-      drawWrappedText(ctx, text, x, y, textWidth)
+      drawWrappedText(ctx, text, transformedX, transformedY, textWidth)
     } else {
-      ctx.fillText(text, x, y)
+      ctx.fillText(text, transformedX, transformedY)
       
       // Add underline if enabled
       if (isUnderlined) {
         const textMetrics = ctx.measureText(text)
         const textWidth = textMetrics.width
-        const underlineY = y + textSize * 0.15
-        drawUnderline(ctx, x - textWidth / 2, underlineY, textWidth, textColor)
+        const underlineY = transformedY + textSize * 0.15
+        drawUnderline(ctx, transformedX - textWidth / 2, underlineY, textWidth, textColor)
       }
     }
+    
+    // Restore the canvas to its original state
+    ctx.restore()
   }, [backgroundColor, text, fontFamily, textColor, textSize, 
-      textOffsetX, textOffsetY, textWidth, fontWeight, isItalic, isUnderlined, fontLoaded])
+      textOffsetX, textOffsetY, textWidth, fontWeight, isItalic, isUnderlined, 
+      skewX, skewY, rotation, fontLoaded])
 
   // Function to draw an underline
   function drawUnderline(ctx, x, y, width, color) {
@@ -517,6 +545,73 @@ export default function FontLogo() {
                   style={{ width: '100%' }}
                 />
               </div>
+            </div>
+            
+            {/* Text Transformations */}
+            <div style={{ marginTop: '10px' }}>
+              <label style={{ display: 'block', marginBottom: '5px' }}>
+                Text Transformations:
+              </label>
+              
+              {/* Rotation */}
+              <div style={{ marginBottom: '10px' }}>
+                <label style={{ display: 'block', marginBottom: '5px' }}>
+                  Rotation: {rotation}°
+                </label>
+                <input
+                  type="range"
+                  min={-180}
+                  max={180}
+                  value={rotation}
+                  onChange={(e) => setRotation(parseInt(e.target.value))}
+                  style={{ width: '100%' }}
+                />
+              </div>
+              
+              {/* SkewX */}
+              <div style={{ marginBottom: '10px' }}>
+                <label style={{ display: 'block', marginBottom: '5px' }}>
+                  Skew X: {skewX}°
+                </label>
+                <input
+                  type="range"
+                  min={-45}
+                  max={45}
+                  value={skewX}
+                  onChange={(e) => setSkewX(parseInt(e.target.value))}
+                  style={{ width: '100%' }}
+                />
+              </div>
+              
+              {/* SkewY */}
+              <div style={{ marginBottom: '10px' }}>
+                <label style={{ display: 'block', marginBottom: '5px' }}>
+                  Skew Y: {skewY}°
+                </label>
+                <input
+                  type="range"
+                  min={-45}
+                  max={45}
+                  value={skewY}
+                  onChange={(e) => setSkewY(parseInt(e.target.value))}
+                  style={{ width: '100%' }}
+                />
+              </div>
+              
+              {/* Reset Transformations Button */}
+              <button
+                onClick={() => {
+                  setRotation(0)
+                  setSkewX(0)
+                  setSkewY(0)
+                }}
+                style={{
+                  padding: '6px 12px',
+                  marginTop: '5px'
+                }}
+              >
+                Reset Transformations
+              </button>
             </div>
             
             {/* Color Palette */}
