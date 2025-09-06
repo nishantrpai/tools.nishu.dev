@@ -2098,6 +2098,13 @@ export const tools = [
     "publishDate": "5th Sept 2025",
     "url": "/bgcolor",
     "tags": []
+  },
+  {
+    "title": "Google Font Logo",
+    "description": "Generate logo using google fonts",
+    "publishDate": "6th Sept 2025",
+    "url": "/googlefontlogo",
+    "tags": []
   }
 ];
 
