@@ -266,12 +266,12 @@ export default function FontLogo() {
   return (
     <>
       <Head>
-        <title>Font Logo Creator</title>
+        <title>Google Font Logo Creator</title>
         <meta name="description" content="Create logos with custom fonts and export favicon sets" />
       </Head>
       
       <main>
-        <h1>Font Logo Creator</h1>
+        <h1>Google Font Logo Creator</h1>
         <p style={{ color: '#666', marginBottom: '20px' }}>
           Create logos with custom Google fonts and generate favicon sets
         </p>
