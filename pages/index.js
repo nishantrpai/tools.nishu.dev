@@ -2105,6 +2105,13 @@ export const tools = [
     "publishDate": "6th Sept 2025",
     "url": "/googlefontlogo",
     "tags": []
+  },
+  {
+    "title": "Self Program",
+    "description": "Program your subconscious mind to enter a specific activity",
+    "publishDate": "8th Sept 2025",
+    "url": "/selfprogram",
+    "tags": []
   }
 ];
 

@@ -106,7 +106,7 @@ export default async function handler(req, res) {
       const response_format = req.body.response_format;
     }
     if (!model) {
-      model = 'gpt-3.5-turbo';
+      model = 'gpt-5-nano';
     }
     // let { prompt, model = 'gpt-3.5-turbo', image_url = '' } = JSON.parse(req.body);
     if (!prompt) {
