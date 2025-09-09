@@ -11,7 +11,7 @@ export default function Home() {
   const getSuggestions = async () => {
     if (!activity.trim()) return
     setLoading(true)
-    const prompt = `Suggest music, songs, or playlists for "${activity}" to trigger the mood, get mind, heart, and soul involved. Fit the mood, occasion, and energy level of the activity. Only provide a list of suggestions without any additional commentary.`
+    const prompt = `Suggest music, songs, and movie scenes for "${activity}"  trigger the mood, get mind, heart, and soul involved. Fit the mood, occasion, and energy level of the activity. Only provide a list of suggestions without any additional commentary.`
     const res = await fetch(`/api/gpt?prompt=${encodeURIComponent(prompt)}`)
     const data = await res.json()
     setMusicSuggestions(data.response)
