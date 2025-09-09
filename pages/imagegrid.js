@@ -43,8 +43,9 @@ export default function CanvasLines() {
             // draw measurement text at top
       context.font = `${fontSize}px sans-serif`
       context.fillStyle = `rgba(${r}, ${g}, ${b}, ${Math.min(opacity * 2, 1)})`
-      for (let x = 50; x < canvas.width; x += gap) {
-        context.fillText(`${x}px`, x - 10, 30)
+      for (let x = 0; x < canvas.width; x += gap) {
+        if (x === 0) continue
+        context.fillText(`${x}px`, x - 10, fontSize + 5)
       }
 
       // vertical lines
@@ -117,7 +118,7 @@ export default function CanvasLines() {
           <input type="range" min="1" max="20" value={dash} onChange={(e) => setDash(Number(e.target.value))} />
           <input type="number" value={dash} onChange={(e) => setDash(Number(e.target.value))} />
           <label>Font Size</label>
-          <input type="range" min="8" max="24" value={fontSize} onChange={(e) => setFontSize(Number(e.target.value))} />
+          <input type="range" min="8" max="72" value={fontSize} onChange={(e) => setFontSize(Number(e.target.value))} />
           <input type="number" value={fontSize} onChange={(e) => setFontSize(Number(e.target.value))} />
           
           <label>Grid Opacity</label>
