@@ -2119,6 +2119,13 @@ export const tools = [
     "publishDate": "9th Sept 2025",
     "url": "/imagegrid",
     "tags": []
+  },
+  {
+    "title": "Blend Gif and Image",
+    "description": "Blend Gif and Image",
+    "publishDate": "10th Sept 2025",
+    "url": "/blendgifimg",
+    "tags": []
   }
 ];
 
