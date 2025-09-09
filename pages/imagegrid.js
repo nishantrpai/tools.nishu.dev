@@ -134,7 +134,7 @@ export default function CanvasLines() {
           const dataURL = canvas.toDataURL('image/png')
           const a = document.createElement('a')
           a.href = dataURL
-          a.download = `canvaslines-${Date.now()}.png`
+          a.download = `imagegrid-${Date.now()}.png`
           a.click()
         }} style={{
           marginTop: 20
