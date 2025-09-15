@@ -152,7 +152,7 @@ export default async function handler(req, res) {
     return;
   }
   else {
-    let { prompt, model = 'gpt-3.5-turbo', image_url = '', system = '', response_format = null } = req.query;
+    let { prompt, model = 'gpt-5-nano', image_url = '', system = '', response_format = null } = req.query;
     const chatCompletion = await openai.chat.completions.create({
       messages: [
         ...(system ? [{ role: 'system', content: system }] : []),
