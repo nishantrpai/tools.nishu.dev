@@ -28,7 +28,7 @@ export default function Text2Logo() {
       const res = await fetch(`/api/gpt`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt, model: 'gpt-4o' })
+        body: JSON.stringify({ prompt, model: 'gpt-5-nano' })
       })
       const data = await res.json()
       // Remove any ```svg or ``` tags from the response
