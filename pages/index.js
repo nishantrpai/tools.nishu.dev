@@ -2126,6 +2126,13 @@ export const tools = [
     "publishDate": "10th Sept 2025",
     "url": "/blendgifimg",
     "tags": []
+  },
+  {
+    "title": "Etherscan Tx Receipt",
+    "description": "Get Etherscan transaction receipt",
+    "publishDate": "11th Sept 2025",
+    "url": "/txreceipt",
+    "tags": []
   }
 ];
 
