@@ -2133,6 +2133,14 @@ export const tools = [
     "publishDate": "11th Sept 2025",
     "url": "/txreceipt",
     "tags": []
+  },
+  {
+    "title": "Can the world survive till tomorrow?",
+    "description": "Can the world survive till tomorrow?",
+    "publishDate": "12th Sept 2025",
+    "url": "/survivetomorrow",
+    "tags": []
+
   }
 ];
 

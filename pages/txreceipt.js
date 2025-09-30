@@ -1,6 +1,6 @@
 import { ethers } from 'ethers'
 import styles from '@/styles/Home.module.css'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 const TxReceipt = () => {
   const [txHash, setTxHash] = useState('')
@@ -11,6 +11,8 @@ const TxReceipt = () => {
   const [nftData, setNftData] = useState(null)
   const [chain, setChain] = useState('ETHEREUM')
   const [isDarkMode, setIsDarkMode] = useState(true)
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false)
+  const canvasRef = useRef(null)
 
   const RPC_CHAINS = {
     'ETHEREUM': {
@@ -165,6 +167,309 @@ const TxReceipt = () => {
     navigator.clipboard.writeText(text)
   }
 
+  const generateScreenshot = async () => {
+    setIsGeneratingImage(true)
+    
+    try {
+      const canvas = canvasRef.current
+      const ctx = canvas.getContext('2d')
+      
+      // Set canvas size
+      canvas.width = 600
+      canvas.height = 800
+      
+      // Fill background
+      const bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height)
+      if (isDarkMode) {
+        bgGradient.addColorStop(0, '#1a1a1a')
+        bgGradient.addColorStop(1, '#111111')
+      } else {
+        bgGradient.addColorStop(0, '#ffffff')
+        bgGradient.addColorStop(1, '#f8fafc')
+      }
+      ctx.fillStyle = bgGradient
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      
+      // Draw content
+      await drawReceiptContent(ctx)
+      
+      // Download the image
+      const link = document.createElement('a')
+      link.download = `tx-receipt-${formatHash(txData.hash)}.png`
+      link.href = canvas.toDataURL()
+      link.click()
+      
+    } catch (error) {
+      console.error('Error generating screenshot:', error)
+    } finally {
+      setIsGeneratingImage(false)
+    }
+  }
+  
+  const drawReceiptContent = async (ctx) => {
+    const textColor = isDarkMode ? '#ffffff' : '#1a202c'
+    const secondaryColor = isDarkMode ? '#888888' : '#64748b'
+    
+    ctx.fillStyle = textColor
+    ctx.font = 'bold 32px -apple-system, BlinkMacSystemFont, sans-serif'
+    ctx.textAlign = 'center'
+    
+    // Title
+    const titleGradient = ctx.createLinearGradient(0, 0, 600, 0)
+    titleGradient.addColorStop(0, '#667eea')
+    titleGradient.addColorStop(1, '#764ba2')
+    ctx.fillStyle = titleGradient
+    ctx.fillText('Transaction Receipt', 300, 60)
+    
+    let yPos = 120
+    
+    // Status
+    ctx.font = 'bold 24px -apple-system, BlinkMacSystemFont, sans-serif'
+    ctx.fillStyle = textColor
+    ctx.textAlign = 'left'
+    const statusText = `${getStatusIcon(receipt.status)} ${getStatusText(receipt.status)}`
+    ctx.fillText(statusText, 50, yPos)
+    
+    // Block number
+    ctx.font = '16px -apple-system, BlinkMacSystemFont, sans-serif'
+    ctx.fillStyle = secondaryColor
+    ctx.textAlign = 'right'
+    ctx.fillText(`Block #${receipt.blockNumber.toLocaleString()}`, 550, yPos)
+    
+    yPos += 60
+    
+    // NFT section if available
+    if (nftData && nftData.image) {
+      try {
+        const img = new Image()
+        img.crossOrigin = 'anonymous'
+        await new Promise((resolve, reject) => {
+          img.onload = resolve
+          img.onerror = reject
+          img.src = nftData.image
+        })
+        
+        // Draw NFT image
+        ctx.drawImage(img, 50, yPos, 80, 80)
+        
+        // NFT info
+        ctx.font = 'bold 18px -apple-system, BlinkMacSystemFont, sans-serif'
+        ctx.fillStyle = textColor
+        ctx.textAlign = 'left'
+        ctx.fillText(nftData.name || 'Unknown NFT', 150, yPos + 25)
+        
+        ctx.font = '14px -apple-system, BlinkMacSystemFont, sans-serif'
+        ctx.fillStyle = secondaryColor
+        ctx.fillText(`Token ID: ${nftData.tokenId}`, 150, yPos + 45)
+        ctx.fillText(formatAddress(nftData.contractAddress), 150, yPos + 65)
+        
+        yPos += 100
+      } catch (error) {
+        console.log('Failed to load NFT image for canvas')
+      }
+    }
+    
+    // Transaction details
+    const details = [
+      ['Transaction Hash', formatHash(txData.hash)],
+      ['From', formatAddress(txData.from)],
+      ['To', formatAddress(txData.to)],
+      ['Value', `${formatValue(txData.value)} ETH`],
+      ['Gas Used', `${formatGas(receipt.gasUsed)} / ${formatGas(txData.gasLimit)}`],
+      ['Gas Price', `${formatValue(txData.gasPrice, 9)} Gwei`],
+      ['Transaction Fee', `${formatValue(BigInt(receipt.gasUsed) * BigInt(txData.gasPrice))} ETH`],
+      ['Date', new Date(txData.timestamp * 1000).toLocaleDateString()]
+    ]
+    
+    ctx.font = '16px -apple-system, BlinkMacSystemFont, sans-serif'
+    details.forEach(([label, value]) => {
+      ctx.fillStyle = secondaryColor
+      ctx.textAlign = 'left'
+      ctx.fillText(label, 50, yPos)
+      
+      ctx.fillStyle = textColor
+      ctx.textAlign = 'right'
+      ctx.fillText(value, 550, yPos)
+      
+      yPos += 35
+    })
+    
+    // Footer
+    yPos += 20
+    ctx.font = '14px -apple-system, BlinkMacSystemFont, sans-serif'
+    ctx.fillStyle = '#667eea'
+    ctx.textAlign = 'center'
+    ctx.fillText('Generated by tools.nishu.dev', 300, yPos)
+  }
+  
+  const generateTweet = () => {
+    const statusEmoji = receipt.status === 1 ? '✅' : '❌'
+    const chainName = chain.charAt(0) + chain.slice(1).toLowerCase()
+    const explorerUrl = `${RPC_CHAINS[chain].explorer}/tx/${txData.hash}`
+    
+    const tweetText = `${statusEmoji} Transaction ${getStatusText(receipt.status)} on ${chainName}\\n\\n` +
+      `💰 Value: ${formatValue(txData.value)} ETH\\n` +
+      `⛽ Gas: ${formatGas(receipt.gasUsed)}\\n` +
+      `🧱 Block: ${receipt.blockNumber.toLocaleString()}\\n\\n` +
+      `${explorerUrl}\\n\\n` +
+      `#${chainName} #crypto #blockchain`
+    
+    const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`
+    window.open(tweetUrl, '_blank')
+  }
+
+  const generateScreenshot = async () => {
+    setIsGeneratingImage(true)
+    
+    try {
+      const canvas = canvasRef.current
+      const ctx = canvas.getContext('2d')
+      
+      // Set canvas size
+      canvas.width = 600
+      canvas.height = 800
+      
+      // Fill background
+      const bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height)
+      if (isDarkMode) {
+        bgGradient.addColorStop(0, '#1a1a1a')
+        bgGradient.addColorStop(1, '#111111')
+      } else {
+        bgGradient.addColorStop(0, '#ffffff')
+        bgGradient.addColorStop(1, '#f8fafc')
+      }
+      ctx.fillStyle = bgGradient
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      
+      // Draw content
+      await drawReceiptContent(ctx)
+      
+      // Download the image
+      const link = document.createElement('a')
+      link.download = `tx-receipt-${formatHash(txData.hash)}.png`
+      link.href = canvas.toDataURL()
+      link.click()
+      
+    } catch (error) {
+      console.error('Error generating screenshot:', error)
+    } finally {
+      setIsGeneratingImage(false)
+    }
+  }
+  
+  const drawReceiptContent = async (ctx) => {
+    const textColor = isDarkMode ? '#ffffff' : '#1a202c'
+    const secondaryColor = isDarkMode ? '#888888' : '#64748b'
+    const borderColor = isDarkMode ? '#333333' : '#e2e8f0'
+    
+    ctx.fillStyle = textColor
+    ctx.font = 'bold 32px -apple-system, BlinkMacSystemFont, sans-serif'
+    ctx.textAlign = 'center'
+    
+    // Title
+    const titleGradient = ctx.createLinearGradient(0, 0, 600, 0)
+    titleGradient.addColorStop(0, '#667eea')
+    titleGradient.addColorStop(1, '#764ba2')
+    ctx.fillStyle = titleGradient
+    ctx.fillText('Transaction Receipt', 300, 60)
+    
+    let yPos = 120
+    
+    // Status
+    ctx.font = 'bold 24px -apple-system, BlinkMacSystemFont, sans-serif'
+    ctx.fillStyle = textColor
+    ctx.textAlign = 'left'
+    const statusText = `${getStatusIcon(receipt.status)} ${getStatusText(receipt.status)}`
+    ctx.fillText(statusText, 50, yPos)
+    
+    // Block number
+    ctx.font = '16px -apple-system, BlinkMacSystemFont, sans-serif'
+    ctx.fillStyle = secondaryColor
+    ctx.textAlign = 'right'
+    ctx.fillText(`Block #${receipt.blockNumber.toLocaleString()}`, 550, yPos)
+    
+    yPos += 60
+    
+    // NFT section if available
+    if (nftData && nftData.image) {
+      try {
+        const img = new Image()
+        img.crossOrigin = 'anonymous'
+        await new Promise((resolve, reject) => {
+          img.onload = resolve
+          img.onerror = reject
+          img.src = nftData.image
+        })
+        
+        // Draw NFT image
+        ctx.drawImage(img, 50, yPos, 80, 80)
+        
+        // NFT info
+        ctx.font = 'bold 18px -apple-system, BlinkMacSystemFont, sans-serif'
+        ctx.fillStyle = textColor
+        ctx.textAlign = 'left'
+        ctx.fillText(nftData.name || 'Unknown NFT', 150, yPos + 25)
+        
+        ctx.font = '14px -apple-system, BlinkMacSystemFont, sans-serif'
+        ctx.fillStyle = secondaryColor
+        ctx.fillText(`Token ID: ${nftData.tokenId}`, 150, yPos + 45)
+        ctx.fillText(formatAddress(nftData.contractAddress), 150, yPos + 65)
+        
+        yPos += 100
+      } catch (error) {
+        console.log('Failed to load NFT image for canvas')
+      }
+    }
+    
+    // Transaction details
+    const details = [
+      ['Transaction Hash', formatHash(txData.hash)],
+      ['From', formatAddress(txData.from)],
+      ['To', formatAddress(txData.to)],
+      ['Value', `${formatValue(txData.value)} ETH`],
+      ['Gas Used', `${formatGas(receipt.gasUsed)} / ${formatGas(txData.gasLimit)}`],
+      ['Gas Price', `${formatValue(txData.gasPrice, 9)} Gwei`],
+      ['Transaction Fee', `${formatValue(BigInt(receipt.gasUsed) * BigInt(txData.gasPrice))} ETH`],
+      ['Date', new Date(txData.timestamp * 1000).toLocaleDateString()]
+    ]
+    
+    ctx.font = '16px -apple-system, BlinkMacSystemFont, sans-serif'
+    details.forEach(([label, value]) => {
+      ctx.fillStyle = secondaryColor
+      ctx.textAlign = 'left'
+      ctx.fillText(label, 50, yPos)
+      
+      ctx.fillStyle = textColor
+      ctx.textAlign = 'right'
+      ctx.fillText(value, 550, yPos)
+      
+      yPos += 35
+    })
+    
+    // Footer
+    yPos += 20
+    ctx.font = '14px -apple-system, BlinkMacSystemFont, sans-serif'
+    ctx.fillStyle = '#667eea'
+    ctx.textAlign = 'center'
+    ctx.fillText('Generated by tools.nishu.dev', 300, yPos)
+  }
+  
+  const generateTweet = () => {
+    const statusEmoji = receipt.status === 1 ? '✅' : '❌'
+    const chainName = chain.charAt(0) + chain.slice(1).toLowerCase()
+    const explorerUrl = `${RPC_CHAINS[chain].explorer}/tx/${txData.hash}`
+    
+    const tweetText = `${statusEmoji} Transaction ${getStatusText(receipt.status)} on ${chainName}\n\n` +
+      `💰 Value: ${formatValue(txData.value)} ETH\n` +
+      `⛽ Gas: ${formatGas(receipt.gasUsed)}\n` +
+      `🧱 Block: ${receipt.blockNumber.toLocaleString()}\n\n` +
+      `${explorerUrl}\n\n` +
+      `#${chainName} #crypto #blockchain`
+    
+    const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`
+    window.open(tweetUrl, '_blank')
+  }
+
   return (
     <main className={`${styles.main} ${isDarkMode ? 'dark' : 'light'}`}>
       <a href='/' className={styles.home}>🏠</a>
@@ -314,6 +619,40 @@ const TxReceipt = () => {
               )}
             </div>
 
+            <div className="action-buttons">
+              <button 
+                className="screenshot-btn"
+                onClick={generateScreenshot}
+                disabled={isGeneratingImage}
+              >
+                {isGeneratingImage ? '📸 Generating...' : '📸 Screenshot'}
+              </button>
+              
+              <button 
+                className="tweet-btn"
+                onClick={generateTweet}
+              >
+                🐦 Tweet
+              </button>
+            </div>
+
+            <div className="action-buttons">
+              <button 
+                className="screenshot-btn"
+                onClick={generateScreenshot}
+                disabled={isGeneratingImage}
+              >
+                {isGeneratingImage ? '📸 Generating...' : '📸 Screenshot'}
+              </button>
+              
+              <button 
+                className="tweet-btn"
+                onClick={generateTweet}
+              >
+                🐦 Tweet
+              </button>
+            </div>
+
             <div className="footer">
               <a 
                 href={`${RPC_CHAINS[chain].explorer}/tx/${txData.hash}`}
@@ -327,6 +666,11 @@ const TxReceipt = () => {
           </div>
         )}
       </div>
+      
+      <canvas 
+        ref={canvasRef} 
+        style={{ display: 'none' }}
+      />
 
       <style jsx>{`
         .receipt-container {
@@ -610,6 +954,52 @@ const TxReceipt = () => {
           opacity: 1;
         }
 
+        .action-buttons {
+          display: flex;
+          gap: 15px;
+          justify-content: center;
+          margin-bottom: 20px;
+        }
+        
+        .screenshot-btn,
+        .tweet-btn {
+          background: ${isDarkMode ? '#333' : '#f1f5f9'};
+          border: 1px solid ${isDarkMode ? '#555' : '#e2e8f0'};
+          border-radius: 8px;
+          padding: 12px 20px;
+          color: ${isDarkMode ? 'white' : '#2d3748'};
+          font-size: 14px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+        
+        .screenshot-btn:hover:not(:disabled),
+        .tweet-btn:hover {
+          background: ${isDarkMode ? '#444' : '#e2e8f0'};
+          transform: translateY(-1px);
+        }
+        
+        .screenshot-btn:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+          transform: none;
+        }
+        
+        .tweet-btn {
+          background: #1da1f2;
+          border-color: #1da1f2;
+          color: white;
+        }
+        
+        .tweet-btn:hover {
+          background: #1991db;
+          border-color: #1991db;
+        }
+
         .footer {
           text-align: center;
           padding-top: 20px;
@@ -673,6 +1063,17 @@ const TxReceipt = () => {
 
           .value {
             text-align: left;
+          }
+
+          .action-buttons {
+            flex-direction: column;
+            align-items: center;
+          }
+          
+          .screenshot-btn,
+          .tweet-btn {
+            width: 100%;
+            max-width: 200px;
           }
         }
       `}</style>
