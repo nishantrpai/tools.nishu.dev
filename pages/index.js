@@ -2141,6 +2141,13 @@ export const tools = [
     "url": "/survivetomorrow",
     "tags": []
 
+  },
+  {
+    "title": "Different copy angles for same product",
+    "description": "Generate different copy angles for same product",
+    "publishDate": "22nd Oct 2025",
+    "url": "/copyangles",
+    "tags": []
   }
 ];
 
