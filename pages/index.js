@@ -2148,6 +2148,13 @@ export const tools = [
     "publishDate": "22nd Oct 2025",
     "url": "/copyangles",
     "tags": []
+  },
+  {
+    "title": "Extend Boolean search",
+    "description": "Extend Boolean search",
+    "publishDate": "23rd Oct 2025",
+    "url": "/extendboolean",
+    "tags": []
   }
 ];
 
