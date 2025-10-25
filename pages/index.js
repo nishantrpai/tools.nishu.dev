@@ -2155,6 +2155,13 @@ export const tools = [
     "publishDate": "23rd Oct 2025",
     "url": "/extendboolean",
     "tags": []
+  },
+  {
+    "title": "Guitar Tuner",
+    "description": "Tune your guitar online",
+    "publishDate": "25th Oct 2025",
+    "url": "/guitartuner",
+    "tags": []
   }
 ];
 
