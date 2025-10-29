@@ -2162,6 +2162,13 @@ export const tools = [
     "publishDate": "25th Oct 2025",
     "url": "/guitartuner",
     "tags": []
+  },
+  {
+    "title": "Similar Query",
+    "description": "Get similar queries for your search",
+    "publishDate": "29th Oct 2025",
+    "url": "/similarquery",
+    "tags": []
   }
 ];
 
