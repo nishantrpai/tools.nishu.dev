@@ -13,7 +13,7 @@ export default function Home() {
     // make api call to /api/gpt?prompt
     if (!text || text.trim().length === 0) return
     setLoading(true)
-    const prompt = `Generate 15 alternative search query phrases for: "${text}". Each phrase should maintain the same intent but use different wording. Return only newline-separated phrases (no punctuation, no full sentences, no questions). Use concise keyword phrases people might type into a search box, e.g. for "is there a shopify app" -> "best shopify app for", "shopify app that", "find shopify app for", "shopify integration for". Do not include numbering or extra explanation or additional jargon.`
+    const prompt = `Generate 10 alternative search phrases for "${text}". Maintain intent, different wording. Return newline-separated phrases only. Examples: "best shopify app for", "shopify app that", "find shopify app for". No punctuation, no full sentences, no questions.`
     const res = await fetch('/api/gpt', {
       method: 'POST',
       headers: {
