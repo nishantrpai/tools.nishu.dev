@@ -1,4 +1,4 @@
-import cheerio from 'cheerio'
+const cheerio = require('cheerio')
 
 function parseNftHtmlToJson(response) {
   const html = response.d.data[0].NftColumn || ''
