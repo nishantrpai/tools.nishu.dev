@@ -82,11 +82,20 @@ export default function DownloadNFTs() {
       }
       
       setCurrentPage(page)
-      setHasMore(pagination.hasMore || false)
       
       // Fetch images for the new NFTs
       if (newNfts.length > 0) {
         await fetchImagesForNFTs(newNfts)
+      }
+      
+      // Automatically load next page if there are more pages
+      if (pagination.hasMore && page < 50) { // Safety limit of 50 pages
+        console.log(`Auto-loading next page ${page + 1}`)
+        setTimeout(() => fetchNFTs(address, page + 1), 100) // Small delay to prevent overwhelming the API
+      } else {
+        console.log('All pages loaded or reached safety limit')
+        setHasMore(false)
+        setLoading(false)
       }
     } catch (error) {
       console.error(error)
@@ -94,7 +103,6 @@ export default function DownloadNFTs() {
         setNfts([])
       }
       setHasMore(false)
-    } finally {
       setLoading(false)
     }
   }
@@ -103,12 +111,6 @@ export default function DownloadNFTs() {
     const nextPage = currentPage + 1
     fetchNFTs(walletAddress, nextPage)
   }
-
-  useEffect(() => {
-    if (nftImages.length) {
-      setSelected(new Array(nftImages.length).fill(true))
-    }
-  }, [nftImages])
 
   const handleImageError = (index) => {
     console.log('Image failed to load, removing:', index)
@@ -233,7 +235,11 @@ export default function DownloadNFTs() {
           gap: '20px',
           marginTop: '20px'
         }}>
-          {loading && <p>Loading...</p>}
+          {loading && (
+            <p style={{color: '#666', fontSize: '16px'}}>
+              Loading NFTs... (Page {currentPage}{totalNFTs > 0 ? ` of ~${Math.ceil(totalNFTs / 12)}` : ''})
+            </p>
+          )}
           <div style={{flex: 1, width: '100%'}}>
             <span style={{width: '100%', textAlign: 'left', marginBottom: '20px', display: 'flex', color :'#888 '}}>
             {nftImages.length > 0 ?  `Showing ${nftImages.length}${totalNFTs > 0 ? ` of ${totalNFTs}` : ''} NFTs` : ''}
@@ -271,16 +277,13 @@ export default function DownloadNFTs() {
             setNftImages([])
             setSelected([])
             setTotalNFTs(0)
+            setHasMore(true)
             fetchNFTs(walletAddress, 1)
           }} disabled={!walletAddress || loading}>Get NFTs</button>
 
-          {hasMore && nfts.length > 0 && (
-            <button onClick={loadMore} disabled={loading}>
-              {loading ? 'Loading...' : 'Load More NFTs'}
-            </button>
-          )}
-
-          <button onClick={downloadZip} disabled={!nftImages.length}>Download Zip</button>
+          <button onClick={downloadZip} disabled={!nftImages.length || loading}>
+            {loading ? 'Loading NFTs...' : 'Download Zip'}
+          </button>
         </div>
       </main>
     </div>
