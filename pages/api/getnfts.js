@@ -1,31 +1,41 @@
-import { JSDOM } from "jsdom";
+import cheerio from 'cheerio'
 
 function parseNftHtmlToJson(response) {
-  const html = response.d.data[0].NftColumn;
-  const dom = new JSDOM(html);
-  const document = dom.window.document;
+  const html = response.d.data[0].NftColumn || ''
+  const $ = cheerio.load(html)
 
-  const items = [...document.querySelectorAll(".nft-block-wrapper")].map(el => {
-    const link = el.querySelector("a[href^='/nft/']");
-    const img = el.querySelector("img");
-    const type = el.querySelector(".nft-block-badge")?.textContent?.trim();
-    const tokenAnchor = el.querySelector(".text-truncate[href*='/token/']");
-    const tokenIdAnchor = el.querySelector("div:has(> a[href*='?a=']) a:last-child");
+  const items = $('.nft-block-wrapper').map((i, el) => {
+    const linkHref = $(el).find("a[href^='/nft/']").attr('href') || ''
+    const imgSrc = $(el).find('img').attr('src') || null
+    const type = $(el).find('.nft-block-badge').text().trim() || null
+    const tokenAnchorText = $(el).find(".text-truncate[href*='/token/']").first().text().trim() || null
 
-    const hrefParts = link?.getAttribute("href")?.split("/") || [];
-    const contract = hrefParts[2];
-    const tokenId = hrefParts[3];
+    let contract = null
+    let tokenId = null
+    if (linkHref) {
+      const parts = linkHref.split('/')
+      contract = parts[2] || null
+      tokenId = parts[3] || null
+    } else {
+      // fallback: try to parse token id from token anchors
+      const tokenHref = $(el).find("a[href*='/token/']").last().attr('href') || ''
+      if (tokenHref.includes('?a=')) {
+        const parts = tokenHref.split('?a=')
+        // sometimes token id is last part
+        tokenId = parts[1] || null
+      }
+    }
 
     return {
       contract,
       token_id: tokenId,
-      name: tokenAnchor?.textContent?.trim() || null,
+      name: tokenAnchorText || null,
       type,
-      image: img?.getAttribute("src") || null
-    };
-  });
+      image: imgSrc
+    }
+  }).get()
 
-  return items;
+  return items
 }
 
 export default async function handler(req, res) {
