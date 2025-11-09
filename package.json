@@ -50,6 +50,7 @@
     "natural": "^7.0.5",
     "next": "13.4.10",
     "node-fetch": "^3.3.2",
+    "onnxruntime-web": "^1.23.2",
     "openai": "^4.29.2",
     "opepen-standard": "^1.0.1",
     "prop-types": "^15.8.1",
