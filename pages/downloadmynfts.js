@@ -13,6 +13,7 @@ export default function DownloadNFTs() {
     }
   }
   const [walletAddress, setWalletAddress] = useState('')
+  const [resolvedAddress, setResolvedAddress] = useState('')
   const [nfts, setNfts] = useState([])
   const [nftImages, setNftImages] = useState([])
   const [selected, setSelected] = useState([])
@@ -62,11 +63,41 @@ export default function DownloadNFTs() {
     }
   }
 
-  const fetchNFTs = async (address, page = 1) => {
-    if (!address) return
-    setLoading(true)
+  const resolveENS = async (ensName) => {
     try {
-      const response = await fetch(`/api/getnfts?address=${address}&page=${page}`)
+      const provider = new ethers.JsonRpcProvider(RPC_CHAINS['ETHEREUM'].rpc)
+      const address = await provider.resolveName(ensName)
+      return address
+    } catch (error) {
+      console.error('Error resolving ENS:', error)
+      return null
+    }
+  }
+
+  const fetchNFTs = async (addressOrENS, page = 1) => {
+    if (!addressOrENS) return
+    setLoading(true)
+    
+    let resolvedAddress = addressOrENS
+    
+    // Check if it's an ENS name (ends with .eth)
+    if (addressOrENS.toLowerCase().endsWith('.eth')) {
+      console.log('Resolving ENS name:', addressOrENS)
+      const resolved = await resolveENS(addressOrENS)
+      if (!resolved) {
+        alert('Could not resolve ENS name. Please check the name and try again.')
+        setLoading(false)
+        return
+      }
+      resolvedAddress = resolved
+      setResolvedAddress(resolved)
+      console.log('Resolved to address:', resolvedAddress)
+    } else {
+      setResolvedAddress(resolvedAddress)
+    }
+    
+    try {
+      const response = await fetch(`/api/getnfts?address=${resolvedAddress}&page=${page}`)
       const data = await response.json()
       const newNfts = data.data || []
       const pagination = data.pagination || {}
@@ -91,7 +122,7 @@ export default function DownloadNFTs() {
       // Automatically load next page if there are more pages
       if (pagination.hasMore && page < 50) { // Safety limit of 50 pages
         console.log(`Auto-loading next page ${page + 1}`)
-        setTimeout(() => fetchNFTs(address, page + 1), 100) // Small delay to prevent overwhelming the API
+        setTimeout(() => fetchNFTs(resolvedAddress, page + 1), 100) // Small delay to prevent overwhelming the API
       } else {
         console.log('All pages loaded or reached safety limit')
         setHasMore(false)
@@ -109,7 +140,7 @@ export default function DownloadNFTs() {
 
   const loadMore = () => {
     const nextPage = currentPage + 1
-    fetchNFTs(walletAddress, nextPage)
+    fetchNFTs(resolvedAddress, nextPage)
   }
 
   useEffect(() => {
@@ -230,10 +261,10 @@ export default function DownloadNFTs() {
           margin: '20px 0',
           width: '100%',
           textAlign: 'center'
-        }}>Enter your wallet address to download all NFTs</p>
+        }}>Enter your wallet address or ENS name to download all NFTs</p>
 
         <div className={styles.searchContainer}>
-          <input className={styles.search} placeholder="Wallet Address"
+          <input className={styles.search} placeholder="Wallet Address or ENS name (e.g. vitalik.eth)"
             value={walletAddress}
             onChange={(e) => setWalletAddress(e.target.value)}
           />
@@ -289,6 +320,7 @@ export default function DownloadNFTs() {
             setSelected([])
             setTotalNFTs(0)
             setHasMore(true)
+            setResolvedAddress('')
             fetchNFTs(walletAddress, 1)
           }} disabled={!walletAddress || loading}>Get NFTs</button>
 
