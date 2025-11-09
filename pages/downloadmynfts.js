@@ -138,9 +138,10 @@ export default function DownloadNFTs() {
     }
   }
 
-  const loadMore = () => {
-    const nextPage = currentPage + 1
-    fetchNFTs(resolvedAddress, nextPage)
+  const toggleSelected = (index) => {
+    const newSelected = [...selected]
+    newSelected[index] = !newSelected[index]
+    setSelected(newSelected)
   }
 
   useEffect(() => {
@@ -274,31 +275,129 @@ export default function DownloadNFTs() {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          gap: '20px',
-          marginTop: '20px'
+          gap: '30px',
+          marginTop: '30px',
+          padding: '0 20px',
+          maxWidth: '100%',
+          margin: '30px auto 0'
         }}>
           {loading && (
-            <p style={{color: '#666', fontSize: '16px'}}>
-              Loading NFTs... (Page {currentPage}{totalNFTs > 0 ? ` of ~${Math.ceil(totalNFTs / 12)}` : ''})
-            </p>
+            <div style={{
+              padding: '16px 24px',
+              borderRadius: '8px',
+              border: '1px solid #444',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px'
+            }}>
+              <div style={{
+                width: '20px',
+                height: '20px',
+                border: '2px solid #666',
+                borderTop: '2px solid #4CAF50',
+                borderRadius: '50%',
+                animation: 'spin 1s linear infinite'
+              }}></div>
+              <p style={{color: '#e0e0e0', fontSize: '16px', margin: '0'}}>
+                Loading NFTs... (Page {currentPage}{totalNFTs > 0 ? ` of ~${Math.ceil(totalNFTs / 12)}` : ''})
+              </p>
+            </div>
           )}
           <div style={{flex: 1, width: '100%'}}>
-            <span style={{width: '100%', textAlign: 'left', marginBottom: '20px', display: 'flex', color :'#888 '}}>
-            {nftImages.length > 0 ?  `Showing ${nftImages.length}${totalNFTs > 0 ? ` of ${totalNFTs}` : ''} NFTs` : ''}
-            </span>
-            <div style={{display: 'flex', flexWrap: 'wrap', gap: '20px', justifyContent: 'center'}}>
+            <div style={{
+              width: '100%',
+              textAlign: 'center',
+              marginBottom: '30px',
+              padding: '16px',
+              borderRadius: '8px',
+            }}>
+              <span style={{color: '#888', fontSize: '12px', fontWeight: '500'}}>
+                {nftImages.length > 0 ? `Showing ${nftImages.length}${totalNFTs > 0 ? ` of ${totalNFTs}` : ''} NFTs` : 'No NFTs loaded yet'}
+              </span>
+            </div>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: nftImages.length === 1 ? '1fr' :
+                                   nftImages.length === 2 ? '1fr 1fr' :
+                                   nftImages.length === 3 ? '1fr 1fr' :
+                                   nftImages.length === 4 ? '1fr 1fr' : 'repeat(auto-fill, minmax(100px, 1fr))',
+              gridTemplateRows: nftImages.length === 3 ? '1fr 1fr' : 'auto',
+              gap: '0px',
+              width: '100%',
+              maxWidth: '500px',
+              backgroundColor: '#000',
+              overflow: 'hidden',
+              margin: '0 auto'
+            }}>
               {nftImages.map((nft, i) => (
-                <div key={i} style={{marginBottom: '20px', textAlign: 'center'}}>
-                  <img 
-                    src={nft.url} 
-                    style={{maxWidth: '200px', border: '1px solid #333'}} 
+                <div key={i} style={{
+                  position: 'relative',
+                  aspectRatio: nftImages.length === 1 ? '16/9' :
+                              nftImages.length === 2 ? '1/1' :
+                              nftImages.length === 3 && i === 0 ? '2/1' :
+                              '1/1',
+                  backgroundColor: '#1a1a1a',
+                  overflow: 'hidden',
+                  cursor: 'pointer'
+                }}
+                onClick={() => toggleSelected(i)}
+                >
+                  <img
+                    src={nft.url}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      transition: 'transform 0.2s ease, opacity 0.2s ease'
+                    }}
                     onError={() => handleImageError(i)}
                     alt={nft.name || 'NFT'}
+                    onMouseEnter={(e) => {
+                      e.target.style.transform = 'scale(1.05)'
+                      e.target.style.opacity = '0.9'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.transform = 'scale(1)'
+                      e.target.style.opacity = '1'
+                    }}
                   />
-                  <p style={{color: '#888', fontSize: '12px'}}>
-                    {nft.name}
-                  </p>
-                  <input type="checkbox" checked={selected[i]} onChange={() => toggleSelected(i)} />
+                  <div style={{
+                    position: 'absolute',
+                    top: '8px',
+                    right: '8px',
+                    width: '24px',
+                    height: '24px',
+                    backgroundColor: selected[i] ? 'rgba(29, 161, 242, 0.9)' : 'rgba(0, 0, 0, 0.6)',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    border: '2px solid rgba(255, 255, 255, 0.8)',
+                    transition: 'all 0.2s ease',
+                    zIndex: 10
+                  }}>
+                    {selected[i] && (
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20 6L9 17L4 12" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    )}
+                  </div>
+                  <div style={{
+                    position: 'absolute',
+                    bottom: '0',
+                    left: '0',
+                    right: '0',
+                    background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%)',
+                    padding: '40px 12px 12px',
+                    color: 'white',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    textOverflow: 'ellipsis',
+                    overflow: 'hidden',
+                    whiteSpace: 'nowrap'
+                  }}>
+                    {nft.name || `NFT #${nft.tokenId || i + 1}`}
+                  </div>
                 </div>
               ))}
             </div>
