@@ -2169,6 +2169,13 @@ export const tools = [
     "publishDate": "29th Oct 2025",
     "url": "/similarquery",
     "tags": []
+  },
+  {
+    "title": "Download My NFTs",
+    "description": "Download all your NFTs",
+    "publishDate": "30th Oct 2025",
+    "url": "/downloadmynfts",
+    "tags": []
   }
 ];
 
