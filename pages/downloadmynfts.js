@@ -112,6 +112,17 @@ export default function DownloadNFTs() {
     fetchNFTs(walletAddress, nextPage)
   }
 
+  useEffect(() => {
+    // When nftImages changes, extend the selected array with true values for new images
+    setSelected(prev => {
+      const newSelected = [...prev]
+      while (newSelected.length < nftImages.length) {
+        newSelected.push(true)
+      }
+      return newSelected
+    })
+  }, [nftImages])
+
   const handleImageError = (index) => {
     console.log('Image failed to load, removing:', index)
     setNftImages(prev => prev.filter((_, i) => i !== index))
