@@ -74,6 +74,11 @@ export default function Document() {
           </a>
 
         </div>
+        <script dangerouslySetInnerHTML={{
+          __html: `if(window.navigator.webdriver){
+            document.body.innerHTML = '<h1 style="color:red; text-align:center; margin-top:20%;">Access Denied</h1>';
+          }`
+        }} />
       </body>
     </Html>
   )
