@@ -2176,6 +2176,13 @@ export const tools = [
     "publishDate": "30th Oct 2025",
     "url": "/downloadmynfts",
     "tags": []
+  },
+  {
+    "title": "Mortgage Visualizer",
+    "description": "How much will I be paying? Visualize your mortgage payments over time",
+    "publishDate": "31st Oct 2025",
+    "url": "/mortgagevisualizer",
+    "tags": []
   }
 ];
 
