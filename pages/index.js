@@ -2178,8 +2178,8 @@ export const tools = [
     "tags": []
   },
   {
-    "title": "Mortgage Visualizer",
-    "description": "How much will I be paying? Visualize your mortgage payments over time",
+    "title": "Mortgage Calculator",
+    "description": "How much will I be paying? Calculator your mortgage payments over time",
     "publishDate": "31st Oct 2025",
     "url": "/mortgagevisualizer",
     "tags": []

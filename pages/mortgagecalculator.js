@@ -52,17 +52,17 @@ export default function MortgageVisualizer() {
   return (
     <>
       <Head>
-        <title>Mortgage Visualizer</title>
-        <meta name="description" content="Visualize your mortgage payments and affordability" />
+        <title>Mortgage Calculator</title>
+        <meta name="description" content="Calculate your mortgage payments and affordability" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <main className={styles.container}>
         <h1 className={styles.title}>
-          Mortgage Visualizer
+          Mortgage Calculator
         </h1>
         <span style={{ color: '#777', fontSize: '14px', marginBottom: '20px', display: 'block' }}>
-          Calculate and visualize your mortgage payments
+          Calculate your mortgage payments and affordability
         </span>
 
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '40px', alignItems: 'start' }}>
