@@ -2173,7 +2173,7 @@ export const tools = [
   {
     "title": "Download My NFTs",
     "description": "Download all your NFTs",
-    "publishDate": "30th Oct 2025",
+    "publishDate": "10th Oct 2025",
     "url": "/downloadmynfts",
     "tags": []
   },
