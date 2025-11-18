@@ -210,17 +210,17 @@ export default function Svg2Webm() {
   return (
     <>
       <Head>
-        <title>SVG to WebM Converter</title>
-        <meta name="description" content="Convert animated SVG to WebM video" />
+        <title>SVG to Video Converter</title>
+        <meta name="description" content="Convert animated SVG to video" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <main className={styles.container}>
         <h1 className={styles.title}>
-          SVG to WebM Converter
+          SVG to Video Converter
         </h1>
         <span style={{ color: '#777', fontSize: '14px', marginBottom: '20px', display: 'block' }}>
-          Paste your animated SVG code and download it as WebM video.
+          Paste your animated SVG code and download it as video.
         </span>
 
         <textarea
