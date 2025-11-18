@@ -20,6 +20,7 @@ export default function Svg2Webm() {
   const fpsRef = useRef(30)
   const recordDimsRef = useRef({ w: 0, h: 0 })
   const [format, setFormat] = useState('webm') // 'mp4' | 'webm' | 'gif'
+  const [fps, setFps] = useState(30)
 
   // Pick best available MediaRecorder mimeType (prefer MP4/H.264)
   const pickRecorderType = (preferred) => {
@@ -34,13 +35,13 @@ export default function Svg2Webm() {
     ]
     const order = preferred === 'mp4' ? [...mp4Candidates, ...webmCandidates]
       : preferred === 'webm' ? [...webmCandidates, ...mp4Candidates]
-      : [...mp4Candidates, ...webmCandidates]
+        : [...mp4Candidates, ...webmCandidates]
     for (const c of order) {
       try {
         if (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported?.(c.mimeType)) {
           return c
         }
-      } catch (_) {}
+      } catch (_) { }
     }
     return { mimeType: '', ext: 'webm' }
   }
@@ -57,14 +58,14 @@ export default function Svg2Webm() {
     if (!svgCode || isRecording) return
     setLoading(true)
     setFrameCount(0)
-    
+
     // Create or get canvas
     let canvas = canvasRef.current
     if (!canvas) {
       canvas = document.createElement('canvas')
       canvasRef.current = canvas
     }
-    
+
     // Ensure canvas exists; it's fine to keep it off-DOM for GIF capture
 
     const img = new Image()
@@ -75,17 +76,17 @@ export default function Svg2Webm() {
     img.onload = async () => {
       const w = width || img.naturalWidth || 300
       const h = height || img.naturalHeight || 300
-      
+
       console.log('Recording dimensions:', w, h)
       canvas.width = w
       canvas.height = h
       const ctx = canvas.getContext('2d')
       recordDimsRef.current = { w, h }
-      
+
       // Branch by format
       if (format === 'gif') {
         recorderRef.current = { kind: 'gif' }
-        fpsRef.current = 15
+        fpsRef.current = fps
         framesRef.current = []
         setIsRecording(true)
         isRecordingRef.current = true
@@ -93,7 +94,7 @@ export default function Svg2Webm() {
         lastFrameTimeRef.current = 0
       } else {
         // Create MediaRecorder from canvas stream
-        const stream = canvas.captureStream(30) // 30 FPS
+        const stream = canvas.captureStream(fps) // Use configurable FPS
         const { mimeType, ext } = pickRecorderType(format)
         const options = mimeType ? { mimeType, videoBitsPerSecond: 2500000 } : { videoBitsPerSecond: 2500000 }
         const mediaRecorder = new MediaRecorder(stream, options)
@@ -143,7 +144,7 @@ export default function Svg2Webm() {
             if (!last || (ts && ts - last >= intervalMs)) {
               try {
                 framesRef.current.push(canvas.toDataURL('image/png'))
-              } catch (_) {}
+              } catch (_) { }
               lastFrameTimeRef.current = ts || 0
             }
           }
@@ -154,7 +155,7 @@ export default function Svg2Webm() {
 
       animationIdRef.current = requestAnimationFrame(animate)
     }
-    
+
     img.onerror = () => {
       setLoading(false)
       alert('Failed to load SVG. Please check your SVG code.')
@@ -169,10 +170,10 @@ export default function Svg2Webm() {
         cancelAnimationFrame(animationIdRef.current)
         animationIdRef.current = null
       }
-      
+
       if (format === 'gif' && recorderRef.current?.kind === 'gif') {
         const { w, h } = recordDimsRef.current
-        const fps = fpsRef.current || 15
+        const fps = fpsRef.current || 30
         const images = framesRef.current.slice()
         framesRef.current = []
         gifshot.createGIF({
@@ -181,8 +182,10 @@ export default function Svg2Webm() {
           images,
           frameDuration: 1 / fps,
           numWorkers: 2,
-          sampleInterval: 10,
+          sampleInterval: 1,
           numFrames: images.length,
+          quality: 1,
+          dither: false,
         }, (obj) => {
           if (!obj.error) {
             const a = document.createElement('a')
@@ -235,23 +238,33 @@ export default function Svg2Webm() {
 
         <div style={{ margin: '20px 0', display: 'flex', gap: 20, alignItems: 'center', flexWrap: 'wrap' }}>
           <label style={{ marginRight: '20px' }}>
-            Width: 
-            <input 
-              type="number" 
-              value={width} 
-              onChange={(e) => setWidth(Number(e.target.value))} 
-              placeholder="Auto" 
+            Width:
+            <input
+              type="number"
+              value={width}
+              onChange={(e) => setWidth(Number(e.target.value))}
+              placeholder="Auto"
               style={{ marginLeft: '5px', width: '80px' }}
             />
           </label>
           <label>
-            Height: 
-            <input 
-              type="number" 
-              value={height} 
-              onChange={(e) => setHeight(Number(e.target.value))} 
-              placeholder="Auto" 
+            Height:
+            <input
+              type="number"
+              value={height}
+              onChange={(e) => setHeight(Number(e.target.value))}
+              placeholder="Auto"
               style={{ marginLeft: '5px', width: '80px' }}
+            />
+          </label>
+          <label>
+            FPS:
+            <input
+              type="number"
+              value={fps}
+              onChange={(e) => setFps(Number(e.target.value))}
+              placeholder="30"
+              style={{ marginLeft: '5px', width: '60px' }}
             />
           </label>
           <label>
@@ -267,10 +280,10 @@ export default function Svg2Webm() {
         {svgDataUri && (
           <div style={{ margin: '20px 0' }}>
             <div>Preview:</div>
-            <img 
-              src={svgDataUri} 
-              width={width || undefined} 
-              height={height || undefined} 
+            <img
+              src={svgDataUri}
+              width={width || undefined}
+              height={height || undefined}
               onLoad={(e) => {
                 if (!width) setWidth(e.target.naturalWidth)
                 if (!height) setHeight(e.target.naturalHeight)
