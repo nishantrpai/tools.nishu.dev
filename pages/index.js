@@ -2185,10 +2185,10 @@ export const tools = [
     "tags": []
   },
   {
-    "title": "SVG to webm",
-    "description": "Convert SVG to webm",
+    "title": "SVG to Video",
+    "description": "Convert SVG to video",
     "publishDate": "18 Nov 2025",
-    "url": "/svg2webm",
+    "url": "/svg2video",
     "tags": []
   }
 ];
