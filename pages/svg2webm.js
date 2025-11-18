@@ -1,227 +1,150 @@
 import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
-import { useState, useRef, useEffect } from 'react'
+import { useState } from 'react'
 
 export default function Svg2Webm() {
-  const [svgFile, setSvgFile] = useState(null)
-  const [svgPaths, setSvgPaths] = useState([])
-  const [selectedPath, setSelectedPath] = useState('')
-  const [animationDirection, setAnimationDirection] = useState('leftToRight')
-  const [duration, setDuration] = useState(2) // Duration in seconds
-  const [offsetX, setOffsetX] = useState(0)
-  const [offsetY, setOffsetY] = useState(0)
-  const [scale, setScale] = useState(1)
-  const [pathColor, setPathColor] = useState('#fff')
+  const [svgCode, setSvgCode] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [width, setWidth] = useState(0)
+  const [height, setHeight] = useState(0)
   const [isRecording, setIsRecording] = useState(false)
-  const canvasRef = useRef(null)
-  const mediaRecorderRef = useRef(null)
-  const chunksRef = useRef([])
+  const [recorder, setRecorder] = useState(null)
+  const [animationId, setAnimationId] = useState(null)
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0]
-    if (file) {
-      const reader = new FileReader()
-      reader.onload = (event) => {
-        const parser = new DOMParser()
-        const svgDoc = parser.parseFromString(event.target.result, 'image/svg+xml')
-        const paths = Array.from(svgDoc.querySelectorAll('path'))
-        setSvgPaths(paths)
-        setSvgFile(event.target.result)
-        // draw svg on canvas
-        const canvas = canvasRef.current
-        const ctx = canvas.getContext('2d')
-        const svgImage = new Image()
-        const svgDataUri = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(event.target.result)}`
-        svgImage.src = svgDataUri
-        svgImage.onload = () => {
-          const imgWidth = svgImage.width
-          const imgHeight = svgImage.height
-          const xOffset = (canvas.width - imgWidth) / 2
-          const yOffset = (canvas.height - imgHeight) / 2
-          ctx.drawImage(svgImage, xOffset, yOffset, imgWidth, imgHeight)
-        }
-      }
-      reader.readAsText(file)
-    }
+  const handleSvgChange = (e) => {
+    setSvgCode(e.target.value)
   }
 
-  const handlePathChange = (e) => {
-    setSelectedPath(e.target.value)
-  }
-
-  const handleDirectionChange = (e) => {
-    setAnimationDirection(e.target.value)
-  }
-  
-
-  const handleDurationChange = (e) => {
-    setDuration(Number(e.target.value))
-  }
-  const animatePath = () => {
-    if (!selectedPath || !svgFile) return
-
-    const svgDoc = new DOMParser().parseFromString(svgFile, 'image/svg+xml')
-    const canvas = canvasRef.current
-    const ctx = canvas.getContext('2d')
-    const svgImage = new Image()
-    const svgDataUri = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgFile)}`
-    svgImage.src = svgDataUri
-
-    svgImage.onload = () => {
-      const imgWidth = svgImage.width
-      const imgHeight = svgImage.height
-      const xOffset = (canvas.width - imgWidth) / 2
-      const yOffset = (canvas.height - imgHeight) / 2
-
-      const pathElement = svgDoc.querySelector(`path[d="${selectedPath}"]`)
-      if (!pathElement) return
-
-      const path2D = new Path2D(pathElement.getAttribute('d'))
-      const totalLength = pathElement.getTotalLength()
-      const frameCount = 60 * duration // Assuming 60 FPS
-      const lengthPerFrame = totalLength / frameCount
-
-      for (let i = 0; i <= frameCount; i++) {
-      setTimeout(() => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height)
-        ctx.drawImage(svgImage, offsetX, offsetY, imgWidth * scale, imgHeight * scale)
-        ctx.save()
-        // ctx.translate(xOffset, yOffset)
-        ctx.strokeStyle = pathColor
-        ctx.lineWidth = 2
-        ctx.setLineDash([totalLength])
-        ctx.lineDashOffset = totalLength - lengthPerFrame * i
-        ctx.stroke(path2D)
-        ctx.restore()
-
-        if(totalLength - lengthPerFrame * i <= 0) {
-        stopRecording()
-        }
-        if (i === frameCount) {
-        stopRecording()
-        }
-      }, (i * 1000) / 60)
-      }
-    }
-  }
-  
+  const svgDataUri = svgCode ? `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgCode)}` : ''
 
   const startRecording = () => {
-    if (!canvasRef.current) return
+    if (!svgCode || isRecording) return
+    setLoading(true)
+    const img = new Image();
+    img.src = svgDataUri;
+    img.onload = () => {
+      const w = width || img.naturalWidth;
+      const h = height || img.naturalHeight;
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      const stream = canvas.captureStream(30); // 30 fps
+      const mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+      const chunks = [];
+      mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(chunks, { type: 'video/webm' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'animation.webm';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setLoading(false);
+        setIsRecording(false);
+        setRecorder(null);
+      };
+      mediaRecorder.start();
+      setRecorder(mediaRecorder);
+      setIsRecording(true);
+      setLoading(false);
 
-    const stream = canvasRef.current.captureStream(60)
-    const mediaRecorder = new MediaRecorder(stream, {
-      mimeType: 'video/webm;codecs=vp9',
-      videoBitsPerSecond: 8000000
-    })
-
-    mediaRecorderRef.current = mediaRecorder
-    chunksRef.current = []
-
-    mediaRecorder.ondataavailable = (event) => {
-      if (event.data.size > 0) {
-        chunksRef.current.push(event.data)
-      }
-    }
-
-    mediaRecorder.onstop = () => {
-      const blob = new Blob(chunksRef.current, {
-        type: 'video/webm'
-      })
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = 'animation.webm'
-      a.click()
-      URL.revokeObjectURL(url)
-    }
-
-    mediaRecorder.start()
-    setIsRecording(true)
-    animatePath()
+      const animate = () => {
+        ctx.clearRect(0, 0, w, h);
+        ctx.drawImage(img, 0, 0, w, h);
+        if (isRecording) {
+          setAnimationId(requestAnimationFrame(animate));
+        }
+      };
+      animate();
+    };
   }
 
   const stopRecording = () => {
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop()
-      setIsRecording(false)
-    }
-  }
-  
-  useEffect(() => {
-    if(svgFile) {
-      let canvas = canvasRef.current
-      let ctx = canvas.getContext('2d')
-      let svgImage = new Image()
-      let svgDataUri = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgFile)}`
-      svgImage.src = svgDataUri
-      svgImage.onload = () => {
-        let imgWidth = svgImage.width
-        let imgHeight = svgImage.height
-        // clear canvas
-        ctx.clearRect(0, 0, canvas.width, canvas.height)
-        ctx.drawImage(svgImage, offsetX, offsetY, imgWidth *scale, imgHeight * scale)
+    if (recorder && isRecording) {
+      recorder.stop();
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+        setAnimationId(null);
       }
     }
-  }, [offsetX, offsetY, scale, pathColor, svgFile, selectedPath, animationDirection])
+  }
 
   return (
     <>
       <Head>
-        <title>SVG to WebM Animator</title>
-        <meta name="description" content="Animate SVG paths and download as WebM" />
+        <title>SVG to WebM Converter</title>
+        <meta name="description" content="Convert animated SVG to WebM video" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <main className={styles.container}>
         <h1 className={styles.title}>
-          SVG to WebM Animator
+          SVG to WebM Converter
         </h1>
-        <span style={{ color: '#777', fontSize: '14px', marginBottom: '20px', display: 'block' }}>Upload your SVG file, select a path, and download the animation as WebM.</span>
-        <canvas ref={canvasRef} width={800} height={800}  style={{ border: '1px solid #333', width: '100%', background: '#fff' }} />
+        <span style={{ color: '#777', fontSize: '14px', marginBottom: '20px', display: 'block' }}>Paste your animated SVG code and download it as WebM video.</span>
 
-        <input type="file" accept="image/svg+xml" onChange={handleFileChange} />
-        {svgPaths.length > 0 && (
-          <>
-          <input type="color" value={pathColor} defaultValue={pathColor} onChange={(e) => setPathColor(e.target.value)} />
-            <select onChange={handlePathChange} value={selectedPath}>
-              <option value="">Select a path</option>
-              {svgPaths.map((path, index) => (
-                <option key={index} value={path.getAttribute('d')}>{`Path ${index + 1}`}</option>
-              ))}
-            </select>
+        <textarea
+          value={svgCode}
+          onChange={handleSvgChange}
+          placeholder="Paste your SVG code here"
+          style={{
+            width: '100%',
+            border: '1px solid #333',
+            padding: '10px',
+            outline: 'none',
+            height: '200px',
+          }}
+        />
 
-            <select onChange={handleDirectionChange} value={animationDirection}>
-              <option value="leftToRight">Left to Right</option>
-              <option value="rightToLeft">Right to Left</option>
-              <option value="topToBottom">Top to Bottom</option>
-              <option value="bottomToTop">Bottom to Top</option>
-            </select>
+        <div style={{ margin: '20px 0' }}>
+          <label style={{ marginRight: '20px' }}>
+            Width: 
+            <input 
+              type="number" 
+              value={width} 
+              onChange={(e) => setWidth(Number(e.target.value))} 
+              placeholder="Auto" 
+              style={{ marginLeft: '5px', width: '80px' }}
+            />
+          </label>
+          <label>
+            Height: 
+            <input 
+              type="number" 
+              value={height} 
+              onChange={(e) => setHeight(Number(e.target.value))} 
+              placeholder="Auto" 
+              style={{ marginLeft: '5px', width: '80px' }}
+            />
+          </label>
+        </div>
 
-            <label>
-              Duration (seconds):
-              <input type="number" min="1" value={duration} onChange={handleDurationChange} />
-            </label>
-
-            <button onClick={isRecording ? stopRecording : startRecording} className={styles.button}>
-              {isRecording ? 'Stop Recording' : 'Animate and Download as WebM'}
-            </button>
-            <label>
-              Offset X: {offsetX}
-            </label>
-            <input type="range" min="-400" max="400" value={offsetX} onChange={(e) => setOffsetX(Number(e.target.value))} />
-            <label>
-              Offset Y: {offsetY}
-            </label>
-            <input type="range" min="-400" max="400" value={offsetY} onChange={(e) => setOffsetY(Number(e.target.value))} />
-            <label>
-              Scale: {scale}
-            </label>
-
-            <input type="range" min="0.1" max="100" step="0.1" value={scale} onChange={(e) => setScale(Number(e.target.value))} />
-          </>
+        {svgDataUri && (
+          <div style={{ margin: '20px 0' }}>
+            <div>Preview:</div>
+            <img 
+              src={svgDataUri} 
+              width={width || undefined} 
+              height={height || undefined} 
+              onLoad={(e) => {
+                if (!width) setWidth(e.target.naturalWidth);
+                if (!height) setHeight(e.target.naturalHeight);
+              }}
+              style={{ border: '1px solid #ccc', maxWidth: '100%' }}
+              alt="SVG Preview"
+            />
+          </div>
         )}
 
+        <button onClick={startRecording} className={styles.button} disabled={loading || isRecording}>
+          {isRecording ? 'Recording...' : 'Start Recording'}
+        </button>
+        <button onClick={stopRecording} className={styles.button} disabled={!isRecording}>
+          Stop Recording
+        </button>
       </main>
     </>
   )

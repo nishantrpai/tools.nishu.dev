@@ -2183,6 +2183,13 @@ export const tools = [
     "publishDate": "13 Nov 2025",
     "url": "/mortgagevisualizer",
     "tags": []
+  },
+  {
+    "title": "SVG to webm",
+    "description": "Convert SVG to webm",
+    "publishDate": "18 Nov 2025",
+    "url": "/svg2webm",
+    "tags": []
   }
 ];
 
