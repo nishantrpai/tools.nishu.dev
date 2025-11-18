@@ -48,6 +48,7 @@ export default function Svg2Webm() {
       const w = width || img.naturalWidth || 300
       const h = height || img.naturalHeight || 300
       
+      console.log('Recording dimensions:', w, h)
       canvas.width = w
       canvas.height = h
       const ctx = canvas.getContext('2d')
@@ -185,7 +186,7 @@ export default function Svg2Webm() {
                 if (!width) setWidth(e.target.naturalWidth)
                 if (!height) setHeight(e.target.naturalHeight)
               }}
-              style={{ border: '1px solid #ccc', maxWidth: '100%' }}
+              style={{ border: '1px solid #ccc' }}
               alt="SVG Preview"
             />
           </div>
