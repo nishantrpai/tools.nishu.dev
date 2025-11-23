@@ -2190,6 +2190,13 @@ export const tools = [
     "publishDate": "18 Nov 2025",
     "url": "/svg2video",
     "tags": []
+  },
+  {
+    "title": "Reddit Research",
+    "description": "Search reddit for your query and keep queries on the tab",
+    "publishDate": "20 Nov 2025",
+    "url": "/redditresearch",
+    "tags": []
   }
 ];
 
