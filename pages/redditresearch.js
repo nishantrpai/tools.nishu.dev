@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { useState, useEffect } from 'react'
-import { FiArrowRight } from "react-icons/fi";
+import { FiArrowRight, FiStar } from "react-icons/fi";
 
 export default function RedditResearch() {
   const [subreddit, setSubreddit] = useState('webdev')
@@ -10,6 +10,8 @@ export default function RedditResearch() {
   const [loading, setLoading] = useState(false)
   const [status, setStatus] = useState('')
   const [exactMatch, setExactMatch] = useState(false)
+  const [activeTab, setActiveTab] = useState('search')
+  const [history, setHistory] = useState([])
 
   useEffect(() => {
     setSearches([])
@@ -25,6 +27,10 @@ export default function RedditResearch() {
       text += '\n'
     })
     navigator.clipboard.writeText(text)
+  }
+
+  const toggleStar = (idx) => {
+    setHistory(prev => prev.map((h, i) => i === idx ? {...h, starred: !h.starred} : h))
   }
 
   const searchPosts = async () => {
@@ -50,6 +56,14 @@ export default function RedditResearch() {
       }
       console.log('Matching Posts:', matchingPosts)
       setSearches(prev => [{ query, posts: matchingPosts }, ...prev])
+      // Add to history if not already present
+      setHistory(prev => {
+        const exists = prev.some(h => h.subreddit === subreddit && h.query.toLowerCase() === query.toLowerCase())
+        if (!exists) {
+          return [{ subreddit, query, posts: matchingPosts, starred: false }, ...prev]
+        }
+        return prev
+      })
       setLoading(false)
     } catch (error) {
       setStatus('error fetching posts')
@@ -69,45 +83,89 @@ export default function RedditResearch() {
         <h1 className={styles.title}>Reddit Research</h1>
         <p className={styles.description} style={{ width: '100%', textAlign: 'center' }}>Search Reddit posts by title match</p>
 
-        <form style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '70%', flexWrap: 'wrap', width: '100%' }}>
-          <input style={{ background: '#000', color: '#fff', border: '1px solid #333', padding: '5px', borderRadius: 5, flex: 1 }} type="text" value={subreddit} onChange={(e) => setSubreddit(e.target.value)} placeholder='Enter the subreddit' />
-          <input style={{ background: '#000', color: '#fff', border: '1px solid #333', padding: '5px', borderRadius: 5, flex: 1 }} type="text" value={query} onChange={(e) => setQuery(e.target.value)} placeholder='Enter the query' />
-          <button style={{ width: '100%' }} onClick={(e) => { e.preventDefault(); searchPosts() }}>Search</button>
-          <label style={{ display: 'flex', alignItems: 'flex-start', gap: '5px', color: '#fff' }}>
-            <input type="checkbox" style={{width: 'max-content'}} checked={exactMatch} onChange={(e) => setExactMatch(e.target.checked)} />
-            Exact Match
-          </label>
-          <button style={{ width: '100%' }} onClick={(e) => { e.preventDefault(); copyResults() }}>Copy Results</button>
+        <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginBottom: '20px' }}>
+          <button 
+            onClick={() => setActiveTab('search')} 
+            style={{ 
+              background: activeTab === 'search' ? '#333' : '#000', 
+              color: '#fff', 
+              border: '1px solid #333', 
+              padding: '10px 20px', 
+              borderRadius: 5 
+            }}
+          >
+            Search
+          </button>
+          <button 
+            onClick={() => setActiveTab('history')} 
+            style={{ 
+              background: activeTab === 'history' ? '#333' : '#000', 
+              color: '#fff', 
+              border: '1px solid #333', 
+              padding: '10px 20px', 
+              borderRadius: 5 
+            }}
+          >
+            History
+          </button>
+        </div>
 
-        </form>
+        {activeTab === 'search' && (
+          <>
+            <form style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '70%', flexWrap: 'wrap', width: '100%' }}>
+              <input style={{ background: '#000', color: '#fff', border: '1px solid #333', padding: '5px', borderRadius: 5, flex: 1 }} type="text" value={subreddit} onChange={(e) => setSubreddit(e.target.value)} placeholder='Enter the subreddit' />
+              <input style={{ background: '#000', color: '#fff', border: '1px solid #333', padding: '5px', borderRadius: 5, flex: 1 }} type="text" value={query} onChange={(e) => setQuery(e.target.value)} placeholder='Enter the query' />
+              <button style={{ width: '100%' }} onClick={(e) => { e.preventDefault(); searchPosts() }}>Search</button>
+              <label style={{ display: 'flex', alignItems: 'flex-start', gap: '5px', color: '#fff' }}>
+                <input type="checkbox" style={{width: 'max-content'}} checked={exactMatch} onChange={(e) => setExactMatch(e.target.checked)} />
+                Exact Match
+              </label>
+              <button style={{ width: '100%' }} onClick={(e) => { e.preventDefault(); copyResults() }}>Copy Results</button>
+            </form>
 
-        <br />
-        <hr />
-        {loading && <p>{status}</p>}
+            <br />
+            <hr />
+            {loading && <p>{status}</p>}
 
-        {searches.map((search, idx) => (
-          <div key={idx} style={{ marginBottom: '20px', width: '100%' }}>
-            <p style={{ textAlign: 'left', marginBottom: 10, color: '#888' }}>query: {search.query}</p>
-            <p style={{ textAlign: 'left', marginBottom: 20, color: '#888' }}>posts:</p>
-            <ul style={{
-              listStyleType: 'none',
-              fontSize: '14px',
-              fontFamily: 'monospace',
-              padding: 0,
-              display: 'flex', flexDirection: 'column', gap: '10px',
-              width: '100%',
-            }}>
-              {search.posts.map((post, index) => (
-                <li key={index}>
-                  <a href={`https://reddit.com${post.permalink}`} target="_blank" rel="noopener noreferrer" style={{ color: '#fff' }}>
-                    {post.title}
-                  </a>
-                </li>
-              ))}
-            </ul>
-            <hr style={{ color: '#fff', marginTop: 20 }} />
-          </div>
-        ))}
+            {searches.map((search, idx) => (
+              <div key={idx} style={{ marginBottom: '20px', width: '100%' }}>
+                <p style={{ textAlign: 'left', marginBottom: 10, color: '#888' }}>query: {search.query}</p>
+                <p style={{ textAlign: 'left', marginBottom: 20, color: '#888' }}>posts:</p>
+                <ul style={{
+                  listStyleType: 'none',
+                  fontSize: '14px',
+                  fontFamily: 'monospace',
+                  padding: 0,
+                  display: 'flex', flexDirection: 'column', gap: '10px',
+                  width: '100%',
+                }}>
+                  {search.posts.map((post, index) => (
+                    <li key={index}>
+                      <a href={`https://reddit.com${post.permalink}`} target="_blank" rel="noopener noreferrer" style={{ color: '#fff' }}>
+                        {post.title}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+                <hr style={{ color: '#fff', marginTop: 20 }} />
+              </div>
+            ))}
+          </>
+        )}        {activeTab === 'history' && (
+          <>
+            {history.map((item, idx) => (
+              <div key={idx} style={{ marginBottom: '20px', width: '100%' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: 10 }}>
+                  <p style={{ textAlign: 'left', color: '#888', margin: 0 }}>r/{item.subreddit}: {item.query}</p>
+                  <button onClick={() => toggleStar(idx)} style={{ background: 'none', border: 'none', color: item.starred ? '#ffd700' : '#888', cursor: 'pointer' }}>
+                    <FiStar />
+                  </button>
+                </div>
+                <hr style={{ color: '#fff', marginTop: 20 }} />
+              </div>
+            ))}
+          </>
+        )}
       </main>
 
     </>
