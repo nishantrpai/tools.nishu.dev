@@ -213,10 +213,10 @@ export default function Home() {
           const parts = question.split(new RegExp(`(${anchor.ngram})`, 'gi'))
           const highlightedParts = parts.map((part, pidx) => 
             part.toLowerCase() === anchor.ngram.toLowerCase() ? 
-              <span key={pidx} style={{backgroundColor: '#111', borderRadius: '5px', padding: '2px'}}>{part}</span> : 
+              <span key={pidx} style={{backgroundColor: '#333', color: '#aaa', borderRadius: '5px', padding: '1px'}}>{part}</span> : 
               part
           )
-          summaryElements.push(<p key={`question-${length}-${i}-${idx}`} style={{margin: 0, fontSize: 10, color: '#444'}}>{`    ${idx}: `}{highlightedParts}</p>)
+          summaryElements.push(<p key={`question-${length}-${i}-${idx}`} style={{margin: 0, fontSize: 10, color: '#555'}}>{`    ${idx}: `}{highlightedParts}</p>)
         })
         summaryElements.push(<p key={`blank-after-${length}-${i}`} style={{margin: 0}}></p>)
       })
@@ -224,7 +224,7 @@ export default function Home() {
     })
 
     if (result.totalCovered < result.totalSentences) {
-      summaryElements.push(<p key="uncovered-header" style={{margin: 0}}>{`UNCOVERED QUESTIONS: (${result.totalSentences - result.totalCovered} questions)`}</p>)
+      summaryElements.push(<p key="uncovered-header" style={{marginTop: 10}}>{`UNCOVERED QUESTIONS: (${result.totalSentences - result.totalCovered} questions)`}</p>)
       const covered = new Set()
       result.anchors.forEach(anchor => {
         anchor.sentenceIndices.forEach(i => covered.add(i))
