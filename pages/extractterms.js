@@ -204,9 +204,9 @@ export default function Home() {
     sortedLengths.forEach(length => {
       const anchors = byLength.get(length)
       const totalCoveredByLength = anchors.reduce((sum, anchor) => sum + anchor.sentenceIndices.length, 0)
-      summaryElements.push(<p key={`length-${length}`} style={{margin: 0}}>{`${length}-word (${totalCoveredByLength} questions):`}</p>)
+      summaryElements.push(<p key={`length-${length}`} style={{marginTop: 20}}>{`${length}-word (${totalCoveredByLength} questions):`}</p>)
       anchors.forEach((anchor, i) => {
-        summaryElements.push(<p key={`anchor-${length}-${i}`} style={{margin: 0}}>{`  ${i+1}. "${anchor.ngram}" (${anchor.sentenceIndices.length} questions)`}</p>)
+        summaryElements.push(<p key={`anchor-${length}-${i}`} style={{marginTop: 10}}>{`  ${i+1}. "${anchor.ngram}" (${anchor.sentenceIndices.length} questions)`}</p>)
         summaryElements.push(<p key={`blank-anchor-${length}-${i}`} style={{margin: 0}}></p>)
         anchor.sentenceIndices.forEach(idx => {
           const question = questions[idx]
@@ -216,7 +216,7 @@ export default function Home() {
               <span key={pidx} style={{backgroundColor: '#111', borderRadius: '5px', padding: '2px'}}>{part}</span> : 
               part
           )
-          summaryElements.push(<p key={`question-${length}-${i}-${idx}`} style={{margin: 0, fontSize: 10, color: '#444'}}>{`    ${idx}: "`}{highlightedParts}{`"`}</p>)
+          summaryElements.push(<p key={`question-${length}-${i}-${idx}`} style={{margin: 0, fontSize: 10, color: '#444'}}>{`    ${idx}: `}{highlightedParts}</p>)
         })
         summaryElements.push(<p key={`blank-after-${length}-${i}`} style={{margin: 0}}></p>)
       })
@@ -224,14 +224,14 @@ export default function Home() {
     })
 
     if (result.totalCovered < result.totalSentences) {
-      summaryElements.push(<p key="uncovered-header" style={{margin: 0}}>{`UNCOVERED QUESTIONS:\n (${result.totalSentences - result.totalCovered} questions)`}</p>)
+      summaryElements.push(<p key="uncovered-header" style={{margin: 0}}>{`UNCOVERED QUESTIONS: (${result.totalSentences - result.totalCovered} questions)`}</p>)
       const covered = new Set()
       result.anchors.forEach(anchor => {
         anchor.sentenceIndices.forEach(i => covered.add(i))
       })
       for (let i = 0; i < questions.length; i++) {
         if (!covered.has(i)) {
-          summaryElements.push(<p key={`uncovered-${i}`} style={{margin: 0}}>{`  ${i}: "${questions[i]}"`}</p>)
+          summaryElements.push(<p key={`uncovered-${i}`} style={{margin: 0, fontSize: 10, color: '#333', marginTop: 5}}>{`    ${i}: ${questions[i]}`}</p>)
         }
       }
     }
