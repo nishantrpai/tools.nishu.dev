@@ -2197,6 +2197,13 @@ export const tools = [
     "publishDate": "20 Nov 2025",
     "url": "/redditresearch",
     "tags": []
+  },
+  {
+    "title": "Extract Terms",
+    "description": "Extract terms from questions",
+    "publishDate": "1 Dec 2025",
+    "url": "/extractterms",
+    "tags": []
   }
 ];
 
