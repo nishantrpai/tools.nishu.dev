@@ -1675,8 +1675,8 @@ function descendingNgramCover(sentences, maxN = 10, minSentenceCount = 2, minCon
     const anchors = [];
     const anchorToCoverage = new Map();
 
-    // Descend from maxN to 2 (skip 1-grams)
-    for (let n = Math.max(maxN, 2); n >= 2; n--) {
+    // Descend from maxN to 1
+    for (let n = Math.max(maxN, 1); n >= 1; n--) {
         if (covered.size === sentences.length) {
             break;
         }
