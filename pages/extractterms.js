@@ -1756,14 +1756,24 @@ export default function Home() {
   const [loading, setLoading] = useState(false)
   const [maxN, setMaxN] = useState(3)
   const [separator, setSeparator] = useState('single')
+  const [filterWords, setFilterWords] = useState('')
 
   const extractTerms = async () => {
     setLoading(true)
     let sep = separator === 'double' ? /\n\n+/ : '\n'
     let questions = text.split(sep).map(line => line.trim()).filter(line => line.length > 0)
     questions = Array.from(new Set(questions)) // Remove duplicates
+
+    // Filter questions based on filter words
+    if (filterWords.trim()) {
+      const filters = filterWords.split(',').map(w => w.trim().toLowerCase()).filter(w => w.length > 0)
+      if (filters.length > 0) {
+        questions = questions.filter(q => filters.some(f => q.toLowerCase().includes(f)))
+      }
+    }
+
     if (questions.length === 0) {
-      setSummaryJSX([<p key="no-data" style={{margin: 0}}>No questions provided.</p>])
+      setSummaryJSX([<p key="no-data" style={{margin: 0}}>No questions provided or none match the filter.</p>])
       setLoading(false)
       return
     }
@@ -1858,6 +1868,20 @@ export default function Home() {
             padding: '10px',
             outline: 'none',
             resize: 'vertical'
+          }}
+        />
+
+        <input
+          type="text"
+          value={filterWords}
+          onChange={(e) => setFilterWords(e.target.value)}
+          placeholder="Enter words to filter questions (comma-separated, e.g., budgeting, sheets)"
+          style={{
+            width: '100%',
+            border: '1px solid #333',
+            padding: '10px',
+            outline: 'none',
+            marginTop: '10px'
           }}
         />
 
