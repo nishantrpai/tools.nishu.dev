@@ -1755,10 +1755,12 @@ export default function Home() {
   const [summaryJSX, setSummaryJSX] = useState([])
   const [loading, setLoading] = useState(false)
   const [maxN, setMaxN] = useState(3)
+  const [separator, setSeparator] = useState('single')
 
   const extractTerms = async () => {
     setLoading(true)
-    let questions = text.split('\n').map(line => line.trim()).filter(line => line.length > 0)
+    let sep = separator === 'double' ? /\n\n+/ : '\n'
+    let questions = text.split(sep).map(line => line.trim()).filter(line => line.length > 0)
     questions = Array.from(new Set(questions)) // Remove duplicates
     if (questions.length === 0) {
       setSummaryJSX([<p key="no-data" style={{margin: 0}}>No questions provided.</p>])
@@ -1844,30 +1846,11 @@ export default function Home() {
         </h1>
         <span style={{ color: '#777', fontSize: '14px', marginBottom: '20px', display: 'block' }}>Find common phrases in your list of questions</span>
 
-        <div style={{ marginBottom: '20px', display: 'flex', gap: '10px', alignItems: 'center' }}>
-          <label style={{ color: '#777', fontSize: '14px' }}>
-            Max n-gram length:
-            <input
-              type="number"
-              value={maxN}
-              onChange={(e) => setMaxN(parseInt(e.target.value) || 1)}
-              min="1"
-              max="10"
-              style={{
-                marginLeft: '5px',
-                width: '60px',
-                border: '1px solid #333',
-                padding: '5px',
-                outline: 'none'
-              }}
-            />
-          </label>
-        </div>
 
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="Enter your questions, one per line"
+          placeholder="Enter your questions, one per line or separated by double lines for multi-line sentences"
           style={{
             width: '100%',
             height: '200px',
@@ -1877,6 +1860,29 @@ export default function Home() {
             resize: 'vertical'
           }}
         />
+
+        <div style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'center' }}>
+          <label>
+            Max n-gram length:
+          </label>
+          <input
+              type="number"
+              value={maxN}
+              onChange={(e) => setMaxN(parseInt(e.target.value) || 1)}
+              min="1"
+              max="10"
+            />
+          <label>
+            Line separator:
+            <select
+              value={separator}
+              onChange={(e) => setSeparator(e.target.value)}
+            >
+              <option value="single">Single line</option>
+              <option value="double">Double line</option>
+            </select>
+          </label>
+        </div>
 
         <button onClick={extractTerms} className={styles.button}>
           {loading ? 'Extracting...' : 'Extract Terms'}
