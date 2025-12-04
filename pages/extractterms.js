@@ -1906,7 +1906,7 @@ export default function Home() {
           }}
         />
 
-        <div style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'flex-start' }}>
+        <div style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'flex-start', width: '100%' }}>
           <label>
             Max n-gram length:
           </label>
@@ -1920,8 +1920,8 @@ export default function Home() {
           <label style={{display: 'flex', alignItems: 'center', gap: '5px', width: '100%'}}>
             <input
               type="checkbox"
-              checked={allowSingleNgram}
               style={{width: 10}}
+              checked={allowSingleNgram}
               onChange={(e) => setAllowSingleNgram(e.target.checked)}
             />
             Allow single-word n-grams
