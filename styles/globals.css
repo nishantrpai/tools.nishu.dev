@@ -97,6 +97,7 @@ select {
   border: 1px solid #333;
   width: 100%;
   border-radius: 5px;
+  background-color: #000;
 }
 
 .grid {
