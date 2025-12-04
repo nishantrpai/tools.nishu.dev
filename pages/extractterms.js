@@ -1595,12 +1595,12 @@ const defaultStopwords =[
     "figupons",
     "figupon…"
 ]
-const stopwordSet = new Set(defaultStopwords.map(w => w.toLowerCase()));
+
 
 /**
  * Preprocess a question: lowercase, remove punctuation, tokenize, remove stopwords
  */
-function preprocessQuestion(question, removeStopwords = true) {
+function preprocessQuestion(question, removeStopwords = true, stopwordSet = new Set()) {
     const tokens = question
         .toLowerCase()
         .replace(/[^\w\s]/g, ' ')  // Replace punctuation with spaces
@@ -1629,7 +1629,7 @@ function extractNgrams(tokens, n) {
 /**
  * Check if an n-gram should be filtered out based on content quality
  */
-function shouldFilterNgram(ngram, minContentWords = 1, stopwordsRemoved = true) {
+function shouldFilterNgram(ngram, minContentWords = 1, stopwordsRemoved = true, stopwordSet = new Set()) {
     const words = ngram.split(' ');
 
     // If stopwords were already removed, we mainly check for length and quality
@@ -1666,17 +1666,17 @@ function shouldFilterNgram(ngram, minContentWords = 1, stopwordsRemoved = true) 
 /**
  * Main descending n-gram coverage algorithm
  */
-function descendingNgramCover(sentences, maxN = 10, minSentenceCount = 2, minContentWords = 1, removeStopwords = true) {
+function descendingNgramCover(sentences, maxN = 10, minSentenceCount = 2, minContentWords = 1, removeStopwords = true, stopwordSet = new Set(), minN = 2) {
     // Preprocess all sentences - remove stopwords by default for cleaner n-grams
-    const processedSentences = sentences.map(s => preprocessQuestion(s, removeStopwords));
+    const processedSentences = sentences.map(s => preprocessQuestion(s, removeStopwords, stopwordSet));
 
     // Track coverage
     const covered = new Set();
     const anchors = [];
     const anchorToCoverage = new Map();
 
-    // Descend from maxN to 1
-    for (let n = Math.max(maxN, 1); n >= 1; n--) {
+    // Descend from maxN to minN
+    for (let n = Math.max(maxN, minN); n >= minN; n--) {
         if (covered.size === sentences.length) {
             break;
         }
@@ -1694,7 +1694,7 @@ function descendingNgramCover(sentences, maxN = 10, minSentenceCount = 2, minCon
 
             for (const ngram of ngrams) {
                 // Apply filters
-                if (shouldFilterNgram(ngram, minContentWords, removeStopwords)) continue;
+                if (shouldFilterNgram(ngram, minContentWords, removeStopwords, stopwordSet)) continue;
 
                 if (!ngramMap.has(ngram)) {
                     ngramMap.set(ngram, new Set());
@@ -1757,6 +1757,8 @@ export default function Home() {
   const [maxN, setMaxN] = useState(3)
   const [separator, setSeparator] = useState('single')
   const [filterWords, setFilterWords] = useState('')
+  const [customStopwords, setCustomStopwords] = useState('')
+  const [allowSingleNgram, setAllowSingleNgram] = useState(false)
 
   const extractTerms = async () => {
     setLoading(true)
@@ -1778,7 +1780,12 @@ export default function Home() {
       return
     }
 
-    const result = descendingNgramCover(questions, maxN, 2, 1, true)
+    // Create full stopword set including custom ones
+    const customStopwordsArray = customStopwords.split(',').map(w => w.trim().toLowerCase()).filter(w => w.length > 0)
+    const fullStopwordSet = new Set([...defaultStopwords.map(w => w.toLowerCase()), ...customStopwordsArray])
+
+    const minN = allowSingleNgram ? 1 : 2
+    const result = descendingNgramCover(questions, maxN, 2, 1, true, fullStopwordSet, minN)
 
     const summaryElements = []
 
@@ -1885,7 +1892,21 @@ export default function Home() {
           }}
         />
 
-        <div style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'center' }}>
+        <input
+          type="text"
+          value={customStopwords}
+          onChange={(e) => setCustomStopwords(e.target.value)}
+          placeholder="Enter custom stop words to exclude (comma-separated, e.g., please, help)"
+          style={{
+            width: '100%',
+            border: '1px solid #333',
+            padding: '10px',
+            outline: 'none',
+            marginTop: '10px'
+          }}
+        />
+
+        <div style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'flex-start' }}>
           <label>
             Max n-gram length:
           </label>
@@ -1896,6 +1917,15 @@ export default function Home() {
               min="1"
               max="10"
             />
+          <label style={{display: 'flex', alignItems: 'center', gap: '5px', width: '100%'}}>
+            <input
+              type="checkbox"
+              checked={allowSingleNgram}
+              style={{width: 10}}
+              onChange={(e) => setAllowSingleNgram(e.target.checked)}
+            />
+            Allow single-word n-grams
+          </label>
           <label>
             Line separator:
             <select
