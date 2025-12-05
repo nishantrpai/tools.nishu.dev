@@ -17,7 +17,7 @@ export default function ExplainLikeIWant() {
         method: 'POST',
         body: JSON.stringify({
           prompt: `word: "${text}". More about the idea than actual fact. Negative value for e.g., -100x would indicate opposite. Positive value for e.g., 100x would indicate superlative. Only reply with a * list of words. Give a list of words that is value:${newComplexity}x superlative/opposite more that of the given word.`,
-          model: 'gemini-1.5-flash'
+          model: 'gpt-4o-mini',
         })
       })
   
