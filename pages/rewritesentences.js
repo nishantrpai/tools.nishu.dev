@@ -29,7 +29,7 @@ export default function Home() {
     const results = []
     for (const sentence of sentenceList) {
       try {
-        const prompt = `Rewrite the following sentence into the format: "${template}". Do not hallucinate, derive directly from the sentence. Sentence: ${sentence}`
+        const prompt = `Read this sentence and fill in the blank that would be more accurate: "${template}". Respond with only the filled-in phrase, no explanation. Sentence: ${sentence}`
 
         const response = await fetch(`${lmStudioUrl}/v1/chat/completions`, {
           method: 'POST',
