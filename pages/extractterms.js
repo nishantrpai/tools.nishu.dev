@@ -1756,7 +1756,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false)
   const [maxN, setMaxN] = useState(3)
   const [separator, setSeparator] = useState('single')
-  const [customSeparator, setCustomSeparator] = useState('')
+  const [customSeparator, setCustomSeparator] = useState('---')
   const [filterWords, setFilterWords] = useState('')
   const [customStopwords, setCustomStopwords] = useState('')
   const [allowSingleNgram, setAllowSingleNgram] = useState(false)
