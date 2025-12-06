@@ -2204,6 +2204,20 @@ export const tools = [
     "publishDate": "1 Dec 2025",
     "url": "/extractterms",
     "tags": []
+  },
+  {
+    "title": "Rewrite sentences",
+    "description": "Rewrite differente sentences in one format for faster reading",
+    "publishDate": "6 Dec 2025",
+    "url": "/rewritesentences",
+    "tags": []
+  },
+  {
+    "title": "Things people say when",
+    "description": "Get common things people say when in different situations",
+    "publishDate": "10 Dec 2025",
+    "url": "/thingspeoplesaywhen",
+    "tags": []
   }
 ];
 

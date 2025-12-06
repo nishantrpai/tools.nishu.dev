@@ -1756,13 +1756,21 @@ export default function Home() {
   const [loading, setLoading] = useState(false)
   const [maxN, setMaxN] = useState(3)
   const [separator, setSeparator] = useState('single')
+  const [customSeparator, setCustomSeparator] = useState('')
   const [filterWords, setFilterWords] = useState('')
   const [customStopwords, setCustomStopwords] = useState('')
   const [allowSingleNgram, setAllowSingleNgram] = useState(false)
 
   const extractTerms = async () => {
     setLoading(true)
-    let sep = separator === 'double' ? /\n\n+/ : '\n'
+    let sep;
+    if (separator === 'double') {
+      sep = /\n\n+/;
+    } else if (separator === 'custom') {
+      sep = customSeparator || '\n'; // Default to newline if empty
+    } else {
+      sep = '\n';
+    }
     let questions = text.split(sep).map(line => line.trim()).filter(line => line.length > 0)
     questions = Array.from(new Set(questions)) // Remove duplicates
 
@@ -1934,8 +1942,24 @@ export default function Home() {
             >
               <option value="single">Single line</option>
               <option value="double">Double line</option>
+              <option value="custom">Custom</option>
             </select>
           </label>
+          {separator === 'custom' && (
+            <input
+              type="text"
+              value={customSeparator}
+              onChange={(e) => setCustomSeparator(e.target.value)}
+              placeholder="Enter custom separator, e.g., ; or ---"
+              style={{
+                width: '100%',
+                border: '1px solid #333',
+                padding: '10px',
+                outline: 'none',
+                marginTop: '10px'
+              }}
+            />
+          )}
         </div>
 
         <button onClick={extractTerms} className={styles.button}>
