@@ -1760,6 +1760,8 @@ export default function Home() {
   const [filterWords, setFilterWords] = useState('')
   const [customStopwords, setCustomStopwords] = useState('')
   const [allowSingleNgram, setAllowSingleNgram] = useState(false)
+  const [removeStopwords, setRemoveStopwords] = useState(true)
+  const [removeCustomStopwords, setRemoveCustomStopwords] = useState(true)
 
   const extractTerms = async () => {
     setLoading(true)
@@ -1773,6 +1775,7 @@ export default function Home() {
     }
     let questions = text.split(sep).map(line => line.trim()).filter(line => line.length > 0)
     questions = Array.from(new Set(questions)) // Remove duplicates
+    console.log(questions);
 
     // Filter questions based on filter words
     if (filterWords.trim()) {
@@ -1788,12 +1791,18 @@ export default function Home() {
       return
     }
 
-    // Create full stopword set including custom ones
+    // Create full stopword set including custom ones based on checkboxes
     const customStopwordsArray = customStopwords.split(',').map(w => w.trim().toLowerCase()).filter(w => w.length > 0)
-    const fullStopwordSet = new Set([...defaultStopwords.map(w => w.toLowerCase()), ...customStopwordsArray])
+    const fullStopwordSet = new Set()
+    if (removeStopwords) {
+      defaultStopwords.forEach(w => fullStopwordSet.add(w.toLowerCase()))
+    }
+    if (removeCustomStopwords) {
+      customStopwordsArray.forEach(w => fullStopwordSet.add(w))
+    }
 
     const minN = allowSingleNgram ? 1 : 2
-    const result = descendingNgramCover(questions, maxN, 2, 1, true, fullStopwordSet, minN)
+    const result = descendingNgramCover(questions, maxN, 2, 1, removeStopwords, fullStopwordSet, minN)
 
     const summaryElements = []
 
@@ -1830,10 +1839,10 @@ export default function Home() {
           const parts = question.split(new RegExp(`(${anchor.ngram})`, 'gi'))
           const highlightedParts = parts.map((part, pidx) => 
             part.toLowerCase() === anchor.ngram.toLowerCase() ? 
-              <span key={pidx} style={{backgroundColor: '#333', color: '#aaa', borderRadius: '5px', padding: '1px'}}>{part}</span> : 
+              <span key={pidx} className="highlight" style={{backgroundColor: '#ffff00', color: '#000', borderRadius: '3px', padding: '1px'}}>{part}</span> : 
               part
           )
-          summaryElements.push(<p key={`question-${length}-${i}-${idx}`} style={{margin: 0, fontSize: 10, color: '#555'}}>{`    ${idx}: `}{highlightedParts}</p>)
+          summaryElements.push(<p key={`question-${length}-${i}-${idx}`} className='question-highlight' style={{ margin: 0, fontSize: 10, color: '#555', marginLeft: 20, marginBottom: 20, marginTop: 5}}>{`${idx}: `}{highlightedParts} <br/>----<br/></p>)
         })
         summaryElements.push(<p key={`blank-after-${length}-${i}`} style={{margin: 0}}></p>)
       })
@@ -1848,7 +1857,7 @@ export default function Home() {
       })
       for (let i = 0; i < questions.length; i++) {
         if (!covered.has(i)) {
-          summaryElements.push(<p key={`uncovered-${i}`} style={{margin: 0, fontSize: 10, color: '#333', marginTop: 5}}>{`    ${i}: ${questions[i]}`}</p>)
+          summaryElements.push(<p key={`uncovered-${i}`} style={{margin: 0, fontSize: 10, color: '#555', marginTop: 5, marginLeft: 20, marginBottom: 20}}>{`${i}: ${questions[i]}`} <br/>----<br/></p>)
         }
       }
     }
@@ -1864,6 +1873,11 @@ export default function Home() {
         <meta name="description" content="Extract common terms from a list of questions" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
+      <style>{`
+      .highlight::selection { background: #ffff00; color: #000; }
+      .question-highlight::selection { background: #555; color: #fff; }
+      
+      `}</style>
 
       <main className={styles.container}>
         <h1 className={styles.title}>
@@ -1933,6 +1947,24 @@ export default function Home() {
               onChange={(e) => setAllowSingleNgram(e.target.checked)}
             />
             Allow single-word n-grams
+          </label>
+          <label style={{display: 'flex', alignItems: 'center', gap: '5px', width: '100%'}}>
+            <input
+              type="checkbox"
+              style={{width: 10}}
+              defaultValue={!removeStopwords}
+              onChange={(e) => setRemoveStopwords(e.target.checked)}
+            />
+            Default stop words
+          </label>
+          <label style={{display: 'flex', alignItems: 'center', gap: '5px', width: '100%'}}>
+            <input
+              type="checkbox"
+              style={{width: 10}}
+              defaultValue={!removeCustomStopwords}
+              onChange={(e) => setRemoveCustomStopwords(e.target.checked)}
+            />
+            Custom stop words
           </label>
           <label>
             Line separator:
