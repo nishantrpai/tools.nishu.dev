@@ -1669,23 +1669,14 @@ function descendingNgramCover(sentences, maxN = 10, minSentenceCount = 2, minCon
     // Preprocess all sentences - remove stopwords by default for cleaner n-grams
     const processedSentences = sentences.map(s => preprocessQuestion(s, removeStopwords, stopwordSet));
 
-    // Track coverage
-    const covered = new Set();
     const anchors = [];
-    const anchorToCoverage = new Map();
 
     // Descend from maxN to minN
     for (let n = Math.max(maxN, minN); n >= minN; n--) {
-        if (covered.size === sentences.length) {
-            break;
-        }
-
-        // Build n-gram candidates from uncovered sentences only
+        // Build n-gram candidates from all sentences
         const ngramMap = new Map();
 
         for (let i = 0; i < processedSentences.length; i++) {
-            if (covered.has(i)) continue; // Skip already covered sentences
-
             const tokens = processedSentences[i];
             if (tokens.length < n) continue; // Skip if sentence too short
 
@@ -1702,49 +1693,26 @@ function descendingNgramCover(sentences, maxN = 10, minSentenceCount = 2, minCon
             }
         }
 
-        // Filter by minimum sentence count
-        const candidateNgrams = Array.from(ngramMap.entries())
-            .filter(([ngram, sentenceSet]) => sentenceSet.size >= minSentenceCount)
-            .map(([ngram, sentenceSet]) => ({
-                ngram,
-                sentenceIndices: Array.from(sentenceSet),
-                uncoveredCount: Array.from(sentenceSet).filter(i => !covered.has(i)).length
-            }))
-            .filter(item => item.uncoveredCount > 0)  // Only consider ngrams that cover uncovered sentences
-            .sort((a, b) => b.uncoveredCount - a.uncoveredCount);  // Sort by coverage descending
-
-        // Greedily select the best n-grams at this level
-        for (const candidate of candidateNgrams) {
-            const uncoveredSentences = candidate.sentenceIndices.filter(i => !covered.has(i));
-
-            if (uncoveredSentences.length === 0) continue;  // No new coverage
-
-            // Add this n-gram as an anchor
-            anchors.push({
-                ngram: candidate.ngram,
-                ngramLength: n,
-                sentenceIndices: candidate.sentenceIndices,
-                newlyCovered: uncoveredSentences
-            });
-
-            anchorToCoverage.set(candidate.ngram, candidate.sentenceIndices);
-
-            // Mark sentences as covered
-            uncoveredSentences.forEach(i => covered.add(i));
-
-            // Check if we've covered everything
-            if (covered.size === sentences.length) {
-                break;
+        // Add all n-grams that meet the minimum sentence count
+        for (const [ngram, sentenceSet] of ngramMap) {
+            if (sentenceSet.size >= minSentenceCount) {
+                anchors.push({
+                    ngram,
+                    ngramLength: n,
+                    sentenceIndices: Array.from(sentenceSet)
+                });
             }
         }
-
-        if (covered.size === sentences.length) break;
     }
+
+    // Sort anchors by length descending, then by frequency descending
+    anchors.sort((a, b) => {
+        if (a.ngramLength !== b.ngramLength) return b.ngramLength - a.ngramLength;
+        return b.sentenceIndices.length - a.sentenceIndices.length;
+    });
 
     return {
         anchors,
-        coverage: anchorToCoverage,
-        totalCovered: covered.size,
         totalSentences: sentences.length
     };
 }
@@ -1957,12 +1925,10 @@ export default function Home() {
 
         {result && (
           <div style={{ whiteSpace: 'pre-wrap', fontFamily: 'monospace', textAlign: 'left', padding: '10px', border: '1px solid #333', borderRadius: 10, background: '#000', width: '100%', lineHeight: 1.5, color: '#fff'}}>
-            <p style={{margin: 0}}>{`N-GRAM COVERAGE ANALYSIS - ${new Date().toLocaleString()}`}</p>
+            <p style={{margin: 0}}>{`N-GRAM EXTRACTION ANALYSIS - ${new Date().toLocaleString()}`}</p>
             <p style={{margin: 0}}>{`${'='.repeat(60)}`}</p>
             <p style={{margin: 0}}>{`Total Questions: ${result.totalSentences}`}</p>
             <p style={{margin: 0}}>{`Total Anchors: ${(() => { const filteredAnchors = result.anchors.filter(anchor => anchor.ngram.toLowerCase().includes(searchTerm.toLowerCase())); return filteredAnchors.length; })()}`}</p>
-            <p style={{margin: 0}}>{`Coverage: ${result.totalCovered}/${result.totalSentences} (${((result.totalCovered / result.totalSentences) * 100).toFixed(1)}%)`}</p>
-            <p style={{margin: 0}}>{`Uncovered: ${result.totalSentences - result.totalCovered}`}</p>
             <p style={{margin: 0}}></p>
             <input
               type="text"
@@ -2031,22 +1997,6 @@ export default function Home() {
                 )
               })
             })()}
-            {result.totalCovered < result.totalSentences && (
-              <div>
-                <p style={{marginTop: 10}}>{`UNCOVERED QUESTIONS: (${result.totalSentences - result.totalCovered} questions)`}</p>
-                {(() => {
-                  const covered = new Set()
-                  result.anchors.forEach(anchor => {
-                    anchor.sentenceIndices.forEach(i => covered.add(i))
-                  })
-                  return questions.map((q, i) => 
-                    !covered.has(i) && (
-                      <p key={`uncovered-${i}`} style={{margin: 0, fontSize: 10, color: '#555', marginTop: 5, marginLeft: 20, marginBottom: 20}}>{`${i}: ${q}`} <br/>----</p>
-                    )
-                  )
-                })()}
-              </div>
-            )}
           </div>
         )}
       </main>
