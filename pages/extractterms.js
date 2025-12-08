@@ -12,6 +12,7 @@ const defaultStopwords =[
     "against",
     "all",
     "am",
+    "a",
     "an",
     "and",
     "any",
@@ -1290,6 +1291,7 @@ const defaultStopwords =[
     "wouldn",
     "ws",
     "ye",
+    "yeah",
     "year",
     "years",
     "youll",
@@ -1665,56 +1667,133 @@ function shouldFilterNgram(ngram, minContentWords = 1, stopwordsRemoved = true, 
 /**
  * Main descending n-gram coverage algorithm
  */
-function descendingNgramCover(sentences, maxN = 10, minSentenceCount = 2, minContentWords = 1, removeStopwords = true, stopwordSet = new Set(), minN = 2) {
+function descendingNgramCover(sentences, maxN = 10, minSentenceCount = 2, minContentWords = 1, removeStopwords = true, stopwordSet = new Set(), minN = 2, extractAll = false) {
     // Preprocess all sentences - remove stopwords by default for cleaner n-grams
     const processedSentences = sentences.map(s => preprocessQuestion(s, removeStopwords, stopwordSet));
 
-    const anchors = [];
+    if (extractAll) {
+        const anchors = [];
 
-    // Descend from maxN to minN
-    for (let n = Math.max(maxN, minN); n >= minN; n--) {
-        // Build n-gram candidates from all sentences
-        const ngramMap = new Map();
+        // Descend from maxN to minN
+        for (let n = Math.max(maxN, minN); n >= minN; n--) {
+            // Build n-gram candidates from all sentences
+            const ngramMap = new Map();
 
-        for (let i = 0; i < processedSentences.length; i++) {
-            const tokens = processedSentences[i];
-            if (tokens.length < n) continue; // Skip if sentence too short
+            for (let i = 0; i < processedSentences.length; i++) {
+                const tokens = processedSentences[i];
+                if (tokens.length < n) continue; // Skip if sentence too short
 
-            const ngrams = extractNgrams(tokens, n);
+                const ngrams = extractNgrams(tokens, n);
 
-            for (const ngram of ngrams) {
-                // Apply filters
-                if (shouldFilterNgram(ngram, minContentWords, removeStopwords, stopwordSet)) continue;
+                for (const ngram of ngrams) {
+                    // Apply filters
+                    if (shouldFilterNgram(ngram, minContentWords, removeStopwords, stopwordSet)) continue;
 
-                if (!ngramMap.has(ngram)) {
-                    ngramMap.set(ngram, new Set());
+                    if (!ngramMap.has(ngram)) {
+                        ngramMap.set(ngram, new Set());
+                    }
+                    ngramMap.get(ngram).add(i);
                 }
-                ngramMap.get(ngram).add(i);
+            }
+
+            // Add all n-grams that meet the minimum sentence count
+            for (const [ngram, sentenceSet] of ngramMap) {
+                if (sentenceSet.size >= minSentenceCount) {
+                    anchors.push({
+                        ngram,
+                        ngramLength: n,
+                        sentenceIndices: Array.from(sentenceSet)
+                    });
+                }
             }
         }
 
-        // Add all n-grams that meet the minimum sentence count
-        for (const [ngram, sentenceSet] of ngramMap) {
-            if (sentenceSet.size >= minSentenceCount) {
-                anchors.push({
+        return {
+            anchors,
+            totalSentences: sentences.length,
+            extractAll: true
+        };
+    } else {
+        // Original coverage algorithm
+        const covered = new Set();
+        const anchors = [];
+        const anchorToCoverage = new Map();
+
+        // Descend from maxN to minN
+        for (let n = Math.max(maxN, minN); n >= minN; n--) {
+            if (covered.size === sentences.length) {
+                break;
+            }
+
+            // Build n-gram candidates from uncovered sentences only
+            const ngramMap = new Map();
+
+            for (let i = 0; i < processedSentences.length; i++) {
+                if (covered.has(i)) continue; // Skip already covered sentences
+
+                const tokens = processedSentences[i];
+                if (tokens.length < n) continue; // Skip if sentence too short
+
+                const ngrams = extractNgrams(tokens, n);
+
+                for (const ngram of ngrams) {
+                    // Apply filters
+                    if (shouldFilterNgram(ngram, minContentWords, removeStopwords, stopwordSet)) continue;
+
+                    if (!ngramMap.has(ngram)) {
+                        ngramMap.set(ngram, new Set());
+                    }
+                    ngramMap.get(ngram).add(i);
+                }
+            }
+
+            // Filter by minimum sentence count
+            const candidateNgrams = Array.from(ngramMap.entries())
+                .filter(([ngram, sentenceSet]) => sentenceSet.size >= minSentenceCount)
+                .map(([ngram, sentenceSet]) => ({
                     ngram,
+                    sentenceIndices: Array.from(sentenceSet),
+                    uncoveredCount: Array.from(sentenceSet).filter(i => !covered.has(i)).length
+                }))
+                .filter(item => item.uncoveredCount > 0)  // Only consider ngrams that cover uncovered sentences
+                .sort((a, b) => b.uncoveredCount - a.uncoveredCount);  // Sort by coverage descending
+
+            // Greedily select the best n-grams at this level
+            for (const candidate of candidateNgrams) {
+                const uncoveredSentences = candidate.sentenceIndices.filter(i => !covered.has(i));
+
+                if (uncoveredSentences.length === 0) continue;  // No new coverage
+
+                // Add this n-gram as an anchor
+                anchors.push({
+                    ngram: candidate.ngram,
                     ngramLength: n,
-                    sentenceIndices: Array.from(sentenceSet)
+                    sentenceIndices: candidate.sentenceIndices,
+                    newlyCovered: uncoveredSentences
                 });
+
+                anchorToCoverage.set(candidate.ngram, candidate.sentenceIndices);
+
+                // Mark sentences as covered
+                uncoveredSentences.forEach(i => covered.add(i));
+
+                // Check if we've covered everything
+                if (covered.size === sentences.length) {
+                    break;
+                }
             }
+
+            if (covered.size === sentences.length) break;
         }
+
+        return {
+            anchors,
+            coverage: anchorToCoverage,
+            totalCovered: covered.size,
+            totalSentences: sentences.length,
+            extractAll: false
+        };
     }
-
-    // Sort anchors by length descending, then by frequency descending
-    anchors.sort((a, b) => {
-        if (a.ngramLength !== b.ngramLength) return b.ngramLength - a.ngramLength;
-        return b.sentenceIndices.length - a.sentenceIndices.length;
-    });
-
-    return {
-        anchors,
-        totalSentences: sentences.length
-    };
 }
 
 export default function Home() {
@@ -1733,6 +1812,36 @@ export default function Home() {
   const [questions, setQuestions] = useState([])
   const [expandedAnchors, setExpandedAnchors] = useState(new Set())
   const [searchTerm, setSearchTerm] = useState('')
+  const [extractAll, setExtractAll] = useState(false)
+  const [hideStopwordNgrams, setHideStopwordNgrams] = useState(false)
+  const [lowerRankIntervening, setLowerRankIntervening] = useState(false)
+
+  const hasInterveningStopwords = (ngram, question, stopWords) => {
+    const words = ngram.split(' ');
+    if (words.length < 2) return false; // single word, no intervening
+
+    const questionTokens = preprocessQuestion(question, false, new Set()); // don't remove stop words
+
+    // Find positions of the words in order
+    let pos = 0;
+    const positions = [];
+    for (const word of words) {
+      const idx = questionTokens.indexOf(word, pos);
+      if (idx === -1) return false; // not found in order
+      positions.push(idx);
+      pos = idx + 1;
+    }
+
+    // Check between positions if there are stop words
+    for (let i = 0; i < positions.length - 1; i++) {
+      for (let j = positions[i] + 1; j < positions[i + 1]; j++) {
+        if (stopWords.has(questionTokens[j])) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
 
   const toggleAnchor = (anchorIndex) => {
     const newExpanded = new Set(expandedAnchors)
@@ -1783,7 +1892,7 @@ export default function Home() {
     }
 
     const minN = allowSingleNgram ? 1 : 2
-    const analysisResult = descendingNgramCover(questions, maxN, 2, 1, removeStopwords, fullStopwordSet, minN)
+    const analysisResult = descendingNgramCover(questions, maxN, 2, 1, removeStopwords, fullStopwordSet, minN, extractAll)
 
     setResult(analysisResult)
     setQuestions(questions)
@@ -1886,10 +1995,10 @@ export default function Home() {
             <input
               type="checkbox"
               style={{width: 10}}
-              defaultValue={!removeCustomStopwords}
-              onChange={(e) => setRemoveCustomStopwords(e.target.checked)}
+              checked={extractAll}
+              onChange={(e) => setExtractAll(e.target.checked)}
             />
-            Custom stop words
+            Extract all possible n-grams (instead of minimal coverage)
           </label>
           <label>
             Line separator:
@@ -1925,10 +2034,28 @@ export default function Home() {
 
         {result && (
           <div style={{ whiteSpace: 'pre-wrap', fontFamily: 'monospace', textAlign: 'left', padding: '10px', border: '1px solid #333', borderRadius: 10, background: '#000', width: '100%', lineHeight: 1.5, color: '#fff'}}>
-            <p style={{margin: 0}}>{`N-GRAM EXTRACTION ANALYSIS - ${new Date().toLocaleString()}`}</p>
+            <p style={{margin: 0}}>{`${result.extractAll ? 'N-GRAM EXTRACTION ANALYSIS' : 'N-GRAM COVERAGE ANALYSIS'} - ${new Date().toLocaleString()}`}</p>
             <p style={{margin: 0}}>{`${'='.repeat(60)}`}</p>
             <p style={{margin: 0}}>{`Total Questions: ${result.totalSentences}`}</p>
-            <p style={{margin: 0}}>{`Total Anchors: ${(() => { const filteredAnchors = result.anchors.filter(anchor => anchor.ngram.toLowerCase().includes(searchTerm.toLowerCase())); return filteredAnchors.length; })()}`}</p>
+            <p style={{margin: 0}}>{`Total Anchors: ${(() => { 
+              let filteredAnchors = result.anchors.filter(anchor => anchor.ngram.toLowerCase().includes(searchTerm.toLowerCase()))
+              if (hideStopwordNgrams) {
+                const stopWords = new Set([
+                  ...defaultStopwords,
+                  ...customStopwords.split(',').map(w => w.trim().toLowerCase()).filter(w => w.length > 0)
+                ])
+                filteredAnchors = filteredAnchors.filter(anchor => 
+                  !anchor.ngram.split(' ').some(word => stopWords.has(word))
+                )
+              }
+              return filteredAnchors.length; 
+            })()}`}</p>
+            {!result.extractAll && (
+              <>
+                <p style={{margin: 0}}>{`Coverage: ${result.totalCovered}/${result.totalSentences} (${((result.totalCovered / result.totalSentences) * 100).toFixed(1)}%)`}</p>
+                <p style={{margin: 0}}>{`Uncovered: ${result.totalSentences - result.totalCovered}`}</p>
+              </>
+            )}
             <p style={{margin: 0}}></p>
             <input
               type="text"
@@ -1945,10 +2072,51 @@ export default function Home() {
                 color: '#fff'
               }}
             />
+            <label style={{display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '10px'}}>
+              <input
+                type="checkbox"
+                style={{width: 10}}
+                checked={hideStopwordNgrams}
+                onChange={(e) => setHideStopwordNgrams(e.target.checked)}
+              />
+              Hide n-grams containing stop words
+            </label>
+            <label style={{display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '10px'}}>
+              <input
+                type="checkbox"
+                style={{width: 10}}
+                checked={lowerRankIntervening}
+                onChange={(e) => setLowerRankIntervening(e.target.checked)}
+              />
+              Lower rank n-grams with intervening stop words
+            </label>
             <p style={{margin: 0}}>ANCHORS BY LENGTH:</p>
             <p style={{margin: 0}}></p>
             {(() => {
-              const filteredAnchors = result.anchors.filter(anchor => anchor.ngram.toLowerCase().includes(searchTerm.toLowerCase()))
+              let filteredAnchors = result.anchors.filter(anchor => anchor.ngram.toLowerCase().includes(searchTerm.toLowerCase()))
+              if (hideStopwordNgrams) {
+                const stopWords = new Set([
+                  ...defaultStopwords,
+                  ...customStopwords.split(',').map(w => w.trim().toLowerCase()).filter(w => w.length > 0)
+                ])
+                filteredAnchors = filteredAnchors.filter(anchor => 
+                  !anchor.ngram.split(' ').some(word => stopWords.has(word))
+                )
+              }
+              // Add hasIntervening
+              const stopWords = new Set([
+                ...defaultStopwords,
+                ...customStopwords.split(',').map(w => w.trim().toLowerCase()).filter(w => w.length > 0)
+              ])
+              filteredAnchors.forEach(anchor => {
+                anchor.hasIntervening = anchor.sentenceIndices.some(idx => hasInterveningStopwords(anchor.ngram, questions[idx], stopWords));
+              });
+              // Sort
+              filteredAnchors.sort((a, b) => {
+                if (a.ngramLength !== b.ngramLength) return b.ngramLength - a.ngramLength;
+                if (lowerRankIntervening && a.hasIntervening !== b.hasIntervening) return a.hasIntervening ? 1 : -1; // false first
+                return b.sentenceIndices.length - a.sentenceIndices.length;
+              });
               const byLength = new Map()
               filteredAnchors.forEach((anchor, index) => {
                 if (!byLength.has(anchor.ngramLength)) {
@@ -1985,7 +2153,7 @@ export default function Home() {
                                     part
                                 )
                                 return (
-                                  <p key={`question-${length}-${i}-${idx}`} className='question-highlight' style={{ margin: 0, fontSize: 10, color: '#555', marginBottom: 20, marginTop: 5}}>{`${idx}: `}{highlightedParts} <br/>----</p>
+                                  <p key={`question-${length}-${i}-${idx}`} className='question-highlight' style={{ margin: 0, fontSize: 10, color: '#555', marginBottom: 20, marginTop: 5}}>{`${idx}: `}{highlightedParts} <br/><span style={{color: '#ccc'}}>----</span></p>
                                 )
                               })}
                             </div>
@@ -1997,6 +2165,22 @@ export default function Home() {
                 )
               })
             })()}
+            {!result.extractAll && result.totalCovered < result.totalSentences && (
+              <div>
+                <p style={{marginTop: 10}}>{`UNCOVERED QUESTIONS: (${result.totalSentences - result.totalCovered} questions)`}</p>
+                {(() => {
+                  const covered = new Set()
+                  result.anchors.forEach(anchor => {
+                    anchor.sentenceIndices.forEach(i => covered.add(i))
+                  })
+                  return questions.map((q, i) => 
+                    !covered.has(i) && (
+                      <p key={`uncovered-${i}`} style={{margin: 0, fontSize: 10, color: '#555', marginTop: 5, marginLeft: 20, marginBottom: 20}}>{`${i}: ${q}`} <br/>----</p>
+                    )
+                  )
+                })()}
+              </div>
+            )}
           </div>
         )}
       </main>
