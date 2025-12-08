@@ -1,7 +1,7 @@
-// Extract terms from a list of sentences using descending n-gram cover
 import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { useState, useEffect } from 'react'
+import { FiPlus, FiMinus } from 'react-icons/fi'
 
 // Default stopwords
 const defaultStopwords =[
@@ -1596,7 +1596,6 @@ const defaultStopwords =[
     "figupon…"
 ]
 
-
 /**
  * Preprocess a question: lowercase, remove punctuation, tokenize, remove stopwords
  */
@@ -1762,6 +1761,20 @@ export default function Home() {
   const [allowSingleNgram, setAllowSingleNgram] = useState(false)
   const [removeStopwords, setRemoveStopwords] = useState(true)
   const [removeCustomStopwords, setRemoveCustomStopwords] = useState(true)
+  const [result, setResult] = useState(null)
+  const [questions, setQuestions] = useState([])
+  const [expandedAnchors, setExpandedAnchors] = useState(new Set())
+  const [searchTerm, setSearchTerm] = useState('')
+
+  const toggleAnchor = (anchorIndex) => {
+    const newExpanded = new Set(expandedAnchors)
+    if (newExpanded.has(anchorIndex)) {
+      newExpanded.delete(anchorIndex)
+    } else {
+      newExpanded.add(anchorIndex)
+    }
+    setExpandedAnchors(newExpanded)
+  }
 
   const extractTerms = async () => {
     setLoading(true)
@@ -1802,67 +1815,11 @@ export default function Home() {
     }
 
     const minN = allowSingleNgram ? 1 : 2
-    const result = descendingNgramCover(questions, maxN, 2, 1, removeStopwords, fullStopwordSet, minN)
+    const analysisResult = descendingNgramCover(questions, maxN, 2, 1, removeStopwords, fullStopwordSet, minN)
 
-    const summaryElements = []
-
-    summaryElements.push(<p key="header" style={{margin: 0}}>{`N-GRAM COVERAGE ANALYSIS - ${new Date().toLocaleString()}`}</p>)
-    summaryElements.push(<p key="line" style={{margin: 0}}>{`${'='.repeat(60)}`}</p>)
-    summaryElements.push(<p key="total" style={{margin: 0}}>{`Total Questions: ${result.totalSentences}`}</p>)
-    summaryElements.push(<p key="anchors" style={{margin: 0}}>{`Total Anchors: ${result.anchors.length}`}</p>)
-    summaryElements.push(<p key="coverage" style={{margin: 0}}>{`Coverage: ${result.totalCovered}/${result.totalSentences} (${((result.totalCovered / result.totalSentences) * 100).toFixed(1)}%)`}</p>)
-    summaryElements.push(<p key="uncovered" style={{margin: 0}}>{`Uncovered: ${result.totalSentences - result.totalCovered}`}</p>)
-    summaryElements.push(<p key="blank1" style={{margin: 0}}></p>)
-
-    // Group by length
-    const byLength = new Map()
-    result.anchors.forEach(anchor => {
-      if (!byLength.has(anchor.ngramLength)) {
-        byLength.set(anchor.ngramLength, [])
-      }
-      byLength.get(anchor.ngramLength).push(anchor)
-    })
-
-    summaryElements.push(<p key="anchors-header" style={{margin: 0}}>ANCHORS BY LENGTH:</p>)
-    summaryElements.push(<p key="blank2" style={{margin: 0}}></p>)
-
-    const sortedLengths = Array.from(byLength.keys()).sort((a, b) => b - a)
-    sortedLengths.forEach(length => {
-      const anchors = byLength.get(length)
-      const totalCoveredByLength = anchors.reduce((sum, anchor) => sum + anchor.sentenceIndices.length, 0)
-      summaryElements.push(<p key={`length-${length}`} style={{marginTop: 20}}>{`${length}-word (${totalCoveredByLength} questions):`}</p>)
-      anchors.forEach((anchor, i) => {
-        summaryElements.push(<p key={`anchor-${length}-${i}`} style={{marginTop: 10}}>{`  ${i+1}. "${anchor.ngram}" (${anchor.sentenceIndices.length} questions)`}</p>)
-        summaryElements.push(<p key={`blank-anchor-${length}-${i}`} style={{margin: 0}}></p>)
-        anchor.sentenceIndices.forEach(idx => {
-          const question = questions[idx]
-          const parts = question.split(new RegExp(`(${anchor.ngram})`, 'gi'))
-          const highlightedParts = parts.map((part, pidx) => 
-            part.toLowerCase() === anchor.ngram.toLowerCase() ? 
-              <span key={pidx} className="highlight" style={{backgroundColor: '#ffff00', color: '#000', borderRadius: '3px', padding: '1px'}}>{part}</span> : 
-              part
-          )
-          summaryElements.push(<p key={`question-${length}-${i}-${idx}`} className='question-highlight' style={{ margin: 0, fontSize: 10, color: '#555', marginLeft: 20, marginBottom: 20, marginTop: 5}}>{`${idx}: `}{highlightedParts} <br/>----<br/></p>)
-        })
-        summaryElements.push(<p key={`blank-after-${length}-${i}`} style={{margin: 0}}></p>)
-      })
-      summaryElements.push(<p key={`blank-length-${length}`} style={{margin: 0}}></p>)
-    })
-
-    if (result.totalCovered < result.totalSentences) {
-      summaryElements.push(<p key="uncovered-header" style={{marginTop: 10}}>{`UNCOVERED QUESTIONS: (${result.totalSentences - result.totalCovered} questions)`}</p>)
-      const covered = new Set()
-      result.anchors.forEach(anchor => {
-        anchor.sentenceIndices.forEach(i => covered.add(i))
-      })
-      for (let i = 0; i < questions.length; i++) {
-        if (!covered.has(i)) {
-          summaryElements.push(<p key={`uncovered-${i}`} style={{margin: 0, fontSize: 10, color: '#555', marginTop: 5, marginLeft: 20, marginBottom: 20}}>{`${i}: ${questions[i]}`} <br/>----<br/></p>)
-        }
-      }
-    }
-
-    setSummaryJSX(summaryElements)
+    setResult(analysisResult)
+    setQuestions(questions)
+    setExpandedAnchors(new Set()) // Reset expanded state
     setLoading(false)
   }
 
@@ -1998,9 +1955,98 @@ export default function Home() {
           {loading ? 'Extracting...' : 'Extract Terms'}
         </button>
 
-        {summaryJSX.length > 0 && (
-          <div style={{ whiteSpace: 'pre-wrap', fontFamily: 'monospace', textAlign: 'left', padding: '10px', border: '1px solid #333', borderRadius: 10, background: '#000', width: '100%', lineHeight: 1.5}}>
-            {summaryJSX}
+        {result && (
+          <div style={{ whiteSpace: 'pre-wrap', fontFamily: 'monospace', textAlign: 'left', padding: '10px', border: '1px solid #333', borderRadius: 10, background: '#000', width: '100%', lineHeight: 1.5, color: '#fff'}}>
+            <p style={{margin: 0}}>{`N-GRAM COVERAGE ANALYSIS - ${new Date().toLocaleString()}`}</p>
+            <p style={{margin: 0}}>{`${'='.repeat(60)}`}</p>
+            <p style={{margin: 0}}>{`Total Questions: ${result.totalSentences}`}</p>
+            <p style={{margin: 0}}>{`Total Anchors: ${(() => { const filteredAnchors = result.anchors.filter(anchor => anchor.ngram.toLowerCase().includes(searchTerm.toLowerCase())); return filteredAnchors.length; })()}`}</p>
+            <p style={{margin: 0}}>{`Coverage: ${result.totalCovered}/${result.totalSentences} (${((result.totalCovered / result.totalSentences) * 100).toFixed(1)}%)`}</p>
+            <p style={{margin: 0}}>{`Uncovered: ${result.totalSentences - result.totalCovered}`}</p>
+            <p style={{margin: 0}}></p>
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search n-grams..."
+              style={{
+                width: '100%',
+                border: '1px solid #333',
+                padding: '5px',
+                outline: 'none',
+                marginBottom: '10px',
+                background: '#111',
+                color: '#fff'
+              }}
+            />
+            <p style={{margin: 0}}>ANCHORS BY LENGTH:</p>
+            <p style={{margin: 0}}></p>
+            {(() => {
+              const filteredAnchors = result.anchors.filter(anchor => anchor.ngram.toLowerCase().includes(searchTerm.toLowerCase()))
+              const byLength = new Map()
+              filteredAnchors.forEach((anchor, index) => {
+                if (!byLength.has(anchor.ngramLength)) {
+                  byLength.set(anchor.ngramLength, [])
+                }
+                byLength.get(anchor.ngramLength).push({ ...anchor, globalIndex: index })
+              })
+              const sortedLengths = Array.from(byLength.keys()).sort((a, b) => b - a)
+              return sortedLengths.map(length => {
+                const anchors = byLength.get(length)
+                const totalCoveredByLength = anchors.reduce((sum, anchor) => sum + anchor.sentenceIndices.length, 0)
+                return (
+                  <div key={`length-${length}`}>
+                    <p style={{marginTop: 20}}>{`${length}-word (${totalCoveredByLength} questions):`}</p>
+                    {anchors.map((anchor, i) => {
+                      const isExpanded = expandedAnchors.has(anchor.globalIndex)
+                      return (
+                        <div key={`anchor-${length}-${i}`}>
+                          <div 
+                            style={{marginTop: 10, cursor: 'pointer', display: 'flex', alignItems: 'center'}}
+                            onClick={() => toggleAnchor(anchor.globalIndex)}
+                          >
+                            {isExpanded ? <FiMinus style={{marginRight: 5}} /> : <FiPlus style={{marginRight: 5}} />}
+                            {`  ${i+1}. "${anchor.ngram}" (${anchor.sentenceIndices.length} questions)`}
+                          </div>
+                          {isExpanded && (
+                            <div style={{marginLeft: 20}}>
+                              {anchor.sentenceIndices.map(idx => {
+                                const question = questions[idx]
+                                const parts = question.split(new RegExp(`(${anchor.ngram})`, 'gi'))
+                                const highlightedParts = parts.map((part, pidx) => 
+                                  part.toLowerCase() === anchor.ngram.toLowerCase() ? 
+                                    <span key={pidx} className="highlight" style={{backgroundColor: '#ffff00', color: '#000', borderRadius: '3px', padding: '1px'}}>{part}</span> : 
+                                    part
+                                )
+                                return (
+                                  <p key={`question-${length}-${i}-${idx}`} className='question-highlight' style={{ margin: 0, fontSize: 10, color: '#555', marginBottom: 20, marginTop: 5}}>{`${idx}: `}{highlightedParts} <br/>----</p>
+                                )
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                )
+              })
+            })()}
+            {result.totalCovered < result.totalSentences && (
+              <div>
+                <p style={{marginTop: 10}}>{`UNCOVERED QUESTIONS: (${result.totalSentences - result.totalCovered} questions)`}</p>
+                {(() => {
+                  const covered = new Set()
+                  result.anchors.forEach(anchor => {
+                    anchor.sentenceIndices.forEach(i => covered.add(i))
+                  })
+                  return questions.map((q, i) => 
+                    !covered.has(i) && (
+                      <p key={`uncovered-${i}`} style={{margin: 0, fontSize: 10, color: '#555', marginTop: 5, marginLeft: 20, marginBottom: 20}}>{`${i}: ${q}`} <br/>----</p>
+                    )
+                  )
+                })()}
+              </div>
+            )}
           </div>
         )}
       </main>
