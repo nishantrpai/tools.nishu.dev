@@ -15,6 +15,7 @@ but I'm not sure.`)
   const [showJson, setShowJson] = useState(false)
   const [highlightedText, setHighlightedText] = useState('')
   const [extractIndex, setExtractIndex] = useState('4')
+  const [searchFilter, setSearchFilter] = useState('')
 
 
 
@@ -78,8 +79,15 @@ but I'm not sure.`)
       
       setHighlightedText(highlightedHtml)
       // Create column array for specific index
-      const columnArray = extractIndex ? 
+      let columnArray = extractIndex ? 
         matches.map(match => match.groups[parseInt(extractIndex) - 1] || '').filter(v => v.trim()) : []
+      
+      // Filter column array based on search filter
+      if (searchFilter.trim()) {
+        columnArray = columnArray.filter(value => 
+          value.toLowerCase().includes(searchFilter.toLowerCase())
+        )
+      }
       
       setResult({
         matches,
@@ -105,7 +113,7 @@ but I'm not sure.`)
     }, 300)
     
     return () => clearTimeout(debounceTimer)
-  }, [regexPattern, flags, text, extractIndex])
+  }, [regexPattern, flags, text, extractIndex, searchFilter])
 
   return (
     <>
@@ -251,6 +259,8 @@ but I'm not sure.`)
           />
         </div>
 
+       
+
         {/* Live Preview */}
 
         {/* Results */}
@@ -272,6 +282,20 @@ but I'm not sure.`)
               color: '#fff',
               overflow: 'hidden'
             }}>
+               {/* Search Filter */}
+        <div style={{ margin: 'auto', width: '95%' }}>
+          <input
+            type="text"
+            value={searchFilter}
+            onChange={(e) => setSearchFilter(e.target.value)}
+            placeholder="Search extracted values..."
+          />
+          {searchFilter.trim() && result && result.columnArray && (
+            <span style={{ color: '#777', fontSize: '12px', marginTop: '5px', display: 'block' }}>
+              Showing {result.columnArray.length} of {result.extractedValues ? result.extractedValues.filter(ev => ev.group === parseInt(extractIndex)).length : 0} results
+            </span>
+          )}
+        </div>
               {/* Column Array Section */}
               {result.columnArray && result.columnArray.length > 0 && (
                 <div style={{ padding: '15px', borderBottom: '1px solid #333' }}>
