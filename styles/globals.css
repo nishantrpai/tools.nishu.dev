@@ -196,6 +196,13 @@ input[type='range']::-webkit-slider-runnable-track {
   border-radius: 5px;
 }
 
+/* checkbox input css */
+input[type="checkbox"] {
+  width: 10px;
+  height: 10px;
+  cursor: pointer;
+}
+
 /* change the input color select */
 input[type="color"] {
 	border: none;
