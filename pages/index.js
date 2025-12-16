@@ -2225,6 +2225,13 @@ export const tools = [
     "publishDate": "15 Dec 2025",
     "url": "/bulkfind",
     "tags": []
+  },
+  {
+    "title": "Reconcile",
+    "description": "Reconcile internal desire with external situation",
+    "publishDate": "20 Dec 2025",
+    "url": "/reconcile",
+    "tags": []
   }
 ];
 
