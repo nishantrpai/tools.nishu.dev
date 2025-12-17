@@ -2227,10 +2227,10 @@ export const tools = [
     "tags": []
   },
   {
-    "title": "Reconcile",
-    "description": "Reconcile internal desire with external situation",
+    "title": "Closure",
+    "description": "Achieve internal closure for your mind, body and soul",
     "publishDate": "20 Dec 2025",
-    "url": "/reconcile",
+    "url": "/closure",
     "tags": []
   }
 ];
