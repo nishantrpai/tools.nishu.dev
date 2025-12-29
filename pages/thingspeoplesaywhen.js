@@ -12,7 +12,7 @@ export default function Home() {
     if (!situation.trim()) return
     setLoading(true)
     try {
-      const res = await fetch(`/api/gpt?prompt=List things people say when ${situation}. Make it a bulleted list.`)
+      const res = await fetch(`/api/gpt?prompt=List 10 things people say when ${situation}. Make it a bulleted list.`)
       const data = await res.json()
       setResponse(data.response)
     } catch (error) {
@@ -54,7 +54,7 @@ export default function Home() {
         </button>
 
         {response && (
-          <div style={{ whiteSpace: 'pre-wrap', fontFamily: 'monospace', textAlign: 'left', padding: '10px', border: '1px solid #333', background: '#333', width: '100%', lineHeight: 1.5, marginTop: '20px'}}>
+          <div style={{ whiteSpace: 'pre-wrap', fontFamily: 'monospace', textAlign: 'left', padding: '10px', border: '1px solid #333', borderRadius: 10, background: '#000', width: '100%', lineHeight: 1.5, marginTop: '20px'}}>
             {response}
           </div>
         )}
