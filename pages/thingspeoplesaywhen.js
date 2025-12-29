@@ -12,7 +12,7 @@ export default function Home() {
     if (!situation.trim()) return
     setLoading(true)
     try {
-      const res = await fetch(`/api/gpt?prompt=List 10 things people say when ${situation}. Make it a bulleted list.`)
+      const res = await fetch(`/api/gpt?prompt=List 5 things people say when ${situation}. Make it a bulleted list.`)
       const data = await res.json()
       setResponse(data.response)
     } catch (error) {
