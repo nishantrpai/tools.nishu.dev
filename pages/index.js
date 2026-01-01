@@ -2232,6 +2232,13 @@ export const tools = [
     "publishDate": "20 Dec 2025",
     "url": "/closure",
     "tags": []
+  },
+  {
+    "title": "Why do they say what they say",
+    "description": "Understand the why behind questions",
+    "publishDate": "25 Dec 2025",
+    "url": "/whydotheysay",
+    "tags": []
   }
 ];
 
