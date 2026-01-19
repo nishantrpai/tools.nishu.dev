@@ -22,7 +22,7 @@ export default function HigherItalicVideo() {
   const [enterAnimation, setEnterAnimation] = useState('fade')
   const [exitAnimation, setExitAnimation] = useState('fade')
   const [animationDuration, setAnimationDuration] = useState(0.5) // in seconds
-  const nikeDuration = 2; // seconds for nike ending
+  const nikeDuration = 1; // seconds for nike ending
   const canvasRef = useRef(null)
   const videoRef = useRef(null)
   const animationRef = useRef(null)
