@@ -15,6 +15,9 @@ export default function HigherHat() {
   const [imgHeight, setImgHeight] = useState(0)
   const [hatType, setHatType] = useState(0)
   const canvasRef = useRef(null)
+  const HAT_WIDTH = 40;
+  const FRAME_WIDTH = 50;
+  const HAT_MARGIN = 10;
 
   let RPC_CHAINS = {
     'ETHEREUM': {
@@ -80,6 +83,7 @@ export default function HigherHat() {
   const higherHat2 = '/higherhat2.png'
   const higherHat3 = '/higherhat3.png'
   const higherCrown = '/highercrown.png'
+  const higherHatBW = '/higherhat_bw.png'
 
   useEffect(() => {
     // draw image on canvas
@@ -87,9 +91,11 @@ export default function HigherHat() {
     const context = canvas.getContext('2d')
     context.beginPath()
     if (image) {
-      canvas.width = imgWidth
-      canvas.height = imgHeight
-      context.clearRect(0, 0, canvas.width, canvas.height)
+      const displayScale = Math.min(400 / imgWidth, 400 / imgHeight) || 1
+      canvas.width = imgWidth * displayScale
+      canvas.height = imgHeight * displayScale
+      context.scale(displayScale, displayScale)
+      context.clearRect(0, 0, canvas.width / displayScale, canvas.height / displayScale)
       context.drawImage(image, 0, 0, image.width, image.height)
       const hat = new Image()
       if (hatType === 0)
@@ -102,6 +108,8 @@ export default function HigherHat() {
         hat.src = higherCrown
       else if (hatType === 4)
         hat.src = higherHat4
+      else if (hatType === 5)
+        hat.src = higherHatBW
 
       hat.crossOrigin = 'anonymous'
 
@@ -113,18 +121,18 @@ export default function HigherHat() {
         context.closePath()
       }
     }
-  }, [image, offsetX, offsetY, scale, offsetTheta, hatType, higherHat4])
+  }, [image, offsetX, offsetY, scale, offsetTheta, hatType, higherHat4, imgWidth, imgHeight])
 
   useEffect(() => {
-    getNFTData(contract, tokenId).then(data => {
-      // set image higherhat4 
-      const img = new Image()
-      img.src = data.image
-      setHigherHat4(data.image)
-      // img.onload = () => {
-      //   setHigherHat4(img)
-      // }
-    })
+    // getNFTData(contract, tokenId).then(data => {
+    //   // set image higherhat4 
+    //   const img = new Image()
+    //   img.src = data.image
+    //   setHigherHat4(data.image)
+    //   // img.onload = () => {
+    //   //   setHigherHat4(img)
+    //   // }
+    // })
   }, [chain, contract, tokenId])
 
   const handlePaste = (e) => {
@@ -197,74 +205,86 @@ export default function HigherHat() {
           }
           reader.readAsDataURL(file)
         }} />
-        <div style={{ display: 'flex', gap: 20, margin: '20px 0' }}>
-          <canvas ref={canvasRef} id="canvas" width="800" height="800" style={{
-            border: '1px solid #333',
-            borderRadius: 10,
-            maxHeight: 500,
-            height: 'auto',
-            flexBasis: '95%'
-          }}></canvas>
 
-          <div>
+                  <div style={{ display: 'flex', gap: 20, justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', gap: 20, justifyContent: 'space-between' }}>
               <div style={{
-                width: 100,
-                height: 100,
+                width: FRAME_WIDTH,
+                height: FRAME_WIDTH,
                 border: hatType === 0 ? '2px solid #333' : '2px solid #111',
                 borderRadius: 10,
-                padding: 10
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
               }}>
                 <img src={higherHat} alt="Higher Hat" style={{
-                  height: 'auto', width: 70,
-                  margin: 'auto',
-                  marginTop: 20,
+                  height: 'auto', 
+                  width: HAT_WIDTH
                 }} onClick={() => setHatType(0)} />
               </div>
             </div>
             <div style={{
-              width: 100,
-              height: 100,
+              width: FRAME_WIDTH,
+              height: FRAME_WIDTH,
               border: hatType === 1 ? '2px solid #333' : '2px solid #111',
-              borderRadius: 10
+              borderRadius: 10,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
             }}>
               <img src={higherHat2} alt="Higher Hat 2" style={{
-                width: '80%', height: 'auto',
-                margin: 'auto',
-                marginTop: 30,
-                marginLeft: 10
+                width: HAT_WIDTH, 
+                height: 'auto'
               }} onClick={() => setHatType(1)} />
             </div>
             <div style={{
-              width: 100,
-              height: 100,
+              width: FRAME_WIDTH,
+              height: FRAME_WIDTH,
               border: hatType === 2 ? '2px solid #333' : '2px solid #111',
-              borderRadius: 10
+              borderRadius: 10,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
             }}>
               <img src={higherHat3} alt="Higher Hat 3" style={{
-                width: 100, height: 'auto',
-                marginTop: 20,
+                width: HAT_WIDTH, 
+                height: 'auto'
               }} onClick={() => setHatType(2)} />
             </div>
             <div style={{
-              width: 100,
-              height: 100,
+              width: FRAME_WIDTH,
+              height: FRAME_WIDTH,
               border: hatType === 3 ? '2px solid #333' : '2px solid #111',
-              borderRadius: 10
+              borderRadius: 10,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
             }}>
               <img src={higherCrown} alt="Higher Crown" style={{
-                width: 100, height: 'auto',
-                marginTop: 20,
+                width: HAT_WIDTH, height: 'auto'
               }} onClick={() => setHatType(3)} />
             </div>
-
             <div style={{
-              width: 100,
+              width: FRAME_WIDTH,
+              height: FRAME_WIDTH,
+              border: hatType === 5 ? '2px solid #333' : '2px solid #111',
+              borderRadius: 10,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <img src={higherHatBW} alt="Higher Hat BW" style={{
+                width: HAT_WIDTH, height: 'auto'
+              }} onClick={() => setHatType(5)} />
+            </div>
+
+            {/* <div style={{
+              width: FRAME_WIDTH,
               border: hatType === 4 ? '2px solid #333' : '2px solid #111',
               borderRadius: 10
             }}>
               <img src={higherHat4} alt="Higher Hat 4" style={{
-                width: 100, height: 'auto',
+                width: FRAME_WIDTH, height: 'auto',
                 marginTop: 20,
               }} onClick={() => { setHatType(4)
               setScale(0.25)
@@ -272,17 +292,28 @@ export default function HigherHat() {
               <input type="number" value={tokenId} onChange={(e) => {
                 setTokenId(e.target.value)
               }} style={{
-                width: 100,
+                width: FRAME_WIDTH,
                 marginTop: 10,
                 borderRadius: 5,
                 backgroundColor: '#000',
                 border: '1px solid #333',
                 padding: 5,
               }} />
-            </div>
+            </div> */}
 
 
           </div>
+
+          <canvas ref={canvasRef} id="canvas" width="400" height="400" style={{
+            border: '1px solid #333',
+            borderRadius: 10,
+            maxHeight: 500,
+            height: 'auto',
+            flexBasis: '95%'
+          }}></canvas>
+
+        <div style={{ display: 'flex', gap: 20, margin: '20px 0' }}>
+
         </div>
 
 
@@ -309,8 +340,31 @@ export default function HigherHat() {
           <input type="number" value={offsetTheta} onChange={(e) => setOffsetTheta(e.target.value)} />
         </div>
 
-        <button onClick={() => {
-          const canvas = canvasRef.current
+        <button onClick={async () => {
+          if (!image) return
+          const canvas = document.createElement('canvas')
+          canvas.width = imgWidth
+          canvas.height = imgHeight
+          const context = canvas.getContext('2d')
+          context.drawImage(image, 0, 0)
+          const hat = new Image()
+          if (hatType === 0)
+            hat.src = higherHat
+          else if (hatType === 1)
+            hat.src = higherHat2
+          else if (hatType === 2)
+            hat.src = higherHat3
+          else if (hatType === 3)
+            hat.src = higherCrown
+          else if (hatType === 4)
+            hat.src = higherHat4
+          else if (hatType === 5)
+            hat.src = higherHatBW
+          hat.crossOrigin = 'anonymous'
+          await new Promise(resolve => hat.onload = resolve)
+          context.translate(offsetX, offsetY)
+          context.rotate(offsetTheta * Math.PI / 180)
+          context.drawImage(hat, offsetX, offsetY, hat.width * scale, hat.height * scale)
           const dataURL = canvas.toDataURL('image/png')
           const a = document.createElement('a')
           a.href = dataURL

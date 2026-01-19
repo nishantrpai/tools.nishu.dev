@@ -2239,6 +2239,13 @@ export const tools = [
     "publishDate": "25 Dec 2025",
     "url": "/whydotheysay",
     "tags": []
+  },
+  {
+    "title": "Generate JSON for Indian GST Filing",
+    "description": "Generate JSON for Indian GST Filing",
+    "publishDate": "30 Dec 2025",
+    "url": "/indiagstjson",
+    "tags": []
   }
 ];
 
