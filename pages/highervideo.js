@@ -81,6 +81,7 @@ export default function HigherItalicVideo() {
 
   // Asset paths
   const assetPaths = {
+    'None': null,
     'Helvetica': '/higherhelvetica.svg',
     'Times New Roman': '/higheritalic.svg',
     'Comic Sans': '/highercomicsans.svg',
@@ -92,7 +93,7 @@ export default function HigherItalicVideo() {
 
   useEffect(() => {
     // Preload the italic image with the selected asset
-    if (italicRef.current) {
+    if (italicRef.current && selectedAsset !== 'None') {
       const assetPath = assetPaths[selectedAsset] || '/higheritalic.svg'
       
       // For colored SVG assets
@@ -352,7 +353,7 @@ export default function HigherItalicVideo() {
       if (currentTime >= startTime && currentTime <= endTime) {
         // Draw higher italic centered with animation
         const italic = italicRef.current
-        if (italic && italic.complete) {
+        if (italic && italic.complete && selectedAsset !== 'None') {
           // Check if this is an entrance or exit animation
           const isEntering = currentTime < startTime + animationDuration;
           const progress = calculateAnimationProgress(currentTime);
@@ -366,19 +367,19 @@ export default function HigherItalicVideo() {
         context.fillRect(0, 0, canvas.width, canvas.height);
         const arrow = arrowRef.current;
         if (arrow && arrow.complete) {
-          const arrowScale = Math.min(canvas.width / arrow.width, canvas.height / arrow.height) * 0.5;
+          const arrowScale = Math.min(canvas.width / arrow.width, canvas.height / arrow.height) * 0.125;
           const x = (canvas.width - arrow.width * arrowScale) / 2;
           const y = (canvas.height - arrow.height * arrowScale) / 2;
           context.drawImage(arrow, x, y, arrow.width * arrowScale, arrow.height * arrowScale);
           
           // Draw "AIM HIGHER" below the arrow
-          const fontSize = Math.min(canvas.width, canvas.height) / 8;
+          const fontSize = Math.min(canvas.width, canvas.height) / 32;
           context.font = `bold ${fontSize}px "Helvetica Neue", Arial, sans-serif`;
           context.fillStyle = '#fff';
           context.textAlign = 'center';
           context.textBaseline = 'middle';
           const textY = y + arrow.height * arrowScale + 20 + fontSize / 2;
-          context.fillText('aimhigher.net', canvas.width / 2, textY);
+          context.fillText('AIM HIGHER', canvas.width / 2, textY);
         }
       }
 
@@ -523,7 +524,9 @@ export default function HigherItalicVideo() {
         const progress = calculateAnimationProgress(currentTime);
           
         // Apply animation with calculated progress
-        applyAnimation(hqContext, italic, progress, isEntering);
+        if (italic && italic.complete && selectedAsset !== 'None') {
+          applyAnimation(hqContext, italic, progress, isEntering);
+        }
       } else if (currentTime > videoDuration - nikeDuration) {
         // Nike ending
         hqContext.fillStyle = '#000';
@@ -647,7 +650,7 @@ export default function HigherItalicVideo() {
         // Check if we should display the asset
         if (timeInSeconds >= startTime && timeInSeconds <= endTime) {
           const italic = italicRef.current;
-          if (italic && italic.complete) {
+          if (italic && italic.complete && selectedAsset !== 'None') {
             // Check if this is an entrance or exit animation
             const isEntering = timeInSeconds < startTime + animationDuration;
             const progress = calculateAnimationProgress(timeInSeconds);
