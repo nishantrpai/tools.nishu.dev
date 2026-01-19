@@ -22,10 +22,12 @@ export default function HigherItalicVideo() {
   const [enterAnimation, setEnterAnimation] = useState('fade')
   const [exitAnimation, setExitAnimation] = useState('fade')
   const [animationDuration, setAnimationDuration] = useState(0.5) // in seconds
+  const nikeDuration = 2; // seconds for nike ending
   const canvasRef = useRef(null)
   const videoRef = useRef(null)
   const animationRef = useRef(null)
   const italicRef = useRef(typeof window !== 'undefined' ? new window.Image() : null)
+  const arrowRef = useRef(typeof window !== 'undefined' ? new window.Image() : null)
   const mediaRecorderRef = useRef(null)
   const lastRenderTimeRef = useRef(0)
 
@@ -109,6 +111,21 @@ export default function HigherItalicVideo() {
       } else {
         italicRef.current.src = assetPath;
       }
+    }
+
+    // Preload arrow with white fill for nike ending
+    if (arrowRef.current) {
+      fetch('/higherarrow.svg')
+        .then(response => response.text())
+        .then(svgText => {
+          const whiteSvg = svgText.replace(/fill="[^"]*"/g, `fill="#fff"`);
+          const blob = new Blob([whiteSvg], { type: 'image/svg+xml' });
+          arrowRef.current.src = URL.createObjectURL(blob);
+        })
+        .catch(error => {
+          console.error('Error fetching arrow SVG:', error);
+          arrowRef.current.src = '/higherarrow.svg';
+        });
     }
   }, [selectedAsset, assetColor])
 
@@ -343,6 +360,26 @@ export default function HigherItalicVideo() {
           // Apply animation with calculated progress
           applyAnimation(context, italic, progress, isEntering);
         }
+      } else if (currentTime > videoDuration - nikeDuration) {
+        // Nike ending
+        context.fillStyle = '#000';
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        const arrow = arrowRef.current;
+        if (arrow && arrow.complete) {
+          const arrowScale = Math.min(canvas.width / arrow.width, canvas.height / arrow.height) * 0.5;
+          const x = (canvas.width - arrow.width * arrowScale) / 2;
+          const y = (canvas.height - arrow.height * arrowScale) / 2;
+          context.drawImage(arrow, x, y, arrow.width * arrowScale, arrow.height * arrowScale);
+          
+          // Draw "AIM HIGHER" below the arrow
+          const fontSize = Math.min(canvas.width, canvas.height) / 8;
+          context.font = `bold ${fontSize}px "Helvetica Neue", Arial, sans-serif`;
+          context.fillStyle = '#fff';
+          context.textAlign = 'center';
+          context.textBaseline = 'middle';
+          const textY = y + arrow.height * arrowScale + 20 + fontSize / 2;
+          context.fillText('aimhigher.net', canvas.width / 2, textY);
+        }
       }
 
       animationRef.current = requestAnimationFrame(drawFrame)
@@ -452,16 +489,33 @@ export default function HigherItalicVideo() {
       URL.revokeObjectURL(url);
     };
 
+    let isVideoEnded = false;
+    let startExtraTime = null;
+
     const captureFrame = () => {
       // Clear canvas
       hqContext.clearRect(0, 0, hqCanvas.width, hqCanvas.height);
       
-      // Draw video frame
-      hqContext.drawImage(videoElement, 0, 0, hqCanvas.width, hqCanvas.height);
+      let currentTime;
+      if (!isVideoEnded) {
+        // Draw video frame
+        hqContext.drawImage(videoElement, 0, 0, hqCanvas.width, hqCanvas.height);
+        currentTime = videoElement.currentTime;
+      } else {
+        // Black background for nike ending
+        hqContext.fillStyle = '#000';
+        hqContext.fillRect(0, 0, hqCanvas.width, hqCanvas.height);
+        const extraTime = (Date.now() - startExtraTime) / 1000;
+        currentTime = videoDuration + extraTime;
+        if (extraTime >= nikeDuration) {
+          clearInterval(captureInterval);
+          setIsRecording(false);
+          mediaRecorder.stop();
+          return;
+        }
+      }
   
       // Check if we should display the asset based on time
-      const currentTime = videoElement.currentTime;
-      
       if (currentTime >= startTime && currentTime <= endTime) {
         const italic = italicRef.current;
         // Check if this is an entrance or exit animation
@@ -470,6 +524,26 @@ export default function HigherItalicVideo() {
           
         // Apply animation with calculated progress
         applyAnimation(hqContext, italic, progress, isEntering);
+      } else if (currentTime > videoDuration - nikeDuration) {
+        // Nike ending
+        hqContext.fillStyle = '#000';
+        hqContext.fillRect(0, 0, hqCanvas.width, hqCanvas.height);
+        const arrow = arrowRef.current;
+        if (arrow && arrow.complete) {
+          const arrowScale = Math.min(hqCanvas.width / arrow.width, hqCanvas.height / arrow.height) * 0.125;
+          const x = (hqCanvas.width - arrow.width * arrowScale) / 2;
+          const y = (hqCanvas.height - arrow.height * arrowScale) / 2;
+          hqContext.drawImage(arrow, x, y, arrow.width * arrowScale, arrow.height * arrowScale);
+          
+          // Draw "AIM HIGHER" below the arrow
+          const fontSize = Math.min(hqCanvas.width, hqCanvas.height) / 32;
+          hqContext.font = `bold ${fontSize}px "Helvetica Neue", Arial, sans-serif`;
+          hqContext.fillStyle = '#fff';
+          hqContext.textAlign = 'center';
+          hqContext.textBaseline = 'middle';
+          const textY = y + arrow.height * arrowScale + 10 + fontSize / 2;
+          hqContext.fillText('AIM HIGHER', hqCanvas.width / 2, textY);
+        }
       }
     };
   
@@ -477,13 +551,14 @@ export default function HigherItalicVideo() {
     const captureInterval = setInterval(() => {
       if (!videoElement.paused && !videoElement.ended) {
         captureFrame();
+      } else if (isVideoEnded) {
+        captureFrame();
       }
     }, 1000 / fps);
   
     videoElement.onended = () => {
-      clearInterval(captureInterval);
-      setIsRecording(false);
-      mediaRecorder.stop();
+      isVideoEnded = true;
+      startExtraTime = Date.now();
     };
   
     mediaRecorder.start();
@@ -579,6 +654,26 @@ export default function HigherItalicVideo() {
             
             // Apply animation with calculated progress
             applyAnimation(context, italic, progress, isEntering);
+          }
+        } else if (timeInSeconds > videoDuration - nikeDuration) {
+          // Nike ending
+          context.fillStyle = '#000';
+          context.fillRect(0, 0, canvas.width, canvas.height);
+          const arrow = arrowRef.current;
+          if (arrow && arrow.complete) {
+            const arrowScale = Math.min(canvas.width / arrow.width, canvas.height / arrow.height) * 0.5;
+            const x = (canvas.width - arrow.width * arrowScale) / 2;
+            const y = (canvas.height - arrow.height * arrowScale) / 2;
+            context.drawImage(arrow, x, y, arrow.width * arrowScale, arrow.height * arrowScale);
+            
+            // Draw "AIM HIGHER" below the arrow
+            const fontSize = Math.min(canvas.width, canvas.height) / 8;
+            context.font = `bold ${fontSize}px "Helvetica Neue", Arial, sans-serif`;
+            context.fillStyle = '#fff';
+            context.textAlign = 'center';
+            context.textBaseline = 'middle';
+            const textY = y + arrow.height * arrowScale + 20 + fontSize / 2;
+            context.fillText('AIM HIGHER', canvas.width / 2, textY);
           }
         }
       }
