@@ -2239,6 +2239,13 @@ export const tools = [
     "publishDate": "25 Dec 2025",
     "url": "/whydotheysay",
     "tags": []
+  },
+  {
+    "title": "Watermark Video",
+    "description": "Add watermark to your video",
+    "publishDate": "30th Dec 2025",
+    "url": "/watermarkvideo",
+    "tags": []
   }
 ];
 
