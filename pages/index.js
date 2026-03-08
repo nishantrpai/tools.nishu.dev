@@ -2243,7 +2243,7 @@ export const tools = [
   {
     "title": "Watermark Video",
     "description": "Add watermark to your video",
-    "publishDate": "30th Dec 2025",
+    "publishDate": "8th Mar 2026",
     "url": "/watermarkvideo",
     "tags": []
   }
