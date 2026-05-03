@@ -5,6 +5,7 @@ export default function Document() {
     <Html lang="en">
       <Head>
         <link rel="icon" href="/favicon.ico" />
+        <script src="https://visitoralerts.com/tracker.js"></script>
       </Head>
       <body>
         <Main />
