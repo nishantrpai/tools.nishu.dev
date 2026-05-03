@@ -1,7 +1,7 @@
 // add paper noise effect to an image
 import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 
 export default function Paperize() {
   const [image, setImage] = useState(null)
@@ -26,13 +26,26 @@ export default function Paperize() {
     ctx.putImageData(imageData, 0, 0)
   }
 
+  const previewUrl = useMemo(() => {
+    if (!image) return null
+    return URL.createObjectURL(image)
+  }, [image])
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl)
+    }
+  }, [previewUrl])
+
   useEffect(() => {
     if (!image || !canvasRef.current) return
     const canvas = canvasRef.current
     const ctx = canvas.getContext('2d')
     const img = new Image()
-    img.src = URL.createObjectURL(image)
+    const url = URL.createObjectURL(image)
+    img.src = url
     img.onload = () => {
+      URL.revokeObjectURL(url)
       canvas.width = img.width
       canvas.height = img.height
       ctx.drawImage(img, 0, 0)
@@ -126,7 +139,7 @@ export default function Paperize() {
             <div>
               <p style={{ color: '#888', marginBottom: 6 }}>Original</p>
               <img
-                src={URL.createObjectURL(image)}
+                src={previewUrl}
                 alt="original"
                 style={{ maxWidth: 500, width: '100%', height: 'auto' }}
               />
