@@ -2246,6 +2246,14 @@ export const tools = [
     "publishDate": "8th Mar 2026",
     "url": "/watermarkvideo",
     "tags": []
+  },
+  {
+    "title": "Paperize",
+    "description": "Add paper noise effect to your image",
+    "publishDate": "3rd May 2026",
+    "icon": "📄",
+    "url": "/paperize",
+    "tags": []
   }
 ];
 
