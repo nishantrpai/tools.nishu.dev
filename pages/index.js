@@ -2254,6 +2254,13 @@ export const tools = [
     "icon": "📄",
     "url": "/paperize",
     "tags": []
+  },
+  {
+    "title": "8bit GIF",
+    "description": "Turn GIFs into pixelized 8bit GIFs",
+    "publishDate": "14th May 2026",
+    "url": "/8bitgif",
+    "tags": []
   }
 ];
 
