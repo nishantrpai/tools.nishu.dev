@@ -1888,7 +1888,7 @@ export default function Home() {
       defaultStopwords.forEach(w => fullStopwordSet.add(w.toLowerCase()))
     }
     if (removeCustomStopwords) {
-      customStopwordsArray.forEach(w => fullStopwordSet.add(w))
+      customStopwordsArray.forEach(w => w.split(/\s+/).forEach(part => fullStopwordSet.add(part)))
     }
 
     const minN = allowSingleNgram ? 1 : 2
@@ -2033,6 +2033,33 @@ export default function Home() {
         </button>
 
         {result && (
+          <button
+            onClick={() => {
+              let filteredAnchors = result.anchors.filter(anchor => anchor.ngram.toLowerCase().includes(searchTerm.toLowerCase()))
+              if (hideStopwordNgrams) {
+                const stopWords = new Set([
+                  ...defaultStopwords,
+                  ...customStopwords.split(',').flatMap(w => w.trim().toLowerCase().split(/\s+/)).filter(w => w.length > 0)
+                ])
+                filteredAnchors = filteredAnchors.filter(anchor =>
+                  !anchor.ngram.split(' ').some(word => stopWords.has(word))
+                )
+              }
+              filteredAnchors.sort((a, b) => {
+                if (a.ngramLength !== b.ngramLength) return b.ngramLength - a.ngramLength
+                return b.sentenceIndices.length - a.sentenceIndices.length
+              })
+              const text = filteredAnchors.map(a => a.ngram).join('\n')
+              navigator.clipboard.writeText(text)
+            }}
+            className={styles.button}
+            style={{ marginLeft: 8 }}
+          >
+            Copy Terms
+          </button>
+        )}
+
+        {result && (
           <div style={{ whiteSpace: 'pre-wrap', fontFamily: 'monospace', textAlign: 'left', padding: '10px', border: '1px solid #333', borderRadius: 10, background: '#000', width: '100%', lineHeight: 1.5, color: '#fff'}}>
             <p style={{margin: 0}}>{`${result.extractAll ? 'N-GRAM EXTRACTION ANALYSIS' : 'N-GRAM COVERAGE ANALYSIS'} - ${new Date().toLocaleString()}`}</p>
             <p style={{margin: 0}}>{`${'='.repeat(60)}`}</p>
@@ -2042,7 +2069,7 @@ export default function Home() {
               if (hideStopwordNgrams) {
                 const stopWords = new Set([
                   ...defaultStopwords,
-                  ...customStopwords.split(',').map(w => w.trim().toLowerCase()).filter(w => w.length > 0)
+                  ...customStopwords.split(',').flatMap(w => w.trim().toLowerCase().split(/\s+/)).filter(w => w.length > 0)
                 ])
                 filteredAnchors = filteredAnchors.filter(anchor => 
                   !anchor.ngram.split(' ').some(word => stopWords.has(word))
@@ -2097,7 +2124,7 @@ export default function Home() {
               if (hideStopwordNgrams) {
                 const stopWords = new Set([
                   ...defaultStopwords,
-                  ...customStopwords.split(',').map(w => w.trim().toLowerCase()).filter(w => w.length > 0)
+                  ...customStopwords.split(',').flatMap(w => w.trim().toLowerCase().split(/\s+/)).filter(w => w.length > 0)
                 ])
                 filteredAnchors = filteredAnchors.filter(anchor => 
                   !anchor.ngram.split(' ').some(word => stopWords.has(word))
@@ -2106,7 +2133,7 @@ export default function Home() {
               // Add hasIntervening
               const stopWords = new Set([
                 ...defaultStopwords,
-                ...customStopwords.split(',').map(w => w.trim().toLowerCase()).filter(w => w.length > 0)
+                ...customStopwords.split(',').flatMap(w => w.trim().toLowerCase().split(/\s+/)).filter(w => w.length > 0)
               ])
               filteredAnchors.forEach(anchor => {
                 anchor.hasIntervening = anchor.sentenceIndices.some(idx => hasInterveningStopwords(anchor.ngram, questions[idx], stopWords));
