@@ -1606,11 +1606,11 @@ const isolatorWords = [
   'recommended', 'recommend', 'suggest', 'suggested', 'alternative', 'instead',
   'try', 'use', 'switch', 'replace', 'prefer', 'preferred',
   // Quality / sentiment
-  'free', 'paid', 'cheap', 'expensive', 'fast', 'slow', 'easy', 'hard',
-  'fully', 'powerful', 'simple', 'popular', 'great', 'good', 'bad',
+  // 'free', 'paid', 'cheap', 'expensive', 'fast', 'slow', 'easy', 'hard',
+  // 'fully', 'powerful', 'simple', 'popular', 'great', 'good', 'bad',
   // Connective / contrast
-  'but', 'however', 'although', 'though', 'while', 'whereas', 'yet',
-  'still', 'otherwise',
+  // 'but', 'however', 'although', 'though', 'while', 'whereas', 'yet',
+  // 'still', 'otherwise',
 ]
 
 const GRAPH_WIDTH = 1000;
@@ -1686,7 +1686,13 @@ export default function Home() {
   const [onlyQA, setOnlyQA] = useState(false);
   const [result, setResult] = useState(null);           // full data
   const [searchTerm, setSearchTerm] = useState('');
+  const [minWeight, setMinWeight] = useState(1);
   const [fullNodes, setFullNodes] = useState([]);       // with stable positions
+  const [zoom, setZoom] = useState(1);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const isPanning = useRef(false);
+  const panStart = useRef({ x: 0, y: 0 });
+  const panOrigin = useRef({ x: 0, y: 0 });
 
   const buildAssociations = () => {
     const stopwordSet = new Set(defaultStopwords);
@@ -1841,21 +1847,39 @@ export default function Home() {
     setFullNodes(simNodes);
     setResult({ nodes: simNodes, edges });
     setSearchTerm('');
+    setZoom(1);
+    setPan({ x: 0, y: 0 });
+    setZoom(1);
+    setPan({ x: 0, y: 0 });
   };
 
   // Highlight logic only (no repositioning)
   const highlightedData = useMemo(() => {
     if (!result || !searchTerm.trim()) {
-      return { nodes: fullNodes, edges: result?.edges || [], term: '', connectionWeightMap: new Map(), maxConnWeight: 1, level1Set: new Set(), hasSearch: false };
+      return { nodes: fullNodes, edges: result?.edges || [], term: '', termSet: new Set(), connectionWeightMap: new Map(), maxConnWeight: 1, level1Set: new Set(), hasSearch: false };
     }
 
     const term = searchTerm.trim().toLowerCase();
-    const directEdges = result.edges.filter(e => e.source === term || e.target === term);
+    // Match any node whose id equals the term OR contains it as a whole word
+    const termSet = new Set(
+      result.nodes
+        .map(n => n.id)
+        .filter(id => id === term || id.split(' ').includes(term))
+    );
+
+    if (termSet.size === 0) {
+      return { nodes: fullNodes, edges: result.edges, term: '', termSet: new Set(), connectionWeightMap: new Map(), maxConnWeight: 1, level1Set: new Set(), hasSearch: false };
+    }
+
+    const directEdges = result.edges.filter(e => termSet.has(e.source) || termSet.has(e.target));
 
     const connectionWeightMap = new Map();
     directEdges.forEach(e => {
-      const neighbor = e.source === term ? e.target : e.source;
-      connectionWeightMap.set(neighbor, e.weight);
+      const isSourceCenter = termSet.has(e.source);
+      const neighbor = isSourceCenter ? e.target : e.source;
+      if (!termSet.has(neighbor)) {
+        connectionWeightMap.set(neighbor, (connectionWeightMap.get(neighbor) || 0) + e.weight);
+      }
     });
     const maxConnWeight = Math.max(...Array.from(connectionWeightMap.values()), 1);
     const level1Set = new Set(connectionWeightMap.keys());
@@ -1864,6 +1888,7 @@ export default function Home() {
       nodes: fullNodes,
       edges: result.edges,
       term,
+      termSet,
       connectionWeightMap,
       maxConnWeight,
       level1Set,
@@ -1875,10 +1900,10 @@ export default function Home() {
     <>
       <Head><title>Network Graph</title></Head>
 
-      <main style={{ padding: '20px', background: '#000', color: '#fff', fontFamily: 'system-ui' }}>
+      <main style={{ padding: '20px', background: '#000', color: '#fff', fontFamily: 'system-ui', maxWidth: '100%', width: '100%' }}>
         <h1 style={{ textAlign: 'center' }}>Association Network</h1>
 
-        <div style={{ maxWidth: '1040px', margin: '0 auto' }}>
+        <div style={{ width: '100%' }}>
           {/* Input fields same as before */}
           <textarea
             value={text}
@@ -1895,10 +1920,22 @@ export default function Home() {
             style={{ width: '100%', padding: '10px', margin: '10px 0', background: '#111', border: '1px solid #333', color: '#fff' }}
           />
 
-          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: '10px 0' }}>
-            <input type="checkbox" checked={onlyQA} onChange={e => setOnlyQA(e.target.checked)} />
-            Only show Q → A associations
-          </label>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', margin: '10px 0', flexWrap: 'wrap' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <input type="checkbox" checked={onlyQA} onChange={e => setOnlyQA(e.target.checked)} />
+              Only show Q → A associations
+            </label>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#aaa', fontSize: '14px', fontFamily: 'monospace' }}>
+              Min weight
+              <input
+                type="number"
+                min="1"
+                value={minWeight}
+                onChange={e => setMinWeight(Math.max(1, parseInt(e.target.value) || 1))}
+                style={{ width: '60px', padding: '4px 8px', background: '#111', border: '1px solid #333', color: '#fff', fontFamily: 'monospace' }}
+              />
+            </label>
+          </div>
 
           <button onClick={buildAssociations} style={{ padding: '12px 28px', fontSize: '16px' }}>
             Build Network
@@ -1911,20 +1948,51 @@ export default function Home() {
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
                 placeholder="Search a word or phrase to highlight (e.g. hotjar, pagespeed issues)..."
-                style={{ width: '100%', padding: '12px', fontSize: '16px', background: '#111', border: '1px solid #444', color: '#fff', marginBottom: '15px' }}
+                style={{ width: '100%', padding: '12px', fontSize: '16px', background: '#111', border: '1px solid #444', color: '#fff', marginBottom: '10px' }}
               />
 
-              <svg viewBox={`0 0 ${GRAPH_WIDTH} ${GRAPH_HEIGHT}`} style={{ width: '100%', height: 'auto', background: '#0a0a0a', borderRadius: '12px', border: '1px solid #222' }}>
+              {/* Zoom controls */}
+              <div style={{ display: 'flex', gap: '8px', marginBottom: '10px', alignItems: 'center' }}>
+                <button onClick={() => setZoom(z => Math.min(z + 0.2, 5))} style={{ padding: '6px 14px', background: '#222', border: '1px solid #444', color: '#fff', cursor: 'pointer', fontFamily: 'monospace', fontSize: '16px' }}>+</button>
+                <button onClick={() => setZoom(z => Math.max(z - 0.2, 0.2))} style={{ padding: '6px 14px', background: '#222', border: '1px solid #444', color: '#fff', cursor: 'pointer', fontFamily: 'monospace', fontSize: '16px' }}>−</button>
+                <button onClick={() => { setZoom(1); setPan({ x: 0, y: 0 }); }} style={{ padding: '6px 14px', background: '#222', border: '1px solid #444', color: '#aaa', cursor: 'pointer', fontFamily: 'monospace', fontSize: '13px' }}>reset</button>
+                <span style={{ color: '#555', fontFamily: 'monospace', fontSize: '12px' }}>{Math.round(zoom * 100)}%</span>
+              </div>
+
+              <div
+                style={{ width: '100%', height: '82vh', overflow: 'hidden', background: '#0a0a0a', borderRadius: '12px', border: '1px solid #222', cursor: isPanning.current ? 'grabbing' : 'grab', userSelect: 'none' }}
+                onMouseDown={e => {
+                  isPanning.current = true;
+                  panStart.current = { x: e.clientX, y: e.clientY };
+                  panOrigin.current = { ...pan };
+                }}
+                onMouseMove={e => {
+                  if (!isPanning.current) return;
+                  setPan({
+                    x: panOrigin.current.x + (e.clientX - panStart.current.x),
+                    y: panOrigin.current.y + (e.clientY - panStart.current.y),
+                  });
+                }}
+                onMouseUp={() => { isPanning.current = false; }}
+                onMouseLeave={() => { isPanning.current = false; }}
+              >
+                <svg
+                  width="100%"
+                  height="100%"
+                  style={{ display: 'block' }}
+                >
+                <g transform={`translate(${pan.x}, ${pan.y}) scale(${zoom})`}>
                 {/* Edges */}
                 {(() => {
-                  const maxWeight = Math.max(...highlightedData.edges.map(e => e.weight), 1);
-                  return highlightedData.edges.map((edge, i) => {
+                  const visibleEdges = highlightedData.edges.filter(e => e.weight >= minWeight);
+                  const maxWeight = Math.max(...visibleEdges.map(e => e.weight), 1);
+                  return visibleEdges.map((edge, i) => {
                     const source = highlightedData.nodes.find(n => n.id === edge.source);
                     const target = highlightedData.nodes.find(n => n.id === edge.target);
                     if (!source || !target) return null;
 
                     const isConnected = highlightedData.hasSearch &&
-                      (edge.source === highlightedData.term || edge.target === highlightedData.term);
+                      (highlightedData.termSet?.has(edge.source) || highlightedData.termSet?.has(edge.target));
                     const connRatio = isConnected ? edge.weight / highlightedData.maxConnWeight : 0;
                     const strokeOpacity = !highlightedData.hasSearch
                       ? 0.05 + (edge.weight / maxWeight) * 0.15
@@ -1951,8 +2019,15 @@ export default function Home() {
                 })()}
 
                 {/* Nodes */}
-                {highlightedData.nodes.map((node) => {
-                  const isCenter = highlightedData.hasSearch && node.id === highlightedData.term;
+                {(() => {
+                  const activeNodeIds = new Set(
+                    highlightedData.edges
+                      .filter(e => e.weight >= minWeight)
+                      .flatMap(e => [e.source, e.target])
+                  );
+                  return highlightedData.nodes.filter(n => activeNodeIds.has(n.id));
+                })().map((node) => {
+                  const isCenter = highlightedData.hasSearch && (highlightedData.termSet?.has(node.id) ?? false);
                   const connWeight = highlightedData.hasSearch ? highlightedData.connectionWeightMap.get(node.id) : undefined;
                   const isConnected = connWeight !== undefined;
                   const connRatio = isConnected ? connWeight / highlightedData.maxConnWeight : 0;
@@ -1991,7 +2066,9 @@ export default function Home() {
                     </g>
                   );
                 })}
+                </g>
               </svg>
+              </div>
 
               {searchTerm && highlightedData.hasSearch && highlightedData.level1Set.size > 0 && (
                 <div style={{ marginTop: '20px' }}>
@@ -2008,13 +2085,11 @@ export default function Home() {
                     </thead>
                     <tbody>
                       {Array.from(highlightedData.level1Set)
-                        .map(term => {
-                          const weight = result.edges
-                            .filter(e => (e.source === searchTerm.trim().toLowerCase() && e.target === term) ||
-                                         (e.target === searchTerm.trim().toLowerCase() && e.source === term))
-                            .reduce((sum, e) => sum + e.weight, 0);
-                          return { term, weight };
-                        })
+                        .map(term => ({
+                          term,
+                          weight: highlightedData.connectionWeightMap.get(term) || 0
+                        }))
+                        .filter(({ weight }) => weight >= minWeight)
                         .sort((a, b) => b.weight - a.weight)
                         .map(({ term, weight }, i) => (
                           <tr
