@@ -1,3 +1,6 @@
+// ─── Test harness for extractassociations keyword extraction ───
+// Run with: node pages/test.js
+
 const defaultStopwords = [
   "about",
   "above",
@@ -1592,28 +1595,79 @@ const defaultStopwords = [
   "figupon…"
 ]
 
-const customstopwords = ['shopify','app']
-
-const stopwords = new Set([
-  ...defaultStopwords,
-  ...customstopwords
-])
-
-const sentences = [
-  'looking for better user insights shopify app',
-  'Not an app but Microsoft Clarity. Similar to hotjar but fully free',
+const isolatorWords = [
+  'better', 'worse', 'best', 'worst', 'similar', 'similarly', 'faster', 'slower',
+  'cheaper', 'easier', 'harder', 'higher', 'lower', 'larger', 'smaller',
+  'vs', 'versus', 'compared', 'unlike', 'like',
+  'recommended', 'recommend', 'suggest', 'suggested', 'alternative', 'instead',
+  'try', 'use', 'switch', 'replace', 'prefer', 'preferred',
 ]
 
-const cleanedSentences = sentences.map(sentence => {
-  return sentence
+// ─── mirrored from extractassociations.js ───
+function buildKeywordUnits(text, stopwordSet, isolatorSet) {
+  return text
     .toLowerCase()
-    .replace(/[.,!?;:()[\]{}"'`]/g, '') // remove punctuation
-    .split(/\s+/) // split by spaces
-    .map(word => stopwords.has(word) ? '|' : word)
+    .replace(/[^a-zA-Z0-9]/g, ' | ')
+    .split(/\s+/)
+    .map(word => {
+      if (isolatorSet && isolatorSet.has(word)) return `|${word}|`
+      if (stopwordSet.has(word)) return '|'
+      return word
+    })
     .join(' ')
     .split('|')
-    .map(item => item.trim())   // remove spaces
-    .filter(item => item)       // remove empty strings
-})
+    .map(segment => segment.trim())
+    .filter(segment => segment.length > 0)
+}
 
-console.log(cleanedSentences)
+// ─── Test input — edit this ───
+const customStopwords = ['shopify', 'app']
+const input = `
+Q. looking for better user insights shopify app
+A. Not an app but Microsoft Clarity. Similar to hotjar but fully free
+---
+Q. pagespeed issues causing high bounce rate
+A. pagespeed, bots, hotjar tracking
+`
+
+// ─── Run ───
+const stopwordSet = new Set(defaultStopwords)
+customStopwords.forEach(w => stopwordSet.add(w.trim().toLowerCase()))
+const isolatorSet = new Set(isolatorWords)
+isolatorSet.forEach(w => stopwordSet.delete(w))
+
+const edgeMap = new Map()
+const addEdge = (source, target) => {
+  if (source === target) return
+  const key = [source, target].sort().join('||')
+  if (edgeMap.has(key)) edgeMap.get(key).weight++
+  else edgeMap.set(key, { source, target, weight: 1 })
+}
+
+const blocks = input.split('---').map(b => b.trim()).filter(Boolean)
+
+for (const block of blocks) {
+  const qMatch = block.match(/Q\.\s*([\s\S]*?)(?=A\.|$)/i)
+  const aMatch = block.match(/A\.\s*([\s\S]*)$/i)
+  const qText = qMatch?.[1]?.trim() || ''
+  const aText = aMatch?.[1]?.trim() || ''
+
+  const qWords = [...new Set(buildKeywordUnits(qText, stopwordSet, isolatorSet))]
+  const aWords = [...new Set(buildKeywordUnits(aText, stopwordSet, isolatorSet))]
+
+  console.log('\n─── Block ───')
+  console.log('Q keywords:', qWords)
+  console.log('A keywords:', aWords)
+
+  for (const qw of qWords)
+    for (const aw of aWords)
+      addEdge(qw, aw)
+
+  for (let i = 0; i < aWords.length; i++)
+    for (let j = i + 1; j < aWords.length; j++)
+      addEdge(aWords[i], aWords[j])
+}
+
+console.log('\n─── Edges (sorted by weight) ───')
+const edges = [...edgeMap.values()].sort((a, b) => b.weight - a.weight)
+edges.forEach(e => console.log(`  ${e.source} → ${e.target}  (${e.weight})`))
