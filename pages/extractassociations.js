@@ -1621,7 +1621,7 @@ const MIN_NODE_DISTANCE = 34;
 function buildKeywordUnits(text, stopwordSet, isolatorSet) {
   return text
     .toLowerCase()
-    .replace(/[.,!?;:()[\]{}'`"]/g, '')
+    .replace(/[^a-zA-Z0-9]/g, ' | ')
     .split(/\s+/)
     .map(word => {
       if (isolatorSet && isolatorSet.has(word)) return `|${word}|`;
@@ -1693,6 +1693,31 @@ export default function Home() {
   const isPanning = useRef(false);
   const panStart = useRef({ x: 0, y: 0 });
   const panOrigin = useRef({ x: 0, y: 0 });
+
+  const [copied, setCopied] = useState(false);
+
+  const copyAssociations = () => {
+    if (!result) return;
+    let lines;
+    if (highlightedData.hasSearch) {
+      lines = Array.from(highlightedData.level1Set)
+        .map(term => ({ term, weight: highlightedData.connectionWeightMap.get(term) || 0 }))
+        .filter(({ weight }) => weight >= minWeight)
+        .sort((a, b) => b.weight - a.weight)
+        .map(({ term, weight }) => `${highlightedData.term} → ${term} (${weight})`)
+        .join('\n');
+    } else {
+      lines = [...result.edges]
+        .filter(e => e.weight >= minWeight)
+        .sort((a, b) => b.weight - a.weight)
+        .map(e => `${e.source} → ${e.target} (${e.weight})`)
+        .join('\n');
+    }
+    navigator.clipboard.writeText(lines).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    });
+  };
 
   const buildAssociations = () => {
     const stopwordSet = new Set(defaultStopwords);
@@ -1860,11 +1885,12 @@ export default function Home() {
     }
 
     const term = searchTerm.trim().toLowerCase();
-    // Match any node whose id equals the term OR contains it as a whole word
+    // Match any node whose id equals the term OR contains it as a whole word (word-boundary safe)
+    const termRegex = new RegExp(`(?:^|\\s)${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?:\\s|$)`);
     const termSet = new Set(
       result.nodes
         .map(n => n.id)
-        .filter(id => id === term || id.split(' ').includes(term))
+        .filter(id => id === term || termRegex.test(id))
     );
 
     if (termSet.size === 0) {
@@ -1937,9 +1963,16 @@ export default function Home() {
             </label>
           </div>
 
-          <button onClick={buildAssociations} style={{ padding: '12px 28px', fontSize: '16px' }}>
-            Build Network
-          </button>
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginTop: '10px' }}>
+            <button onClick={buildAssociations}>
+              Build Network
+            </button>
+            {result && (
+              <button onClick={copyAssociations}>
+                {copied ? 'copied!' : 'copy associations'}
+              </button>
+            )}
+          </div>
 
           {result && (
             <div style={{ marginTop: '30px' }}>
