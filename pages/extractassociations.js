@@ -1621,7 +1621,7 @@ const MIN_NODE_DISTANCE = 34;
 function buildKeywordUnits(text, stopwordSet, isolatorSet) {
   return text
     .toLowerCase()
-    .replace(/[^a-zA-Z0-9]/g, ' | ')
+    .replace(/[^a-zA-Z0-9\s]/g, ' ')
     .split(/\s+/)
     .map(word => {
       if (isolatorSet && isolatorSet.has(word)) return `|${word}|`;

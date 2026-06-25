@@ -2254,6 +2254,13 @@ export const tools = [
     "icon": "📄",
     "url": "/paperize",
     "tags": []
+  },
+  {
+    "title": "Prompt to Image",
+    "description": "Paste your prompt and get an image",
+    "publishDate": "25th June 2026",
+    "url": "/prompt2img",
+    "tags": []
   }
 ];
 

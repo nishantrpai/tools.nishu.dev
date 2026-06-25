@@ -1607,7 +1607,7 @@ const isolatorWords = [
 function buildKeywordUnits(text, stopwordSet, isolatorSet) {
   return text
     .toLowerCase()
-    .replace(/[^a-zA-Z0-9]/g, ' | ')
+    .replace(/[^a-zA-Z0-9\s]/g, ' ')
     .split(/\s+/)
     .map(word => {
       if (isolatorSet && isolatorSet.has(word)) return `|${word}|`
@@ -1623,11 +1623,10 @@ function buildKeywordUnits(text, stopwordSet, isolatorSet) {
 // ─── Test input — edit this ───
 const customStopwords = ['shopify', 'app']
 const input = `
-Q. looking for better user insights shopify app
-A. Not an app but Microsoft Clarity. Similar to hotjar but fully free
+Q. Best onsite heatmap that won't slow me down?
+
+A. Two heatmap tools that I recommend are Microsoft Clarity and Lucky Orange.
 ---
-Q. pagespeed issues causing high bounce rate
-A. pagespeed, bots, hotjar tracking
 `
 
 // ─── Run ───
@@ -1670,4 +1669,4 @@ for (const block of blocks) {
 
 console.log('\n─── Edges (sorted by weight) ───')
 const edges = [...edgeMap.values()].sort((a, b) => b.weight - a.weight)
-edges.forEach(e => console.log(`  ${e.source} → ${e.target}  (${e.weight})`))
+// edges.forEach(e => console.log(`  ${e.source} → ${e.target}  (${e.weight})`))
