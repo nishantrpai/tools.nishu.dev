@@ -2200,7 +2200,7 @@ export const tools = [
   },
   {
     "title": "Extract Terms",
-    "description": "Extract terms from questions",
+    "description": "Extract terms from questions using n-gram analysis",
     "publishDate": "1 Dec 2025",
     "url": "/extractterms",
     "tags": []
@@ -2256,12 +2256,21 @@ export const tools = [
     "tags": []
   },
   {
+    "title": "Extract Associations",
+    "description": "Extract associations from text",
+    "publishDate": "29th May 2026",
+    "url": "/extractassociations",
+    "tags": []
+
+  },
+  {
     "title": "Prompt to Image",
     "description": "Paste your prompt and get an image",
     "publishDate": "25th June 2026",
     "url": "/prompt2img",
     "tags": []
-  }
+  },
+  
 ];
 
 export default function Home() {

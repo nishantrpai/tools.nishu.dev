@@ -159,7 +159,7 @@ export default function Home() {
     if (typeof window !== 'undefined' && window.ethereum) {
       try {
         await window.ethereum.request({ method: 'eth_requestAccounts' });
-        const walletProvider = new ethers.providers.Web3Provider(window.ethereum);
+        const walletProvider = new ethers.BrowserProvider(window.ethereum);
         setProvider(walletProvider);
         const walletSigner = walletProvider.getSigner();
         setSigner(walletSigner);
@@ -228,7 +228,7 @@ export default function Home() {
       
       // Refresh ownership status
       try {
-        const tempProvider = new ethers.providers.JsonRpcProvider('https://base.llamarpc.com');
+        const tempProvider = new ethers.JsonRpcProvider('https://base.llamarpc.com');
         const tempContract = new ethers.Contract(contractAddress, abi, tempProvider);
         
         const colorData = await tempContract.getColorData(colorToMint);
