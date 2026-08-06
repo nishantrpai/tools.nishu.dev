@@ -75,6 +75,24 @@ export default function Home() {
     drawPixels()
   }, [sensationalizedText])
 
+  const downloadCanvas = (size) => {
+    const canvas = document.getElementById('canvas');
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = size;
+    tempCanvas.height = size;
+    const ctx = tempCanvas.getContext('2d');
+    
+    // Draw the original canvas content scaled to the new size
+    ctx.imageSmoothingEnabled = false; // Keep pixel art sharp
+    ctx.drawImage(canvas, 0, 0, size, size);
+    
+    const dataURL = tempCanvas.toDataURL('image/png');
+    const a = document.createElement('a');
+    a.href = dataURL;
+    a.download = `8bit-${size}x${size}.png`;
+    a.click();
+  }
+
   const sensationalize = async () => {
     // make api call to /api/gpt?prompt
     analytics('8bitcanvas', { text })
@@ -149,17 +167,16 @@ export default function Home() {
 
         <div style={{ marginTop: '20px', display: 'flex', gap: 20 }}>
 
-          <button onClick={() => {
-            // download canvas as image
-            const canvas = document.getElementById('canvas');
-            const dataURL = canvas.toDataURL('image/png');
-            const a = document.createElement('a');
-            a.href = dataURL;
-            a.download = '8bit.png';
-            a.click();
-            
-          }} className={styles.button}>
-            Download
+          <button onClick={() => downloadCanvas(500)} className={styles.button}>
+            Download (500x500)
+          </button>
+
+          <button onClick={() => downloadCanvas(1024)} className={styles.button}>
+            Download (1024x1024)
+          </button>
+
+          <button onClick={() => downloadCanvas(2048)} className={styles.button}>
+            Download (2048x2048)
           </button>
         </div>
       </main>
