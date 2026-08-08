@@ -2,65 +2,43 @@
 import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { useState, useEffect } from 'react'
-import html2canvas from 'html2canvas'
 import { SketchPicker } from 'react-color'
-import {analytics} from '@/utils/analytics'
 
 
 export default function Home() {
-  const [text, setText] = useState('')
-  const [sensationalizedText, setSensationalizedText] = useState('[]')
-  const [bg, setBg] = useState('#000')
-  const [pattern, setPattern] = useState('')
-  const [loading, setLoading] = useState(false)
   const [currentColor, setCurrentColor] = useState('#000')
-  const [coloredPixels, setColoredPixels] = useState([])
+  const [grid, setGrid] = useState({ rows: 8, cols: 8 })
+
+  const GRID_OPTIONS = [
+    { label: '8×8', rows: 8, cols: 8 },
+    { label: '11×11', rows: 11, cols: 11 },
+    { label: '13×11', rows: 11, cols: 13 },
+    { label: '15×15', rows: 15, cols: 15 },
+  ]
 
 
 
 
-  const getDataURI = (svg) => {
-    // svg text to data uri
-    return `data:image/svg+xml,${encodeURIComponent(svg)}`
-  }
-
-
-  const drawPixels = () => {
-    // on 500x500 canvas fill the pixels 500/8 = 62.5 with color
+  const drawPixels = (rows, cols) => {
     const canvas = document.getElementById('canvas');
-    let canvasWidth = canvas.width; 
-    let canvasHeight = canvas.height;
     const ctx = canvas.getContext('2d');
-    let colors = JSON.parse(sensationalizedText) || [];
-    console.log(colors)
-    let rows = 8;
-    let cols = 8;
-        const rectWidth = canvasWidth / cols;
-    const rectHeight = canvasHeight / rows;
-    let colorIndex = 0;
-
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const rectWidth = canvas.width / cols;
+    const rectHeight = canvas.height / rows;
     for (let i = 0; i < rows; i++) {
       for (let j = 0; j < cols; j++) {
-        ctx.fillStyle = colors[colorIndex] || '#fff';
+        ctx.fillStyle = '#fff';
         ctx.fillRect(j * rectWidth, i * rectHeight, rectWidth + 1, rectHeight + 1);
-        // ctx.strokeRect(j * rectWidth, i * rectHeight, rectWidth, rectHeight);
-        colorIndex++;
-
       }
     }
-
   }
 
   const startDrawing = event => {
-    // in the 8x8 grid, find the x,y and fill the current color
     const canvas = document.getElementById('canvas');
-    let canvasWidth = canvas.width;
-    let canvasHeight = canvas.height;
     const ctx = canvas.getContext('2d');
-    let rows = 8;
-    let cols = 8;
-    const rectWidth = canvasWidth / cols;
-    const rectHeight = canvasHeight / rows;
+    const { rows, cols } = grid;
+    const rectWidth = canvas.width / cols;
+    const rectHeight = canvas.height / rows;
     const rect = canvas.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
@@ -72,8 +50,8 @@ export default function Home() {
   }
 
   useEffect(() => {
-    drawPixels()
-  }, [sensationalizedText])
+    drawPixels(grid.rows, grid.cols)
+  }, [grid])
 
   const downloadCanvas = (size) => {
     const canvas = document.getElementById('canvas');
@@ -93,34 +71,13 @@ export default function Home() {
     a.click();
   }
 
-  const sensationalize = async () => {
-    // make api call to /api/gpt?prompt
-    analytics('8bitcanvas', { text })
-    setLoading(true)
-    console.log(text)
-    let prompt = `Given the prompt:${text} (only array).\n\n
-    I have a 8 x 8 grid of squares, fill it with valid hex to match the prompt from birds eye view.\n\n
-    Only send 64 hex colors as an array.\n\n
-    Keep it minimal.`;
-    const res = await fetch(`/api/gpt?prompt`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ prompt })
-    })
-    const data = await res.json()
-    setSensationalizedText(data.response)
-  
-    setLoading(false)
-  }
 
 
   return (
     <>
       <Head>
-        <title>Text to 8bit</title>
-        <meta name="description" content="Draw 8bit art" />
+        <title>8bit Canvas</title>
+        <meta name="description" content="Draw 8bit pixel art" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -129,29 +86,21 @@ export default function Home() {
           Text to 8bit
         </h1>
         <span style={{ color: '#777', fontSize: '14px', marginBottom: '20px', display: 'block' }}>
-          Convert text to 8bit
+          Draw 8bit pixel art
         </span>
 
-
-        <input
-          type="text"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder="Enter the text to generate background"
-          style={{
-            width: '100%',
-            border: '1px solid #333',
-            padding: '10px',
-            outline: 'none',
-            fontSize: 20,
-            background: '#000',
-            borderRadius: 10,
-          }}
-        />
-
-        <button onClick={sensationalize} className={styles.button}>
-          {loading ? 'Generating...' : 'Generate'}
-        </button>
+        <div style={{ display: 'flex', gap: 10, marginBottom: 10 }}>
+          {GRID_OPTIONS.map(opt => (
+            <button
+              key={opt.label}
+              onClick={() => setGrid({ rows: opt.rows, cols: opt.cols })}
+              className={styles.button}
+              style={{ opacity: grid.rows === opt.rows && grid.cols === opt.cols ? 1 : 0.4 }}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
         <div style={{ whiteSpace: 'pre-wrap', fontFamily: 'monospace', textAlign: 'left', padding: '10px', border: '1px solid #333', background: '#000', borderRadius: 10, width: '100%', lineHeight: 1.5 }}>
           {/* {zorbitSvg()} */}
           <canvas id="canvas" width="500" height="500"
