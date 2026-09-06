@@ -2270,6 +2270,12 @@ export const tools = [
     "url": "/prompt2img",
     "tags": []
   },
+  {
+    "title": "Highlighting large pieces of text",
+    "description": "Paste large piece of text. Highlight under 1 theme",
+    "publishDate": "10th July 2026",
+    "url": ""
+  }
   
 ];
 

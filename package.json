@@ -25,6 +25,7 @@
     "chart.js": "^4.4.3",
     "cheerio": "^1.1.2",
     "chess.js": "^1.1.0",
+    "compromise": "^14.15.1",
     "delaunator": "^5.0.1",
     "email-validator": "^2.0.4",
     "ethers": "^6.11.1",
