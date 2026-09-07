@@ -59,13 +59,19 @@ export default function Home() {
     },
   ]
   
-  const extractBeliefWithReason = (sentence) => {
+  const extractBeliefWithReason = (sentence, index, allSentences) => {
     for (const pattern of beliefPatterns) {
       if (pattern.regex.test(sentence)) {
+        // Get context: 2 sentences before and after
+        const contextBefore = allSentences.slice(Math.max(0, index - 2), index)
+        const contextAfter = allSentences.slice(index + 1, Math.min(allSentences.length, index + 3))
+        
         return {
           sentence: sentence.trim(),
           label: pattern.label,
-          description: pattern.description
+          description: pattern.description,
+          contextBefore,
+          contextAfter
         }
       }
     }
@@ -79,9 +85,9 @@ export default function Home() {
       .filter(s => s.trim().length > 0)
     setSentences(sentenceArray)
     
-    // Extract belief-bearing sentences with reasons
+    // Extract belief-bearing sentences with reasons and context
     const extractedBeliefs = sentenceArray
-      .map(extractBeliefWithReason)
+      .map((sentence, index) => extractBeliefWithReason(sentence, index, sentenceArray))
       .filter(belief => belief !== null)
     setBeliefs(extractedBeliefs)
     setFilterCategory('all')
@@ -159,9 +165,28 @@ export default function Home() {
 
                 <ol style={{ lineHeight: 2, paddingLeft: '20px', fontSize: '14px' }}>
                   {filteredBeliefs.map((belief, idx) => (
-                    <li key={idx} style={{ marginBottom: '15px', color: '#fff', fontSize: 12 }}>
-                      <div style={{ fontWeight: '500', fontSize: 12 }}>{belief.sentence}</div>
-                      <div style={{ fontSize: '12px', color: '#fff', marginTop: '4px', fontStyle: 'italic' }}>
+                    <li key={idx} style={{ marginBottom: '20px', color: '#fff', fontSize: 12 }}>
+                      {belief.contextBefore.length > 0 && (
+                        <div style={{ fontSize: '12px', color: '#999', marginBottom: '8px', fontStyle: 'italic', borderLeft: '2px solid #555', paddingLeft: '8px' }}>
+                          {belief.contextBefore.map((ctx, i) => (
+                            <div key={i}>{ctx.trim()}</div>
+                          ))}
+                        </div>
+                      )}
+                      
+                      <div style={{ fontWeight: '500', fontSize: 12, backgroundColor: '#2a2a2a', padding: '8px', borderRadius: '4px', marginBottom: '8px' }}>
+                        {belief.sentence}
+                      </div>
+                      
+                      {belief.contextAfter.length > 0 && (
+                        <div style={{ fontSize: '12px', color: '#999', marginBottom: '8px', fontStyle: 'italic', borderLeft: '2px solid #555', paddingLeft: '8px' }}>
+                          {belief.contextAfter.map((ctx, i) => (
+                            <div key={i}>{ctx.trim()}</div>
+                          ))}
+                        </div>
+                      )}
+                      
+                      <div style={{ fontSize: '12px', color: '#fff', marginTop: '8px' }}>
                         <span style={{ backgroundColor: '#333', color: '#888', padding: '2px 6px', borderRadius: '3px', fontWeight: '600' }}>
                           {belief.label}
                         </span>
