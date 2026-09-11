@@ -2282,9 +2282,6 @@ export const tools = [
     "publishDate": "6th Sept 2026",
     "url": "/extractbeliefs"
   },
-  
-
-  
 ];
 
 export default function Home() {
