@@ -29,9 +29,14 @@ export default function HorizonScapes() {
   const NFT_WIDTH = 280;
   const NFT_HEIGHT = 94;
 
-  const scapesContract = "0x51ae5e2533854495f6c587865af64119db8f59b4";
+  const COLLECTIONS = {
+    'PUNKSCAPE_RELIC': '0x51ae5e2533854495f6c587865af64119db8f59b4',
+    'SCAPES': '0xb7def63a9040ad5dc431aff79045617922f4023a',
+  };
+
   const [scapesId, setScapesId] = useState(1);
   const [chain, setChain] = useState('ETHEREUM');
+  const [collection, setCollection] = useState('PUNKSCAPE_RELIC');
   const [nftImage, setNftImage] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -101,14 +106,15 @@ export default function HorizonScapes() {
       if (!scapesId) return;
       setLoading(true);
       const rpcUrl = RPC_CHAINS[chain].rpc;
-      const scape = await getNFTData(scapesContract, scapesId, rpcUrl);
+      const contractAddress = COLLECTIONS[collection];
+      const scape = await getNFTData(contractAddress, scapesId, rpcUrl);
       if (scape) {
         setNftImage(scape.image);
       }
       setLoading(false);
     }
     fetchData();
-  }, [scapesId, chain]);
+  }, [scapesId, chain, collection]);
 
   const downloadImage = () => {
     const canvas = document.createElement('canvas');
@@ -206,7 +212,7 @@ export default function HorizonScapes() {
           )}
         </div>
 
-        <div className={styles.searchContainer} style={{ marginTop: 20 }}>
+        {/* <div className={styles.searchContainer} style={{ marginTop: 20 }}>
           <select
             value={chain}
             onChange={(e) => setChain(e.target.value)}
@@ -215,6 +221,20 @@ export default function HorizonScapes() {
             {Object.keys(RPC_CHAINS).map((chainKey) => (
               <option key={chainKey} value={chainKey}>
                 {chainKey}
+              </option>
+            ))}
+          </select>
+        </div> */}
+
+        <div className={styles.searchContainer} style={{ marginTop: 20 }}>
+          <select
+            value={collection}
+            onChange={(e) => setCollection(e.target.value)}
+            className={styles.search}
+          >
+            {Object.keys(COLLECTIONS).map((collectionKey) => (
+              <option key={collectionKey} value={collectionKey}>
+                {collectionKey.replace(/_/g, ' ')}
               </option>
             ))}
           </select>
