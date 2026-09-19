@@ -148,7 +148,7 @@ export default function HorizonScapes() {
     <>
       <Head>
         <title>Punkscape Relic</title>
-        <meta name="description" content="Punkscape Relic: Minimalist NFT artwork showcase" />
+        <meta name="description" content="Punkscape Relic and Scape" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
