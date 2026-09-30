@@ -15,45 +15,192 @@ function softmax(values) {
 
   return exps.map(v => v / sum);
 }
-function isAbbrev(s, abbrev){
-	/*Checks if string s is an abbreviation (With periods)*/
-	var single_abbrv = abbrev || ["a.m","p.m","etc","vol","inc","jr","dr","tex","co","prof","rev","revd","hon","v.s","ie",
-		"eg","et al","st","ph.d","capt","mr","mrs","ms"];
-	/*Follows the simple abbreviation patterns*/
-	if(single_abbrv.includes(s.toLowerCase()) || single_abbrv.includes(s.toLowerCase().substring(0,s.length-1))){
-		return true;
-	}
-	
-	/*Possibly an abbreviation like U.S. or D.C, check if it contains periods with less than 2 letters between each period*/
-	if( s.endsWith(".") )
-		s = s.substring(0,s.length-1);
-	s = s.split(".");
-	return s.length > 1 && s.filter(function(x){return x.length <= 2;}).length > 0;
+function isAbbrev(s, abbrev) {
+  const single_abbrv = abbrev || [
+    "a.m", "p.m", "etc", "vol", "inc", "jr", "dr",
+    "tex", "co", "prof", "rev", "revd", "hon", "v.s",
+    "ie", "eg", "et al", "st", "ph.d", "capt",
+    "mr", "mrs", "ms"
+  ];
+
+  const lower = s.toLowerCase();
+
+  if (
+    single_abbrv.includes(lower) ||
+    single_abbrv.includes(lower.replace(/\.$/, ""))
+  ) {
+    return true;
+  }
+
+  let cleaned = s;
+
+  if (cleaned.endsWith(".")) {
+    cleaned = cleaned.slice(0, -1);
+  }
+
+  const parts = cleaned.split(".");
+
+  return (
+    parts.length > 1 &&
+    parts.filter(x => x.length <= 2).length > 0
+  );
 }
 
-function extractsentences(body_text, abbrev, divider){
-	var sentences = [];
-	var start = 0;
-	divider = divider || [".","?","!"];
-	
-	for(var i=0;i<body_text.length;i++){
-		/*Check if it's an end of a sentence*/
-		var temp = body_text.slice(start,Math.min(body_text.length-1,i+1)).split(" "); 
+function extractsentences(body_text, abbrev, divider) {
 
-		if( 
-			divider.includes(body_text[i]) &&    /*Check for end of sentence punctuation*/
-			/*Check for spaces/special chars that make sure it's the end of an sentence*/
-			( body_text[i+1] == " " || body_text[i+1] == '"' || i >= body_text.length - 1 || body_text[i+1] == "[" ) &&
-			/*Check that it's really the end and not an abbreviation*/
-			!isAbbrev( temp[temp.length-1], abbrev ) 
-		){
-			sentences.push( body_text.slice(start,Math.min(body_text.length,i+1)) );
-			start = i+1;
-		}
-	}
-	return sentences;
+  const sentences = [];
+
+  const text = body_text
+    .replace(/\r\n/g, "\n")
+    .replace(/\r/g, "\n")
+    .trim();
+
+  if (!text) {
+    return sentences;
+  }
+
+  divider = divider || [".", "?", "!"];
+
+  let start = 0;
+
+
+  for (let i = 0; i < text.length; i++) {
+
+    const char = text[i];
+
+    if (!divider.includes(char)) {
+      continue;
+    }
+
+
+    // -----------------------------------------------
+    // Decimal numbers
+    // Don't split:
+    //
+    // 3.14
+    // 10.5
+    // -----------------------------------------------
+
+    if (
+      char === "." &&
+      /\d/.test(text[i - 1] || "") &&
+      /\d/.test(text[i + 1] || "")
+    ) {
+      continue;
+    }
+
+
+    // -----------------------------------------------
+    // Get the text since the previous boundary
+    // -----------------------------------------------
+
+    const current = text.slice(start, i + 1);
+
+    const words = current.trim().split(/\s+/);
+
+    const lastWord = words[words.length - 1] || "";
+
+
+    // -----------------------------------------------
+    // Abbreviations
+    // -----------------------------------------------
+
+    if (
+      char === "." &&
+      isAbbrev(lastWord, abbrev)
+    ) {
+      continue;
+    }
+
+
+    // -----------------------------------------------
+    // Initials
+    //
+    // A. Smith
+    // J.R.R. Tolkien
+    // U.S.
+    // -----------------------------------------------
+
+    if (
+      char === "." &&
+      /^[A-Za-z](?:\.[A-Za-z])*\.?$/.test(lastWord)
+    ) {
+      continue;
+    }
+
+
+    // -----------------------------------------------
+    // URLs / emails
+    // -----------------------------------------------
+
+    if (
+      char === "." &&
+      (
+        lastWord.includes("@") ||
+        /^https?:\/\//i.test(lastWord) ||
+        /^www\./i.test(lastWord)
+      )
+    ) {
+      continue;
+    }
+
+
+    // -----------------------------------------------
+    // Sentence boundary
+    //
+    // NO SPACE REQUIRED.
+    //
+    // These all work:
+    //
+    // Hello. World.
+    // Hello.World.
+    // Hello.\nWorld.
+    // Hello!What?
+    // -----------------------------------------------
+
+    let end = i + 1;
+
+
+    // Include closing punctuation
+    while (
+      end < text.length &&
+      ['"', "'", ")", "]", "}"].includes(text[end])
+    ) {
+      end++;
+    }
+
+
+    const sentence = text
+      .slice(start, end)
+      .trim();
+
+
+    if (sentence) {
+      sentences.push(sentence);
+    }
+
+
+    start = end;
+
+    i = end - 1;
+  }
+
+
+  // -----------------------------------------------
+  // Anything left without punctuation
+  // -----------------------------------------------
+
+  const remainder = text
+    .slice(start)
+    .trim();
+
+  if (remainder) {
+    sentences.push(remainder);
+  }
+
+
+  return sentences;
 }
-
 function tokenizeSentence(sentence, stopwordSet) {
   return sentence
     .toLowerCase()
@@ -163,504 +310,317 @@ export default function Home() {
   // BUILD ASSOCIATION NETWORK
   // ------------------------------------------------------------
 
-  const stopwords = [];
-  function buildAssociations() {
-    const stopwordSet = new Set(stopwords);
+  const stopwords = [
+    "a",
+    "an",
+    "the",
+    "and",
+    "or",
+    "but",
+    "if",
+    "then",
+    "so",
+    "because",
+    "of",
+    "to",
+    "in",
+    "on",
+    "at",
+    "for",
+    "from",
+    "with",
+    "by",
+    "about",
+    "as",
+    "into",
+    "through",
+    "during",
+    "before",
+    "after",
+    "between",
+    "is",
+    "am",
+    "are",
+    "was",
+    "were",
+    "be",
+    "been",
+    "being",
+    "have",
+    "has",
+    "had",
+    "do",
+    "does",
+    "did",
+    "i",
+    "me",
+    "my",
+    "mine",
+    "myself",
+    "you",
+    "your",
+    "yours",
+    "yourself",
+    "he",
+    "him",
+    "his",
+    "himself",
+    "she",
+    "her",
+    "hers",
+    "herself",
+    "it",
+    "its",
+    "itself",
+    "we",
+    "us",
+    "our",
+    "ours",
+    "ourselves",
+    "they",
+    "them",
+    "their",
+    "theirs",
+    "themselves",
+    "this",
+    "that",
+    "these",
+    "those"
+];
+function buildAssociations() {
+  const stopwordSet = new Set(stopwords);
 
-    customStopwords
-      .split(',')
-      .forEach(word => {
-        const trimmed = word.trim().toLowerCase();
+  customStopwords
+    .split(',')
+    .forEach(word => {
+      const trimmed = word.trim().toLowerCase();
 
-        if (trimmed) {
-          stopwordSet.add(trimmed);
+      if (trimmed) {
+        stopwordSet.add(trimmed);
+      }
+    });
+
+
+  // --------------------------------------------------
+  // 1. SPLIT INPUT INTO SENTENCES
+  // --------------------------------------------------
+  // Newlines are treated as sentence boundaries.
+  //
+  // Example:
+  //
+  // "the cat sat on the mat .
+  //
+  //  the cat ate the fish .
+  //
+  //  the cat sat on the rug ."
+  //
+  // becomes 3 separate sentences.
+  // --------------------------------------------------
+
+  console.log(text)
+  const sentences = extractsentences(text)
+  console.log('sentences', sentences)
+
+  // --------------------------------------------------
+  // 2. TOKENIZE EACH SENTENCE
+  // --------------------------------------------------
+
+  const sentenceWords = sentences.map(sentence => {
+
+    return tokenizeSentence(
+      sentence,
+      stopwordSet
+    );
+
+  });
+
+
+  // --------------------------------------------------
+  // 3. WORD FREQUENCY
+  // --------------------------------------------------
+  // Count every occurrence globally.
+  //
+  // the = 6
+  // cat = 3
+  // --------------------------------------------------
+
+  const wordFrequency = new Map();
+
+  sentenceWords.forEach(words => {
+
+    words.forEach(word => {
+
+      wordFrequency.set(
+        word,
+        (wordFrequency.get(word) || 0) + 1
+      );
+
+    });
+
+  });
+
+
+  // --------------------------------------------------
+  // 4. BUILD ASSOCIATION GRID
+  // --------------------------------------------------
+  //
+  // This follows the simple experiment:
+  //
+  // for every sentence:
+  //   for every occurrence of wordA:
+  //     for every occurrence of wordB:
+  //       association[A][B] += 1
+  //
+  // Therefore:
+  //
+  // sentence 1:
+  // the = 2
+  // cat = 1
+  //
+  // the → cat = 2 × 1 = 2
+  //
+  // Across 3 sentences:
+  //
+  // the → cat = 2 + 2 + 2 = 6
+  // --------------------------------------------------
+
+  const associationGrid = new Map();
+
+  const ensureWord = word => {
+
+    if (!associationGrid.has(word)) {
+      associationGrid.set(word, new Map());
+    }
+
+  };
+
+
+  sentenceWords.forEach(words => {
+
+    words.forEach(wordA => {
+
+      ensureWord(wordA);
+
+      words.forEach(wordB => {
+
+        if (wordA === wordB) {
+          return;
         }
+
+        ensureWord(wordB);
+
+        const row = associationGrid.get(wordA);
+
+        row.set(
+          wordB,
+          (row.get(wordB) || 0) + 1
+        );
+
       });
 
-    // ----------------------------------------------------------
-    // 1. Split text into sentences
-    // ----------------------------------------------------------
-
-    const sentences = extractsentences(text)
-
-    // ----------------------------------------------------------
-    // 2. Tokenize each sentence
-    //
-    // Each sentence becomes a collection of words.
-    //
-    // IMPORTANT:
-    // A word appearing multiple times inside one sentence
-    // only participates once for that sentence.
-    // ----------------------------------------------------------
-
-    // Count every occurrence of every word in the original text.
-    // This is separate from sentence-level associations, which only
-    // count a word once per sentence.
-    const wordFrequency = new Map();
-
-    const sentenceWords = sentences.map(sentence => {
-      const words = tokenizeSentence(
-        sentence,
-        stopwordSet
-      );
-
-      for (const word of words) {
-        wordFrequency.set(
-          word,
-          (wordFrequency.get(word) || 0) + 1
-        );
-      }
-
-      return [...new Set(words)];
     });
 
-    // ----------------------------------------------------------
-    // 3. Build association grid
-    //
-    // Every pair of words appearing in the SAME SENTENCE
-    // gets +1.
-    //
-    // Example:
-    //
-    // "cat sat mat"
-    //
-    // cat -> sat = 1
-    // cat -> mat = 1
-    // sat -> cat = 1
-    // sat -> mat = 1
-    // mat -> cat = 1
-    // mat -> sat = 1
-    // ----------------------------------------------------------
+  });
 
-    const associationGrid = new Map();
 
-    const ensureWord = word => {
-      if (!associationGrid.has(word)) {
-        associationGrid.set(word, new Map());
+  // --------------------------------------------------
+  // DEBUG
+  // --------------------------------------------------
+
+  console.log("=== ASSOCIATION CHECK ===");
+
+console.table(associationGrid)
+
+  // --------------------------------------------------
+  // 5. CONVERT GRID INTO EDGES
+  // --------------------------------------------------
+
+  const edges = [];
+
+  const edgeMap = new Map();
+
+  associationGrid.forEach((row, source) => {
+
+    row.forEach((weight, target) => {
+
+      if (weight <= 0) {
+        return;
       }
-    };
 
-    for (const words of sentenceWords) {
-      for (const wordA of words) {
-        ensureWord(wordA);
+      // Undirected visual edge.
+      // "the → cat" and "cat → the"
+      // represent the same connection.
+      const key = [source, target]
+        .sort()
+        .join("||");
 
-        for (const wordB of words) {
-          if (wordA === wordB) continue;
+      if (!edgeMap.has(key)) {
 
-          ensureWord(wordB);
-
-          const row = associationGrid.get(wordA);
-
-          row.set(
-            wordB,
-            (row.get(wordB) || 0) + 1
-          );
-        }
-      }
-    }
-
-    // ----------------------------------------------------------
-    // 4. Convert association grid into graph edges
-    //
-    // Raw count:
-    //
-    //   weight = number of sentences containing both words
-    //
-    // Softmax:
-    //
-    //   strength = P(target | source)
-    //
-    // ----------------------------------------------------------
-
-    const edgeMap = new Map();
-
-    for (const [source, connections] of associationGrid) {
-      const targets = Array.from(
-        connections.keys()
-      );
-
-      if (!targets.length) continue;
-
-      const counts = targets.map(
-        target => connections.get(target)
-      );
-
-      const probabilities = softmax(counts);
-
-      const probabilityMap = new Map(
-        targets.map((target, index) => [
+        edgeMap.set(key, {
+          source,
           target,
-          probabilities[index]
-        ])
-      );
+          weight,
+          strength: weight,
+          type: 'sentence'
+        });
 
-      for (const [target, weight] of connections) {
-        const key = [source, target]
-          .sort()
-          .join('||');
-
-        // The grid is symmetric, so only one visual
-        // edge is needed.
-        if (!edgeMap.has(key)) {
-          edgeMap.set(key, {
-            source,
-            target,
-
-            // Raw association count
-            weight,
-
-            // P(target | source)
-            strength:
-              probabilityMap.get(target) || 0,
-
-            type: 'sentence'
-          });
-        }
-      }
-    }
-
-    const edges = Array.from(
-      edgeMap.values()
-    );
-
-    // ----------------------------------------------------------
-    // 5. Create nodes
-    // ----------------------------------------------------------
-
-    const nodesList = Array.from(
-      new Set(
-        edges.flatMap(edge => [
-          edge.source,
-          edge.target
-        ])
-      )
-    );
-
-    const simNodes = nodesList.map(id => ({
-      id,
-
-      x:
-        Math.random() *
-          (GRAPH_WIDTH - GRAPH_PADDING * 2) +
-        GRAPH_PADDING,
-
-      y:
-        Math.random() *
-          (GRAPH_HEIGHT - GRAPH_PADDING * 2) +
-        GRAPH_PADDING,
-
-      vx: 0,
-      vy: 0
-    }));
-
-    const nodeById = new Map(
-      simNodes.map(node => [
-        node.id,
-        node
-      ])
-    );
-
-    // ----------------------------------------------------------
-    // 6. Force simulation
-    // ----------------------------------------------------------
-
-    for (let iteration = 0; iteration < 200; iteration++) {
-      const alpha = Math.max(
-        0.008,
-        1 - iteration / 140
-      );
-
-      // --------------------------------------------------------
-      // Repulsion
-      // --------------------------------------------------------
-
-      for (
-        let i = 0;
-        i < simNodes.length;
-        i++
-      ) {
-        for (
-          let j = i + 1;
-          j < simNodes.length;
-          j++
-        ) {
-          const a = simNodes[i];
-          const b = simNodes[j];
-
-          const dx = b.x - a.x || 0.1;
-          const dy = b.y - a.y || 0.1;
-
-          const distance = Math.sqrt(
-            dx * dx + dy * dy
-          );
-
-          const force =
-            (7600 / (distance * distance)) *
-            alpha;
-
-          a.vx -=
-            (dx / distance) * force;
-
-          a.vy -=
-            (dy / distance) * force;
-
-          b.vx +=
-            (dx / distance) * force;
-
-          b.vy +=
-            (dy / distance) * force;
-        }
       }
 
-      // --------------------------------------------------------
-      // Edge attraction
-      //
-      // Stronger softmax association =
-      // stronger attraction.
-      // --------------------------------------------------------
-
-      for (const edge of edges) {
-        const a = nodeById.get(edge.source);
-        const b = nodeById.get(edge.target);
-
-        if (!a || !b) continue;
-
-        const dx = b.x - a.x;
-        const dy = b.y - a.y;
-
-        const distance =
-          Math.sqrt(dx * dx + dy * dy) || 1;
-
-        const strength = Math.max(
-          0.05,
-          edge.strength || 0
-        );
-
-        const targetDistance =
-          175 - strength * 75;
-
-        const force =
-          (distance - targetDistance) *
-          (0.035 + strength * 0.035) *
-          alpha;
-
-        a.vx +=
-          (dx / distance) * force;
-
-        a.vy +=
-          (dy / distance) * force;
-
-        b.vx -=
-          (dx / distance) * force;
-
-        b.vy -=
-          (dy / distance) * force;
-      }
-
-      // --------------------------------------------------------
-      // Center pull
-      // --------------------------------------------------------
-
-      for (const node of simNodes) {
-        node.vx +=
-          (GRAPH_WIDTH / 2 - node.x) *
-          0.0035 *
-          alpha;
-
-        node.vy +=
-          (GRAPH_HEIGHT / 2 - node.y) *
-          0.0035 *
-          alpha;
-      }
-
-      // --------------------------------------------------------
-      // Update positions
-      // --------------------------------------------------------
-
-      for (const node of simNodes) {
-        node.vx *= 0.8;
-        node.vy *= 0.8;
-
-        node.x = Math.max(
-          GRAPH_PADDING / 2,
-          Math.min(
-            GRAPH_WIDTH - GRAPH_PADDING / 2,
-            node.x + node.vx
-          )
-        );
-
-        node.y = Math.max(
-          GRAPH_PADDING / 2,
-          Math.min(
-            GRAPH_HEIGHT - GRAPH_PADDING / 2,
-            node.y + node.vy
-          )
-        );
-      }
-    }
-
-    // ----------------------------------------------------------
-    // 7. Normalize positions
-    // ----------------------------------------------------------
-
-    if (simNodes.length > 1) {
-      const xs = simNodes.map(
-        node => node.x
-      );
-
-      const ys = simNodes.map(
-        node => node.y
-      );
-
-      const minX = Math.min(...xs);
-      const maxX = Math.max(...xs);
-
-      const minY = Math.min(...ys);
-      const maxY = Math.max(...ys);
-
-      const spanX = Math.max(
-        1,
-        maxX - minX
-      );
-
-      const spanY = Math.max(
-        1,
-        maxY - minY
-      );
-
-      const targetWidth =
-        GRAPH_WIDTH -
-        GRAPH_PADDING * 2;
-
-      const targetHeight =
-        GRAPH_HEIGHT -
-        GRAPH_PADDING * 2;
-
-      for (const node of simNodes) {
-        node.x =
-          GRAPH_PADDING +
-          ((node.x - minX) / spanX) *
-            targetWidth;
-
-        node.y =
-          GRAPH_PADDING +
-          ((node.y - minY) / spanY) *
-            targetHeight;
-      }
-
-      // --------------------------------------------------------
-      // High-degree nodes closer to center
-      // --------------------------------------------------------
-
-      const degreeMap = new Map(
-        simNodes.map(node => [
-          node.id,
-          0
-        ])
-      );
-
-      for (const edge of edges) {
-        degreeMap.set(
-          edge.source,
-          (degreeMap.get(edge.source) || 0) + 1
-        );
-
-        degreeMap.set(
-          edge.target,
-          (degreeMap.get(edge.target) || 0) + 1
-        );
-      }
-
-      const degrees =
-        Array.from(
-          degreeMap.values()
-        );
-
-      const maxDegree =
-        Math.max(...degrees);
-
-      const minDegree =
-        Math.min(...degrees);
-
-      const centerX =
-        GRAPH_WIDTH / 2;
-
-      const centerY =
-        GRAPH_HEIGHT / 2;
-
-      const maxRadius =
-        Math.min(
-          GRAPH_WIDTH,
-          GRAPH_HEIGHT
-        ) / 2 -
-        GRAPH_PADDING;
-
-      for (const node of simNodes) {
-        const degree =
-          degreeMap.get(node.id) || 0;
-
-        const normalizedDegree =
-          maxDegree > minDegree
-            ? (degree - minDegree) /
-              (maxDegree - minDegree)
-            : 0.5;
-
-        const radius =
-          maxRadius *
-          (1 - normalizedDegree * 0.85);
-
-        const angle =
-          Math.atan2(
-            node.y - centerY,
-            node.x - centerX
-          );
-
-        node.x = Math.max(
-          GRAPH_PADDING,
-          Math.min(
-            GRAPH_WIDTH - GRAPH_PADDING,
-            centerX +
-              Math.cos(angle) * radius
-          )
-        );
-
-        node.y = Math.max(
-          GRAPH_PADDING,
-          Math.min(
-            GRAPH_HEIGHT - GRAPH_PADDING,
-            centerY +
-              Math.sin(angle) * radius
-          )
-        );
-      }
-
-      separateOverlappingNodes(
-        simNodes,
-        MIN_NODE_DISTANCE
-      );
-    }
-
-    // ----------------------------------------------------------
-    // 8. Store result
-    // ----------------------------------------------------------
-
-    setFullNodes(simNodes);
-
-    setResult({
-      nodes: simNodes,
-      edges,
-      associationGrid,
-      wordFrequency
     });
 
-    setSearchTerm('');
-    setZoom(1);
-    setPan({
-      x: 0,
-      y: 0
-    });
-  }
+  });
 
+
+  edgeMap.forEach(edge => {
+    edges.push(edge);
+  });
+
+
+  // --------------------------------------------------
+  // 6. BUILD NODES
+  // --------------------------------------------------
+
+  const nodes = [];
+
+  associationGrid.forEach((row, word) => {
+
+    nodes.push({
+      id: word,
+      label: word,
+      frequency: wordFrequency.get(word) || 0
+    });
+
+  });
+
+
+  // --------------------------------------------------
+  // 7. FORCE SIMULATION
+  // --------------------------------------------------
+
+  const simNodes = nodes.map(node => ({
+    ...node,
+    x: Math.random() * 800,
+    y: Math.random() * 600
+  }));
+
+
+  // Keep your existing force simulation here.
+  // If your current buildAssociations() has a specific
+  // simulation block, retain that block unchanged.
+
+
+  // --------------------------------------------------
+  // 8. STORE RESULT
+  // --------------------------------------------------
+setFullNodes(simNodes);
+
+  setResult({
+    nodes: simNodes,
+    edges,
+    associationGrid,
+    wordFrequency
+  });
+}
   // ------------------------------------------------------------
   // SEARCH / HIGHLIGHT
   // ------------------------------------------------------------
@@ -752,7 +712,7 @@ export default function Home() {
         connectionWeightMap.set(
           neighbor,
           (connectionWeightMap.get(neighbor) || 0) +
-            edge.weight
+          edge.weight
         );
       }
     });
@@ -873,7 +833,7 @@ export default function Home() {
 
   return (
     <>
-           <Head>
+      <Head>
         <title>Visualize Language Network</title>
         <meta name="description" content="Visualize language network from large text and words associated with each other." />
         <link rel="icon" href="/favicon.ico" />
@@ -899,7 +859,7 @@ export default function Home() {
           Language Network
         </h1>
 
-                  <span style={{ color: '#777', fontSize: '14px', marginBottom: '20px', display: 'block' }}>Visualize language network and words associated with each other</span>
+        <span style={{ color: '#777', fontSize: '14px', marginBottom: '20px', display: 'block' }}>Visualize language network and words associated with each other</span>
 
         <div
           style={{
@@ -1011,14 +971,6 @@ The cat sat on the rug.`}
           >
             <button
               onClick={buildAssociations}
-              style={{
-                padding: '8px 14px',
-                background: '#fff',
-                color: '#000',
-                border: 'none',
-                cursor: 'pointer',
-                fontFamily: 'monospace'
-              }}
             >
               Build Network
             </button>
@@ -1026,14 +978,6 @@ The cat sat on the rug.`}
             {result && (
               <button
                 onClick={copyAssociations}
-                style={{
-                  padding: '8px 14px',
-                  background: '#222',
-                  color: '#fff',
-                  border: '1px solid #444',
-                  cursor: 'pointer',
-                  fontFamily: 'monospace'
-                }}
               >
                 {copied
                   ? 'copied!'
@@ -1090,21 +1034,6 @@ The cat sat on the rug.`}
                       )
                     )
                   }
-                  style={{
-                    padding:
-                      '6px 14px',
-                    background:
-                      '#222',
-                    border:
-                      '1px solid #444',
-                    color: '#fff',
-                    cursor:
-                      'pointer',
-                    fontFamily:
-                      'monospace',
-                    fontSize:
-                      '16px'
-                  }}
                 >
                   +
                 </button>
@@ -1118,21 +1047,6 @@ The cat sat on the rug.`}
                       )
                     )
                   }
-                  style={{
-                    padding:
-                      '6px 14px',
-                    background:
-                      '#222',
-                    border:
-                      '1px solid #444',
-                    color: '#fff',
-                    cursor:
-                      'pointer',
-                    fontFamily:
-                      'monospace',
-                    fontSize:
-                      '16px'
-                  }}
                 >
                   −
                 </button>
@@ -1144,21 +1058,6 @@ The cat sat on the rug.`}
                       x: 0,
                       y: 0
                     });
-                  }}
-                  style={{
-                    padding:
-                      '6px 14px',
-                    background:
-                      '#222',
-                    border:
-                      '1px solid #444',
-                    color: '#aaa',
-                    cursor:
-                      'pointer',
-                    fontFamily:
-                      'monospace',
-                    fontSize:
-                      '13px'
                   }}
                 >
                   reset
@@ -1312,31 +1211,31 @@ The cat sat on the rug.`}
                           const connRatio =
                             isConnected
                               ? edge.weight /
-                                highlightedData.maxConnWeight
+                              highlightedData.maxConnWeight
                               : 0;
 
                           const strokeOpacity =
                             !highlightedData.hasSearch
                               ? 0.05 +
-                                (edge.weight /
-                                  maxWeight) *
-                                  0.15
+                              (edge.weight /
+                                maxWeight) *
+                              0.15
                               : isConnected
                                 ? 0.15 +
-                                  connRatio *
-                                    0.15
+                                connRatio *
+                                0.15
                                 : 0.02;
 
                           const strokeWidth =
                             !highlightedData.hasSearch
                               ? 0.5 +
-                                (edge.weight /
-                                  maxWeight) *
-                                  1.5
+                              (edge.weight /
+                                maxWeight) *
+                              1.5
                               : isConnected
                                 ? 0.5 +
-                                  connRatio *
-                                    2
+                                connRatio *
+                                2
                                 : 0.2;
 
                           return (
@@ -1361,7 +1260,7 @@ The cat sat on the rug.`}
 
                               {/* EDGE LABEL */}
 
-                              <text
+                              {/* <text
                                 x={
                                   (source.x +
                                     target.x) /
@@ -1370,7 +1269,7 @@ The cat sat on the rug.`}
                                 y={
                                   (source.y +
                                     target.y) /
-                                    2 -
+                                  2 -
                                   4
                                 }
                                 textAnchor="middle"
@@ -1390,7 +1289,7 @@ The cat sat on the rug.`}
                                   100
                                 ).toFixed(1)}
                                 %
-                              </text>
+                              </text> */}
                             </g>
                           );
                         }
@@ -1415,103 +1314,103 @@ The cat sat on the rug.`}
                         );
                       })
                       .map(node => {
-                      const isCenter =
-                        highlightedData.hasSearch &&
-                        highlightedData.termSet.has(
-                          node.id
-                        );
+                        const isCenter =
+                          highlightedData.hasSearch &&
+                          highlightedData.termSet.has(
+                            node.id
+                          );
 
-                      const connWeight =
-                        highlightedData.hasSearch
-                          ? highlightedData.connectionWeightMap.get(
+                        const connWeight =
+                          highlightedData.hasSearch
+                            ? highlightedData.connectionWeightMap.get(
                               node.id
                             )
-                          : undefined;
+                            : undefined;
 
-                      const isConnected =
-                        connWeight !==
-                        undefined;
+                        const isConnected =
+                          connWeight !==
+                          undefined;
 
-                      const connRatio =
-                        isConnected
-                          ? connWeight /
+                        const connRatio =
+                          isConnected
+                            ? connWeight /
                             highlightedData.maxConnWeight
-                          : 0;
+                            : 0;
 
-                      const radius =
-                        isCenter
-                          ? 22
-                          : 12;
+                        const radius =
+                          isCenter
+                            ? 22
+                            : 12;
 
-                      const nodeOpacity =
-                        !highlightedData.hasSearch
-                          ? 1
-                          : isCenter
+                        const nodeOpacity =
+                          !highlightedData.hasSearch
                             ? 1
-                            : isConnected
-                              ? 0.2 +
+                            : isCenter
+                              ? 1
+                              : isConnected
+                                ? 0.2 +
                                 connRatio *
-                                  0.8
-                              : 0.1;
+                                0.8
+                                : 0.1;
 
-                      const brightness =
-                        Math.round(
-                          80 +
+                        const brightness =
+                          Math.round(
+                            80 +
                             connRatio *
-                              175
-                        );
+                            175
+                          );
 
-                      const textFill =
-                        !highlightedData.hasSearch
-                          ? '#888'
-                          : isCenter
-                            ? '#fff'
-                            : isConnected
-                              ? `rgb(${brightness},${brightness},${brightness})`
-                              : '#333';
+                        const textFill =
+                          !highlightedData.hasSearch
+                            ? '#888'
+                            : isCenter
+                              ? '#fff'
+                              : isConnected
+                                ? `rgb(${brightness},${brightness},${brightness})`
+                                : '#333';
 
-                      return (
-                        <g
-                          key={node.id}
-                          opacity={
-                            nodeOpacity
-                          }
-                        >
-                          <circle
-                            cx={node.x}
-                            cy={node.y}
-                            r={radius}
-                            fill="transparent"
-                            stroke="transparent"
-                          />
-
-                          <text
-                            x={node.x}
-                            y={
-                              node.y + 5
-                            }
-                            textAnchor="middle"
-                            fill={textFill}
-                            fontSize={
-                              isCenter
-                                ? '13.5'
-                                : isConnected
-                                  ? '11'
-                                  : '9.5'
-                            }
-                            fontFamily="monospace"
-                            fontWeight={
-                              isCenter ||
-                              isConnected
-                                ? 'bold'
-                                : 'normal'
+                        return (
+                          <g
+                            key={node.id}
+                            opacity={
+                              nodeOpacity
                             }
                           >
-                            {node.id}
-                          </text>
-                        </g>
-                      );
-                    })}
+                            <circle
+                              cx={node.x}
+                              cy={node.y}
+                              r={radius}
+                              fill="transparent"
+                              stroke="transparent"
+                            />
+
+                            <text
+                              x={node.x}
+                              y={
+                                node.y + 5
+                              }
+                              textAnchor="middle"
+                              fill={textFill}
+                              fontSize={
+                                isCenter
+                                  ? '13.5'
+                                  : isConnected
+                                    ? '11'
+                                    : '9.5'
+                              }
+                              fontFamily="monospace"
+                              fontWeight={
+                                isCenter ||
+                                  isConnected
+                                  ? 'bold'
+                                  : 'normal'
+                              }
+                            >
+                              {node.id}
+                            </text>
+                          </g>
+                        );
+                      })}
                   </g>
                 </svg>
               </div>
