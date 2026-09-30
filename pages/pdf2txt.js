@@ -292,14 +292,14 @@ export default function Home() {
           pdf to txt
         </h1>
         <h2 className={styles.description}>
-          Listen to pdf while you work
+          get txt from pdf
         </h2>
         <div>
           {/* input pdf file */}
           <input type="file" accept="application/pdf" onChange={handleFileChange} style={{
             marginBottom: 20
           }} />
-          <textarea style={{ background: '#000', border: '1px solid #333', width: '500px', height: '200px' }}
+          <textarea style={{ background: '#000', border: '1px solid #333', width: '100%', height: '200px' }}
             value={text}
             onChange={e => setText(e.target.value)}></textarea>
         </div>
