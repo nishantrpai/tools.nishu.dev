@@ -792,15 +792,6 @@ The cat sat on the rug.`);
 
 
       <main
-        style={{
-          padding: '20px',
-          background: '#000',
-          color: '#fff',
-          fontFamily: 'system-ui',
-          maxWidth: '100%',
-          width: '100%',
-          minHeight: '100vh'
-        }}
       >
         <h1
           style={{
