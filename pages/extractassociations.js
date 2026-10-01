@@ -912,6 +912,11 @@ The cat sat on the rug.`}
             >
               {visualMode ? 'Hide Visual' : 'Show Visual'}
             </button>
+             <button
+              onClick={() => setShowEdges(value => !value)}
+            >
+              {showEdges ? 'Hide Edges' : 'Show Edges'}
+            </button>
 
 
             {result && (
