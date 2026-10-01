@@ -299,7 +299,7 @@ The cat sat on the rug.`);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [visualMode, setVisualMode] = useState(true)
-  const [showEdges, setShowEdges] = useState(false)
+  const [showEdges, setShowEdges] = useState(true)
   const deferredSearchTerm = useDeferredValue(searchTerm);
 
   const [minWeight, setMinWeight] = useState(1);
@@ -307,7 +307,7 @@ The cat sat on the rug.`);
 
   const [fullNodes, setFullNodes] = useState([]);
 
-  const [zoom, setZoom] = useState(1);
+  const [zoom, setZoom] = useState(0.6);
   const [pan, setPan] = useState({ x: 0, y: 0 });
 
   const [copied, setCopied] = useState(false);
@@ -907,17 +907,21 @@ The cat sat on the rug.`}
             >
               Build Network
             </button>
-             <button
+             <input
+             type="checkbox"
+             checked={visualMode}
               onClick={() => setVisualMode(value => !value)}
-            >
-              {visualMode ? 'Hide Visual' : 'Show Visual'}
-            </button>
-             <button
+            />
+              <label>Visual </label>
+                         <input
+             type="checkbox"
+             checked={showEdges}
               onClick={() => setShowEdges(value => !value)}
-            >
-              {showEdges ? 'Hide Edges' : 'Show Edges'}
-            </button>
+            />
+              <label>
+               Edges
 
+                </label>
 
             {result && (
               <button
