@@ -298,9 +298,11 @@ The cat sat on the rug.`);
   const [result, setResult] = useState(null);
 
   const [searchTerm, setSearchTerm] = useState('');
+  const [visualMode, setVisualMode] = useState(true)
   const deferredSearchTerm = useDeferredValue(searchTerm);
 
   const [minWeight, setMinWeight] = useState(1);
+
 
   const [fullNodes, setFullNodes] = useState([]);
 
@@ -921,6 +923,7 @@ The cat sat on the rug.`}
               Build Network
             </button>
 
+
             {result && (
               <button
                 onClick={copyAssociations}
@@ -937,6 +940,11 @@ The cat sat on the rug.`}
                 {highlightTop10 ? 'Show All Nodes' : 'Highlight Top 10'}
               </button>
             )}
+            <button
+              onClick={() => setVisualMode(value => !value)}
+            >
+              {visualMode ? 'Hide Visual' : 'Show Visual'}
+            </button>
           </div>
 
           {/* GRAPH */}
@@ -970,7 +978,7 @@ The cat sat on the rug.`}
 
               {/* ZOOM */}
 
-              <div
+              {visualMode && <div
                 style={{
                   display: 'flex',
                   gap: '8px',
@@ -1029,11 +1037,11 @@ The cat sat on the rug.`}
                   )}
                   %
                 </span>
-              </div>
+              </div>}
 
               {/* SVG CONTAINER */}
 
-              <div
+              {visualMode && <div
                 style={{
                   width: '100%',
                   height: '82vh',
@@ -1376,7 +1384,7 @@ The cat sat on the rug.`}
                       })}
                   </g>
                 </svg>
-              </div>
+              </div>}
 
               {/* ------------------------------------------
                   SEARCH RESULTS
