@@ -312,7 +312,7 @@ The cat sat on the rug.`);
   const isPanning = useRef(false);
   const panStart = useRef({ x: 0, y: 0 });
   const panOrigin = useRef({ x: 0, y: 0 });
-
+  const [highlightTop10, setHighlightTop10] = useState(false);
   // ------------------------------------------------------------
   // BUILD ASSOCIATION NETWORK
   // ------------------------------------------------------------
@@ -393,240 +393,239 @@ The cat sat on the rug.`);
     "that",
     "these",
     "those"
-];
-function buildAssociations() {
-  const stopwordSet = new Set(stopwords);
+  ];
+  function buildAssociations() {
+    const stopwordSet = new Set(stopwords);
 
-  customStopwords
-    .split(',')
-    .forEach(word => {
-      const trimmed = word.trim().toLowerCase();
+    customStopwords
+      .split(',')
+      .forEach(word => {
+        const trimmed = word.trim().toLowerCase();
 
-      if (trimmed) {
-        stopwordSet.add(trimmed);
-      }
-    });
-
-
-  // --------------------------------------------------
-  // 1. SPLIT INPUT INTO SENTENCES
-  // --------------------------------------------------
-  // Newlines are treated as sentence boundaries.
-  //
-  // Example:
-  //
-  // "the cat sat on the mat .
-  //
-  //  the cat ate the fish .
-  //
-  //  the cat sat on the rug ."
-  //
-  // becomes 3 separate sentences.
-  // --------------------------------------------------
-
-  console.log(text)
-  const sentences = extractsentences(text)
-  console.log('sentences', sentences)
-
-  // --------------------------------------------------
-  // 2. TOKENIZE EACH SENTENCE
-  // --------------------------------------------------
-
-  const sentenceWords = sentences.map(sentence => {
-
-    return tokenizeSentence(
-      sentence,
-      stopwordSet
-    );
-
-  });
+        if (trimmed) {
+          stopwordSet.add(trimmed);
+        }
+      });
 
 
-  // --------------------------------------------------
-  // 3. WORD FREQUENCY
-  // --------------------------------------------------
-  // Count every occurrence globally.
-  //
-  // the = 6
-  // cat = 3
-  // --------------------------------------------------
+    // --------------------------------------------------
+    // 1. SPLIT INPUT INTO SENTENCES
+    // --------------------------------------------------
+    // Newlines are treated as sentence boundaries.
+    //
+    // Example:
+    //
+    // "the cat sat on the mat .
+    //
+    //  the cat ate the fish .
+    //
+    //  the cat sat on the rug ."
+    //
+    // becomes 3 separate sentences.
+    // --------------------------------------------------
 
+    const sentences = extractsentences(text)
+    console.log('sentences', sentences)
 
-  sentenceWords.forEach(words => {
+    // --------------------------------------------------
+    // 2. TOKENIZE EACH SENTENCE
+    // --------------------------------------------------
 
-    words.forEach(word => {
+    const sentenceWords = sentences.map(sentence => {
 
-      wordFrequency.set(
-        word,
-        (wordFrequency.get(word) || 0) + 1
+      return tokenizeSentence(
+        sentence,
+        stopwordSet
       );
 
     });
 
-  });
+
+    // --------------------------------------------------
+    // 3. WORD FREQUENCY
+    // --------------------------------------------------
+    // Count every occurrence globally.
+    //
+    // the = 6
+    // cat = 3
+    // --------------------------------------------------
 
 
-  // --------------------------------------------------
-  // 4. BUILD ASSOCIATION GRID
-  // --------------------------------------------------
-  //
-  // This follows the simple experiment:
-  //
-  // for every sentence:
-  //   for every occurrence of wordA:
-  //     for every occurrence of wordB:
-  //       association[A][B] += 1
-  //
-  // Therefore:
-  //
-  // sentence 1:
-  // the = 2
-  // cat = 1
-  //
-  // the → cat = 2 × 1 = 2
-  //
-  // Across 3 sentences:
-  //
-  // the → cat = 2 + 2 + 2 = 6
-  // --------------------------------------------------
+    sentenceWords.forEach(words => {
 
-  const associationGrid = new Map();
+      words.forEach(word => {
 
-  const ensureWord = word => {
-
-    if (!associationGrid.has(word)) {
-      associationGrid.set(word, new Map());
-    }
-
-  };
-
-
-  sentenceWords.forEach(words => {
-
-    words.forEach(wordA => {
-
-      ensureWord(wordA);
-
-      words.forEach(wordB => {
-
-        if (wordA === wordB) {
-          return;
-        }
-
-        ensureWord(wordB);
-
-        const row = associationGrid.get(wordA);
-
-        row.set(
-          wordB,
-          (row.get(wordB) || 0) + 1
+        wordFrequency.set(
+          word,
+          (wordFrequency.get(word) || 0) + 1
         );
 
       });
 
     });
 
-  });
 
+    // --------------------------------------------------
+    // 4. BUILD ASSOCIATION GRID
+    // --------------------------------------------------
+    //
+    // This follows the simple experiment:
+    //
+    // for every sentence:
+    //   for every occurrence of wordA:
+    //     for every occurrence of wordB:
+    //       association[A][B] += 1
+    //
+    // Therefore:
+    //
+    // sentence 1:
+    // the = 2
+    // cat = 1
+    //
+    // the → cat = 2 × 1 = 2
+    //
+    // Across 3 sentences:
+    //
+    // the → cat = 2 + 2 + 2 = 6
+    // --------------------------------------------------
 
-  // --------------------------------------------------
-  // DEBUG
-  // --------------------------------------------------
+    const associationGrid = new Map();
 
-  console.log("=== ASSOCIATION CHECK ===");
+    const ensureWord = word => {
 
-console.table(associationGrid)
-
-  // --------------------------------------------------
-  // 5. CONVERT GRID INTO EDGES
-  // --------------------------------------------------
-
-  const edges = [];
-
-  const edgeMap = new Map();
-
-  associationGrid.forEach((row, source) => {
-
-    row.forEach((weight, target) => {
-
-      if (weight <= 0) {
-        return;
+      if (!associationGrid.has(word)) {
+        associationGrid.set(word, new Map());
       }
 
-      // Undirected visual edge.
-      // "the → cat" and "cat → the"
-      // represent the same connection.
-      const key = [source, target]
-        .sort()
-        .join("||");
+    };
 
-      if (!edgeMap.has(key)) {
 
-        edgeMap.set(key, {
-          source,
-          target,
-          weight,
-          strength: weight,
-          type: 'sentence'
+    sentenceWords.forEach(words => {
+
+      words.forEach(wordA => {
+
+        ensureWord(wordA);
+
+        words.forEach(wordB => {
+
+          if (wordA === wordB) {
+            return;
+          }
+
+          ensureWord(wordB);
+
+          const row = associationGrid.get(wordA);
+
+          row.set(
+            wordB,
+            (row.get(wordB) || 0) + 1
+          );
+
         });
 
-      }
+      });
 
     });
 
-  });
 
+    // --------------------------------------------------
+    // DEBUG
+    // --------------------------------------------------
 
-  edgeMap.forEach(edge => {
-    edges.push(edge);
-  });
+    console.log("=== ASSOCIATION CHECK ===");
 
+    console.table(associationGrid)
 
-  // --------------------------------------------------
-  // 6. BUILD NODES
-  // --------------------------------------------------
+    // --------------------------------------------------
+    // 5. CONVERT GRID INTO EDGES
+    // --------------------------------------------------
 
-  const nodes = [];
+    const edges = [];
 
-  associationGrid.forEach((row, word) => {
+    const edgeMap = new Map();
 
-    nodes.push({
-      id: word,
-      label: word,
-      frequency: wordFrequency.get(word) || 0
+    associationGrid.forEach((row, source) => {
+
+      row.forEach((weight, target) => {
+
+        if (weight <= 0) {
+          return;
+        }
+
+        // Undirected visual edge.
+        // "the → cat" and "cat → the"
+        // represent the same connection.
+        const key = [source, target]
+          .sort()
+          .join("||");
+
+        if (!edgeMap.has(key)) {
+
+          edgeMap.set(key, {
+            source,
+            target,
+            weight,
+            strength: weight,
+            type: 'sentence'
+          });
+
+        }
+
+      });
+
     });
 
-  });
+
+    edgeMap.forEach(edge => {
+      edges.push(edge);
+    });
 
 
-  // --------------------------------------------------
-  // 7. FORCE SIMULATION
-  // --------------------------------------------------
+    // --------------------------------------------------
+    // 6. BUILD NODES
+    // --------------------------------------------------
 
-  const simNodes = nodes.map(node => ({
-    ...node,
-    x: Math.random() * 800,
-    y: Math.random() * 600
-  }));
+    const nodes = [];
+
+    associationGrid.forEach((row, word) => {
+
+      nodes.push({
+        id: word,
+        label: word,
+        frequency: wordFrequency.get(word) || 0
+      });
+
+    });
 
 
-  // Keep your existing force simulation here.
-  // If your current buildAssociations() has a specific
-  // simulation block, retain that block unchanged.
+    // --------------------------------------------------
+    // 7. FORCE SIMULATION
+    // --------------------------------------------------
+
+    const simNodes = nodes.map(node => ({
+      ...node,
+      x: Math.random() * 800,
+      y: Math.random() * 600
+    }));
 
 
-  // --------------------------------------------------
-  // 8. STORE RESULT
-  // --------------------------------------------------
-setFullNodes(simNodes);
+    // Keep your existing force simulation here.
+    // If your current buildAssociations() has a specific
+    // simulation block, retain that block unchanged.
 
-  setResult({
-    nodes: simNodes,
-    edges,
-    associationGrid,
-    wordFrequency
-  });
-}
+
+    // --------------------------------------------------
+    // 8. STORE RESULT
+    // --------------------------------------------------
+    setFullNodes(simNodes);
+
+    setResult({
+      nodes: simNodes,
+      edges,
+      associationGrid,
+      wordFrequency
+    });
+  }
   // ------------------------------------------------------------
   // SEARCH / HIGHLIGHT
   // ------------------------------------------------------------
@@ -769,6 +768,24 @@ setFullNodes(simNodes);
     fullNodes
   ]);
 
+
+  const top10Nodes = useMemo(() => {
+    if (!result) return new Set();
+
+    const degree = new Map();
+
+    result.edges.forEach(({ source, target }) => {
+      degree.set(source, (degree.get(source) || 0) + 1);
+      degree.set(target, (degree.get(target) || 0) + 1);
+    });
+
+    return new Set(
+      [...degree.entries()]
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 10)
+        .map(([word]) => word)
+    );
+  }, [result]);
   // ------------------------------------------------------------
   // COPY ASSOCIATIONS
   // ------------------------------------------------------------
@@ -988,6 +1005,13 @@ The cat sat on the rug.`}
                 {copied
                   ? 'copied!'
                   : 'copy associations'}
+              </button>
+            )}
+            {result && (
+              <button
+                onClick={() => setHighlightTop10(value => !value)}
+              >
+                {highlightTop10 ? 'Show All Nodes' : 'Highlight Top 10'}
               </button>
             )}
           </div>
@@ -1279,7 +1303,7 @@ The cat sat on the rug.`}
                                   4
                                 }
                                 textAnchor="middle"
-                                fill="#666"
+                                fill="#333"
                                 fontSize="8"
                                 fontFamily="monospace"
                                 pointerEvents="none"
@@ -1337,6 +1361,11 @@ The cat sat on the rug.`}
                           connWeight !==
                           undefined;
 
+                        const isTop10 =
+                          highlightTop10 &&
+                          !highlightedData.hasSearch &&
+                          top10Nodes.has(node.id);
+
                         const connRatio =
                           isConnected
                             ? connWeight /
@@ -1346,7 +1375,9 @@ The cat sat on the rug.`}
                         const radius =
                           isCenter
                             ? 22
-                            : 12;
+                            : isTop10
+                              ? 18
+                              : 12;
 
                         const nodeOpacity =
                           !highlightedData.hasSearch
@@ -1367,9 +1398,11 @@ The cat sat on the rug.`}
                           );
 
                         const textFill =
-                          !highlightedData.hasSearch
-                            ? '#888'
-                            : isCenter
+                          isTop10
+                            ? '#fff'
+                            : !highlightedData.hasSearch
+                              ? '#888'
+                              : isCenter
                               ? '#fff'
                               : isConnected
                                 ? `rgb(${brightness},${brightness},${brightness})`
@@ -1387,7 +1420,8 @@ The cat sat on the rug.`}
                               cy={node.y}
                               r={radius}
                               fill="transparent"
-                              stroke="transparent"
+                              stroke={isTop10 ? '#fff' : 'transparent'}
+                              strokeWidth={isTop10 ? 1.5 : 0}
                             />
 
                             <text
@@ -1400,6 +1434,8 @@ The cat sat on the rug.`}
                               fontSize={
                                 isCenter
                                   ? '13.5'
+                                  : isTop10
+                                    ? '15'
                                   : isConnected
                                     ? '11'
                                     : '9.5'
@@ -1407,7 +1443,8 @@ The cat sat on the rug.`}
                               fontFamily="monospace"
                               fontWeight={
                                 isCenter ||
-                                  isConnected
+                                  isConnected ||
+                                  isTop10
                                   ? 'bold'
                                   : 'normal'
                               }
