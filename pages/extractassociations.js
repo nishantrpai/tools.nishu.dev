@@ -317,83 +317,7 @@ The cat sat on the rug.`);
   // BUILD ASSOCIATION NETWORK
   // ------------------------------------------------------------
 
-  const stopwords = [
-    "a",
-    "an",
-    "the",
-    "and",
-    "or",
-    "but",
-    "if",
-    "then",
-    "so",
-    "because",
-    "of",
-    "to",
-    "in",
-    "on",
-    "at",
-    "for",
-    "from",
-    "with",
-    "by",
-    "about",
-    "as",
-    "into",
-    "through",
-    "during",
-    "before",
-    "after",
-    "between",
-    "is",
-    "am",
-    "are",
-    "was",
-    "were",
-    "be",
-    "been",
-    "being",
-    "have",
-    "has",
-    "had",
-    "do",
-    "does",
-    "did",
-    "i",
-    "me",
-    "my",
-    "mine",
-    "myself",
-    "you",
-    "your",
-    "yours",
-    "yourself",
-    "he",
-    "him",
-    "his",
-    "himself",
-    "she",
-    "her",
-    "hers",
-    "herself",
-    "it",
-    "its",
-    "itself",
-    "we",
-    "us",
-    "our",
-    "ours",
-    "ourselves",
-    "they",
-    "them",
-    "their",
-    "theirs",
-    "themselves",
-    "this",
-    "that",
-    "these",
-    "those"
-  ];
+  const stopwords = [];
   function buildAssociations() {
     const stopwordSet = new Set(stopwords);
 
@@ -723,13 +647,12 @@ The cat sat on the rug.`);
     });
 
     const maxConnWeight =
-      Math.max(
-        ...Array.from(
-          connectionWeightMap.values()
-        ),
+      Array.from(
+        connectionWeightMap.values()
+      ).reduce(
+        (max, value) => Math.max(max, value),
         1
       );
-
     const level1Set =
       new Set(
         connectionWeightMap.keys()
@@ -1196,11 +1119,8 @@ The cat sat on the rug.`}
                         );
 
                       const maxWeight =
-                        Math.max(
-                          ...visibleEdges.map(
-                            edge =>
-                              edge.weight
-                          ),
+                        visibleEdges.reduce(
+                          (max, edge) => Math.max(max, edge.weight),
                           1
                         );
 
@@ -1403,10 +1323,10 @@ The cat sat on the rug.`}
                             : !highlightedData.hasSearch
                               ? '#888'
                               : isCenter
-                              ? '#fff'
-                              : isConnected
-                                ? `rgb(${brightness},${brightness},${brightness})`
-                                : '#333';
+                                ? '#fff'
+                                : isConnected
+                                  ? `rgb(${brightness},${brightness},${brightness})`
+                                  : '#333';
 
                         return (
                           <g
@@ -1436,9 +1356,9 @@ The cat sat on the rug.`}
                                   ? '13.5'
                                   : isTop10
                                     ? '15'
-                                  : isConnected
-                                    ? '11'
-                                    : '9.5'
+                                    : isConnected
+                                      ? '11'
+                                      : '9.5'
                               }
                               fontFamily="monospace"
                               fontWeight={
