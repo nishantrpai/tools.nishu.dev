@@ -299,6 +299,7 @@ The cat sat on the rug.`);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [visualMode, setVisualMode] = useState(true)
+  const [showEdges, setShowEdges] = useState(false)
   const deferredSearchTerm = useDeferredValue(searchTerm);
 
   const [minWeight, setMinWeight] = useState(1);
@@ -559,14 +560,15 @@ The cat sat on the rug.`);
   const highlightedData = useMemo(() => {
     if (
       !result ||
-      !searchTerm.trim()
+      !deferredSearchTerm.trim()
     ) {
       return {
         nodes: fullNodes,
         edges: result?.edges || [],
-        term: '',
+        terms: [],
         termSet: new Set(),
         connectionWeightMap: new Map(),
+        cooccurrences: [],
         maxConnWeight: 1,
         level1Set: new Set(),
         occurrence: 0,
@@ -574,39 +576,42 @@ The cat sat on the rug.`);
       };
     }
 
-    const term =
-      searchTerm
-        .trim()
-        .toLowerCase();
+    const terms = deferredSearchTerm
+      .split(',')
+      .map(term => term.trim().toLowerCase())
+      .filter(Boolean);
 
-    const escapedTerm =
-      term.replace(
-        /[.*+?^${}()|[\]\\]/g,
-        '\\$&'
-      );
+    const uniqueTerms = [...new Set(terms)];
 
-    const termRegex =
-      new RegExp(
-        `(?:^|\\s)${escapedTerm}(?:\\s|$)`
-      );
+    if (uniqueTerms.length === 0) {
+      return {
+        nodes: fullNodes,
+        edges: result.edges,
+        terms: [],
+        termSet: new Set(),
+        connectionWeightMap: new Map(),
+        cooccurrences: [],
+        maxConnWeight: 1,
+        level1Set: new Set(),
+        occurrence: 0,
+        hasSearch: false
+      };
+    }
 
-    const termSet = new Set(
+    const matchingTerms = new Set(
       result.nodes
         .map(node => node.id)
-        .filter(
-          id =>
-            id === term ||
-            termRegex.test(id)
-        )
+        .filter(id => uniqueTerms.includes(id))
     );
 
-    if (termSet.size === 0) {
+    if (matchingTerms.size !== uniqueTerms.length) {
       return {
         nodes: [],
         edges: [],
-        term,
+        terms: uniqueTerms,
         termSet: new Set(),
         connectionWeightMap: new Map(),
+        cooccurrences: [],
         maxConnWeight: 1,
         level1Set: new Set(),
         occurrence: 0,
@@ -614,56 +619,69 @@ The cat sat on the rug.`);
       };
     }
 
-    const occurrence = Array.from(termSet).reduce(
-      (total, matchedTerm) =>
-        total + (result.wordFrequency.get(matchedTerm) || 0),
-      0
+    const directEdges = result.edges.filter(
+      edge =>
+        matchingTerms.has(edge.source) ||
+        matchingTerms.has(edge.target)
     );
 
-    const directEdges =
-      result.edges.filter(
-        edge =>
-          termSet.has(edge.source) ||
-          termSet.has(edge.target)
-      );
-
-    const connectionWeightMap =
-      new Map();
+    const connectionWeightMap = new Map();
 
     directEdges.forEach(edge => {
-      const isSourceCenter =
-        termSet.has(edge.source);
+      const connectedTerm = matchingTerms.has(edge.source)
+        ? edge.source
+        : edge.target;
+      const neighbor = connectedTerm === edge.source
+        ? edge.target
+        : edge.source;
 
-      const neighbor =
-        isSourceCenter
-          ? edge.target
-          : edge.source;
+      if (!matchingTerms.has(neighbor)) {
+        if (!connectionWeightMap.has(neighbor)) {
+          connectionWeightMap.set(neighbor, new Map());
+        }
 
-      if (!termSet.has(neighbor)) {
-        connectionWeightMap.set(
-          neighbor,
-          (connectionWeightMap.get(neighbor) || 0) +
-          edge.weight
-        );
+        connectionWeightMap
+          .get(neighbor)
+          .set(connectedTerm, edge.weight);
       }
     });
 
-    const maxConnWeight =
-      Array.from(
-        connectionWeightMap.values()
-      ).reduce(
-        (max, value) => Math.max(max, value),
-        1
-      );
-    const level1Set =
-      new Set(
-        connectionWeightMap.keys()
-      );
+    const level1Set = new Set(
+      [...connectionWeightMap.entries()]
+        .filter(([, connections]) =>
+          connections.size === uniqueTerms.length
+        )
+        .map(([word]) => word)
+    );
 
-    // Search only filters the already-built graph.
-    // No tokenization, association building, or layout happens here.
+    const cooccurrences = [...level1Set]
+      .map(word => {
+        const connections = connectionWeightMap.get(word);
+
+        return {
+          word,
+          connections: uniqueTerms.map(term => ({
+            term,
+            weight: connections.get(term) || 0
+          })),
+          total: [...connections.values()]
+            .reduce((sum, weight) => sum + weight, 0)
+        };
+      })
+      .sort((a, b) => b.total - a.total);
+
+    const maxConnWeight = cooccurrences
+      .flatMap(item => item.connections.map(connection => connection.weight))
+      .reduce((max, weight) => Math.max(max, weight), 1);
+
+    const occurrence = [...matchingTerms].reduce(
+      (total, term) =>
+        total + (result.wordFrequency.get(term) || 0),
+      0
+    );
+
     const visibleNodeIds = new Set([
-      ...termSet,
+      ...matchingTerms,
       ...level1Set
     ]);
 
@@ -671,17 +689,19 @@ The cat sat on the rug.`);
       visibleNodeIds.has(node.id)
     );
 
-    const visibleEdges = result.edges.filter(edge =>
-      termSet.has(edge.source) ||
-      termSet.has(edge.target)
+    const visibleEdges = result.edges.filter(
+      edge =>
+        visibleNodeIds.has(edge.source) &&
+        visibleNodeIds.has(edge.target)
     );
 
     return {
       nodes: visibleNodes,
       edges: visibleEdges,
-      term,
-      termSet,
+      terms: uniqueTerms,
+      termSet: matchingTerms,
       connectionWeightMap,
+      cooccurrences,
       maxConnWeight,
       level1Set,
       occurrence,
@@ -721,30 +741,13 @@ The cat sat on the rug.`);
     let lines;
 
     if (highlightedData.hasSearch) {
-      lines =
-        Array.from(
-          highlightedData.level1Set
+      lines = highlightedData.cooccurrences
+        .map(({ word, connections }) =>
+          `${word} → ${connections
+            .map(({ term, weight }) => `${term} (${weight})`)
+            .join(', ')}`
         )
-          .map(term => ({
-            term,
-            weight:
-              highlightedData
-                .connectionWeightMap
-                .get(term) || 0
-          }))
-          .filter(
-            ({ weight }) =>
-              weight >= minWeight
-          )
-          .sort(
-            (a, b) =>
-              b.weight - a.weight
-          )
-          .map(
-            ({ term, weight }) =>
-              `${highlightedData.term} → ${term} (${weight})`
-          )
-          .join('\n');
+        .join('\n');
     } else {
       lines =
         [...result.edges]
@@ -922,6 +925,11 @@ The cat sat on the rug.`}
             >
               Build Network
             </button>
+             <button
+              onClick={() => setVisualMode(value => !value)}
+            >
+              {visualMode ? 'Hide Visual' : 'Show Visual'}
+            </button>
 
 
             {result && (
@@ -940,11 +948,6 @@ The cat sat on the rug.`}
                 {highlightTop10 ? 'Show All Nodes' : 'Highlight Top 10'}
               </button>
             )}
-            <button
-              onClick={() => setVisualMode(value => !value)}
-            >
-              {visualMode ? 'Hide Visual' : 'Show Visual'}
-            </button>
           </div>
 
           {/* GRAPH */}
@@ -963,7 +966,7 @@ The cat sat on the rug.`}
                     e.target.value
                   )
                 }
-                placeholder="Search a word to highlight..."
+                placeholder="Search terms, comma separated..."
                 style={{
                   width: '100%',
                   padding: '12px',
@@ -1218,7 +1221,7 @@ The cat sat on the rug.`}
 
                               {/* EDGE LABEL */}
 
-                              {/* <text
+                              {showEdges && <text
                                 x={
                                   (source.x +
                                     target.x) /
@@ -1247,7 +1250,7 @@ The cat sat on the rug.`}
                                   100
                                 ).toFixed(1)}
                                 %
-                              </text> */}
+                              </text> }
                             </g>
                           );
                         }
@@ -1278,11 +1281,15 @@ The cat sat on the rug.`}
                             node.id
                           );
 
-                        const connWeight =
+                        const nodeConnections =
                           highlightedData.hasSearch
-                            ? highlightedData.connectionWeightMap.get(
-                              node.id
-                            )
+                            ? highlightedData.connectionWeightMap.get(node.id)
+                            : undefined;
+
+                        const connWeight =
+                          nodeConnections
+                            ? [...nodeConnections.values()]
+                              .reduce((total, weight) => total + weight, 0)
                             : undefined;
 
                         const isConnected =
@@ -1407,190 +1414,112 @@ The cat sat on the rug.`}
                   </div>
                 )}
 
-              {searchTerm &&
-                highlightedData.hasSearch &&
-                highlightedData.level1Set
-                  .size > 0 && (
-                  <div
+              {highlightedData.hasSearch && (
+                <div
+                  style={{
+                    marginTop: '20px',
+                    fontFamily: 'monospace'
+                  }}
+                >
+                  <h3
                     style={{
-                      marginTop:
-                        '20px'
+                      color: '#aaa',
+                      fontSize: '14px',
+                      marginBottom: '10px'
                     }}
                   >
-                    <h3
+                    Connected words
+                  </h3>
+
+                  {highlightedData.cooccurrences.length > 0 ? (
+                    <div
                       style={{
-                        color: '#aaa',
-                        fontSize:
-                          '14px',
-                        marginBottom:
-                          '10px',
-                        fontFamily:
-                          'monospace'
+                        overflowX: 'auto'
                       }}
                     >
-                      Terms associated
-                      with{' '}
-                      <strong
+                      <table
                         style={{
-                          color:
-                            '#fff'
+                          width: '100%',
+                          borderCollapse: 'collapse',
+                          fontSize: '13px'
                         }}
                       >
-                        "{searchTerm}"
-                      </strong>
-                    </h3>
-
-                    <table
-                      style={{
-                        width: '100%',
-                        borderCollapse:
-                          'collapse',
-                        fontFamily:
-                          'monospace',
-                        fontSize:
-                          '13px'
-                      }}
-                    >
-                      <thead>
-                        <tr
-                          style={{
-                            borderBottom:
-                              '1px solid #333'
-                          }}
-                        >
-                          <th
+                        <thead>
+                          <tr
                             style={{
-                              textAlign:
-                                'left',
-                              padding:
-                                '8px 12px',
-                              color:
-                                '#666',
-                              fontWeight:
-                                'normal'
+                              borderBottom: '1px solid #333'
                             }}
                           >
-                            #
-                          </th>
+                            <th
+                              style={{
+                                textAlign: 'left',
+                                padding: '8px 12px',
+                                color: '#666',
+                                fontWeight: 'normal'
+                              }}
+                            >
+                              Connected word
+                            </th>
 
-                          <th
-                            style={{
-                              textAlign:
-                                'left',
-                              padding:
-                                '8px 12px',
-                              color:
-                                '#666',
-                              fontWeight:
-                                'normal'
-                            }}
-                          >
-                            Term
-                          </th>
-
-                          <th
-                            style={{
-                              textAlign:
-                                'right',
-                              padding:
-                                '8px 12px',
-                              color:
-                                '#666',
-                              fontWeight:
-                                'normal'
-                            }}
-                          >
-                            Co-occurrences
-                          </th>
-                        </tr>
-                      </thead>
-
-                      <tbody>
-                        {Array.from(
-                          highlightedData.level1Set
-                        )
-                          .map(term => ({
-                            term,
-                            weight:
-                              highlightedData
-                                .connectionWeightMap
-                                .get(term) ||
-                              0
-                          }))
-                          .filter(
-                            ({ weight }) =>
-                              weight >=
-                              minWeight
-                          )
-                          .sort(
-                            (a, b) =>
-                              b.weight -
-                              a.weight
-                          )
-                          .map(
-                            (
-                              {
-                                term,
-                                weight
-                              },
-                              index
-                            ) => (
-                              <tr
+                            {highlightedData.terms.map(term => (
+                              <th
                                 key={term}
                                 style={{
-                                  borderBottom:
-                                    '1px solid #1a1a1a',
-                                  cursor:
-                                    'pointer'
+                                  textAlign: 'right',
+                                  padding: '8px 12px',
+                                  color: '#666',
+                                  fontWeight: 'normal'
                                 }}
-                                onClick={() =>
-                                  setSearchTerm(
-                                    term
-                                  )
-                                }
                               >
-                                <td
-                                  style={{
-                                    padding:
-                                      '8px 12px',
-                                    color:
-                                      '#555'
-                                  }}
-                                >
-                                  {index +
-                                    1}
-                                </td>
+                                {term}
+                              </th>
+                            ))}
+                          </tr>
+                        </thead>
 
-                                <td
-                                  style={{
-                                    padding:
-                                      '8px 12px',
-                                    color:
-                                      '#c8c8c8'
-                                  }}
-                                >
-                                  {term}
-                                </td>
+                        <tbody>
+                          {highlightedData.cooccurrences.map(item => (
+                            <tr
+                              key={item.word}
+                              style={{
+                                borderBottom: '1px solid #1a1a1a',
+                                cursor: 'pointer'
+                              }}
+                              onClick={() => setSearchTerm(item.word)}
+                            >
+                              <td
+                                style={{
+                                  padding: '8px 12px',
+                                  color: '#c8c8c8'
+                                }}
+                              >
+                                {item.word}
+                              </td>
 
+                              {item.connections.map(connection => (
                                 <td
+                                  key={connection.term}
                                   style={{
-                                    padding:
-                                      '8px 12px',
-                                    color:
-                                      '#666',
-                                    textAlign:
-                                      'right'
+                                    padding: '8px 12px',
+                                    color: '#888',
+                                    textAlign: 'right'
                                   }}
                                 >
-                                  {weight}
+                                  {connection.weight}
                                 </td>
-                              </tr>
-                            )
-                          )}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
+                              ))}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <div style={{ color: '#777' }}>
+                      No words connect to all searched terms.
+                    </div>
+                  )}
+                </div>
+              )}
 
               {searchTerm && (
                 <p
@@ -1606,8 +1535,7 @@ The cat sat on the rug.`}
                   <strong>
                     "{searchTerm}"
                   </strong>{' '}
-                  and its direct
-                  connections
+                  and nodes connected to every searched term
                 </p>
               )}
             </div>
