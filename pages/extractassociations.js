@@ -5,7 +5,7 @@ const GRAPH_WIDTH = 1000;
 const GRAPH_HEIGHT = 1000;
 const GRAPH_PADDING = 40;
 const MIN_NODE_DISTANCE = 34;
-const wordFrequency = new Map();
+const INITIAL_INDEX_SENTENCE_LIMIT = 200;
 
 function softmax(values) {
   if (!values.length) return [];
@@ -358,7 +358,12 @@ The cat sat on the rug.`);
     // 2. TOKENIZE EACH SENTENCE
     // --------------------------------------------------
 
-    const sentenceWords = sentences.map(sentence => {
+    const indexedSentences = sentences.slice(
+      0,
+      INITIAL_INDEX_SENTENCE_LIMIT
+    );
+
+    const sentenceWords = indexedSentences.map(sentence => {
 
       return tokenizeSentence(
         sentence,
@@ -369,14 +374,14 @@ The cat sat on the rug.`);
 
 
     // --------------------------------------------------
-    // 3. WORD FREQUENCY
+    // 3. INITIAL INDEX WORD FREQUENCY
     // --------------------------------------------------
-    // Count every occurrence globally.
+    // Count occurrences in the initially indexed sentences.
     //
-    // the = 6
-    // cat = 3
+    // Search expands these counts across the full corpus.
     // --------------------------------------------------
 
+    const wordFrequency = new Map();
 
     sentenceWords.forEach(words => {
 
@@ -550,7 +555,11 @@ The cat sat on the rug.`);
       nodes: simNodes,
       edges,
       associationGrid,
-      wordFrequency
+      wordFrequency,
+      sentences,
+      indexedSentenceWords: sentenceWords,
+      indexedSentenceCount: indexedSentences.length,
+      stopwordSet
     });
   }
   // ------------------------------------------------------------
@@ -598,10 +607,56 @@ The cat sat on the rug.`);
       };
     }
 
+    const connectionWeightMap = new Map();
+    const uniqueTermSet = new Set(uniqueTerms);
+    const termFrequencies = new Map(
+      uniqueTerms.map(term => [term, 0])
+    );
+
+    result.sentences.forEach((sentence, index) => {
+      const words =
+        index < result.indexedSentenceCount
+          ? result.indexedSentenceWords[index]
+          : tokenizeSentence(sentence, result.stopwordSet);
+      const sentenceCounts = new Map();
+
+      words.forEach(word => {
+        sentenceCounts.set(
+          word,
+          (sentenceCounts.get(word) || 0) + 1
+        );
+      });
+
+      const termsInSentence = uniqueTerms
+        .map(term => [term, sentenceCounts.get(term) || 0])
+        .filter(([, count]) => count > 0);
+
+      termsInSentence.forEach(([term, count]) => {
+        termFrequencies.set(
+          term,
+          termFrequencies.get(term) + count
+        );
+      });
+
+      sentenceCounts.forEach((wordCount, word) => {
+        if (uniqueTermSet.has(word)) return;
+
+        termsInSentence.forEach(([term, termCount]) => {
+          if (!connectionWeightMap.has(word)) {
+            connectionWeightMap.set(word, new Map());
+          }
+
+          const connections = connectionWeightMap.get(word);
+          connections.set(
+            term,
+            (connections.get(term) || 0) + termCount * wordCount
+          );
+        });
+      });
+    });
+
     const matchingTerms = new Set(
-      result.nodes
-        .map(node => node.id)
-        .filter(id => uniqueTerms.includes(id))
+      uniqueTerms.filter(term => termFrequencies.get(term) > 0)
     );
 
     if (matchingTerms.size !== uniqueTerms.length) {
@@ -619,37 +674,10 @@ The cat sat on the rug.`);
       };
     }
 
-    const directEdges = result.edges.filter(
-      edge =>
-        matchingTerms.has(edge.source) ||
-        matchingTerms.has(edge.target)
-    );
-
-    const connectionWeightMap = new Map();
-
-    directEdges.forEach(edge => {
-      const connectedTerm = matchingTerms.has(edge.source)
-        ? edge.source
-        : edge.target;
-      const neighbor = connectedTerm === edge.source
-        ? edge.target
-        : edge.source;
-
-      if (!matchingTerms.has(neighbor)) {
-        if (!connectionWeightMap.has(neighbor)) {
-          connectionWeightMap.set(neighbor, new Map());
-        }
-
-        connectionWeightMap
-          .get(neighbor)
-          .set(connectedTerm, edge.weight);
-      }
-    });
-
     const level1Set = new Set(
       [...connectionWeightMap.entries()]
         .filter(([, connections]) =>
-          connections.size === uniqueTerms.length
+          connections.size === matchingTerms.size
         )
         .map(([word]) => word)
     );
@@ -676,7 +704,7 @@ The cat sat on the rug.`);
 
     const occurrence = [...matchingTerms].reduce(
       (total, term) =>
-        total + (result.wordFrequency.get(term) || 0),
+        total + termFrequencies.get(term),
       0
     );
 
@@ -685,14 +713,27 @@ The cat sat on the rug.`);
       ...level1Set
     ]);
 
-    const visibleNodes = fullNodes.filter(node =>
-      visibleNodeIds.has(node.id)
+    const initialNodeMap = new Map(
+      fullNodes.map(node => [node.id, node])
+    );
+    const visibleNodes = [...visibleNodeIds].map(id =>
+      initialNodeMap.get(id) || {
+        id,
+        label: id,
+        frequency: termFrequencies.get(id) || 0,
+        x: GRAPH_PADDING + Math.random() * (GRAPH_WIDTH - GRAPH_PADDING * 2),
+        y: GRAPH_PADDING + Math.random() * (GRAPH_HEIGHT - GRAPH_PADDING * 2)
+      }
     );
 
-    const visibleEdges = result.edges.filter(
-      edge =>
-        visibleNodeIds.has(edge.source) &&
-        visibleNodeIds.has(edge.target)
+    const visibleEdges = cooccurrences.flatMap(item =>
+      item.connections.map(({ term, weight }) => ({
+        source: term,
+        target: item.word,
+        weight,
+        strength: weight,
+        type: 'sentence'
+      }))
     );
 
     return {
@@ -792,6 +833,15 @@ The cat sat on the rug.`);
 
 
       <main
+      style={{
+          padding: '20px',
+          background: '#000',
+          color: '#fff',
+          fontFamily: 'system-ui',
+          maxWidth: '100%',
+          width: '100%',
+          minHeight: '100vh'
+        }}
       >
         <h1
           style={{
@@ -959,6 +1009,17 @@ The cat sat on the rug.`}
                 }
                 placeholder="Search terms, comma separated..."
               />
+              <div
+                style={{
+                  color: '#777',
+                  fontSize: '12px',
+                  margin: '0 0 10px',
+                  fontFamily: 'monospace'
+                }}
+              >
+                Initial graph indexes the first {INITIAL_INDEX_SENTENCE_LIMIT} sentences.
+                Searching expands connections across the full text.
+              </div>
 
               {/* ZOOM */}
 
