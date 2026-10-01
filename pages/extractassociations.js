@@ -1,10 +1,11 @@
 import Head from 'next/head';
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useDeferredValue } from 'react';
 
 const GRAPH_WIDTH = 1000;
 const GRAPH_HEIGHT = 1000;
 const GRAPH_PADDING = 40;
 const MIN_NODE_DISTANCE = 34;
+const wordFrequency = new Map();
 
 function softmax(values) {
   if (!values.length) return [];
@@ -175,6 +176,7 @@ function extractsentences(body_text, abbrev, divider) {
       .trim();
 
 
+    console.log(sentence, start, end)
     if (sentence) {
       sentences.push(sentence);
     }
@@ -286,12 +288,17 @@ function separateOverlappingNodes(nodes, minDistance) {
 }
 
 export default function Home() {
-  const [text, setText] = useState('');
+  const [text, setText] = useState(`The cat sat on the mat.
+
+The cat ate the fish.
+
+The cat sat on the rug.`);
   const [customStopwords, setCustomStopwords] = useState('');
 
   const [result, setResult] = useState(null);
 
   const [searchTerm, setSearchTerm] = useState('');
+  const deferredSearchTerm = useDeferredValue(searchTerm);
 
   const [minWeight, setMinWeight] = useState(1);
 
@@ -444,7 +451,6 @@ function buildAssociations() {
   // cat = 3
   // --------------------------------------------------
 
-  const wordFrequency = new Map();
 
   sentenceWords.forEach(words => {
 
@@ -759,7 +765,7 @@ setFullNodes(simNodes);
     };
   }, [
     result,
-    searchTerm,
+    deferredSearchTerm,
     fullNodes
   ]);
 
