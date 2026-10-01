@@ -850,15 +850,6 @@ The cat sat on the rug.`}
               )
             }
             placeholder="Custom stopwords (comma separated)"
-            style={{
-              width: '100%',
-              padding: '10px',
-              margin: '10px 0',
-              background: '#111',
-              border: '1px solid #333',
-              color: '#fff',
-              fontFamily: 'monospace'
-            }}
           />
 
           {/* CONTROLS 
@@ -967,16 +958,6 @@ The cat sat on the rug.`}
                   )
                 }
                 placeholder="Search terms, comma separated..."
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  fontSize: '16px',
-                  background: '#111',
-                  border: '1px solid #444',
-                  color: '#fff',
-                  marginBottom: '10px',
-                  fontFamily: 'monospace'
-                }}
               />
 
               {/* ZOOM */}
