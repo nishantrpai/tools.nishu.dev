@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import { useState, useMemo, useRef, useDeferredValue, useEffect } from 'react';
+import { useState, useMemo, useRef, useDeferredValue } from 'react';
 
 const GRAPH_WIDTH = 1000;
 const GRAPH_HEIGHT = 1000;
@@ -7,6 +7,15 @@ const GRAPH_PADDING = 40;
 const MIN_NODE_DISTANCE = 34;
 const INITIAL_INDEX_SENTENCE_LIMIT = 200;
 
+function softmax(values) {
+  if (!values.length) return [];
+
+  const max = Math.max(...values);
+  const exps = values.map(v => Math.exp(v - max));
+  const sum = exps.reduce((a, b) => a + b, 0);
+
+  return exps.map(v => v / sum);
+}
 function isAbbrev(s, abbrev) {
   const single_abbrv = abbrev || [
     "a.m", "p.m", "etc", "vol", "inc", "jr", "dr",
@@ -206,161 +215,77 @@ function tokenizeSentence(sentence, stopwordSet) {
     .filter(word => !stopwordSet.has(word));
 }
 
-function createPathSearch(terms) {
-  const termIndex = new Map(
-    terms.map((term, index) => [term, index])
-  );
-  const initialMask = 1 << termIndex.get(terms[0]);
 
-  return {
-    terms,
-    termIndex,
-    fullMask: (1 << terms.length) - 1,
-    queue: [{
-      current: terms[0],
-      path: [terms[0]],
-      mask: initialMask
-    }],
-    queueIndex: 0,
-    currentState: null,
-    currentNeighbors: null,
-    seen: new Map([
-      [`${terms[0]}|${initialMask}`, {
-        depth: 1,
-        count: 1
-      }]
-    ]),
-    paths: [],
-    shortestPathLength: null,
-    done: false
-  };
-}
+function separateOverlappingNodes(nodes, minDistance) {
+  if (nodes.length < 2) return;
 
-function advancePathSearch(search, adjacency, terms, budget = 250) {
-  let processed = 0;
-  const maxPathLength = terms.length > 2 ? 8 : Infinity;
+  for (let iteration = 0; iteration < 30; iteration++) {
+    let moved = false;
 
-  while (processed < budget && !search.done) {
-    if (!search.currentState) {
-      if (search.queueIndex >= search.queue.length) {
-        search.done = true;
-        break;
-      }
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        const a = nodes[i];
+        const b = nodes[j];
 
-      search.currentState =
-        search.queue[search.queueIndex++];
-      processed++;
+        let dx = b.x - a.x;
+        let dy = b.y - a.y;
+        let distance = Math.sqrt(dx * dx + dy * dy);
 
-      const state = search.currentState;
+        if (distance >= minDistance) continue;
 
-      if (
-        search.shortestPathLength !== null &&
-        state.path.length > search.shortestPathLength
-      ) {
-        search.done = true;
-        break;
-      }
+        if (distance < 0.001) {
+          const angle = ((i + 1) * 37 + (j + 1) * 17) % 360;
+          const radians = angle * (Math.PI / 180);
 
-      if (state.mask === search.fullMask) {
-        search.shortestPathLength = state.path.length;
-        search.paths.push(state.path);
-
-        if (search.paths.length >= 20) {
-          search.done = true;
+          dx = Math.cos(radians);
+          dy = Math.sin(radians);
+          distance = 1;
         }
 
-        search.currentState = null;
-        continue;
-      }
+        const push = (minDistance - distance) / 2;
 
-      if (state.path.length >= maxPathLength) {
-        search.currentState = null;
-        continue;
-      }
+        const offsetX = (dx / distance) * push;
+        const offsetY = (dy / distance) * push;
 
-      search.currentNeighbors =
-        adjacency
-          .get(state.current)
-          ?.values();
+        a.x = Math.max(
+          GRAPH_PADDING,
+          Math.min(
+            GRAPH_WIDTH - GRAPH_PADDING,
+            a.x - offsetX
+          )
+        );
+
+        a.y = Math.max(
+          GRAPH_PADDING,
+          Math.min(
+            GRAPH_HEIGHT - GRAPH_PADDING,
+            a.y - offsetY
+          )
+        );
+
+        b.x = Math.max(
+          GRAPH_PADDING,
+          Math.min(
+            GRAPH_WIDTH - GRAPH_PADDING,
+            b.x + offsetX
+          )
+        );
+
+        b.y = Math.max(
+          GRAPH_PADDING,
+          Math.min(
+            GRAPH_HEIGHT - GRAPH_PADDING,
+            b.y + offsetY
+          )
+        );
+
+        moved = true;
+      }
     }
 
-    const nextNeighbor =
-      search.currentNeighbors?.next();
-
-    if (!nextNeighbor || nextNeighbor.done) {
-      search.currentState = null;
-      search.currentNeighbors = null;
-      continue;
-    }
-
-    processed++;
-
-    const neighbor = nextNeighbor.value;
-    const state = search.currentState;
-
-    if (state.path.includes(neighbor)) {
-      continue;
-    }
-
-    let mask = state.mask;
-    const termIndex = search.termIndex.get(neighbor);
-
-    if (termIndex !== undefined) {
-      mask |= 1 << termIndex;
-    }
-
-    const depth = state.path.length + 1;
-    const stateKey = `${neighbor}|${mask}`;
-    const seenState = search.seen.get(stateKey);
-
-    if (terms.length === 2) {
-      if (
-        seenState?.depth < depth ||
-        (
-          seenState?.depth === depth &&
-          seenState.count >= 20
-        )
-      ) {
-        continue;
-      }
-
-      if (seenState?.depth === depth) {
-        seenState.count++;
-      } else {
-        search.seen.set(stateKey, {
-          depth,
-          count: 1
-        });
-      }
-    } else {
-      if (seenState) {
-        continue;
-      }
-
-      search.seen.set(stateKey, {
-        depth,
-        count: 1
-      });
-    }
-
-    search.queue.push({
-      current: neighbor,
-      path: [
-        ...state.path,
-        neighbor
-      ],
-      mask
-    });
-  }
-
-  if (
-    !search.currentState &&
-    search.queueIndex >= search.queue.length
-  ) {
-    search.done = true;
+    if (!moved) break;
   }
 }
-
 
 export default function Home() {
   const [text, setText] = useState(`The cat sat on the mat.
@@ -368,32 +293,16 @@ export default function Home() {
 The cat ate the fish.
 
 The cat sat on the rug.`);
+  const [isExtractingPdf, setIsExtractingPdf] = useState(false);
+  const [pdfError, setPdfError] = useState('');
   const [customStopwords, setCustomStopwords] = useState('');
 
   const [result, setResult] = useState(null);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [visualMode, setVisualMode] = useState(true)
-  const [showEdges, setShowEdges] = useState(false)
-  const [showNeighbours, setShowNeighbours] = useState(false);
+  const [showEdges, setShowEdges] = useState(true)
   const deferredSearchTerm = useDeferredValue(searchTerm);
-  const pathTerms = [...new Set(
-    searchTerm
-      .split(',')
-      .map(term => term.trim().toLowerCase())
-      .filter(Boolean)
-  )];
-  const pathQueryKey = JSON.stringify(pathTerms);
-  const [pathSearch, setPathSearch] = useState({
-    result: null,
-    key: '',
-    terms: [],
-    paths: [],
-    indexed: 0,
-    total: 0,
-    status: 'idle',
-    error: null
-  });
 
   const [minWeight, setMinWeight] = useState(1);
 
@@ -408,27 +317,128 @@ The cat sat on the rug.`);
   const isPanning = useRef(false);
   const panStart = useRef({ x: 0, y: 0 });
   const panOrigin = useRef({ x: 0, y: 0 });
+  const pdfInputRef = useRef(null);
   const [highlightTop10, setHighlightTop10] = useState(false);
+
+  async function handlePdfUpload(event) {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+
+    if (!file) return;
+
+    setIsExtractingPdf(true);
+    setPdfError('');
+
+    try {
+      if (!window.pdfjsLib) {
+        throw new Error('PDF text extraction is unavailable. Please reload the page and try again.');
+      }
+
+      const pdf = await window.pdfjsLib.getDocument({
+        data: await file.arrayBuffer()
+      }).promise;
+      let extractedText = '';
+
+      for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
+        const page = await pdf.getPage(pageNumber);
+        const content = await page.getTextContent();
+        extractedText += content.items
+          .map(item => item.str)
+          .join(' ')
+          .trim();
+      }
+
+      setText(extractedText.replace(/\s+/g, ' '));
+    } catch (error) {
+      console.error('Failed to extract text from PDF:', error);
+      setPdfError(error.message || 'Could not extract text from this PDF.');
+    } finally {
+      setIsExtractingPdf(false);
+    }
+  }
+
   // ------------------------------------------------------------
   // BUILD ASSOCIATION NETWORK
   // ------------------------------------------------------------
 
-  // const stopwords = [
-  //   'a', 'an', 'the', 'and', 'or', 'but', 'if', 'then', 'so', 'because',
-  //   'of', 'to', 'in', 'on', 'at', 'for', 'from', 'with', 'by', 'about',
-  //   'as', 'into', 'through', 'during', 'before', 'after', 'between',
-  //   'is', 'am', 'are', 'was', 'were', 'be', 'been', 'being',
-  //   'have', 'has', 'had', 'do', 'does', 'did',
-  //   'i', 'me', 'my', 'mine', 'myself',
-  //   'you', 'your', 'yours', 'yourself',
-  //   'he', 'him', 'his', 'himself',
-  //   'she', 'her', 'hers', 'herself',
-  //   'it', 'its', 'itself',
-  //   'we', 'us', 'our', 'ours', 'ourselves',
-  //   'they', 'them', 'their', 'theirs', 'themselves',
-  //   'this', 'that', 'these', 'those'
-  // ];
   const stopwords = [];
+  const connectedstopwords = [
+    "a",
+    "an",
+    "the",
+    "and",
+    "or",
+    "but",
+    "if",
+    "then",
+    "so",
+    "because",
+    "of",
+    "to",
+    "in",
+    "on",
+    "at",
+    "for",
+    "from",
+    "with",
+    "by",
+    "about",
+    "as",
+    "into",
+    "through",
+    "during",
+    "before",
+    "after",
+    "between",
+    "is",
+    "am",
+    "are",
+    "was",
+    "were",
+    "be",
+    "been",
+    "being",
+    "have",
+    "has",
+    "had",
+    "do",
+    "does",
+    "did",
+    "i",
+    "me",
+    "my",
+    "mine",
+    "myself",
+    "you",
+    "your",
+    "yours",
+    "yourself",
+    "he",
+    "him",
+    "his",
+    "himself",
+    "she",
+    "her",
+    "hers",
+    "herself",
+    "it",
+    "its",
+    "itself",
+    "we",
+    "us",
+    "our",
+    "ours",
+    "ourselves",
+    "they",
+    "them",
+    "their",
+    "theirs",
+    "themselves",
+    "this",
+    "that",
+    "these",
+    "those"
+]
   function buildAssociations() {
     const stopwordSet = new Set(stopwords);
 
@@ -683,15 +693,11 @@ The cat sat on the rug.`);
         nodes: fullNodes,
         edges: result?.edges || [],
         terms: [],
-        paths: [],
         termSet: new Set(),
-        connectedTermSet: new Set(),
-        firstDegreeSet: new Set(),
         connectionWeightMap: new Map(),
         cooccurrences: [],
         maxConnWeight: 1,
         level1Set: new Set(),
-        bridgeSet: new Set(),
         occurrence: 0,
         hasSearch: false
       };
@@ -709,15 +715,11 @@ The cat sat on the rug.`);
         nodes: fullNodes,
         edges: result.edges,
         terms: [],
-        paths: [],
         termSet: new Set(),
-        connectedTermSet: new Set(),
-        firstDegreeSet: new Set(),
         connectionWeightMap: new Map(),
         cooccurrences: [],
         maxConnWeight: 1,
         level1Set: new Set(),
-        bridgeSet: new Set(),
         occurrence: 0,
         hasSearch: false
       };
@@ -780,45 +782,25 @@ The cat sat on the rug.`);
         nodes: [],
         edges: [],
         terms: uniqueTerms,
-        paths: [],
         termSet: new Set(),
-        connectedTermSet: new Set(),
-        firstDegreeSet: new Set(),
         connectionWeightMap: new Map(),
         cooccurrences: [],
         maxConnWeight: 1,
         level1Set: new Set(),
-        bridgeSet: new Set(),
         occurrence: 0,
         hasSearch: true
       };
     }
 
-    const bridgeSet = new Set(
+    const level1Set = new Set(
       [...connectionWeightMap.entries()]
-        .filter(([, connections]) => {
-          const connectedTerms = [...connections.keys()]
-            .filter(term => matchingTerms.has(term));
-
-          return connectedTerms.length >= 2;
-        })
+        .filter(([, connections]) =>
+          connections.size === matchingTerms.size 
+        )
         .map(([word]) => word)
     );
-    const firstDegreeSet = new Set(connectionWeightMap.keys());
 
-    const connectedTermSet = new Set();
-
-    bridgeSet.forEach(word => {
-      const connections = connectionWeightMap.get(word);
-      const connectedTerms = [...connections.keys()]
-        .filter(term => matchingTerms.has(term));
-
-      connectedTerms.forEach(term => {
-        connectedTermSet.add(term);
-      });
-    });
-
-    const cooccurrences = [...bridgeSet]
+    const cooccurrences = [...level1Set]
       .map(word => {
         const connections = connectionWeightMap.get(word);
 
@@ -846,8 +828,7 @@ The cat sat on the rug.`);
 
     const visibleNodeIds = new Set([
       ...matchingTerms,
-      ...bridgeSet,
-      ...(showNeighbours ? firstDegreeSet : [])
+      ...level1Set
     ]);
 
     const initialNodeMap = new Map(
@@ -863,302 +844,37 @@ The cat sat on the rug.`);
       }
     );
 
-    const bridgeEdges = [...bridgeSet].flatMap(word => {
-      const connections = connectionWeightMap.get(word);
-
-      return uniqueTerms
-        .filter(term => connections.has(term))
-        .map(term => ({
-          source: term,
-          target: word,
-          weight: connections.get(term),
-          strength: connections.get(term),
-          type: 'bridge'
-        }));
-    });
-
-    const neighbourEdges = showNeighbours
-      ? [...firstDegreeSet]
-        .filter(word => !bridgeSet.has(word))
-        .flatMap(word => {
-          const connections = connectionWeightMap.get(word);
-
-          if (!connections) return [];
-
-          return uniqueTerms
-            .filter(term => connections.has(term))
-            .map(term => ({
-              source: term,
-              target: word,
-              weight: connections.get(term),
-              strength: connections.get(term),
-              type: 'sentence'
-            }));
-        })
-      : [];
-
-    const visibleEdges = [...bridgeEdges, ...neighbourEdges];
+    const visibleEdges = cooccurrences.flatMap(item =>
+      item.connections.map(({ term, weight }) => ({
+        source: term,
+        target: item.word,
+        weight,
+        strength: weight,
+        type: 'sentence'
+      }))
+    );
 
     return {
       nodes: visibleNodes,
       edges: visibleEdges,
       terms: uniqueTerms,
       termSet: matchingTerms,
-      connectedTermSet,
-      firstDegreeSet,
       connectionWeightMap,
       cooccurrences,
       maxConnWeight,
-      level1Set: bridgeSet,
-      bridgeSet,
+      level1Set,
       occurrence,
       hasSearch: true
     };
   }, [
     result,
     deferredSearchTerm,
-    fullNodes,
-    showNeighbours
+    fullNodes
   ]);
 
-useEffect(() => {
-  let cancelled = false;
-
-  const terms = JSON.parse(pathQueryKey);
-  const sentences = result?.sentences || [];
-
-  setPathSearch({
-    result,
-    key: pathQueryKey,
-    terms,
-    paths: [],
-    indexed: 0,
-    total: sentences.length,
-    status: result && terms.length >= 2 ? 'indexing' : 'idle',
-    error: null
-  });
-
-  if (!result || terms.length < 2) {
-    return () => {
-      cancelled = true;
-    };
-  }
-
-  const adjacency = new Map();
-
-  let nextSentence = 0;
-  let search = null;
-
-  let bestPaths = [];
-  let bestPathLength = null;
-
-  const publish = (indexed, status, error = null) => {
-    if (cancelled) return;
-
-    setPathSearch({
-      result,
-      key: pathQueryKey,
-      terms,
-      paths: bestPaths,
-      indexed,
-      total: sentences.length,
-      status,
-      error
-    });
-  };
-
-  const addSentenceToAdjacency = words => {
-    const uniqueWords = [...new Set(words)];
-
-    uniqueWords.forEach(word => {
-      if (!adjacency.has(word)) {
-        adjacency.set(word, new Set());
-      }
-
-      uniqueWords.forEach(other => {
-        if (word !== other) {
-          adjacency.get(word).add(other);
-        }
-      });
-    });
-  };
-
-  const indexNextChunk = async () => {
-    try {
-
-      // --------------------------------------------------
-      // INDEX NEXT 50 SENTENCES
-      // --------------------------------------------------
-
-      if (nextSentence < sentences.length) {
-        const chunkEnd =
-          Math.min(nextSentence + 50, sentences.length);
-
-        for (; nextSentence < chunkEnd; nextSentence++) {
-          const words =
-            nextSentence < result.indexedSentenceCount
-              ? result.indexedSentenceWords[nextSentence]
-              : tokenizeSentence(
-                  sentences[nextSentence],
-                  result.stopwordSet
-                );
-
-          addSentenceToAdjacency(words);
-        }
-      }
-
-      // --------------------------------------------------
-      // FIRST: DIRECT SENTENCE CONNECTION
-      //
-      // If two terms occur in the same sentence,
-      // that IS the shortest possible path.
-      // --------------------------------------------------
-
-      if (terms.length === 2 && bestPathLength === null) {
-        const [a, b] = terms;
-
-        for (
-          let i = 0;
-          i < nextSentence;
-          i++
-        ) {
-          const words =
-            i < result.indexedSentenceCount
-              ? result.indexedSentenceWords[i]
-              : tokenizeSentence(
-                  sentences[i],
-                  result.stopwordSet
-                );
-
-          const wordSet = new Set(words);
-
-          if (
-            wordSet.has(a) &&
-            wordSet.has(b)
-          ) {
-            bestPaths = [[a, b]];
-            bestPathLength = 2;
-            break;
-          }
-        }
-      }
-
-      // --------------------------------------------------
-      // GENERAL PATH SEARCH
-      // --------------------------------------------------
-
-      if (
-        bestPathLength === null ||
-        terms.length > 2
-      ) {
-        if (!search) {
-          search = createPathSearch(terms);
-        }
-
-        advancePathSearch(
-          search,
-          adjacency,
-          terms
-        );
-
-        if (search.paths.length > 0) {
-          const candidateLength =
-            search.paths[0].length;
-
-          if (
-            bestPathLength === null ||
-            candidateLength < bestPathLength
-          ) {
-            bestPathLength = candidateLength;
-            bestPaths = search.paths;
-          } else if (
-            candidateLength === bestPathLength
-          ) {
-            const knownPaths = new Set(
-              bestPaths.map(path =>
-                path.join('\u0000')
-              )
-            );
-
-            search.paths.forEach(path => {
-              const pathKey =
-                path.join('\u0000');
-
-              if (
-                !knownPaths.has(pathKey) &&
-                bestPaths.length < 20
-              ) {
-                knownPaths.add(pathKey);
-
-                bestPaths = [
-                  ...bestPaths,
-                  path
-                ];
-              }
-            });
-          }
-        }
-      }
-
-      // --------------------------------------------------
-      // COMPLETE?
-      // --------------------------------------------------
-
-      const directTwoTermPath =
-        terms.length === 2 &&
-        bestPathLength !== null;
-
-      const complete =
-        nextSentence >= sentences.length &&
-        (
-          directTwoTermPath ||
-          !search ||
-          search.done
-        );
-
-      publish(
-        nextSentence,
-        complete
-          ? 'complete'
-          : 'indexing'
-      );
-
-      if (!complete && !cancelled) {
-        await new Promise(resolve =>
-          setTimeout(resolve, 0)
-        );
-
-        if (!cancelled) {
-          indexNextChunk();
-        }
-      }
-
-    } catch (error) {
-      console.error(
-        'Path indexing failed:',
-        error
-      );
-
-      publish(
-        nextSentence,
-        'error',
-        error.message
-      );
-    }
-  };
-
-  indexNextChunk();
-
-  return () => {
-    cancelled = true;
-  };
-
-}, [result, pathQueryKey]);
-
-  const activePathSearch =
-    pathSearch.result === result && pathSearch.key === pathQueryKey
-      ? pathSearch
-      : null;
+  const tableCooccurrences = highlightedData.cooccurrences.filter(
+    ({ word }) => !connectedstopwords.includes(word)
+  );
 
   const top10Nodes = useMemo(() => {
     if (!result) return new Set();
@@ -1234,6 +950,8 @@ useEffect(() => {
         <title>Visualize Language Network</title>
         <meta name="description" content="Visualize language network from large text and words associated with each other." />
         <link rel="icon" href="/favicon.ico" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.worker.min.js"></script>
       </Head>
 
 
@@ -1264,6 +982,28 @@ useEffect(() => {
           }}
         >
           {/* INPUT */}
+
+          <div style={{ marginBottom: '10px' }}>
+            <button
+              type="button"
+              onClick={() => pdfInputRef.current?.click()}
+              disabled={isExtractingPdf}
+            >
+              {isExtractingPdf ? 'Extracting PDF...' : 'Upload PDF'}
+            </button>
+            <input
+              ref={pdfInputRef}
+              type="file"
+              accept="application/pdf"
+              onChange={handlePdfUpload}
+              style={{ display: 'none' }}
+            />
+            {pdfError && (
+              <span role="alert" style={{ color: '#ff6b6b', marginLeft: '10px' }}>
+                {pdfError}
+              </span>
+            )}
+          </div>
 
           <textarea
             value={text}
@@ -1365,26 +1105,20 @@ The cat sat on the rug.`}
             <input
               type="checkbox"
               checked={visualMode}
-              onChange={() => setVisualMode(value => !value)}
+              onClick={() => setVisualMode(value => !value)}
             />
             <label>Visual </label>
             <input
               type="checkbox"
               checked={showEdges}
-              onChange={() => setShowEdges(value => !value)}
+              onClick={() => setShowEdges(value => !value)}
             />
             <label>
               Edges
 
             </label>
-            <input
-              type="checkbox"
-              checked={showNeighbours}
-              onChange={() => setShowNeighbours(value => !value)}
-            />
-            <label>Neighbours</label>
 
-            {/*result && (
+            {result && (
               <button
                 onClick={copyAssociations}
               >
@@ -1392,7 +1126,7 @@ The cat sat on the rug.`}
                   ? 'copied!'
                   : 'copy associations'}
               </button>
-            )*/}
+            )}
             {result && (
               <button
                 onClick={() => setHighlightTop10(value => !value)}
@@ -1642,13 +1376,14 @@ The cat sat on the rug.`}
 
                           const strokeWidth =
                             !highlightedData.hasSearch
-                              ? 0.15 +
+                              ? 0.5 +
                               (edge.weight /
                                 maxWeight) *
-                              0.6
+                              1.5
                               : isConnected
-                                ? 0.15 +
-                                connRatio * 0.25
+                                ? 0.5 +
+                                connRatio *
+                                2
                                 : 0.2;
 
                           return (
@@ -1745,12 +1480,8 @@ The cat sat on the rug.`}
                             : undefined;
 
                         const isConnected =
-                          connWeight !== undefined ||
-                          highlightedData.connectedTermSet?.has(node.id);
-
-                        const isFirstDegree =
-                          highlightedData.hasSearch &&
-                          highlightedData.firstDegreeSet.has(node.id);
+                          connWeight !==
+                          undefined;
 
                         const isTop10 =
                           highlightTop10 &&
@@ -1776,10 +1507,10 @@ The cat sat on the rug.`}
                             : isCenter
                               ? 1
                               : isConnected
-                                ? 0.5
-                                : isFirstDegree
-                                  ? 0.25
-                                  : 0.05;
+                                ? 0.2 +
+                                connRatio *
+                                0.8
+                                : 0.1;
 
                         const brightness =
                           Math.round(
@@ -1797,9 +1528,7 @@ The cat sat on the rug.`}
                                 ? '#fff'
                                 : isConnected
                                   ? `rgb(${brightness},${brightness},${brightness})`
-                                  : isFirstDegree
-                                    ? '#999'
-                                : '#333';
+                                  : '#333';
 
                         return (
                           <g
@@ -1814,7 +1543,7 @@ The cat sat on the rug.`}
                               r={radius}
                               fill="transparent"
                               stroke={isTop10 ? '#fff' : 'transparent'}
-                              strokeWidth={isTop10 ? 1 : 0}
+                              strokeWidth={isTop10 ? 1.5 : 0}
                             />
 
                             <text
@@ -1829,11 +1558,15 @@ The cat sat on the rug.`}
                                   ? '13.5'
                                   : isTop10
                                     ? '15'
-                                    : '9.5'
+                                    : isConnected
+                                      ? '11'
+                                      : '9.5'
                               }
                               fontFamily="monospace"
                               fontWeight={
-                                isCenter || isTop10
+                                isCenter ||
+                                  isConnected ||
+                                  isTop10
                                   ? 'bold'
                                   : 'normal'
                               }
@@ -1868,54 +1601,6 @@ The cat sat on the rug.`}
                   </div>
                 )}
 
-              {pathTerms.length >= 2 && (
-                <div
-                  style={{
-                    marginTop: '24px',
-                    fontFamily: 'monospace'
-                  }}
-                >
-                  <h3
-                    style={{
-                      color: '#aaa',
-                      fontSize: '14px',
-                      marginBottom: '10px'
-                    }}
-                  >
-                    Paths ({activePathSearch?.paths.length || 0})
-                  </h3>
-
-                  <div style={{ color: '#aaa', marginBottom: '8px' }}>
-                    Connecting: {pathTerms.map(term => term.toUpperCase()).join(' → ')}
-                  </div>
-
-                  {activePathSearch?.paths.map((path, index) => (
-                    <div
-                      key={index}
-                      style={{
-                        color: '#888',
-                        fontSize: '13px',
-                        marginBottom: '6px'
-                      }}
-                    >
-                      {path.join(' → ')}
-                    </div>
-                  ))}
-
-                  <div style={{ color: '#777', fontSize: '12px' }}>
-                    {!result
-                      ? 'Build the network to start path indexing.'
-                      : activePathSearch?.status === 'error'
-                        ? `Path indexing failed: ${activePathSearch.error}`
-                        : activePathSearch?.status === 'complete'
-                          ? activePathSearch.paths.length > 0
-                            ? `Indexed ${activePathSearch.total} / ${activePathSearch.total} sentences.`
-                            : `No path found after indexing ${activePathSearch.total} sentences.`
-                          : `Indexing: ${activePathSearch?.indexed || 0} / ${activePathSearch?.total || result.sentences.length} sentences`}
-                  </div>
-                </div>
-              )}
-
               {highlightedData.hasSearch && (
                 <div
                   style={{
@@ -1930,10 +1615,10 @@ The cat sat on the rug.`}
                       marginBottom: '10px'
                     }}
                   >
-                    {`Connected words (${highlightedData.cooccurrences.length})`}
+                    {`Connected words (${tableCooccurrences.length})`}
                   </h3>
 
-                  {highlightedData.cooccurrences.length > 0 ? (
+                  {tableCooccurrences.length > 0 ? (
                     <div
                       style={{
                         overflowX: 'auto'
@@ -1980,7 +1665,7 @@ The cat sat on the rug.`}
                         </thead>
 
                         <tbody>
-                          {highlightedData.cooccurrences.map(item => (
+                          {tableCooccurrences.map(item => (
                             <tr
                               key={item.word}
                               style={{
@@ -2035,7 +1720,6 @@ The cat sat on the rug.`}
                   )}
                 </div>
               )}
-
 
               {searchTerm && (
                 <p
