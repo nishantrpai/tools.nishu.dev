@@ -833,7 +833,7 @@ The cat sat on the rug.`);
 
 
       <main
-      style={{
+        style={{
           padding: '20px',
           background: '#000',
           color: '#fff',
@@ -957,21 +957,21 @@ The cat sat on the rug.`}
             >
               Build Network
             </button>
-             <input
-             type="checkbox"
-             checked={visualMode}
+            <input
+              type="checkbox"
+              checked={visualMode}
               onClick={() => setVisualMode(value => !value)}
             />
-              <label>Visual </label>
-                         <input
-             type="checkbox"
-             checked={showEdges}
+            <label>Visual </label>
+            <input
+              type="checkbox"
+              checked={showEdges}
               onClick={() => setShowEdges(value => !value)}
             />
-              <label>
-               Edges
+            <label>
+              Edges
 
-                </label>
+            </label>
 
             {result && (
               <button
@@ -1292,7 +1292,7 @@ The cat sat on the rug.`}
                                   100
                                 ).toFixed(1)}
                                 %
-                              </text> }
+                              </text>}
                             </g>
                           );
                         }
@@ -1470,7 +1470,7 @@ The cat sat on the rug.`}
                       marginBottom: '10px'
                     }}
                   >
-                    Connected words
+                    {`Connected words (${highlightedData.cooccurrences.length})`}
                   </h3>
 
                   {highlightedData.cooccurrences.length > 0 ? (
@@ -1527,7 +1527,20 @@ The cat sat on the rug.`}
                                 borderBottom: '1px solid #1a1a1a',
                                 cursor: 'pointer'
                               }}
-                              onClick={() => setSearchTerm(item.word)}
+                              onClick={() =>
+                                setSearchTerm(current => {
+                                  const existing = current
+                                    .split(',')
+                                    .map(term => term.trim())
+                                    .filter(Boolean);
+
+                                  if (existing.includes(item.word)) {
+                                    return current;
+                                  }
+
+                                  return [...existing, item.word].join(', ');
+                                })
+                              }
                             >
                               <td
                                 style={{
