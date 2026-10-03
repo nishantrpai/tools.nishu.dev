@@ -216,76 +216,6 @@ function tokenizeSentence(sentence, stopwordSet) {
 }
 
 
-function separateOverlappingNodes(nodes, minDistance) {
-  if (nodes.length < 2) return;
-
-  for (let iteration = 0; iteration < 30; iteration++) {
-    let moved = false;
-
-    for (let i = 0; i < nodes.length; i++) {
-      for (let j = i + 1; j < nodes.length; j++) {
-        const a = nodes[i];
-        const b = nodes[j];
-
-        let dx = b.x - a.x;
-        let dy = b.y - a.y;
-        let distance = Math.sqrt(dx * dx + dy * dy);
-
-        if (distance >= minDistance) continue;
-
-        if (distance < 0.001) {
-          const angle = ((i + 1) * 37 + (j + 1) * 17) % 360;
-          const radians = angle * (Math.PI / 180);
-
-          dx = Math.cos(radians);
-          dy = Math.sin(radians);
-          distance = 1;
-        }
-
-        const push = (minDistance - distance) / 2;
-
-        const offsetX = (dx / distance) * push;
-        const offsetY = (dy / distance) * push;
-
-        a.x = Math.max(
-          GRAPH_PADDING,
-          Math.min(
-            GRAPH_WIDTH - GRAPH_PADDING,
-            a.x - offsetX
-          )
-        );
-
-        a.y = Math.max(
-          GRAPH_PADDING,
-          Math.min(
-            GRAPH_HEIGHT - GRAPH_PADDING,
-            a.y - offsetY
-          )
-        );
-
-        b.x = Math.max(
-          GRAPH_PADDING,
-          Math.min(
-            GRAPH_WIDTH - GRAPH_PADDING,
-            b.x + offsetX
-          )
-        );
-
-        b.y = Math.max(
-          GRAPH_PADDING,
-          Math.min(
-            GRAPH_HEIGHT - GRAPH_PADDING,
-            b.y + offsetY
-          )
-        );
-
-        moved = true;
-      }
-    }
-
-    if (!moved) break;
-  }
-}
 
 export default function Home() {
   const [text, setText] = useState(`The cat sat on the mat.
@@ -301,6 +231,8 @@ The cat sat on the rug.`);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [animationTarget, setAnimationTarget] = useState(null);
+  const [showContext, setShowContext] = useState(false);
+  const [contextResults, setContextResults] = useState([]);
   const [visualMode, setVisualMode] = useState(true)
   const [showEdges, setShowEdges] = useState(true)
   const deferredSearchTerm = useDeferredValue(searchTerm);
@@ -344,10 +276,46 @@ The cat sat on the rug.`);
       for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
         const page = await pdf.getPage(pageNumber);
         const content = await page.getTextContent();
-        extractedText += content.items
-          .map(item => item.str)
-          .join(' ')
-          .trim();
+
+        const items = content.items;
+        let pageText = '';
+
+        for (let i = 0; i < items.length; i++) {
+          const current = items[i];
+
+          if (!current.str) continue;
+
+          if (i === 0) {
+            pageText = current.str;
+            continue;
+          }
+
+          const previous = items[i - 1];
+
+          const previousX = previous.transform[4];
+          const previousY = previous.transform[5];
+          const currentX = current.transform[4];
+          const currentY = current.transform[5];
+
+          if (Math.abs(currentY - previousY) > 2) {
+            pageText += '\n';
+          } else {
+            const gap =
+              currentX - (previousX + previous.width);
+
+            if (
+              gap > 1 &&
+              !pageText.endsWith(' ') &&
+              !current.str.startsWith(' ')
+            ) {
+              pageText += ' ';
+            }
+          }
+
+          pageText += current.str;
+        }
+
+        extractedText += pageText.trim() + '\n';
       }
 
       setText(extractedText.replace(/\s+/g, ' '));
@@ -363,7 +331,7 @@ The cat sat on the rug.`);
   // BUILD ASSOCIATION NETWORK
   // ------------------------------------------------------------
 
-  const stopwords = [];
+  let stopwords = [];
   const connectedstopwords = [
     "a",
     "an",
@@ -440,7 +408,9 @@ The cat sat on the rug.`);
     "that",
     "these",
     "those"
-]
+  ]
+  stopwords = connectedstopwords
+  
   function buildAssociations() {
     const stopwordSet = new Set(stopwords);
 
@@ -797,7 +767,7 @@ The cat sat on the rug.`);
     const level1Set = new Set(
       [...connectionWeightMap.entries()]
         .filter(([, connections]) =>
-          connections.size === matchingTerms.size 
+          connections.size === matchingTerms.size
         )
         .map(([word]) => word)
     );
@@ -880,6 +850,8 @@ The cat sat on the rug.`);
 
   useEffect(() => {
     setAnimationTarget(null);
+    setShowContext(false);
+    setContextResults([]);
 
     return () => {
       clearInterval(animationIntervalRef.current);
@@ -896,9 +868,9 @@ The cat sat on the rug.`);
         term
       })),
       ...[...highlightedData.level1Set].map(word => ({
-          type: 'word',
-          word
-        }))
+        type: 'word',
+        word
+      }))
     ];
 
     if (sequence.length === 0) return;
@@ -919,6 +891,69 @@ The cat sat on the rug.`);
 
       setAnimationTarget(sequence[index]);
     }, 250);
+  };
+
+  const exploreContext = () => {
+    console.log('exploring context')
+    if (!result || !highlightedData.hasSearch) return;
+
+    const terms = highlightedData.terms;
+    console.log(terms)
+    const commonWords = [...highlightedData.level1Set];
+    console.log(commonWords);
+    const evidence = [];
+
+    result.sentences.forEach((sentence, index) => {
+      const words =
+        index < result.indexedSentenceCount
+          ? result.indexedSentenceWords[index]
+          : tokenizeSentence(sentence, result.stopwordSet);
+      const sentenceWordSet = new Set(words);
+      const matchedTerms = terms.filter(term =>
+        sentenceWordSet.has(term)
+      );
+
+      if (matchedTerms.length === 0) return;
+
+      const connectedWords = commonWords.filter(word =>
+        sentenceWordSet.has(word) &&
+        matchedTerms.some(term =>
+          highlightedData.connectionWeightMap.get(word)?.has(term)
+        )
+      );
+
+      console.log(connectedWords)
+      if (connectedWords.length === 0) return;
+
+      evidence.push({
+        index,
+        matchedTerms,
+        connectedWords
+      });
+    });
+
+    const contexts = [];
+
+    evidence.forEach(item => {
+      const start = Math.max(0, item.index - 1);
+      const end = Math.min(result.sentences.length - 1, item.index + 1);
+      const previousContext = contexts[contexts.length - 1];
+
+      if (previousContext && start <= previousContext.end) {
+        previousContext.end = Math.max(previousContext.end, end);
+        previousContext.evidence.push(item);
+      } else {
+        contexts.push({
+          start,
+          end,
+          evidence: [item]
+        });
+      }
+    });
+
+    console.log(contexts)
+    setContextResults(contexts);
+    setShowContext(true);
   };
 
   const top10Nodes = useMemo(() => {
@@ -1150,13 +1185,13 @@ The cat sat on the rug.`}
             <input
               type="checkbox"
               checked={visualMode}
-              onClick={() => setVisualMode(value => !value)}
+              onChange={() => setVisualMode(value => !value)}
             />
             <label>Visual </label>
             <input
               type="checkbox"
               checked={showEdges}
-              onClick={() => setShowEdges(value => !value)}
+              onChange={() => setShowEdges(value => !value)}
             />
             <label>
               Edges
@@ -1189,7 +1224,7 @@ The cat sat on the rug.`}
                 marginTop: '30px'
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'baseline', gap: '8px' }}>
                 <input
                   type="text"
                   value={searchTerm}
@@ -1200,6 +1235,8 @@ The cat sat on the rug.`}
                   }
                   placeholder="Search terms, comma separated..."
                 />
+                <div style={{display: 'flex', gap: 10, alignItems: 'baseline'}}>
+
                 <button
                   type="button"
                   onClick={animateAssociations}
@@ -1207,6 +1244,14 @@ The cat sat on the rug.`}
                 >
                   Explore
                 </button>
+                <button
+                  type="button"
+                  onClick={exploreContext}
+                  style={{ marginBottom: '12px' }}
+                >
+                  Context
+                </button>
+                  </div>
               </div>
               <div
                 style={{
@@ -1420,39 +1465,39 @@ The cat sat on the rug.`}
                           const isAnimationEdge =
                             animationTarget?.type === 'term'
                               ? edge.source === animationTarget.term ||
-                                edge.target === animationTarget.term
+                              edge.target === animationTarget.term
                               : animationTarget?.type === 'word'
                                 ? edge.source === animationTarget.word ||
-                                  edge.target === animationTarget.word
+                                edge.target === animationTarget.word
                                 : false;
 
                           const strokeOpacity =
                             animationTarget
                               ? isAnimationEdge ? 0.9 : 0.03
                               : !highlightedData.hasSearch
-                              ? 0.05 +
-                              (edge.weight /
-                                maxWeight) *
-                              0.15
-                              : isConnected
-                                ? 0.15 +
-                                connRatio *
+                                ? 0.05 +
+                                (edge.weight /
+                                  maxWeight) *
                                 0.15
-                                : 0.02;
+                                : isConnected
+                                  ? 0.15 +
+                                  connRatio *
+                                  0.15
+                                  : 0.02;
 
                           const strokeWidth =
                             animationTarget
                               ? isAnimationEdge ? 1.5 : 0.2
                               : !highlightedData.hasSearch
-                              ? 0.5 +
-                              (edge.weight /
-                                maxWeight) *
-                              1.5
-                              : isConnected
                                 ? 0.5 +
-                                connRatio *
-                                2
-                                : 0.2;
+                                (edge.weight /
+                                  maxWeight) *
+                                1.5
+                                : isConnected
+                                  ? 0.5 +
+                                  connRatio *
+                                  2
+                                  : 0.2;
 
                           return (
                             <g
@@ -1580,14 +1625,14 @@ The cat sat on the rug.`}
                           animationTarget
                             ? isAnimatingNode ? 1 : 0.25
                             : !highlightedData.hasSearch
-                            ? 1
-                            : isCenter
                               ? 1
-                              : isConnected
-                                ? 0.2 +
-                                connRatio *
-                                0.8
-                                : 0.1;
+                              : isCenter
+                                ? 1
+                                : isConnected
+                                  ? 0.2 +
+                                  connRatio *
+                                  0.8
+                                  : 0.1;
 
                         const brightness =
                           Math.round(
@@ -1600,14 +1645,14 @@ The cat sat on the rug.`}
                           isAnimatingNode
                             ? '#fff'
                             : isTop10
-                            ? '#fff'
-                            : !highlightedData.hasSearch
-                              ? '#888'
-                              : isCenter
-                                ? '#fff'
-                                : isConnected
-                                  ? `rgb(${brightness},${brightness},${brightness})`
-                                  : '#333';
+                              ? '#fff'
+                              : !highlightedData.hasSearch
+                                ? '#888'
+                                : isCenter
+                                  ? '#fff'
+                                  : isConnected
+                                    ? `rgb(${brightness},${brightness},${brightness})`
+                                    : '#333';
 
                         return (
                           <g
@@ -1636,12 +1681,12 @@ The cat sat on the rug.`}
                                 isAnimatingNode
                                   ? '18'
                                   : isCenter
-                                  ? '13.5'
-                                  : isTop10
-                                    ? '15'
-                                    : isConnected
-                                      ? '11'
-                                      : '9.5'
+                                    ? '13.5'
+                                    : isTop10
+                                      ? '15'
+                                      : isConnected
+                                        ? '11'
+                                        : '9.5'
                               }
                               fontFamily="monospace"
                               fontWeight={
@@ -1690,6 +1735,81 @@ The cat sat on the rug.`}
               {/* ------------------------------------------
                   SEARCH RESULTS
               ------------------------------------------- */}
+
+
+              {showContext && (
+                <div
+                  style={{
+                    marginTop: '20px',
+                    fontFamily: 'monospace'
+                  }}
+                >
+                  <h3
+                    style={{
+                      color: '#aaa',
+                      fontSize: '14px',
+                      marginBottom: '12px'
+                    }}
+                  >
+                    Context for{' '}
+                    <strong style={{ color: '#fff' }}>
+                      {highlightedData.terms.join(', ')}
+                    </strong>
+                  </h3>
+
+                  {contextResults.length > 0 ? (
+                    contextResults.map(context => (
+                      <div
+                        key={context.start}
+                        style={{
+                          marginBottom: '20px',
+                          paddingBottom: '20px',
+                          borderBottom: '1px solid #222'
+                        }}
+                      >
+                        {Array.from(
+                          { length: context.end - context.start + 1 },
+                          (_, offset) => context.start + offset
+                        ).map(sentenceIndex => {
+                          const sentenceEvidence = context.evidence.find(
+                            item => item.index === sentenceIndex
+                          );
+
+                          return (
+                            <div
+                              key={sentenceIndex}
+                              style={{
+                                color: sentenceEvidence ? '#fff' : '#555',
+                                marginBottom: '6px',
+                                lineHeight: 1.6
+                              }}
+                            >
+                              {result.sentences[sentenceIndex]}
+                              {sentenceEvidence && (
+                                <div
+                                  style={{
+                                    color: '#777',
+                                    marginTop: '4px',
+                                    fontSize: '12px'
+                                  }}
+                                >
+                                  Supports {sentenceEvidence.matchedTerms.join(', ')} →{' '}
+                                  {sentenceEvidence.connectedWords.join(', ')}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ))
+                  ) : (
+                    <div style={{ color: '#777' }}>
+                      No sentences directly support the connections between these search terms and common words.
+                    </div>
+                  )}
+                </div>
+              )}
+
 
               {searchTerm &&
                 highlightedData.hasSearch && (
@@ -1827,7 +1947,6 @@ The cat sat on the rug.`}
                   )}
                 </div>
               )}
-
               {searchTerm && (
                 <p
                   style={{
