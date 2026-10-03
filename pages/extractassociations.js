@@ -176,7 +176,6 @@ function extractsentences(body_text, abbrev, divider) {
       .trim();
 
 
-    console.log(sentence, start, end)
     if (sentence) {
       sentences.push(sentence);
     }
@@ -214,7 +213,39 @@ function tokenizeSentence(sentence, stopwordSet) {
     .filter(Boolean)
     .filter(word => !stopwordSet.has(word));
 }
+function highlightSearchTerms(sentence, terms) {
+  if (!sentence || !terms?.length) return sentence;
 
+  const escapedTerms = terms
+    .filter(Boolean)
+    .sort((a, b) => b.length - a.length)
+    .map(term => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+
+  if (!escapedTerms.length) return sentence;
+
+  const regex = new RegExp(
+    `\\b(${escapedTerms.join('|')})\\b`,
+    'gi'
+  );
+
+  return sentence.split(regex).map((part, index) =>
+    index % 2 === 1 ? (
+      <mark
+        key={index}
+        style={{
+          background: '#333',
+          color: '#fff',
+          padding: '1px 2px',
+          borderRadius: '2px'
+        }}
+      >
+        {part}
+      </mark>
+    ) : (
+      part
+    )
+  );
+}
 
 
 export default function Home() {
@@ -442,7 +473,6 @@ The cat sat on the rug.`);
     // --------------------------------------------------
 
     const sentences = extractsentences(text)
-    console.log('sentences', sentences)
 
     // --------------------------------------------------
     // 2. TOKENIZE EACH SENTENCE
@@ -554,10 +584,7 @@ The cat sat on the rug.`);
     // DEBUG
     // --------------------------------------------------
 
-    console.log("=== ASSOCIATION CHECK ===");
-
-    console.table(associationGrid)
-
+    
     // --------------------------------------------------
     // 5. CONVERT GRID INTO EDGES
     // --------------------------------------------------
@@ -898,9 +925,7 @@ The cat sat on the rug.`);
     if (!result || !highlightedData.hasSearch) return;
 
     const terms = highlightedData.terms;
-    console.log(terms)
     const commonWords = [...highlightedData.level1Set];
-    console.log(commonWords);
     const evidence = [];
 
     result.sentences.forEach((sentence, index) => {
@@ -922,7 +947,6 @@ The cat sat on the rug.`);
         )
       );
 
-      console.log(connectedWords)
       if (connectedWords.length === 0) return;
 
       evidence.push({
@@ -951,7 +975,6 @@ The cat sat on the rug.`);
       }
     });
 
-    console.log(contexts)
     setContextResults(contexts);
     setShowContext(true);
   };
@@ -1039,7 +1062,6 @@ The cat sat on the rug.`);
         style={{
           padding: '20px',
           background: '#000',
-          color: '#fff',
           fontFamily: 'system-ui',
           maxWidth: '100%',
           width: '100%',
@@ -1779,12 +1801,15 @@ The cat sat on the rug.`}
                             <div
                               key={sentenceIndex}
                               style={{
-                                color: sentenceEvidence ? '#fff' : '#555',
+                                color: sentenceEvidence ? '#888' : '#555',
                                 marginBottom: '6px',
                                 lineHeight: 1.6
                               }}
                             >
-                              {result.sentences[sentenceIndex]}
+                              {highlightSearchTerms(
+                                result.sentences[sentenceIndex],
+                                highlightedData.terms
+                              )}
                               {sentenceEvidence && (
                                 <div
                                   style={{
