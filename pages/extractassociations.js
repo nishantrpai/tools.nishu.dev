@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import { useState, useMemo, useRef, useDeferredValue } from 'react';
+import { useState, useMemo, useRef, useDeferredValue, useEffect } from 'react';
 
 const GRAPH_WIDTH = 1000;
 const GRAPH_HEIGHT = 1000;
@@ -300,6 +300,7 @@ The cat sat on the rug.`);
   const [result, setResult] = useState(null);
 
   const [searchTerm, setSearchTerm] = useState('');
+  const [animationTarget, setAnimationTarget] = useState(null);
   const [visualMode, setVisualMode] = useState(true)
   const [showEdges, setShowEdges] = useState(true)
   const deferredSearchTerm = useDeferredValue(searchTerm);
@@ -318,6 +319,7 @@ The cat sat on the rug.`);
   const panStart = useRef({ x: 0, y: 0 });
   const panOrigin = useRef({ x: 0, y: 0 });
   const pdfInputRef = useRef(null);
+  const animationIntervalRef = useRef(null);
   const [highlightTop10, setHighlightTop10] = useState(false);
 
   async function handlePdfUpload(event) {
@@ -876,6 +878,49 @@ The cat sat on the rug.`);
     ({ word }) => !connectedstopwords.includes(word)
   );
 
+  useEffect(() => {
+    setAnimationTarget(null);
+
+    return () => {
+      clearInterval(animationIntervalRef.current);
+      animationIntervalRef.current = null;
+    };
+  }, [deferredSearchTerm]);
+
+  const animateAssociations = () => {
+    if (!highlightedData.hasSearch) return;
+
+    const sequence = [
+      ...highlightedData.terms.map(term => ({
+        type: 'term',
+        term
+      })),
+      ...[...highlightedData.level1Set].map(word => ({
+          type: 'word',
+          word
+        }))
+    ];
+
+    if (sequence.length === 0) return;
+
+    clearInterval(animationIntervalRef.current);
+    let index = 0;
+    setAnimationTarget(sequence[index]);
+
+    animationIntervalRef.current = setInterval(() => {
+      index++;
+
+      if (index >= sequence.length) {
+        clearInterval(animationIntervalRef.current);
+        animationIntervalRef.current = null;
+        setAnimationTarget(null);
+        return;
+      }
+
+      setAnimationTarget(sequence[index]);
+    }, 250);
+  };
+
   const top10Nodes = useMemo(() => {
     if (!result) return new Set();
 
@@ -1144,16 +1189,25 @@ The cat sat on the rug.`}
                 marginTop: '30px'
               }}
             >
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={e =>
-                  setSearchTerm(
-                    e.target.value
-                  )
-                }
-                placeholder="Search terms, comma separated..."
-              />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={e =>
+                    setSearchTerm(
+                      e.target.value
+                    )
+                  }
+                  placeholder="Search terms, comma separated..."
+                />
+                <button
+                  type="button"
+                  onClick={animateAssociations}
+                  disabled={!highlightedData.hasSearch}
+                >
+                  Explore
+                </button>
+              </div>
               <div
                 style={{
                   color: '#777',
@@ -1235,6 +1289,7 @@ The cat sat on the rug.`}
                 style={{
                   width: '100%',
                   height: '82vh',
+                  position: 'relative',
                   overflow: 'hidden',
                   background:
                     '#0a0a0a',
@@ -1362,8 +1417,19 @@ The cat sat on the rug.`}
                               highlightedData.maxConnWeight
                               : 0;
 
+                          const isAnimationEdge =
+                            animationTarget?.type === 'term'
+                              ? edge.source === animationTarget.term ||
+                                edge.target === animationTarget.term
+                              : animationTarget?.type === 'word'
+                                ? edge.source === animationTarget.word ||
+                                  edge.target === animationTarget.word
+                                : false;
+
                           const strokeOpacity =
-                            !highlightedData.hasSearch
+                            animationTarget
+                              ? isAnimationEdge ? 0.9 : 0.03
+                              : !highlightedData.hasSearch
                               ? 0.05 +
                               (edge.weight /
                                 maxWeight) *
@@ -1375,7 +1441,9 @@ The cat sat on the rug.`}
                                 : 0.02;
 
                           const strokeWidth =
-                            !highlightedData.hasSearch
+                            animationTarget
+                              ? isAnimationEdge ? 1.5 : 0.2
+                              : !highlightedData.hasSearch
                               ? 0.5 +
                               (edge.weight /
                                 maxWeight) *
@@ -1468,6 +1536,13 @@ The cat sat on the rug.`}
                             node.id
                           );
 
+                        const isAnimatingNode =
+                          animationTarget?.type === 'term'
+                            ? node.id === animationTarget.term
+                            : animationTarget?.type === 'word'
+                              ? node.id === animationTarget.word
+                              : false;
+
                         const nodeConnections =
                           highlightedData.hasSearch
                             ? highlightedData.connectionWeightMap.get(node.id)
@@ -1502,7 +1577,9 @@ The cat sat on the rug.`}
                               : 12;
 
                         const nodeOpacity =
-                          !highlightedData.hasSearch
+                          animationTarget
+                            ? isAnimatingNode ? 1 : 0.25
+                            : !highlightedData.hasSearch
                             ? 1
                             : isCenter
                               ? 1
@@ -1520,7 +1597,9 @@ The cat sat on the rug.`}
                           );
 
                         const textFill =
-                          isTop10
+                          isAnimatingNode
+                            ? '#fff'
+                            : isTop10
                             ? '#fff'
                             : !highlightedData.hasSearch
                               ? '#888'
@@ -1554,7 +1633,9 @@ The cat sat on the rug.`}
                               textAnchor="middle"
                               fill={textFill}
                               fontSize={
-                                isCenter
+                                isAnimatingNode
+                                  ? '18'
+                                  : isCenter
                                   ? '13.5'
                                   : isTop10
                                     ? '15'
@@ -1578,6 +1659,32 @@ The cat sat on the rug.`}
                       })}
                   </g>
                 </svg>
+                {animationTarget && (
+                  <div
+                    aria-live="polite"
+                    style={{
+                      position: 'absolute',
+                      right: '24px',
+                      top: '24px',
+                      maxWidth: 'calc(100% - 48px)',
+                      overflow: 'hidden',
+                      color: '#fff',
+                      fontSize: 'clamp(36px, 8vw, 96px)',
+                      fontFamily: 'monospace',
+                      fontWeight: 'bold',
+                      lineHeight: 1,
+                      textAlign: 'right',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      textShadow: '0 2px 16px #000, 0 0 8px #000',
+                      pointerEvents: 'none'
+                    }}
+                  >
+                    {animationTarget.type === 'term'
+                      ? animationTarget.term
+                      : animationTarget.word}
+                  </div>
+                )}
               </div>}
 
               {/* ------------------------------------------
