@@ -319,6 +319,7 @@ The cat sat on the rug.`);
   const [isExtractingPdf, setIsExtractingPdf] = useState(false);
   const [pdfError, setPdfError] = useState('');
   const [customStopwords, setCustomStopwords] = useState('');
+  const [stopWordsByDefault, setStopWordsByDefault] = useState(true);
 
   const [result, setResult] = useState(null);
 
@@ -426,7 +427,6 @@ The cat sat on the rug.`);
   // BUILD ASSOCIATION NETWORK
   // ------------------------------------------------------------
 
-  let stopwords = [];
   const connectedstopwords = [
     "a",
     "an",
@@ -504,10 +504,11 @@ The cat sat on the rug.`);
     "these",
     "those"
   ]
-  stopwords = connectedstopwords
 
   function buildAssociations() {
-    const stopwordSet = new Set(stopwords);
+    const stopwordSet = new Set(
+      stopWordsByDefault ? connectedstopwords : []
+    );
 
     customStopwords
       .split(',')
@@ -947,7 +948,8 @@ The cat sat on the rug.`);
   ]);
 
   const tableCooccurrences = highlightedData.cooccurrences.filter(
-    ({ word }) => !connectedstopwords.includes(word)
+    ({ word }) =>
+      !stopWordsByDefault || !connectedstopwords.includes(word)
   );
 
   useEffect(() => {
@@ -1320,6 +1322,22 @@ The cat sat on the rug.`}
             >
               Build Network
             </button>
+            <label
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                color: '#aaa',
+                fontFamily: 'monospace'
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={stopWordsByDefault}
+                onChange={event => setStopWordsByDefault(event.target.checked)}
+              />
+              Stop words
+            </label>
             <input
               type="checkbox"
               checked={visualMode}
