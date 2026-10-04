@@ -247,6 +247,40 @@ function highlightSearchTerms(sentence, terms) {
   );
 }
 
+function highlightConnectionTerms(sentence, terms) {
+  if (!sentence || !terms?.length) return sentence;
+
+  const escapedTerms = terms
+    .filter(Boolean)
+    .sort((a, b) => b.length - a.length)
+    .map(term => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+
+  if (!escapedTerms.length) return sentence;
+
+  const regex = new RegExp(
+    `\\b(${escapedTerms.join('|')})\\b`,
+    'gi'
+  );
+
+  return sentence.split(regex).map((part, index) =>
+    index % 2 === 1 ? (
+      <mark
+        key={index}
+        style={{
+          background: '#fff',
+          color: '#000',
+          padding: '1px 2px',
+          borderRadius: '2px'
+        }}
+      >
+        {part}
+      </mark>
+    ) : (
+      <span key={index}>{part}</span>
+    )
+  );
+}
+
 
 export default function Home() {
   const [text, setText] = useState(`The cat sat on the mat.
@@ -264,6 +298,8 @@ The cat sat on the rug.`);
   const [animationTarget, setAnimationTarget] = useState(null);
   const [showContext, setShowContext] = useState(false);
   const [contextResults, setContextResults] = useState([]);
+  const [selectedContext, setSelectedContext] = useState(null);
+  const [highlightedContext, setHighlightedContext] = useState(null);
   const [visualMode, setVisualMode] = useState(true)
   const [showEdges, setShowEdges] = useState(true)
   const deferredSearchTerm = useDeferredValue(searchTerm);
@@ -879,6 +915,8 @@ The cat sat on the rug.`);
     setAnimationTarget(null);
     setShowContext(false);
     setContextResults([]);
+    setSelectedContext(null);
+    setHighlightedContext(null);
 
     return () => {
       clearInterval(animationIntervalRef.current);
@@ -886,8 +924,19 @@ The cat sat on the rug.`);
     };
   }, [deferredSearchTerm]);
 
+  const stopExploreAnimation = () => {
+    clearInterval(animationIntervalRef.current);
+    animationIntervalRef.current = null;
+    setAnimationTarget(null);
+  };
+
   const animateAssociations = () => {
     if (!highlightedData.hasSearch) return;
+
+    if (animationIntervalRef.current !== null) {
+      stopExploreAnimation();
+      return;
+    }
 
     const sequence = [
       ...highlightedData.terms.map(term => ({
@@ -910,9 +959,7 @@ The cat sat on the rug.`);
       index++;
 
       if (index >= sequence.length) {
-        clearInterval(animationIntervalRef.current);
-        animationIntervalRef.current = null;
-        setAnimationTarget(null);
+        stopExploreAnimation();
         return;
       }
 
@@ -921,7 +968,6 @@ The cat sat on the rug.`);
   };
 
   const exploreContext = () => {
-    console.log('exploring context')
     if (!result || !highlightedData.hasSearch) return;
 
     const terms = highlightedData.terms;
@@ -940,19 +986,22 @@ The cat sat on the rug.`);
 
       if (matchedTerms.length === 0) return;
 
-      const connectedWords = commonWords.filter(word =>
-        sentenceWordSet.has(word) &&
-        matchedTerms.some(term =>
-          highlightedData.connectionWeightMap.get(word)?.has(term)
-        )
-      );
+      const connections = matchedTerms
+        .map(term => ({
+          term,
+          words: commonWords.filter(word =>
+            sentenceWordSet.has(word) &&
+            highlightedData.connectionWeightMap.get(word)?.has(term)
+          )
+        }))
+        .filter(connection => connection.words.length > 0);
 
-      if (connectedWords.length === 0) return;
+      if (connections.length === 0) return;
 
       evidence.push({
         index,
         matchedTerms,
-        connectedWords
+        connections
       });
     });
 
@@ -976,6 +1025,8 @@ The cat sat on the rug.`);
     });
 
     setContextResults(contexts);
+    setSelectedContext(null);
+    setHighlightedContext(null);
     setShowContext(true);
   };
 
@@ -1264,7 +1315,7 @@ The cat sat on the rug.`}
                   onClick={animateAssociations}
                   disabled={!highlightedData.hasSearch}
                 >
-                  Explore
+                  {animationIntervalRef.current !== null ? 'Stop' : 'Explore'}
                 </button>
                 <button
                   type="button"
@@ -1272,6 +1323,16 @@ The cat sat on the rug.`}
                   style={{ marginBottom: '12px' }}
                 >
                   Context
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setHighlightedContext(null);
+                    setSelectedContext(null);
+                  }}
+                  disabled={!highlightedContext}
+                >
+                  Clear Highlights
                 </button>
                   </div>
               </div>
@@ -1352,6 +1413,8 @@ The cat sat on the rug.`}
 
               {/* SVG CONTAINER */}
 
+              <div className={`graphContextLayout${showContext ? ' withContext' : ''}`}>
+                <div className="graphPane">
               {visualMode && <div
                 style={{
                   width: '100%',
@@ -1753,16 +1816,12 @@ The cat sat on the rug.`}
                   </div>
                 )}
               </div>}
-
-              {/* ------------------------------------------
-                  SEARCH RESULTS
-              ------------------------------------------- */}
-
+                </div>
 
               {showContext && (
                 <div
+                  className="contextPane"
                   style={{
-                    marginTop: '20px',
                     fontFamily: 'monospace'
                   }}
                 >
@@ -1783,10 +1842,47 @@ The cat sat on the rug.`}
                     contextResults.map(context => (
                       <div
                         key={context.start}
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => {
+                          stopExploreAnimation();
+                          setSelectedContext(context);
+                          const terms = context.evidence.flatMap(evidence =>
+                            evidence.connections.flatMap(connection => [
+                              connection.term,
+                              ...connection.words
+                            ])
+                          );
+                          setHighlightedContext({
+                            contextStart: context.start,
+                            terms: [...new Set(terms)]
+                          });
+                        }}
+                        onKeyDown={event => {
+                          if (event.key === 'Enter' || event.key === ' ') {
+                            event.preventDefault();
+                            stopExploreAnimation();
+                            setSelectedContext(context);
+                            const terms = context.evidence.flatMap(evidence =>
+                              evidence.connections.flatMap(connection => [
+                                connection.term,
+                                ...connection.words
+                              ])
+                            );
+                            setHighlightedContext({
+                              contextStart: context.start,
+                              terms: [...new Set(terms)]
+                            });
+                          }
+                        }}
                         style={{
-                          marginBottom: '20px',
-                          paddingBottom: '20px',
-                          borderBottom: '1px solid #222'
+                          marginBottom: '12px',
+                          padding: '12px',
+                          border: selectedContext?.start === context.start
+                            ? '1px solid #666'
+                            : '1px solid #222',
+                          borderRadius: '4px',
+                          cursor: 'pointer'
                         }}
                       >
                         {Array.from(
@@ -1806,10 +1902,15 @@ The cat sat on the rug.`}
                                 lineHeight: 1.6
                               }}
                             >
-                              {highlightSearchTerms(
-                                result.sentences[sentenceIndex],
-                                highlightedData.terms
-                              )}
+                              {highlightedContext?.contextStart === context.start
+                                ? highlightConnectionTerms(
+                                    result.sentences[sentenceIndex],
+                                    highlightedContext.terms
+                                  )
+                                : highlightSearchTerms(
+                                    result.sentences[sentenceIndex],
+                                    highlightedData.terms
+                                  )}
                               {sentenceEvidence && (
                                 <div
                                   style={{
@@ -1818,8 +1919,11 @@ The cat sat on the rug.`}
                                     fontSize: '12px'
                                   }}
                                 >
-                                  Supports {sentenceEvidence.matchedTerms.join(', ')} →{' '}
-                                  {sentenceEvidence.connectedWords.join(', ')}
+                                  {sentenceEvidence.connections.map(connection => (
+                                    <div key={connection.term}>
+                                      Supports {connection.term} → {connection.words.join(', ')}
+                                    </div>
+                                  ))}
                                 </div>
                               )}
                             </div>
@@ -1832,8 +1936,101 @@ The cat sat on the rug.`}
                       No sentences directly support the connections between these search terms and common words.
                     </div>
                   )}
+
+                  {selectedContext && (
+                    <div
+                      style={{
+                        marginTop: '16px',
+                        padding: '12px',
+                        background: '#111',
+                        border: '1px solid #333',
+                        borderRadius: '4px'
+                      }}
+                    >
+                      <div
+                        style={{
+                          color: '#aaa',
+                          fontSize: '13px',
+                          marginBottom: '8px'
+                        }}
+                      >
+                        Connections in selected context
+                      </div>
+                      {selectedContext.evidence.map(evidence => (
+                        <div
+                          key={evidence.index}
+                          style={{
+                            marginTop: '8px',
+                            color: '#ddd'
+                          }}
+                        >
+                          <div style={{ color: '#777', marginBottom: '4px' }}>
+                            {highlightSearchTerms(
+                              result.sentences[evidence.index],
+                              highlightedData.terms
+                            )}
+                          </div>
+                          {evidence.connections.map(connection => (
+                            <div key={connection.term}>
+                              <strong style={{ color: '#fff' }}>
+                                {connection.term}
+                              </strong>
+                              {' → '}
+                              {connection.words.join(', ')}
+                            </div>
+                          ))}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
+                <style jsx>{`
+                  .graphContextLayout {
+                    display: flex;
+                    align-items: flex-start;
+                    gap: 16px;
+                    width: 100%;
+                  }
+
+                  .graphPane {
+                    flex: 1 1 100%;
+                    min-width: 0;
+                  }
+
+                  .withContext .graphPane {
+                    flex: 7 1 0;
+                  }
+
+                  .contextPane {
+                    flex: 3 1 0;
+                    min-width: 0;
+                    max-height: 82vh;
+                    overflow-y: auto;
+                  }
+
+                  @media (max-width: 768px) {
+                    .graphContextLayout {
+                      flex-direction: column;
+                    }
+
+                    .graphPane,
+                    .withContext .graphPane,
+                    .contextPane {
+                      width: 100%;
+                      flex: 1 1 auto;
+                    }
+
+                    .contextPane {
+                      max-height: none;
+                    }
+                  }
+                `}</style>
+              </div>
+
+              {/* ------------------------------------------
+                  SEARCH RESULTS
+              ------------------------------------------- */}
 
 
               {searchTerm &&
