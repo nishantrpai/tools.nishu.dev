@@ -213,6 +213,34 @@ function tokenizeSentence(sentence, stopwordSet) {
     .filter(Boolean)
     .filter(word => !stopwordSet.has(word));
 }
+
+function countPhrase(sentence, phrase, stopwordSet) {
+  const words = tokenizeSentence(sentence, stopwordSet);
+  const phraseWords = phrase
+    .toLowerCase()
+    .split(/\s+/)
+    .filter(Boolean);
+
+  if (!phraseWords.length) return 0;
+
+  let count = 0;
+
+  for (let i = 0; i <= words.length - phraseWords.length; i++) {
+    let matches = true;
+
+    for (let j = 0; j < phraseWords.length; j++) {
+      if (words[i + j] !== phraseWords[j]) {
+        matches = false;
+        break;
+      }
+    }
+
+    if (matches) count++;
+  }
+
+  return count;
+}
+
 function highlightSearchTerms(sentence, terms) {
   if (!sentence || !terms?.length) return sentence;
 
@@ -781,7 +809,18 @@ The cat sat on the rug.`);
       });
 
       const termsInSentence = uniqueTerms
-        .map(term => [term, sentenceCounts.get(term) || 0])
+        .map(term => {
+          const termWords = term.split(/\s+/);
+
+          if (termWords.length === 1) {
+            return [term, sentenceCounts.get(term) || 0];
+          }
+
+          return [
+            term,
+            countPhrase(sentence, term, result.stopwordSet)
+          ];
+        })
         .filter(([, count]) => count > 0);
 
       termsInSentence.forEach(([term, count]) => {
@@ -981,7 +1020,9 @@ The cat sat on the rug.`);
           : tokenizeSentence(sentence, result.stopwordSet);
       const sentenceWordSet = new Set(words);
       const matchedTerms = terms.filter(term =>
-        sentenceWordSet.has(term)
+        term.split(/\s+/).length === 1
+          ? sentenceWordSet.has(term)
+          : countPhrase(sentence, term, result.stopwordSet) > 0
       );
 
       if (matchedTerms.length === 0) return;
@@ -1957,6 +1998,50 @@ The cat sat on the rug.`}
                               </div>
                             );
                           })}
+                          {selectedContext?.start === context.start && (
+                            <div
+                              style={{
+                                marginTop: '16px',
+                                padding: '12px',
+                                background: '#111',
+                                border: '1px solid #333',
+                                borderRadius: '4px',
+                                color: '#ddd'
+                              }}
+                            >
+                              <div
+                                style={{
+                                  color: '#aaa',
+                                  fontSize: '13px',
+                                  marginBottom: '8px'
+                                }}
+                              >
+                                Connections in selected context
+                              </div>
+                              {selectedContext.evidence.map(evidence => (
+                                <div
+                                  key={evidence.index}
+                                  style={{ marginTop: '8px' }}
+                                >
+                                  <div style={{ color: '#777', marginBottom: '4px' }}>
+                                    {highlightSearchTerms(
+                                      result.sentences[evidence.index],
+                                      highlightedData.terms
+                                    )}
+                                  </div>
+                                  {evidence.connections.map(connection => (
+                                    <div key={connection.term}>
+                                      <strong style={{ color: '#fff' }}>
+                                        {connection.term}
+                                      </strong>
+                                      {' → '}
+                                      {connection.words.join(', ')}
+                                    </div>
+                                  ))}
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       ))
                     ) : (
@@ -1965,52 +2050,6 @@ The cat sat on the rug.`}
                       </div>
                     )}
 
-                    {selectedContext && (
-                      <div
-                        style={{
-                          marginTop: '16px',
-                          padding: '12px',
-                          background: '#111',
-                          border: '1px solid #333',
-                          borderRadius: '4px'
-                        }}
-                      >
-                        <div
-                          style={{
-                            color: '#aaa',
-                            fontSize: '13px',
-                            marginBottom: '8px'
-                          }}
-                        >
-                          Connections in selected context
-                        </div>
-                        {selectedContext.evidence.map(evidence => (
-                          <div
-                            key={evidence.index}
-                            style={{
-                              marginTop: '8px',
-                              color: '#ddd'
-                            }}
-                          >
-                            <div style={{ color: '#777', marginBottom: '4px' }}>
-                              {highlightSearchTerms(
-                                result.sentences[evidence.index],
-                                highlightedData.terms
-                              )}
-                            </div>
-                            {evidence.connections.map(connection => (
-                              <div key={connection.term}>
-                                <strong style={{ color: '#fff' }}>
-                                  {connection.term}
-                                </strong>
-                                {' → '}
-                                {connection.words.join(', ')}
-                              </div>
-                            ))}
-                          </div>
-                        ))}
-                      </div>
-                    )}
                   </div>
                 )}
                 <style jsx>{`
