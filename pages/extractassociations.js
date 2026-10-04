@@ -301,7 +301,7 @@ The cat sat on the rug.`);
   const [selectedContext, setSelectedContext] = useState(null);
   const [highlightedContext, setHighlightedContext] = useState(null);
   const [visualMode, setVisualMode] = useState(true)
-  const [showEdges, setShowEdges] = useState(true)
+  const [showEdges, setShowEdges] = useState(false)
   const deferredSearchTerm = useDeferredValue(searchTerm);
 
   const [minWeight, setMinWeight] = useState(1);
@@ -477,7 +477,7 @@ The cat sat on the rug.`);
     "those"
   ]
   stopwords = connectedstopwords
-  
+
   function buildAssociations() {
     const stopwordSet = new Set(stopwords);
 
@@ -620,7 +620,7 @@ The cat sat on the rug.`);
     // DEBUG
     // --------------------------------------------------
 
-    
+
     // --------------------------------------------------
     // 5. CONVERT GRID INTO EDGES
     // --------------------------------------------------
@@ -1030,6 +1030,30 @@ The cat sat on the rug.`);
     setShowContext(true);
   };
 
+  const selectContext = context => {
+    stopExploreAnimation();
+    setSelectedContext(context);
+
+    const edges = new Set();
+    const nodes = new Set();
+
+    context.evidence.forEach(evidence => {
+      evidence.connections.forEach(connection => {
+        connection.words.forEach(word => {
+          edges.add(JSON.stringify([connection.term, word]));
+          nodes.add(connection.term);
+          nodes.add(word);
+        });
+      });
+    });
+
+    setHighlightedContext({
+      contextStart: context.start,
+      edges,
+      nodes
+    });
+  };
+
   const top10Nodes = useMemo(() => {
     if (!result) return new Set();
 
@@ -1308,33 +1332,33 @@ The cat sat on the rug.`}
                   }
                   placeholder="Search terms, comma separated..."
                 />
-                <div style={{display: 'flex', gap: 10, alignItems: 'baseline'}}>
+                <div style={{ display: 'flex', gap: 10, alignItems: 'baseline' }}>
 
-                <button
-                  type="button"
-                  onClick={animateAssociations}
-                  disabled={!highlightedData.hasSearch}
-                >
-                  {animationIntervalRef.current !== null ? 'Stop' : 'Explore'}
-                </button>
-                <button
-                  type="button"
-                  onClick={exploreContext}
-                  style={{ marginBottom: '12px' }}
-                >
-                  Context
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setHighlightedContext(null);
-                    setSelectedContext(null);
-                  }}
-                  disabled={!highlightedContext}
-                >
-                  Clear Highlights
-                </button>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={animateAssociations}
+                    disabled={!highlightedData.hasSearch}
+                  >
+                    {animationIntervalRef.current !== null ? 'Stop' : 'Explore'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={exploreContext}
+                    style={{ marginBottom: '12px' }}
+                  >
+                    Context
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setHighlightedContext(null);
+                      setSelectedContext(null);
+                    }}
+                    disabled={!highlightedContext}
+                  >
+                    Clear Highlights
+                  </button>
+                </div>
               </div>
               <div
                 style={{
@@ -1415,576 +1439,580 @@ The cat sat on the rug.`}
 
               <div className={`graphContextLayout${showContext ? ' withContext' : ''}`}>
                 <div className="graphPane">
-              {visualMode && <div
-                style={{
-                  width: '100%',
-                  height: '82vh',
-                  position: 'relative',
-                  overflow: 'hidden',
-                  background:
-                    '#0a0a0a',
-                  borderRadius:
-                    '12px',
-                  border:
-                    '1px solid #222',
-                  cursor:
-                    isPanning.current
-                      ? 'grabbing'
-                      : 'grab',
-                  userSelect:
-                    'none'
-                }}
-                onMouseDown={e => {
-                  isPanning.current =
-                    true;
+                  {visualMode && <div
+                    style={{
+                      width: '100%',
+                      height: '82vh',
+                      position: 'relative',
+                      overflow: 'hidden',
+                      background:
+                        '#0a0a0a',
+                      borderRadius:
+                        '12px',
+                      border:
+                        '1px solid #222',
+                      cursor:
+                        isPanning.current
+                          ? 'grabbing'
+                          : 'grab',
+                      userSelect:
+                        'none'
+                    }}
+                    onMouseDown={e => {
+                      isPanning.current =
+                        true;
 
-                  panStart.current = {
-                    x: e.clientX,
-                    y: e.clientY
-                  };
+                      panStart.current = {
+                        x: e.clientX,
+                        y: e.clientY
+                      };
 
-                  panOrigin.current = {
-                    ...pan
-                  };
-                }}
-                onMouseMove={e => {
-                  if (
-                    !isPanning.current
-                  ) {
-                    return;
-                  }
+                      panOrigin.current = {
+                        ...pan
+                      };
+                    }}
+                    onMouseMove={e => {
+                      if (
+                        !isPanning.current
+                      ) {
+                        return;
+                      }
 
-                  setPan({
-                    x:
-                      panOrigin.current
-                        .x +
-                      (e.clientX -
-                        panStart.current
-                          .x),
+                      setPan({
+                        x:
+                          panOrigin.current
+                            .x +
+                          (e.clientX -
+                            panStart.current
+                              .x),
 
-                    y:
-                      panOrigin.current
-                        .y +
-                      (e.clientY -
-                        panStart.current
-                          .y)
-                  });
-                }}
-                onMouseUp={() => {
-                  isPanning.current =
-                    false;
-                }}
-                onMouseLeave={() => {
-                  isPanning.current =
-                    false;
-                }}
-              >
-                <svg
-                  width="100%"
-                  height="100%"
-                  style={{
-                    display:
-                      'block'
-                  }}
-                >
-                  <g
-                    transform={`translate(${pan.x}, ${pan.y}) scale(${zoom})`}
+                        y:
+                          panOrigin.current
+                            .y +
+                          (e.clientY -
+                            panStart.current
+                              .y)
+                      });
+                    }}
+                    onMouseUp={() => {
+                      isPanning.current =
+                        false;
+                    }}
+                    onMouseLeave={() => {
+                      isPanning.current =
+                        false;
+                    }}
                   >
-                    {/* ----------------------------------------
+                    <svg
+                      width="100%"
+                      height="100%"
+                      style={{
+                        display:
+                          'block'
+                      }}
+                    >
+                      <g
+                        transform={`translate(${pan.x}, ${pan.y}) scale(${zoom})`}
+                      >
+                        {/* ----------------------------------------
                         EDGES
                     ----------------------------------------- */}
 
-                    {(() => {
-                      const visibleEdges =
-                        highlightedData.edges.filter(
-                          edge =>
-                            edge.weight >= minWeight
-                        );
-
-                      const maxWeight =
-                        visibleEdges.reduce(
-                          (max, edge) => Math.max(max, edge.weight),
-                          1
-                        );
-
-                      return visibleEdges.map(
-                        (edge, index) => {
-                          const source =
-                            highlightedData.nodes.find(
-                              node =>
-                                node.id ===
-                                edge.source
+                        {(() => {
+                          const visibleEdges =
+                            highlightedData.edges.filter(
+                              edge =>
+                                edge.weight >= minWeight ||
+                                highlightedContext?.edges.has(
+                                  JSON.stringify([edge.source, edge.target])
+                                )
                             );
 
-                          const target =
-                            highlightedData.nodes.find(
-                              node =>
-                                node.id ===
-                                edge.target
+                          const maxWeight =
+                            visibleEdges.reduce(
+                              (max, edge) => Math.max(max, edge.weight),
+                              1
                             );
 
-                          if (
-                            !source ||
-                            !target
-                          ) {
-                            return null;
-                          }
 
-                          const isConnected =
-                            highlightedData.hasSearch &&
-                            (
-                              highlightedData.termSet.has(
-                                edge.source
-                              ) ||
-                              highlightedData.termSet.has(
-                                edge.target
-                              )
-                            );
+                          return visibleEdges.map(
+                            (edge, index) => {
+                              const source =
+                                highlightedData.nodes.find(
+                                  node =>
+                                    node.id ===
+                                    edge.source
+                                );
 
-                          const connRatio =
-                            isConnected
-                              ? edge.weight /
-                              highlightedData.maxConnWeight
-                              : 0;
+                              const target =
+                                highlightedData.nodes.find(
+                                  node =>
+                                    node.id ===
+                                    edge.target
+                                );
 
-                          const isAnimationEdge =
-                            animationTarget?.type === 'term'
-                              ? edge.source === animationTarget.term ||
-                              edge.target === animationTarget.term
-                              : animationTarget?.type === 'word'
-                                ? edge.source === animationTarget.word ||
-                                edge.target === animationTarget.word
-                                : false;
+                              if (
+                                !source ||
+                                !target
+                              ) {
+                                return null;
+                              }
 
-                          const strokeOpacity =
-                            animationTarget
-                              ? isAnimationEdge ? 0.9 : 0.03
-                              : !highlightedData.hasSearch
-                                ? 0.05 +
-                                (edge.weight /
-                                  maxWeight) *
-                                0.15
-                                : isConnected
-                                  ? 0.15 +
-                                  connRatio *
-                                  0.15
-                                  : 0.02;
+                              const isConnected =
+                                highlightedData.hasSearch &&
+                                (
+                                  highlightedData.termSet.has(
+                                    edge.source
+                                  ) ||
+                                  highlightedData.termSet.has(
+                                    edge.target
+                                  )
+                                );
 
-                          const strokeWidth =
-                            animationTarget
-                              ? isAnimationEdge ? 1.5 : 0.2
-                              : !highlightedData.hasSearch
-                                ? 0.5 +
-                                (edge.weight /
-                                  maxWeight) *
-                                1.5
-                                : isConnected
-                                  ? 0.5 +
-                                  connRatio *
-                                  2
-                                  : 0.2;
+                              const connRatio =
+                                isConnected
+                                  ? edge.weight /
+                                  highlightedData.maxConnWeight
+                                  : 0;
 
-                          return (
-                            <g
-                              key={index}
-                            >
-                              {/* EDGE */}
+                              const isAnimationEdge =
+                                animationTarget?.type === 'term'
+                                  ? edge.source === animationTarget.term ||
+                                  edge.target === animationTarget.term
+                                  : animationTarget?.type === 'word'
+                                    ? edge.source === animationTarget.word ||
+                                    edge.target === animationTarget.word
+                                    : false;
 
-                              <line
-                                x1={source.x}
-                                y1={source.y}
-                                x2={target.x}
-                                y2={target.y}
-                                stroke="#e5e7eb"
-                                strokeOpacity={
-                                  strokeOpacity
-                                }
-                                strokeWidth={
-                                  strokeWidth
-                                }
-                              />
+                              const isContextEdge = highlightedContext?.edges.has(
+                                JSON.stringify([edge.source, edge.target])
+                              ) || false;
 
-                              {/* EDGE LABEL */}
+                              const strokeOpacity =
+                                isContextEdge
+                                  ? 0.95
+                                  : highlightedContext
+                                    ? 0.02
+                                    : animationTarget
+                                      ? isAnimationEdge ? 0.9 : 0.03
+                                      : !highlightedData.hasSearch
+                                        ? 0.05 +
+                                        (edge.weight /
+                                          maxWeight) *
+                                        0.15
+                                        : isConnected
+                                          ? 0.15 +
+                                          connRatio *
+                                          0.15
+                                          : 0.02;
 
-                              {showEdges && <text
-                                x={
-                                  (source.x +
-                                    target.x) /
-                                  2
-                                }
-                                y={
-                                  (source.y +
-                                    target.y) /
-                                  2 -
-                                  4
-                                }
-                                textAnchor="middle"
-                                fill="#333"
-                                fontSize="8"
-                                fontFamily="monospace"
-                                pointerEvents="none"
-                              >
-                                {edge.source}
-                                {' → '}
-                                {edge.target}
-                                {' · '}
-                                {edge.weight}
-                                {' · '}
-                                {(
-                                  edge.strength *
-                                  100
-                                ).toFixed(1)}
-                                %
-                              </text>}
-                            </g>
+                              const strokeWidth =
+                                isContextEdge
+                                  ? 2
+                                  : highlightedContext
+                                    ? 0.2
+                                    : animationTarget
+                                      ? isAnimationEdge ? 1.5 : 0.2
+                                      : !highlightedData.hasSearch
+                                        ? 0.5 +
+                                        (edge.weight /
+                                          maxWeight) *
+                                        1.5
+                                        : isConnected
+                                          ? 0.5 +
+                                          connRatio *
+                                          2
+                                          : 0.2;
+
+                              const edgeColor = isContextEdge
+                                ? '#333'
+                                : visibleEdges.length > 10
+                                  ? '#ccc'
+                                  : '#888';
+
+                              return (
+                                <g
+                                  key={index}
+                                >
+                                  {/* EDGE */}
+                                  <line
+                                    x1={source.x}
+                                    y1={source.y}
+                                    x2={target.x}
+                                    y2={target.y}
+                                    stroke={edgeColor}
+                                    strokeOpacity={
+                                      strokeOpacity
+                                    }
+                                    strokeWidth={
+                                      strokeWidth
+                                    }
+                                  />
+
+                                  {/* EDGE LABEL */}
+
+                                  {showEdges && <text
+                                    x={
+                                      (source.x +
+                                        target.x) /
+                                      2
+                                    }
+                                    y={
+                                      (source.y +
+                                        target.y) /
+                                      2 -
+                                      4
+                                    }
+                                    textAnchor="middle"
+                                    fill="#333"
+                                    fontSize="8"
+                                    fontFamily="monospace"
+                                    pointerEvents="none"
+                                  >
+                                    {edge.source}
+                                    {' → '}
+                                    {edge.target}
+                                    {' · '}
+                                    {edge.weight}
+                                    {' · '}
+                                    {(
+                                      edge.strength *
+                                      100
+                                    ).toFixed(1)}
+                                    %
+                                  </text>}
+                                </g>
+                              );
+                            }
                           );
-                        }
-                      );
-                    })()}
+                        })()}
 
-                    {/* ----------------------------------------
+                        {/* ----------------------------------------
                         NODES
                     ----------------------------------------- */}
 
-                    {highlightedData.nodes
-                      .filter(node => {
-                        if (highlightedData.hasSearch) {
-                          return true;
-                        }
-
-                        return highlightedData.edges.some(
-                          edge =>
-                            edge.weight >= minWeight &&
-                            (edge.source === node.id ||
-                              edge.target === node.id)
-                        );
-                      })
-                      .map(node => {
-                        const isCenter =
-                          highlightedData.hasSearch &&
-                          highlightedData.termSet.has(
-                            node.id
-                          );
-
-                        const isAnimatingNode =
-                          animationTarget?.type === 'term'
-                            ? node.id === animationTarget.term
-                            : animationTarget?.type === 'word'
-                              ? node.id === animationTarget.word
-                              : false;
-
-                        const nodeConnections =
-                          highlightedData.hasSearch
-                            ? highlightedData.connectionWeightMap.get(node.id)
-                            : undefined;
-
-                        const connWeight =
-                          nodeConnections
-                            ? [...nodeConnections.values()]
-                              .reduce((total, weight) => total + weight, 0)
-                            : undefined;
-
-                        const isConnected =
-                          connWeight !==
-                          undefined;
-
-                        const isTop10 =
-                          highlightTop10 &&
-                          !highlightedData.hasSearch &&
-                          top10Nodes.has(node.id);
-
-                        const connRatio =
-                          isConnected
-                            ? connWeight /
-                            highlightedData.maxConnWeight
-                            : 0;
-
-                        const radius =
-                          isCenter
-                            ? 22
-                            : isTop10
-                              ? 18
-                              : 12;
-
-                        const nodeOpacity =
-                          animationTarget
-                            ? isAnimatingNode ? 1 : 0.25
-                            : !highlightedData.hasSearch
-                              ? 1
-                              : isCenter
-                                ? 1
-                                : isConnected
-                                  ? 0.2 +
-                                  connRatio *
-                                  0.8
-                                  : 0.1;
-
-                        const brightness =
-                          Math.round(
-                            80 +
-                            connRatio *
-                            175
-                          );
-
-                        const textFill =
-                          isAnimatingNode
-                            ? '#fff'
-                            : isTop10
-                              ? '#fff'
-                              : !highlightedData.hasSearch
-                                ? '#888'
-                                : isCenter
-                                  ? '#fff'
-                                  : isConnected
-                                    ? `rgb(${brightness},${brightness},${brightness})`
-                                    : '#333';
-
-                        return (
-                          <g
-                            key={node.id}
-                            opacity={
-                              nodeOpacity
+                        {highlightedData.nodes
+                          .filter(node => {
+                            if (highlightedData.hasSearch) {
+                              return true;
                             }
-                          >
-                            <circle
-                              cx={node.x}
-                              cy={node.y}
-                              r={radius}
-                              fill="transparent"
-                              stroke={isTop10 ? '#fff' : 'transparent'}
-                              strokeWidth={isTop10 ? 1.5 : 0}
-                            />
 
-                            <text
-                              x={node.x}
-                              y={
-                                node.y + 5
-                              }
-                              textAnchor="middle"
-                              fill={textFill}
-                              fontSize={
-                                isAnimatingNode
-                                  ? '18'
-                                  : isCenter
-                                    ? '13.5'
-                                    : isTop10
-                                      ? '15'
-                                      : isConnected
-                                        ? '11'
-                                        : '9.5'
-                              }
-                              fontFamily="monospace"
-                              fontWeight={
-                                isCenter ||
-                                  isConnected ||
-                                  isTop10
-                                  ? 'bold'
-                                  : 'normal'
-                              }
-                            >
-                              {node.id}
-                            </text>
-                          </g>
-                        );
-                      })}
-                  </g>
-                </svg>
-                {animationTarget && (
-                  <div
-                    aria-live="polite"
-                    style={{
-                      position: 'absolute',
-                      right: '24px',
-                      top: '24px',
-                      maxWidth: 'calc(100% - 48px)',
-                      overflow: 'hidden',
-                      color: '#fff',
-                      fontSize: 'clamp(36px, 8vw, 96px)',
-                      fontFamily: 'monospace',
-                      fontWeight: 'bold',
-                      lineHeight: 1,
-                      textAlign: 'right',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                      textShadow: '0 2px 16px #000, 0 0 8px #000',
-                      pointerEvents: 'none'
-                    }}
-                  >
-                    {animationTarget.type === 'term'
-                      ? animationTarget.term
-                      : animationTarget.word}
-                  </div>
-                )}
-              </div>}
-                </div>
-
-              {showContext && (
-                <div
-                  className="contextPane"
-                  style={{
-                    fontFamily: 'monospace'
-                  }}
-                >
-                  <h3
-                    style={{
-                      color: '#aaa',
-                      fontSize: '14px',
-                      marginBottom: '12px'
-                    }}
-                  >
-                    Context for{' '}
-                    <strong style={{ color: '#fff' }}>
-                      {highlightedData.terms.join(', ')}
-                    </strong>
-                  </h3>
-
-                  {contextResults.length > 0 ? (
-                    contextResults.map(context => (
-                      <div
-                        key={context.start}
-                        role="button"
-                        tabIndex={0}
-                        onClick={() => {
-                          stopExploreAnimation();
-                          setSelectedContext(context);
-                          const terms = context.evidence.flatMap(evidence =>
-                            evidence.connections.flatMap(connection => [
-                              connection.term,
-                              ...connection.words
-                            ])
-                          );
-                          setHighlightedContext({
-                            contextStart: context.start,
-                            terms: [...new Set(terms)]
-                          });
-                        }}
-                        onKeyDown={event => {
-                          if (event.key === 'Enter' || event.key === ' ') {
-                            event.preventDefault();
-                            stopExploreAnimation();
-                            setSelectedContext(context);
-                            const terms = context.evidence.flatMap(evidence =>
-                              evidence.connections.flatMap(connection => [
-                                connection.term,
-                                ...connection.words
-                              ])
+                            return highlightedData.edges.some(
+                              edge =>
+                                edge.weight >= minWeight &&
+                                (edge.source === node.id ||
+                                  edge.target === node.id)
                             );
-                            setHighlightedContext({
-                              contextStart: context.start,
-                              terms: [...new Set(terms)]
-                            });
-                          }
-                        }}
+                          })
+                          .map(node => {
+                            const isCenter =
+                              highlightedData.hasSearch &&
+                              highlightedData.termSet.has(
+                                node.id
+                              );
+
+                            const isContextNode =
+                              highlightedContext?.nodes.has(node.id) || false;
+
+                            const isAnimatingNode =
+                              animationTarget?.type === 'term'
+                                ? node.id === animationTarget.term
+                                : animationTarget?.type === 'word'
+                                  ? node.id === animationTarget.word
+                                  : false;
+
+                            const nodeConnections =
+                              highlightedData.hasSearch
+                                ? highlightedData.connectionWeightMap.get(node.id)
+                                : undefined;
+
+                            const connWeight =
+                              nodeConnections
+                                ? [...nodeConnections.values()]
+                                  .reduce((total, weight) => total + weight, 0)
+                                : undefined;
+
+                            const isConnected =
+                              connWeight !==
+                              undefined;
+
+                            const isTop10 =
+                              highlightTop10 &&
+                              !highlightedData.hasSearch &&
+                              top10Nodes.has(node.id);
+
+                            const connRatio =
+                              isConnected
+                                ? connWeight /
+                                highlightedData.maxConnWeight
+                                : 0;
+
+                            const radius =
+                              isCenter
+                                ? 22
+                                : isTop10
+                                  ? 18
+                                  : 12;
+
+                            const nodeOpacity =
+                              highlightedContext
+                                ? isContextNode ? 1 : 0.1
+                                : animationTarget
+                                  ? isAnimatingNode ? 1 : 0.25
+                                  : !highlightedData.hasSearch
+                                    ? 1
+                                    : isCenter
+                                      ? 1
+                                      : isConnected
+                                        ? 0.2 +
+                                        connRatio *
+                                        0.8
+                                        : 0.1;
+
+                            const brightness =
+                              Math.round(
+                                80 +
+                                connRatio *
+                                175
+                              );
+
+                            const textFill =
+                              isAnimatingNode
+                                ? '#fff'
+                                : isContextNode
+                                  ? '#fff'
+                                  : isTop10
+                                    ? '#fff'
+                                    : !highlightedData.hasSearch
+                                      ? '#888'
+                                      : isCenter
+                                        ? '#fff'
+                                        : isConnected
+                                          ? `rgb(${brightness},${brightness},${brightness})`
+                                          : '#333';
+
+                            return (
+                              <g
+                                key={node.id}
+                                opacity={
+                                  nodeOpacity
+                                }
+                              >
+                                <circle
+                                  cx={node.x}
+                                  cy={node.y}
+                                  r={radius}
+                                  fill="transparent"
+                                  stroke={isTop10 ? '#fff' : 'transparent'}
+                                  strokeWidth={isTop10 ? 1.5 : 0}
+                                />
+
+                                <text
+                                  x={node.x}
+                                  y={
+                                    node.y + 5
+                                  }
+                                  textAnchor="middle"
+                                  fill={textFill}
+                                  fontSize={
+                                    isAnimatingNode
+                                      ? '18'
+                                      : isCenter
+                                        ? '13.5'
+                                        : isTop10
+                                          ? '15'
+                                          : isConnected
+                                            ? '11'
+                                            : '9.5'
+                                  }
+                                  fontFamily="monospace"
+                                  fontWeight={
+                                    isCenter ||
+                                      isConnected ||
+                                      isTop10
+                                      ? 'bold'
+                                      : 'normal'
+                                  }
+                                >
+                                  {node.id}
+                                </text>
+                              </g>
+                            );
+                          })}
+                      </g>
+                    </svg>
+                    {animationTarget && (
+                      <div
+                        aria-live="polite"
                         style={{
-                          marginBottom: '12px',
-                          padding: '12px',
-                          border: selectedContext?.start === context.start
-                            ? '1px solid #666'
-                            : '1px solid #222',
-                          borderRadius: '4px',
-                          cursor: 'pointer'
+                          position: 'absolute',
+                          right: '24px',
+                          top: '24px',
+                          maxWidth: 'calc(100% - 48px)',
+                          overflow: 'hidden',
+                          color: '#fff',
+                          fontSize: 'clamp(36px, 8vw, 96px)',
+                          fontFamily: 'monospace',
+                          fontWeight: 'bold',
+                          lineHeight: 1,
+                          textAlign: 'right',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                          textShadow: '0 2px 16px #000, 0 0 8px #000',
+                          pointerEvents: 'none'
                         }}
                       >
-                        {Array.from(
-                          { length: context.end - context.start + 1 },
-                          (_, offset) => context.start + offset
-                        ).map(sentenceIndex => {
-                          const sentenceEvidence = context.evidence.find(
-                            item => item.index === sentenceIndex
-                          );
+                        {animationTarget.type === 'term'
+                          ? animationTarget.term
+                          : animationTarget.word}
+                      </div>
+                    )}
+                  </div>}
+                </div>
 
-                          return (
-                            <div
-                              key={sentenceIndex}
-                              style={{
-                                color: sentenceEvidence ? '#888' : '#555',
-                                marginBottom: '6px',
-                                lineHeight: 1.6
-                              }}
-                            >
-                              {highlightedContext?.contextStart === context.start
-                                ? highlightConnectionTerms(
+                {showContext && (
+                  <div
+                    className="contextPane"
+                    style={{
+                      fontFamily: 'monospace'
+                    }}
+                  >
+                    <h3
+                      style={{
+                        color: '#aaa',
+                        fontSize: '14px',
+                        marginBottom: '12px'
+                      }}
+                    >
+                      Context for{' '}
+                      <strong style={{ color: '#fff' }}>
+                        {highlightedData.terms.join(', ')}
+                      </strong>
+                    </h3>
+
+                    {contextResults.length > 0 ? (
+                      contextResults.map(context => (
+                        <div
+                          key={context.start}
+                          role="button"
+                          tabIndex={0}
+                          onClick={() => selectContext(context)}
+                          onKeyDown={event => {
+                            if (event.key === 'Enter' || event.key === ' ') {
+                              event.preventDefault();
+                              selectContext(context);
+                            }
+                          }}
+                          style={{
+                            marginBottom: '12px',
+                            padding: '12px',
+                            border: selectedContext?.start === context.start
+                              ? '1px solid #666'
+                              : '1px solid #222',
+                            borderRadius: '4px',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          {Array.from(
+                            { length: context.end - context.start + 1 },
+                            (_, offset) => context.start + offset
+                          ).map(sentenceIndex => {
+                            const sentenceEvidence = context.evidence.find(
+                              item => item.index === sentenceIndex
+                            );
+
+                            return (
+                              <div
+                                key={sentenceIndex}
+                                style={{
+                                  color: sentenceEvidence ? '#888' : '#555',
+                                  marginBottom: '6px',
+                                  lineHeight: 1.6
+                                }}
+                              >
+                                {highlightedContext?.contextStart === context.start
+                                  ? highlightConnectionTerms(
                                     result.sentences[sentenceIndex],
-                                    highlightedContext.terms
+                                    [...highlightedContext.nodes]
                                   )
-                                : highlightSearchTerms(
+                                  : highlightSearchTerms(
                                     result.sentences[sentenceIndex],
                                     highlightedData.terms
                                   )}
-                              {sentenceEvidence && (
-                                <div
-                                  style={{
-                                    color: '#777',
-                                    marginTop: '4px',
-                                    fontSize: '12px'
-                                  }}
-                                >
-                                  {sentenceEvidence.connections.map(connection => (
-                                    <div key={connection.term}>
-                                      Supports {connection.term} → {connection.words.join(', ')}
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
-                          );
-                        })}
+                                {sentenceEvidence && (
+                                  <div
+                                    style={{
+                                      color: '#777',
+                                      marginTop: '4px',
+                                      fontSize: '12px'
+                                    }}
+                                  >
+                                    {sentenceEvidence.connections.map(connection => (
+                                      <div key={connection.term}>
+                                        Supports {connection.term} → {connection.words.join(', ')}
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ))
+                    ) : (
+                      <div style={{ color: '#777' }}>
+                        No sentences directly support the connections between these search terms and common words.
                       </div>
-                    ))
-                  ) : (
-                    <div style={{ color: '#777' }}>
-                      No sentences directly support the connections between these search terms and common words.
-                    </div>
-                  )}
+                    )}
 
-                  {selectedContext && (
-                    <div
-                      style={{
-                        marginTop: '16px',
-                        padding: '12px',
-                        background: '#111',
-                        border: '1px solid #333',
-                        borderRadius: '4px'
-                      }}
-                    >
+                    {selectedContext && (
                       <div
                         style={{
-                          color: '#aaa',
-                          fontSize: '13px',
-                          marginBottom: '8px'
+                          marginTop: '16px',
+                          padding: '12px',
+                          background: '#111',
+                          border: '1px solid #333',
+                          borderRadius: '4px'
                         }}
                       >
-                        Connections in selected context
-                      </div>
-                      {selectedContext.evidence.map(evidence => (
                         <div
-                          key={evidence.index}
                           style={{
-                            marginTop: '8px',
-                            color: '#ddd'
+                            color: '#aaa',
+                            fontSize: '13px',
+                            marginBottom: '8px'
                           }}
                         >
-                          <div style={{ color: '#777', marginBottom: '4px' }}>
-                            {highlightSearchTerms(
-                              result.sentences[evidence.index],
-                              highlightedData.terms
-                            )}
-                          </div>
-                          {evidence.connections.map(connection => (
-                            <div key={connection.term}>
-                              <strong style={{ color: '#fff' }}>
-                                {connection.term}
-                              </strong>
-                              {' → '}
-                              {connection.words.join(', ')}
-                            </div>
-                          ))}
+                          Connections in selected context
                         </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
+                        {selectedContext.evidence.map(evidence => (
+                          <div
+                            key={evidence.index}
+                            style={{
+                              marginTop: '8px',
+                              color: '#ddd'
+                            }}
+                          >
+                            <div style={{ color: '#777', marginBottom: '4px' }}>
+                              {highlightSearchTerms(
+                                result.sentences[evidence.index],
+                                highlightedData.terms
+                              )}
+                            </div>
+                            {evidence.connections.map(connection => (
+                              <div key={connection.term}>
+                                <strong style={{ color: '#fff' }}>
+                                  {connection.term}
+                                </strong>
+                                {' → '}
+                                {connection.words.join(', ')}
+                              </div>
+                            ))}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
                 <style jsx>{`
                   .graphContextLayout {
                     display: flex;
