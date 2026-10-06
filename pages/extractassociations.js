@@ -214,8 +214,62 @@ function tokenizeSentence(sentence, stopwordSet) {
     .filter(word => !stopwordSet.has(word));
 }
 
-function countPhrase(sentence, phrase, stopwordSet) {
-  const words = tokenizeSentence(sentence, stopwordSet);
+function parseBooleanSearch(query) {
+  if (!/\s+(AND|OR|NOT)\s+/i.test(query)) {
+    return null;
+  }
+
+  const parts = query
+    .trim()
+    .split(/\s+(AND|OR|NOT)\s+/i);
+
+  const required = [];
+  const excluded = [];
+  const orGroups = [];
+
+  let current = null;
+  let operator = 'AND';
+
+  for (let i = 0; i < parts.length; i++) {
+    const part = parts[i].trim();
+
+    if (!part) continue;
+
+    if (/^(AND|OR|NOT)$/i.test(part)) {
+      operator = part.toUpperCase();
+      continue;
+    }
+
+    const term = part.toLowerCase();
+
+    if (operator === 'NOT') {
+      excluded.push(term);
+    } else if (operator === 'OR') {
+      if (current === null) current = [];
+      current.push(term);
+    } else {
+      if (current?.length) {
+        orGroups.push(current);
+        current = null;
+      }
+      required.push(term);
+    }
+
+    operator = 'AND';
+  }
+
+  if (current?.length) {
+    orGroups.push(current);
+  }
+
+  return {
+    required: [...new Set(required)],
+    excluded: [...new Set(excluded)],
+    orGroups
+  };
+}
+
+function countPhraseInWords(words, phrase) {
   const phraseWords = phrase
     .toLowerCase()
     .split(/\s+/)
@@ -240,6 +294,32 @@ function countPhrase(sentence, phrase, stopwordSet) {
 
   return count;
 }
+
+function countSearchTerm(words, term) {
+  const termWords = term
+    .toLowerCase()
+    .split(/\s+/)
+    .filter(Boolean);
+
+  if (termWords.length === 1) {
+    return words.filter(word => word === termWords[0]).length;
+  }
+
+  return countPhraseInWords(words, term);
+}
+
+function matchesBooleanSearch(booleanSearch, termCounts) {
+  if (!booleanSearch) return true;
+
+  return (
+    booleanSearch.required.every(term => (termCounts.get(term) || 0) > 0) &&
+    booleanSearch.excluded.every(term => (termCounts.get(term) || 0) === 0) &&
+    booleanSearch.orGroups.every(group =>
+      group.some(term => (termCounts.get(term) || 0) > 0)
+    )
+  );
+}
+
 
 function highlightSearchTerms(sentence, terms) {
   if (!sentence || !terms?.length) return sentence;
@@ -767,12 +847,25 @@ The cat sat on the rug.`);
       };
     }
 
-    const terms = deferredSearchTerm
-      .split(',')
-      .map(term => term.trim().toLowerCase())
-      .filter(Boolean);
+    const booleanSearch = parseBooleanSearch(deferredSearchTerm);
+    const terms = booleanSearch
+      ? [
+          ...booleanSearch.required,
+          ...booleanSearch.excluded,
+          ...booleanSearch.orGroups.flat()
+        ]
+      : deferredSearchTerm
+          .split(',')
+          .map(term => term.trim().toLowerCase())
+          .filter(Boolean);
 
     const uniqueTerms = [...new Set(terms)];
+    const searchableTerms = booleanSearch
+      ? [...new Set([
+          ...booleanSearch.required,
+          ...booleanSearch.orGroups.flat()
+        ])]
+      : uniqueTerms;
 
     if (uniqueTerms.length === 0) {
       return {
@@ -790,9 +883,9 @@ The cat sat on the rug.`);
     }
 
     const connectionWeightMap = new Map();
-    const uniqueTermSet = new Set(uniqueTerms);
+    const uniqueTermSet = new Set(searchableTerms);
     const termFrequencies = new Map(
-      uniqueTerms.map(term => [term, 0])
+      searchableTerms.map(term => [term, 0])
     );
 
     result.sentences.forEach((sentence, index) => {
@@ -809,20 +902,19 @@ The cat sat on the rug.`);
         );
       });
 
-      const termsInSentence = uniqueTerms
-        .map(term => {
-          const termWords = term.split(/\s+/);
+      const termCounts = new Map(
+        uniqueTerms.map(term => [
+          term,
+          countSearchTerm(words, term)
+        ])
+      );
+      const matchesBoolean = matchesBooleanSearch(booleanSearch, termCounts);
 
-          if (termWords.length === 1) {
-            return [term, sentenceCounts.get(term) || 0];
-          }
-
-          return [
-            term,
-            countPhrase(sentence, term, result.stopwordSet)
-          ];
-        })
-        .filter(([, count]) => count > 0);
+      const termsInSentence = matchesBoolean
+        ? searchableTerms
+            .map(term => [term, termCounts.get(term) || 0])
+            .filter(([, count]) => count > 0)
+        : [];
 
       termsInSentence.forEach(([term, count]) => {
         termFrequencies.set(
@@ -849,14 +941,21 @@ The cat sat on the rug.`);
     });
 
     const matchingTerms = new Set(
-      uniqueTerms.filter(term => termFrequencies.get(term) > 0)
+      searchableTerms.filter(term => termFrequencies.get(term) > 0)
     );
+    const hasMatchingTerms = booleanSearch
+      ? booleanSearch.required.every(term => termFrequencies.get(term) > 0) &&
+        booleanSearch.orGroups.every(group =>
+          group.some(term => termFrequencies.get(term) > 0)
+        ) &&
+        matchingTerms.size > 0
+      : matchingTerms.size === uniqueTerms.length;
 
-    if (matchingTerms.size !== uniqueTerms.length) {
+    if (!hasMatchingTerms) {
       return {
         nodes: [],
         edges: [],
-        terms: uniqueTerms,
+        terms: searchableTerms,
         termSet: new Set(),
         connectionWeightMap: new Map(),
         cooccurrences: [],
@@ -881,7 +980,7 @@ The cat sat on the rug.`);
 
         return {
           word,
-          connections: uniqueTerms.map(term => ({
+          connections: [...matchingTerms].map(term => ({
             term,
             weight: connections.get(term) || 0
           })),
@@ -932,7 +1031,7 @@ The cat sat on the rug.`);
     return {
       nodes: visibleNodes,
       edges: visibleEdges,
-      terms: uniqueTerms,
+      terms: [...matchingTerms],
       termSet: matchingTerms,
       connectionWeightMap,
       cooccurrences,
@@ -1012,6 +1111,7 @@ The cat sat on the rug.`);
     if (!result || !highlightedData.hasSearch) return;
 
     const terms = highlightedData.terms;
+    const booleanSearch = parseBooleanSearch(deferredSearchTerm);
     const commonWords = [...highlightedData.level1Set];
     const evidence = [];
 
@@ -1021,10 +1121,24 @@ The cat sat on the rug.`);
           ? result.indexedSentenceWords[index]
           : tokenizeSentence(sentence, result.stopwordSet);
       const sentenceWordSet = new Set(words);
+      const booleanTerms = booleanSearch
+        ? [
+            ...booleanSearch.required,
+            ...booleanSearch.excluded,
+            ...booleanSearch.orGroups.flat()
+          ]
+        : terms;
+      const termCounts = new Map(
+        booleanTerms.map(term => [
+          term,
+          countSearchTerm(words, term)
+        ])
+      );
+
+      if (!matchesBooleanSearch(booleanSearch, termCounts)) return;
+
       const matchedTerms = terms.filter(term =>
-        term.split(/\s+/).length === 1
-          ? sentenceWordSet.has(term)
-          : countPhrase(sentence, term, result.stopwordSet) > 0
+        termCounts.get(term) > 0
       );
 
       if (matchedTerms.length === 0) return;
