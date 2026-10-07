@@ -436,68 +436,85 @@ The cat sat on the rug.`);
 
     if (!file) return;
 
+    const isPdf =
+      file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+    const isText =
+      file.type === 'text/plain' || file.name.toLowerCase().endsWith('.txt');
+
+    if (!isPdf && !isText) {
+      setPdfError('Please choose a PDF or plain text (.txt) file.');
+      return;
+    }
+
     setIsExtractingPdf(true);
     setPdfError('');
 
     try {
-      if (!window.pdfjsLib) {
-        throw new Error('PDF text extraction is unavailable. Please reload the page and try again.');
-      }
-
-      const pdf = await window.pdfjsLib.getDocument({
-        data: await file.arrayBuffer()
-      }).promise;
-      let extractedText = '';
-
-      for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
-        const page = await pdf.getPage(pageNumber);
-        const content = await page.getTextContent();
-
-        const items = content.items;
-        let pageText = '';
-
-        for (let i = 0; i < items.length; i++) {
-          const current = items[i];
-
-          if (!current.str) continue;
-
-          if (i === 0) {
-            pageText = current.str;
-            continue;
-          }
-
-          const previous = items[i - 1];
-
-          const previousX = previous.transform[4];
-          const previousY = previous.transform[5];
-          const currentX = current.transform[4];
-          const currentY = current.transform[5];
-
-          if (Math.abs(currentY - previousY) > 2) {
-            pageText += '\n';
-          } else {
-            const gap =
-              currentX - (previousX + previous.width);
-
-            if (
-              gap > 1 &&
-              !pageText.endsWith(' ') &&
-              !current.str.startsWith(' ')
-            ) {
-              pageText += ' ';
-            }
-          }
-
-          pageText += current.str;
+      if (isText) {
+        setText(await file.text());
+      } else {
+        if (!window.pdfjsLib) {
+          throw new Error('PDF text extraction is unavailable. Please reload the page and try again.');
         }
 
-        extractedText += pageText.trim() + '\n';
-      }
+        const pdf = await window.pdfjsLib.getDocument({
+          data: await file.arrayBuffer()
+        }).promise;
+        let extractedText = '';
 
-      setText(extractedText.replace(/\s+/g, ' '));
+        for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
+          const page = await pdf.getPage(pageNumber);
+          const content = await page.getTextContent();
+
+          const items = content.items;
+          let pageText = '';
+
+          for (let i = 0; i < items.length; i++) {
+            const current = items[i];
+
+            if (!current.str) continue;
+
+            if (i === 0) {
+              pageText = current.str;
+              continue;
+            }
+
+            const previous = items[i - 1];
+
+            const previousX = previous.transform[4];
+            const previousY = previous.transform[5];
+            const currentX = current.transform[4];
+            const currentY = current.transform[5];
+
+            if (Math.abs(currentY - previousY) > 2) {
+              pageText += '\n';
+            } else {
+              const gap =
+                currentX - (previousX + previous.width);
+
+              if (
+                gap > 1 &&
+                !pageText.endsWith(' ') &&
+                !current.str.startsWith(' ')
+              ) {
+                pageText += ' ';
+              }
+            }
+
+            pageText += current.str;
+          }
+
+          extractedText += pageText.trim() + '\n';
+        }
+
+        setText(extractedText.replace(/\s+/g, ' '));
+      }
     } catch (error) {
-      console.error('Failed to extract text from PDF:', error);
-      setPdfError(error.message || 'Could not extract text from this PDF.');
+      console.error(`Failed to read text from ${isPdf ? 'PDF' : 'text file'}:`, error);
+      setPdfError(
+        error.message ||
+          `Could not read text from this ${isPdf ? 'PDF' : 'text file'}.`
+      );
     } finally {
       setIsExtractingPdf(false);
     }
@@ -1323,12 +1340,12 @@ The cat sat on the rug.`);
               onClick={() => pdfInputRef.current?.click()}
               disabled={isExtractingPdf}
             >
-              {isExtractingPdf ? 'Extracting PDF...' : 'Upload PDF'}
+              {isExtractingPdf ? 'Extracting text...' : 'Upload PDF or TXT'}
             </button>
             <input
               ref={pdfInputRef}
               type="file"
-              accept="application/pdf"
+              accept="application/pdf,.txt,text/plain"
               onChange={handlePdfUpload}
               style={{ display: 'none' }}
             />
