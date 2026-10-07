@@ -215,52 +215,78 @@ function tokenizeSentence(sentence, stopwordSet) {
 }
 
 function parseBooleanSearch(query) {
-  if (!/\s+(AND|OR|NOT)\s+/i.test(query)) {
+  if (!/(?:^|\s+)(?:AND|OR|NOT)(?:\s+|$)/i.test(query)) {
     return null;
   }
 
   const parts = query
     .trim()
-    .split(/\s+(AND|OR|NOT)\s+/i);
+    .split(/((?<!\S)(?:AND|OR|NOT)(?=\s|$)|[()])/i)
+    .filter(part => part && part.trim())
+    .map(part => {
+      const value = part.trim();
+      return /^(AND|OR|NOT)$/i.test(value)
+        ? value.toUpperCase()
+        : value;
+    });
 
   const required = [];
   const excluded = [];
   const orGroups = [];
+  let currentClause = [];
+  let pendingNot = false;
+  let depth = 0;
+  let invalid = false;
 
-  let current = null;
-  let operator = 'AND';
+  const flushClause = () => {
+    if (!currentClause.length) return;
 
-  for (let i = 0; i < parts.length; i++) {
-    const part = parts[i].trim();
+    const terms = [...new Set(currentClause.map(({ term }) => term))];
+    const hasNegatedTerm = currentClause.some(({ negated }) => negated);
+    const hasPositiveTerm = currentClause.some(({ negated }) => !negated);
 
-    if (!part) continue;
-
-    if (/^(AND|OR|NOT)$/i.test(part)) {
-      operator = part.toUpperCase();
-      continue;
-    }
-
-    const term = part.toLowerCase();
-
-    if (operator === 'NOT') {
-      excluded.push(term);
-    } else if (operator === 'OR') {
-      if (current === null) current = [];
-      current.push(term);
+    if (hasNegatedTerm && hasPositiveTerm) {
+      invalid = true;
+    } else if (hasNegatedTerm) {
+      if (terms.length > 1) invalid = true;
+      else excluded.push(...terms);
+    } else if (terms.length > 1) {
+      orGroups.push(terms);
     } else {
-      if (current?.length) {
-        orGroups.push(current);
-        current = null;
-      }
-      required.push(term);
+      required.push(...terms);
     }
 
-    operator = 'AND';
+    currentClause = [];
+  };
+
+  for (const part of parts) {
+    if (part === '(') {
+      depth++;
+    } else if (part === ')') {
+      if (depth === 0) return null;
+      depth--;
+    } else if (part === 'AND') {
+      if (depth > 0) return null;
+      flushClause();
+    } else if (part === 'OR') {
+      if (!currentClause.length) return null;
+    } else if (part === 'NOT') {
+      flushClause();
+      if (pendingNot) return null;
+      pendingNot = true;
+    } else {
+      currentClause.push({
+        term: part.toLowerCase(),
+        negated: pendingNot
+      });
+      pendingNot = false;
+    }
   }
 
-  if (current?.length) {
-    orGroups.push(current);
-  }
+  if (depth !== 0 || pendingNot) return null;
+  flushClause();
+
+  if (invalid) return null;
 
   return {
     required: [...new Set(required)],
@@ -2223,6 +2249,7 @@ The cat sat on the rug.`}
                     min-width: 0;
                     max-height: 82vh;
                     overflow-y: auto;
+                    overflow-x: hidden;
                   }
 
                   @media (max-width: 768px) {
