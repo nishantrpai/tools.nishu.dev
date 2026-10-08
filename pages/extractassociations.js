@@ -446,6 +446,10 @@ The cat sat on the rug.`);
   const [result, setResult] = useState(null);
 
   const [searchTerm, setSearchTerm] = useState('');
+  const [tableSort, setTableSort] = useState({
+    column: null,
+    direction: 'asc'
+  });
   const [animationTarget, setAnimationTarget] = useState(null);
   const [showContext, setShowContext] = useState(false);
   const [contextResults, setContextResults] = useState([]);
@@ -1123,6 +1127,31 @@ The cat sat on the rug.`);
     ({ word }) =>
       !stopWordsByDefault || !connectedstopwords.includes(word)
   );
+  const sortedTableCooccurrences = tableSort.column
+    ? [...tableCooccurrences].sort((a, b) => {
+        const comparison =
+          tableSort.column === 'word'
+            ? a.word.localeCompare(b.word, undefined, { sensitivity: 'base' })
+            : (a.connections.find(
+                ({ term }) => `term:${term}` === tableSort.column
+              )?.weight || 0) -
+              (b.connections.find(
+                ({ term }) => `term:${term}` === tableSort.column
+              )?.weight || 0);
+
+        return tableSort.direction === 'asc' ? comparison : -comparison;
+      })
+    : tableCooccurrences;
+
+  function handleTableSort(column) {
+    setTableSort(current => ({
+      column,
+      direction:
+        current.column === column && current.direction === 'asc'
+          ? 'desc'
+          : 'asc'
+    }));
+  }
 
   useEffect(() => {
     setAnimationTarget(null);
@@ -2362,6 +2391,13 @@ The cat sat on the rug.`}
                             }}
                           >
                             <th
+                              aria-sort={
+                                tableSort.column === 'word'
+                                  ? tableSort.direction === 'asc'
+                                    ? 'ascending'
+                                    : 'descending'
+                                  : 'none'
+                              }
                               style={{
                                 textAlign: 'left',
                                 padding: '8px 12px',
@@ -2369,27 +2405,76 @@ The cat sat on the rug.`}
                                 fontWeight: 'normal'
                               }}
                             >
-                              Connected word
-                            </th>
-
-                            {highlightedData.terms.map(term => (
-                              <th
-                                key={term}
+                              <button
+                                type="button"
+                                onClick={() => handleTableSort('word')}
                                 style={{
-                                  textAlign: 'right',
-                                  padding: '8px 12px',
-                                  color: '#666',
-                                  fontWeight: 'normal'
+                                  border: 0,
+                                  padding: 0,
+                                  background: 'none',
+                                  color: 'inherit',
+                                  font: 'inherit',
+                                  textAlign: 'left',
+                                  cursor: 'pointer'
                                 }}
                               >
-                                {term}
-                              </th>
-                            ))}
+                                Connected word
+                                {tableSort.column === 'word'
+                                  ? tableSort.direction === 'asc'
+                                    ? ' (A-Z)'
+                                    : ' (Z-A)'
+                                  : ''}
+                              </button>
+                            </th>
+
+                            {highlightedData.terms.map(term => {
+                              const column = `term:${term}`;
+
+                              return (
+                                <th
+                                  key={term}
+                                  aria-sort={
+                                    tableSort.column === column
+                                      ? tableSort.direction === 'asc'
+                                        ? 'ascending'
+                                        : 'descending'
+                                      : 'none'
+                                  }
+                                  style={{
+                                    textAlign: 'right',
+                                    padding: '8px 12px',
+                                    color: '#666',
+                                    fontWeight: 'normal'
+                                  }}
+                                >
+                                  <button
+                                    type="button"
+                                    onClick={() => handleTableSort(column)}
+                                    style={{
+                                      border: 0,
+                                      padding: 0,
+                                      background: 'none',
+                                      color: 'inherit',
+                                      font: 'inherit',
+                                      textAlign: 'right',
+                                      cursor: 'pointer'
+                                    }}
+                                  >
+                                    {term}
+                                    {tableSort.column === column
+                                      ? tableSort.direction === 'asc'
+                                        ? ' (low-high)'
+                                        : ' (high-low)'
+                                      : ''}
+                                  </button>
+                                </th>
+                              );
+                            })}
                           </tr>
                         </thead>
 
                         <tbody>
-                          {tableCooccurrences.map(item => (
+                          {sortedTableCooccurrences.map(item => (
                             <tr
                               key={item.word}
                               style={{
