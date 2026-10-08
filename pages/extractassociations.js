@@ -334,6 +334,22 @@ function countSearchTerm(words, term) {
   return countPhraseInWords(words, term);
 }
 
+function countBooleanSearchTerm(words, term, stopwordSet) {
+  const termWords = tokenizeSentence(term, new Set())
+    .filter(word => !stopwordSet.has(word));
+
+  if (!termWords.length) return 0;
+
+  const wordCounts = new Map();
+  words.forEach(word => {
+    wordCounts.set(word, (wordCounts.get(word) || 0) + 1);
+  });
+
+  return Math.min(
+    ...termWords.map(word => wordCounts.get(word) || 0)
+  );
+}
+
 function matchesBooleanSearch(booleanSearch, termCounts) {
   if (!booleanSearch) return true;
 
@@ -948,7 +964,9 @@ The cat sat on the rug.`);
       const termCounts = new Map(
         uniqueTerms.map(term => [
           term,
-          countSearchTerm(words, term)
+          booleanSearch
+            ? countBooleanSearchTerm(words, term, result.stopwordSet)
+            : countSearchTerm(words, term)
         ])
       );
       const matchesBoolean = matchesBooleanSearch(booleanSearch, termCounts);
@@ -1009,13 +1027,25 @@ The cat sat on the rug.`);
       };
     }
 
-    const level1Set = new Set(
-      [...connectionWeightMap.entries()]
-        .filter(([, connections]) =>
-          connections.size === matchingTerms.size
-        )
-        .map(([word]) => word)
-    );
+   const level1Set = new Set(
+  [...connectionWeightMap.entries()]
+    .filter(([, connections]) => {
+      const connectedTerms = new Set(connections.keys());
+
+      const requiredMatch = booleanSearch
+        ? booleanSearch.required.every(term => connectedTerms.has(term))
+        : true;
+
+      const orGroupsMatch = booleanSearch
+        ? booleanSearch.orGroups.every(group =>
+            group.some(term => connectedTerms.has(term))
+          )
+        : true;
+
+      return requiredMatch && orGroupsMatch;
+    })
+    .map(([word]) => word)
+);
 
     const cooccurrences = [...level1Set]
       .map(word => {
@@ -1174,7 +1204,9 @@ The cat sat on the rug.`);
       const termCounts = new Map(
         booleanTerms.map(term => [
           term,
-          countSearchTerm(words, term)
+          booleanSearch
+            ? countBooleanSearchTerm(words, term, result.stopwordSet)
+            : countSearchTerm(words, term)
         ])
       );
 
