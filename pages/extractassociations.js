@@ -2151,7 +2151,8 @@ The cat sat on the rug.`}
                   <div
                     className="contextPane"
                     style={{
-                      fontFamily: 'monospace'
+                      fontFamily: 'monospace',
+                      gap: '12px',
                     }}
                   >
                     <h3
@@ -2167,6 +2168,23 @@ The cat sat on the rug.`}
                       </strong>
                     </h3>
 
+                    <button onClick={(e) => {
+                      const contextToCopy = contextResults.map(context => {
+                        const sentences = Array.from(
+                          { length: context.end - context.start + 1 },
+                          (_, offset) => context.start + offset
+                        ).map(sentenceIndex => result.sentences[sentenceIndex]);
+
+                        return `${sentences.join('\n')}`;
+                      }).join('\n\n');
+                      navigator.clipboard.writeText(contextToCopy);
+                      e.target.innerText = 'Copied!';
+                      setTimeout(() => {
+                        e.target.innerText = 'Copy Context Sentences';
+                      }, 2000);
+                    }}>
+                      Copy Context Sentences
+                    </button>
                     {contextResults.length > 0 ? (
                       contextResults.map(context => (
                         <div
