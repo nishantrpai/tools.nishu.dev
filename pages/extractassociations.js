@@ -2371,6 +2371,18 @@ The cat sat on the rug.`}
                     {`Connected words (${tableCooccurrences.length})`}
                   </h3>
 
+                  <button onClick={(e) => {
+                    const wordsToCopy = sortedTableCooccurrences.map(item => item.word).join('\n');
+                    navigator.clipboard.writeText(wordsToCopy);
+                    // set text to copied
+                    e.target.innerText = 'Copied!';
+                    setTimeout(() => {
+                      e.target.innerText = 'Copy Words';
+                    }, 2000);
+                  }}>
+                    Copy Words
+                  </button>
+
                   {tableCooccurrences.length > 0 ? (
                     <div
                       style={{
