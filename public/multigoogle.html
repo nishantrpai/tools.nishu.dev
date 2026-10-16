@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discussions</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+                Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+            display: flex;
+            overflow: hidden;
+            background-color: #000;
+            color: #fff;
+        }
+
+        .control-panel {
+            width: 320px;
+            min-width: 320px;
+            background: #000;
+            color: #fff;
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            border-right: 1px solid #333;
+            z-index: 10;
+            overflow-y: auto;
+        }
+
+        .control-panel h2 {
+            margin-top: 0;
+            font-size: 20px;
+            color: #fff;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        label {
+            font-size: 12px;
+            font-weight: bold;
+            color: #888;
+            text-transform: uppercase;
+        }
+
+        textarea {
+            width: 100%;
+            height: 90px;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #333;
+            border-radius: 10px;
+            background: #000;
+            color: #fff;
+            font-family: inherit;
+            resize: none;
+            outline: none;
+        }
+
+        select, input[type="number"], input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #333;
+            border-radius: 10px;
+            background: #000;
+            color: #fff;
+            outline: none;
+        }
+
+        button {
+            background-color: #222;
+            color: #fff;
+            border: 1px solid #111;
+            padding: 8px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        button:hover { background-color: #333; }
+        button.danger { background: #222; color: #fff; border-color: #333; }
+        button.danger:hover { background: #3a2222; }
+
+        .btn-row {
+            display: flex;
+            gap: 8px;
+        }
+        .btn-row button { flex: 1; }
+
+        /* ─── Saved discussions ─── */
+        .saved-section {
+            border-top: 1px solid #333;
+            padding-top: 12px;
+        }
+
+        .saved-section h3 {
+            font-size: 13px;
+            color: #888;
+            margin: 0 0 8px 0;
+            text-transform: uppercase;
+        }
+
+        .saved-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .saved-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px;
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 5px;
+            font-size: 12px;
+            transition: background 0.15s;
+        }
+
+        .saved-item:hover { background: #191919; }
+        .saved-item.active { background: #222; border-color: #555; }
+
+        .saved-item .saved-name {
+            min-width: 0;
+            flex: 1;
+            padding: 4px;
+            border: 0;
+            background: transparent;
+            color: #fff;
+            font-size: 12px;
+            font-weight: normal;
+            text-align: left;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .saved-item .rename,
+        .saved-item .del {
+            padding: 4px 6px;
+            border: 0;
+            background: transparent;
+            color: #888;
+            font-size: 11px;
+        }
+        .saved-item .rename:hover { color: #fff; }
+        .saved-item .del:hover { color: #fff; background: #3a2222; }
+        .saved-item .rename-input {
+            min-width: 0;
+            flex: 1;
+            margin: 0;
+            padding: 6px;
+        }
+
+        /* ─── Scroll buttons ─── */
+        .scroll-controls {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 20;
+        }
+        .scroll-controls.left { left: 324px; }
+        .scroll-controls.right { right: 4px; }
+
+        .scroll-btn {
+            width: 36px;
+            height: 60px;
+            background: #111;
+            color: #fff;
+            border: 1px solid #333;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.8;
+        }
+        .scroll-btn:hover { opacity: 1; }
+
+        /* ─── Flex container ─── */
+        .flex-container {
+            display: flex;
+            flex-direction: row;
+            height: 100vh;
+            flex-grow: 1;
+            overflow-x: auto;
+            background: #dadce0;
+            position: relative;
+            scroll-behavior: smooth;
+        }
+
+        .flex-column {
+            flex: 0 0 768px;
+            min-width: 768px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+        }
+
+        .drag-handle {
+            width: 6px;
+            min-width: 6px;
+            cursor: col-resize;
+            background: #ccc;
+            transition: background 0.2s;
+            z-index: 5;
+        }
+        .drag-handle:hover,
+        .drag-handle.active { background: #555; }
+
+        .column-header {
+            background: #f1f3f4;
+            color: #3c4043;
+            text-align: center;
+            padding: 8px 5px;
+            font-size: 12px;
+            font-weight: bold;
+            border-bottom: 1px solid #dadce0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        iframe {
+            width: 100%;
+            flex: 1;
+            border: none;
+        }
+
+        .welcome-msg {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            color: #5f6368;
+            font-size: 16px;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .cached-badge {
+            display: inline-block;
+            background: #34a853;
+            color: #fff;
+            font-size: 9px;
+            padding: 1px 5px;
+            border-radius: 3px;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="control-panel">
+        <h2>Discussions</h2>
+
+        <div class="input-group">
+            <label for="searchTerms">Search Keywords (one per line)</label>
+            <textarea id="searchTerms" placeholder="e.g.&#10;Artificial Intelligence&#10;Quantum Computing"></textarea>
+        </div>
+
+        <div class="input-group">
+            <label for="timeRange">Time Filter</label>
+            <select id="timeRange">
+                <option value="">Any time</option>
+                <option value="h">Past hour</option>
+                <option value="d">Past 24 hours</option>
+                <option value="w" selected>Past week</option>
+                <option value="m">Past month</option>
+                <option value="y">Past year</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label for="tabCount">Max Columns</label>
+            <input type="number" id="tabCount" value="10" min="1" max="20">
+        </div>
+
+        <div class="btn-row">
+            <button onclick="generateSearchDashboard()">Generate</button>
+            <button class="danger" onclick="clearAll()">Clear</button>
+        </div>
+
+        <div class="input-group" style="margin-top:4px;">
+            <label for="discussionName">Save Discussion</label>
+            <div style="display:flex;gap:6px;">
+                <input type="text" id="discussionName" placeholder="e.g. AI Research Thread">
+                <button onclick="saveDiscussion()" style="white-space:nowrap;">Save</button>
+            </div>
+        </div>
+
+        <div class="saved-section">
+            <h3>Your Discussions</h3>
+            <div class="saved-list" id="savedList"></div>
+        </div>
+    </div>
+
+    <div class="scroll-controls left">
+        <button class="scroll-btn" onclick="scrollContainer(-400)">‹</button>
+    </div>
+    <div class="scroll-controls right">
+        <button class="scroll-btn" onclick="scrollContainer(400)">›</button>
+    </div>
+
+    <div class="flex-container" id="resultsContainer">
+        <div class="welcome-msg">Enter terms and click "Generate" to start.</div>
+    </div>
+
+    <script>
+        const columnCache = new Map();
+        let activeDiscussion = null;
+        let editingDiscussion = null;
+
+        // ─── Storage helpers ───
+        function getSaved() {
+            return JSON.parse(localStorage.getItem('discussions') || '[]');
+        }
+        function setSaved(list) {
+            localStorage.setItem('discussions', JSON.stringify(list));
+        }
+
+        // ─── Render saved list ───
+        function renderSavedList() {
+            const list = getSaved();
+            const el = document.getElementById('savedList');
+            el.innerHTML = '';
+            if (list.length === 0) {
+                const empty = document.createElement('div');
+                empty.textContent = 'No saved discussions yet.';
+                empty.style.cssText = 'color:#888;font-size:11px;';
+                el.appendChild(empty);
+                return;
+            }
+            list.forEach((item) => {
+                const div = document.createElement('div');
+                div.className = 'saved-item' + (activeDiscussion === item.name ? ' active' : '');
+                if (editingDiscussion === item.name) {
+                    const input = document.createElement('input');
+                    input.className = 'rename-input';
+                    input.type = 'text';
+                    input.value = item.name;
+                    input.setAttribute('aria-label', `New name for ${item.name}`);
+
+                    const saveName = document.createElement('button');
+                    saveName.className = 'rename';
+                    saveName.type = 'button';
+                    saveName.textContent = 'Save';
+                    saveName.addEventListener('click', () => saveDiscussionName(item.name, input.value));
+
+                    const cancelRename = document.createElement('button');
+                    cancelRename.className = 'rename';
+                    cancelRename.type = 'button';
+                    cancelRename.textContent = 'Cancel';
+                    cancelRename.addEventListener('click', () => {
+                        editingDiscussion = null;
+                        renderSavedList();
+                    });
+                    input.addEventListener('keydown', (event) => {
+                        if (event.key === 'Enter') saveDiscussionName(item.name, input.value);
+                        if (event.key === 'Escape') {
+                            editingDiscussion = null;
+                            renderSavedList();
+                        }
+                    });
+                    div.append(input, saveName, cancelRename);
+                    requestAnimationFrame(() => {
+                        input.focus();
+                        input.select();
+                    });
+                } else {
+                    const name = document.createElement('button');
+                    name.className = 'saved-name';
+                    name.textContent = item.name;
+                    name.title = item.name;
+                    name.addEventListener('click', () => loadDiscussion(item.name));
+
+                    const rename = document.createElement('button');
+                    rename.className = 'rename';
+                    rename.type = 'button';
+                    rename.textContent = 'Rename';
+                    rename.addEventListener('click', () => renameDiscussion(item.name));
+                    div.append(name, rename);
+                }
+
+                const remove = document.createElement('button');
+                remove.className = 'del';
+                remove.type = 'button';
+                remove.textContent = '✕';
+                remove.title = 'Delete discussion';
+                remove.setAttribute('aria-label', `Delete ${item.name}`);
+                remove.addEventListener('click', () => deleteDiscussion(item.name));
+                div.appendChild(remove);
+                el.appendChild(div);
+            });
+        }
+
+        // ─── Save current terms as a discussion ───
+        function saveDiscussion() {
+            const nameInput = document.getElementById('discussionName');
+            const name = nameInput.value.trim();
+            if (!name) { alert('Give the discussion a name.'); return; }
+
+            const terms = document.getElementById('searchTerms').value;
+            const timeVal = document.getElementById('timeRange').value;
+
+            const list = getSaved();
+            const existing = list.find(d => d.name === name);
+            if (existing) {
+                existing.terms = terms;
+                existing.time = timeVal;
+            } else {
+                list.push({ name, terms, time: timeVal });
+            }
+            setSaved(list);
+            activeDiscussion = name;
+            nameInput.value = '';
+            renderSavedList();
+        }
+
+        // ─── Load a saved discussion ───
+        function loadDiscussion(name) {
+            const list = getSaved();
+            const item = list.find(d => d.name === name);
+            if (!item) return;
+
+            document.getElementById('searchTerms').value = item.terms;
+            document.getElementById('timeRange').value = item.time || '';
+            activeDiscussion = name;
+            renderSavedList();
+            generateSearchDashboard();
+        }
+
+        // ─── Delete a saved discussion ───
+        function deleteDiscussion(name) {
+            const list = getSaved().filter(d => d.name !== name);
+            setSaved(list);
+            if (activeDiscussion === name) activeDiscussion = null;
+            if (editingDiscussion === name) editingDiscussion = null;
+            renderSavedList();
+        }
+
+        function renameDiscussion(name) {
+            editingDiscussion = name;
+            renderSavedList();
+        }
+
+        function saveDiscussionName(name, requestedName) {
+            const newName = requestedName.trim();
+            if (!newName) {
+                alert('Give the discussion a name.');
+                return;
+            }
+            const list = getSaved();
+            const discussion = list.find(item => item.name === name);
+            if (!discussion) return;
+            if (newName === name) {
+                editingDiscussion = null;
+                renderSavedList();
+                return;
+            }
+            if (list.some(item => item.name === newName)) {
+                alert('A discussion with that name already exists.');
+                return;
+            }
+
+            discussion.name = newName;
+            setSaved(list);
+            if (activeDiscussion === name) activeDiscussion = newName;
+            editingDiscussion = null;
+            renderSavedList();
+        }
+
+        function syncActiveDiscussion() {
+            if (!activeDiscussion) return;
+            const list = getSaved();
+            const discussion = list.find(item => item.name === activeDiscussion);
+            if (!discussion) return;
+
+            discussion.terms = document.getElementById('searchTerms').value;
+            discussion.time = document.getElementById('timeRange').value;
+            setSaved(list);
+        }
+
+        // ─── Core generate ───
+function generateSearchDashboard() {
+    const textarea = document.getElementById('searchTerms');
+    const timeSelect = document.getElementById('timeRange');
+    const maxTabsInput = document.getElementById('tabCount');
+    const container = document.getElementById('resultsContainer');
+
+    const rawQueries = textarea.value.split('\n').map(q => q.trim()).filter(q => q !== "");
+    const maxTabs = parseInt(maxTabsInput.value) || 10;
+    const timeValue = timeSelect.value;
+
+    syncActiveDiscussion();
+
+    if (rawQueries.length === 0) {
+        container.innerHTML = '<div class="welcome-msg">Enter at least one query.</div>';
+        return;
+    }
+
+    const finalCount = Math.min(rawQueries.length, maxTabs);
+    const desiredKeys = new Set();
+    let firstNewCol = null;
+
+    // Build the set of keys we want
+    const queryKeys = [];
+    for (let i = 0; i < finalCount; i++) {
+        const key = `${rawQueries[i]}__${timeValue}`;
+        queryKeys.push(key);
+        desiredKeys.add(key);
+    }
+
+    // Remove columns that are no longer needed
+    const existingCols = [...container.querySelectorAll('.flex-column')];
+    existingCols.forEach(col => {
+        if (!desiredKeys.has(col.dataset.key)) {
+            const next = col.nextElementSibling;
+            if (next && next.classList.contains('drag-handle')) next.remove();
+            col.remove();
+        }
+    });
+
+    // Remove welcome msg if present
+    const welcome = container.querySelector('.welcome-msg');
+    if (welcome) welcome.remove();
+
+    // Add new columns (append at end)
+    for (let i = 0; i < finalCount; i++) {
+        const query = rawQueries[i];
+        const key = `${query}__${timeValue}`;
+
+        // Skip if already in the container
+        if (container.querySelector(`.flex-column[data-key="${CSS.escape(key)}"]`)) {
+            continue;
+        }
+
+        let googleUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+        if (timeValue) googleUrl += `&tbs=qdr:${timeValue}`;
+
+        const colDiv = document.createElement('div');
+        colDiv.className = 'flex-column';
+        colDiv.dataset.key = key;
+
+        const headerDiv = document.createElement('div');
+        headerDiv.className = 'column-header';
+        headerDiv.innerText = `[${i + 1}] "${query}"`;
+
+        const iframe = document.createElement('iframe');
+        iframe.src = googleUrl;
+
+        colDiv.appendChild(headerDiv);
+        colDiv.appendChild(iframe);
+
+        // Add drag handle before this column
+        if (container.children.length > 0) {
+            container.appendChild(createDragHandle());
+        }
+        container.appendChild(colDiv);
+
+        if (!firstNewCol) firstNewCol = colDiv;
+    }
+
+    // Re-attach drag resize to all handles
+    initDragResize(container);
+
+    // Scroll to the first new column
+    if (firstNewCol) {
+        firstNewCol.scrollIntoView({ behavior: 'smooth', inline: 'start' });
+    }
+}   
+
+        function createDragHandle() {
+            const h = document.createElement('div');
+            h.className = 'drag-handle';
+            return h;
+        }
+
+        function initDragResize(container) {
+            container.querySelectorAll('.drag-handle').forEach(handle => {
+                let startX, startW, leftCol, rightCol;
+                handle.addEventListener('mousedown', (e) => {
+                    e.preventDefault();
+                    handle.classList.add('active');
+                    leftCol = handle.previousElementSibling;
+                    rightCol = handle.nextElementSibling;
+                    if (!leftCol?.classList.contains('flex-column') || !rightCol?.classList.contains('flex-column')) return;
+                    startX = e.clientX;
+                    startW = leftCol.offsetWidth;
+                    document.body.style.userSelect = 'none';
+                    document.body.style.cursor = 'col-resize';
+                    const move = (e) => {
+                        const delta = e.clientX - startX;
+                        leftCol.style.flex = `0 0 ${Math.max(768, startW + delta)}px`;
+                        rightCol.style.flex = `0 0 ${Math.max(768, rightCol.offsetWidth - (e.movementX))}px`;
+                    };
+                    const up = () => {
+                        handle.classList.remove('active');
+                        document.body.style.userSelect = '';
+                        document.body.style.cursor = '';
+                        document.removeEventListener('mousemove', move);
+                        document.removeEventListener('mouseup', up);
+                    };
+                    document.addEventListener('mousemove', move);
+                    document.addEventListener('mouseup', up);
+                });
+            });
+        }
+
+        function scrollContainer(amount) {
+            document.getElementById('resultsContainer').scrollBy({ left: amount, behavior: 'smooth' });
+        }
+
+        function clearAll() {
+            columnCache.clear();
+            activeDiscussion = null;
+            editingDiscussion = null;
+            renderSavedList();
+            document.getElementById('resultsContainer').innerHTML =
+                '<div class="welcome-msg">Enter terms and click "Generate" to start.</div>';
+        }
+
+        // Init
+        renderSavedList();
+    </script>
+</body>
+</html>   
