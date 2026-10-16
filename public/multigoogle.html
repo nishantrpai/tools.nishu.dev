@@ -354,6 +354,7 @@
         const columnCache = new Map();
         let activeDiscussion = null;
         let editingDiscussion = null;
+        let frameObserver = null;
 
         // ─── Storage helpers ───
         function getSaved() {
@@ -368,6 +369,55 @@
             icon.className = `fa ${iconName}`;
             icon.setAttribute('aria-hidden', 'true');
             return icon;
+        }
+
+        function loadFrame(frame) {
+            if (!frame.dataset.src) return;
+            frame.src = frame.dataset.src;
+            delete frame.dataset.src;
+        }
+
+        function observeLazyFrames(container) {
+            const frames = container.querySelectorAll('iframe[data-src]');
+            if (!('IntersectionObserver' in window)) {
+                const loadVisibleFrames = () => {
+                    const bounds = container.getBoundingClientRect();
+                    container.querySelectorAll('iframe[data-src]').forEach(frame => {
+                        const frameBounds = frame.getBoundingClientRect();
+                        const horizontallyVisible =
+                            frameBounds.right >= bounds.left - 200 &&
+                            frameBounds.left <= bounds.right + 200;
+                        const verticallyVisible =
+                            frameBounds.bottom > bounds.top &&
+                            frameBounds.top < bounds.bottom;
+                        if (horizontallyVisible && verticallyVisible) loadFrame(frame);
+                    });
+                };
+                if (!container.dataset.lazyScrollBound) {
+                    container.addEventListener('scroll', loadVisibleFrames);
+                    window.addEventListener('resize', loadVisibleFrames);
+                    container.dataset.lazyScrollBound = 'true';
+                }
+                loadVisibleFrames();
+                return;
+            }
+
+            if (!frameObserver) {
+                frameObserver = new IntersectionObserver(entries => {
+                    entries.forEach(entry => {
+                        if (!entry.isIntersecting) return;
+                        const frame = entry.target;
+                        loadFrame(frame);
+                        frameObserver.unobserve(frame);
+                    });
+                }, {
+                    root: container,
+                    rootMargin: '0px 200px',
+                    threshold: 0.01
+                });
+            }
+
+            frames.forEach(frame => frameObserver.observe(frame));
         }
 
         // ─── Render saved list ───
@@ -571,6 +621,8 @@ function generateSearchDashboard() {
         if (!desiredKeys.has(col.dataset.key)) {
             const next = col.nextElementSibling;
             if (next && next.classList.contains('drag-handle')) next.remove();
+            const frame = col.querySelector('iframe');
+            if (frame) frameObserver?.unobserve(frame);
             col.remove();
         }
     });
@@ -615,8 +667,9 @@ function generateSearchDashboard() {
             iframe.src = iframe.dataset.searchUrl;
         });
 
+        iframe.loading = 'lazy';
         iframe.dataset.searchUrl = googleUrl;
-        iframe.src = googleUrl;
+        iframe.dataset.src = googleUrl;
 
         headerDiv.append(title, backButton);
         colDiv.appendChild(headerDiv);
@@ -630,6 +683,8 @@ function generateSearchDashboard() {
 
         if (!firstNewCol) firstNewCol = colDiv;
     }
+
+    observeLazyFrames(container);
 
     // Re-attach drag resize to all handles
     initDragResize(container);
@@ -685,6 +740,8 @@ function generateSearchDashboard() {
             columnCache.clear();
             activeDiscussion = null;
             editingDiscussion = null;
+            frameObserver?.disconnect();
+            frameObserver = null;
             renderSavedList();
             document.getElementById('resultsContainer').innerHTML =
                 '<div class="welcome-msg">Enter terms and click "Generate" to start.</div>';
