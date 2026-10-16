@@ -64,7 +64,7 @@
             background: #000;
             color: #fff;
             font-family: inherit;
-            resize: none;
+            resize: vertical;
             outline: none;
         }
 
@@ -127,15 +127,13 @@
             align-items: center;
             gap: 4px;
             padding: 4px;
-            background: #111;
-            border: 1px solid #222;
             border-radius: 5px;
             font-size: 12px;
             transition: background 0.15s;
         }
 
         .saved-item:hover { background: #191919; }
-        .saved-item.active { background: #222; border-color: #555; }
+        /* .saved-item.active { background: #222; border-color: #555; } */
 
         .saved-item .saved-name {
             min-width: 0;
@@ -228,17 +226,37 @@
         .drag-handle.active { background: #555; }
 
         .column-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
             background: #f1f3f4;
             color: #3c4043;
-            text-align: center;
             padding: 8px 5px;
             font-size: 12px;
             font-weight: bold;
             border-bottom: 1px solid #dadce0;
+        }
+
+        .column-title {
+            min-width: 0;
+            flex: 1;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
+
+        .frame-back {
+            flex: none;
+            padding: 4px 8px;
+            border: 1px solid #333;
+            border-radius: 5px;
+            background: #222;
+            color: #fff;
+            font: inherit;
+            cursor: pointer;
+        }
+
+        .frame-back:hover { background: #333; }
 
         iframe {
             width: 100%;
@@ -291,13 +309,8 @@
             </select>
         </div>
 
-        <div class="input-group">
-            <label for="tabCount">Max Columns</label>
-            <input type="number" id="tabCount" value="10" min="1" max="20">
-        </div>
-
         <div class="btn-row">
-            <button onclick="generateSearchDashboard()">Generate</button>
+            <button onclick="generateSearchDashboard()">Search</button>
             <button class="danger" onclick="clearAll()">Clear</button>
         </div>
 
@@ -505,11 +518,9 @@
 function generateSearchDashboard() {
     const textarea = document.getElementById('searchTerms');
     const timeSelect = document.getElementById('timeRange');
-    const maxTabsInput = document.getElementById('tabCount');
     const container = document.getElementById('resultsContainer');
 
     const rawQueries = textarea.value.split('\n').map(q => q.trim()).filter(q => q !== "");
-    const maxTabs = parseInt(maxTabsInput.value) || 10;
     const timeValue = timeSelect.value;
 
     syncActiveDiscussion();
@@ -519,13 +530,12 @@ function generateSearchDashboard() {
         return;
     }
 
-    const finalCount = Math.min(rawQueries.length, maxTabs);
     const desiredKeys = new Set();
     let firstNewCol = null;
 
     // Build the set of keys we want
     const queryKeys = [];
-    for (let i = 0; i < finalCount; i++) {
+    for (let i = 0; i < rawQueries.length; i++) {
         const key = `${rawQueries[i]}__${timeValue}`;
         queryKeys.push(key);
         desiredKeys.add(key);
@@ -546,7 +556,7 @@ function generateSearchDashboard() {
     if (welcome) welcome.remove();
 
     // Add new columns (append at end)
-    for (let i = 0; i < finalCount; i++) {
+    for (let i = 0; i < rawQueries.length; i++) {
         const query = rawQueries[i];
         const key = `${query}__${timeValue}`;
 
@@ -564,11 +574,27 @@ function generateSearchDashboard() {
 
         const headerDiv = document.createElement('div');
         headerDiv.className = 'column-header';
-        headerDiv.innerText = `[${i + 1}] "${query}"`;
+
+        const title = document.createElement('span');
+        title.className = 'column-title';
+        title.textContent = `[${i + 1}] "${query}"`;
 
         const iframe = document.createElement('iframe');
+
+        const backButton = document.createElement('button');
+        backButton.className = 'frame-back';
+        backButton.type = 'button';
+        backButton.textContent = '←';
+        backButton.title = 'Return this frame to its search results';
+        backButton.setAttribute('aria-label', `Return to search results for ${query}`);
+        backButton.addEventListener('click', () => {
+            iframe.src = iframe.dataset.searchUrl;
+        });
+
+        iframe.dataset.searchUrl = googleUrl;
         iframe.src = googleUrl;
 
+        headerDiv.append(title, backButton);
         colDiv.appendChild(headerDiv);
         colDiv.appendChild(iframe);
 
