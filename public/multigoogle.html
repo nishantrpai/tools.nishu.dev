@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Discussions</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <style>
         body, html {
             margin: 0;
@@ -56,7 +57,7 @@
 
         textarea {
             width: 100%;
-            height: 90px;
+            min-height: 90px;
             padding: 10px;
             box-sizing: border-box;
             border: 1px solid #333;
@@ -310,15 +311,21 @@
         </div>
 
         <div class="btn-row">
-            <button onclick="generateSearchDashboard()">Search</button>
-            <button class="danger" onclick="clearAll()">Clear</button>
+            <button type="button" onclick="generateSearchDashboard()" title="Search" aria-label="Search">
+                <i class="fa fa-search" aria-hidden="true"></i>
+            </button>
+            <!-- <button type="button" class="danger" onclick="clearAll()" title="Clear" aria-label="Clear">
+                <i class="fa fa-eraser" aria-hidden="true"></i>
+            </button> -->
         </div>
 
         <div class="input-group" style="margin-top:4px;">
             <label for="discussionName">Save Discussion</label>
             <div style="display:flex;gap:6px;">
                 <input type="text" id="discussionName" placeholder="e.g. AI Research Thread">
-                <button onclick="saveDiscussion()" style="white-space:nowrap;">Save</button>
+                <button type="button" onclick="saveDiscussion()" style="white-space:nowrap;" title="Save discussion" aria-label="Save discussion">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                </button>
             </div>
         </div>
 
@@ -329,10 +336,14 @@
     </div>
 
     <div class="scroll-controls left">
-        <button class="scroll-btn" onclick="scrollContainer(-400)">‹</button>
+        <button type="button" class="scroll-btn" onclick="scrollContainer(-400)" title="Scroll left" aria-label="Scroll left">
+            <i class="fa fa-angle-left" aria-hidden="true"></i>
+        </button>
     </div>
     <div class="scroll-controls right">
-        <button class="scroll-btn" onclick="scrollContainer(400)">›</button>
+        <button type="button" class="scroll-btn" onclick="scrollContainer(400)" title="Scroll right" aria-label="Scroll right">
+            <i class="fa fa-angle-right" aria-hidden="true"></i>
+        </button>
     </div>
 
     <div class="flex-container" id="resultsContainer">
@@ -350,6 +361,13 @@
         }
         function setSaved(list) {
             localStorage.setItem('discussions', JSON.stringify(list));
+        }
+
+        function createIcon(iconName) {
+            const icon = document.createElement('i');
+            icon.className = `fa ${iconName}`;
+            icon.setAttribute('aria-hidden', 'true');
+            return icon;
         }
 
         // ─── Render saved list ───
@@ -377,13 +395,17 @@
                     const saveName = document.createElement('button');
                     saveName.className = 'rename';
                     saveName.type = 'button';
-                    saveName.textContent = 'Save';
+                    saveName.title = 'Save name';
+                    saveName.setAttribute('aria-label', 'Save name');
+                    saveName.appendChild(createIcon('fa-floppy-o'));
                     saveName.addEventListener('click', () => saveDiscussionName(item.name, input.value));
 
                     const cancelRename = document.createElement('button');
                     cancelRename.className = 'rename';
                     cancelRename.type = 'button';
-                    cancelRename.textContent = 'Cancel';
+                    cancelRename.title = 'Cancel rename';
+                    cancelRename.setAttribute('aria-label', 'Cancel rename');
+                    cancelRename.appendChild(createIcon('fa-times'));
                     cancelRename.addEventListener('click', () => {
                         editingDiscussion = null;
                         renderSavedList();
@@ -410,7 +432,9 @@
                     const rename = document.createElement('button');
                     rename.className = 'rename';
                     rename.type = 'button';
-                    rename.textContent = 'Rename';
+                    rename.title = 'Edit discussion name';
+                    rename.setAttribute('aria-label', `Edit name for ${item.name}`);
+                    rename.appendChild(createIcon('fa-pencil'));
                     rename.addEventListener('click', () => renameDiscussion(item.name));
                     div.append(name, rename);
                 }
@@ -418,7 +442,7 @@
                 const remove = document.createElement('button');
                 remove.className = 'del';
                 remove.type = 'button';
-                remove.textContent = '✕';
+                remove.appendChild(createIcon('fa-trash'));
                 remove.title = 'Delete discussion';
                 remove.setAttribute('aria-label', `Delete ${item.name}`);
                 remove.addEventListener('click', () => deleteDiscussion(item.name));
@@ -584,7 +608,7 @@ function generateSearchDashboard() {
         const backButton = document.createElement('button');
         backButton.className = 'frame-back';
         backButton.type = 'button';
-        backButton.textContent = '←';
+        backButton.appendChild(createIcon('fa-arrow-left'));
         backButton.title = 'Return this frame to its search results';
         backButton.setAttribute('aria-label', `Return to search results for ${query}`);
         backButton.addEventListener('click', () => {
