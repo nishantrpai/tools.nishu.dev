@@ -318,6 +318,9 @@
                 <i class="fa fa-eraser" aria-hidden="true"></i>
             </button> -->
         </div>
+        <button type="button" id="slowLoadButton" onclick="toggleSlowLoad()" title="Slowly load each page" hidden>
+            Slow load all pages
+        </button>
 
         <div class="input-group" style="margin-top:4px;">
             <label for="discussionName">Save Discussion</label>
@@ -355,6 +358,7 @@
         let activeDiscussion = null;
         let editingDiscussion = null;
         let frameObserver = null;
+        let slowLoadInterval = null;
 
         // ─── Storage helpers ───
         function getSaved() {
@@ -590,6 +594,7 @@
 
         // ─── Core generate ───
 function generateSearchDashboard() {
+    stopSlowLoad();
     const textarea = document.getElementById('searchTerms');
     const timeSelect = document.getElementById('timeRange');
     const container = document.getElementById('resultsContainer');
@@ -601,6 +606,7 @@ function generateSearchDashboard() {
 
     if (rawQueries.length === 0) {
         container.innerHTML = '<div class="welcome-msg">Enter at least one query.</div>';
+        document.getElementById('slowLoadButton').hidden = true;
         return;
     }
 
@@ -693,7 +699,42 @@ function generateSearchDashboard() {
     if (firstNewCol) {
         firstNewCol.scrollIntoView({ behavior: 'smooth', inline: 'start' });
     }
+    document.getElementById('slowLoadButton').hidden =
+        container.scrollWidth <= container.clientWidth;
 }   
+
+        function toggleSlowLoad() {
+            const container = document.getElementById('resultsContainer');
+            if (slowLoadInterval !== null) {
+                stopSlowLoad();
+                return;
+            }
+            if (container.scrollWidth <= container.clientWidth) return;
+
+            const button = document.getElementById('slowLoadButton');
+            button.textContent = 'Stop loading';
+            button.title = 'Stop slowly loading pages';
+            button.setAttribute('aria-label', 'Stop loading pages');
+            slowLoadInterval = setInterval(() => {
+                if (container.scrollLeft + container.clientWidth >= container.scrollWidth - 1) {
+                    stopSlowLoad();
+                    button.hidden = true;
+                    return;
+                }
+                scrollContainer(400);
+            }, 2000);
+        }
+
+        function stopSlowLoad() {
+            if (slowLoadInterval !== null) {
+                clearInterval(slowLoadInterval);
+                slowLoadInterval = null;
+            }
+            const button = document.getElementById('slowLoadButton');
+            button.textContent = 'Slow load all pages';
+            button.title = 'Slowly load each page';
+            button.removeAttribute('aria-label');
+        }
 
         function createDragHandle() {
             const h = document.createElement('div');
@@ -737,6 +778,8 @@ function generateSearchDashboard() {
         }
 
         function clearAll() {
+            stopSlowLoad();
+            document.getElementById('slowLoadButton').hidden = true;
             columnCache.clear();
             activeDiscussion = null;
             editingDiscussion = null;
