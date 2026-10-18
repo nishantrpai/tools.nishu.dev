@@ -299,6 +299,11 @@
         </div>
 
         <div class="input-group">
+            <label for="discussionNotes">Notes</label>
+            <textarea id="discussionNotes" placeholder="Add observations as you browse"></textarea>
+        </div>
+
+        <div class="input-group">
             <label for="timeRange">Time Filter</label>
             <select id="timeRange">
                 <option value="">Any time</option>
@@ -322,7 +327,7 @@
             Slow load all pages
         </button>
 
-        <div class="input-group" style="margin-top:4px;">
+        <div class="input-group" id="saveDiscussionSection" style="margin-top:4px;">
             <label for="discussionName">Save Discussion</label>
             <div style="display:flex;gap:6px;">
                 <input type="text" id="discussionName" placeholder="e.g. AI Research Thread">
@@ -513,14 +518,16 @@
 
             const terms = document.getElementById('searchTerms').value;
             const timeVal = document.getElementById('timeRange').value;
+            const notes = document.getElementById('discussionNotes').value;
 
             const list = getSaved();
             const existing = list.find(d => d.name === name);
             if (existing) {
                 existing.terms = terms;
                 existing.time = timeVal;
+                existing.notes = notes;
             } else {
-                list.push({ name, terms, time: timeVal });
+                list.push({ name, terms, time: timeVal, notes });
             }
             setSaved(list);
             activeDiscussion = name;
@@ -530,13 +537,16 @@
 
         // ─── Load a saved discussion ───
         function loadDiscussion(name) {
+            syncActiveDiscussion();
             const list = getSaved();
             const item = list.find(d => d.name === name);
             if (!item) return;
 
             document.getElementById('searchTerms').value = item.terms;
+            document.getElementById('discussionNotes').value = item.notes || '';
             document.getElementById('timeRange').value = item.time || '';
             activeDiscussion = name;
+            document.getElementById('saveDiscussionSection').hidden = true;
             renderSavedList();
             generateSearchDashboard();
         }
@@ -589,6 +599,7 @@
 
             discussion.terms = document.getElementById('searchTerms').value;
             discussion.time = document.getElementById('timeRange').value;
+            discussion.notes = document.getElementById('discussionNotes').value;
             setSaved(list);
         }
 
@@ -791,6 +802,7 @@ function generateSearchDashboard() {
         }
 
         // Init
+        document.getElementById('discussionNotes').addEventListener('input', syncActiveDiscussion);
         renderSavedList();
     </script>
 </body>
