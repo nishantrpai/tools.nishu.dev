@@ -152,6 +152,7 @@
         }
 
         .saved-item .rename,
+        .saved-item .branch,
         .saved-item .del {
             padding: 4px 6px;
             border: 0;
@@ -160,6 +161,7 @@
             font-size: 11px;
         }
         .saved-item .rename:hover { color: #fff; }
+        .saved-item .branch:hover { color: #fff; }
         .saved-item .del:hover { color: #fff; background: #3a2222; }
         .saved-item .rename-input {
             min-width: 0;
@@ -337,6 +339,17 @@
             </div>
         </div>
 
+        <div class="input-group" id="branchDiscussionSection" style="margin-top:4px;" hidden>
+            <label for="branchDiscussionName">Branch Discussion</label>
+            <input type="text" id="branchDiscussionName" placeholder="e.g. Copywriting">
+            <label for="branchKeywords">Keywords (comma-separated)</label>
+            <input type="text" id="branchKeywords" placeholder="e.g. copyai, jasper, writer, sonic">
+            <div class="btn-row">
+                <button type="button" onclick="createDiscussionBranch()">Create branch</button>
+                <button type="button" onclick="cancelDiscussionBranch()">Cancel</button>
+            </div>
+        </div>
+
         <div class="saved-section">
             <h3>Your Discussions</h3>
             <div class="saved-list" id="savedList"></div>
@@ -362,6 +375,7 @@
         const columnCache = new Map();
         let activeDiscussion = null;
         let editingDiscussion = null;
+        let branchingDiscussion = null;
         let frameObserver = null;
         let slowLoadInterval = null;
 
@@ -469,6 +483,7 @@
                         editingDiscussion = null;
                         renderSavedList();
                     });
+
                     input.addEventListener('keydown', (event) => {
                         if (event.key === 'Enter') saveDiscussionName(item.name, input.value);
                         if (event.key === 'Escape') {
@@ -488,6 +503,14 @@
                     name.title = item.name;
                     name.addEventListener('click', () => loadDiscussion(item.name));
 
+                    const branch = document.createElement('button');
+                    branch.className = 'branch';
+                    branch.type = 'button';
+                    branch.title = 'Branch discussion';
+                    branch.setAttribute('aria-label', `Branch ${item.name}`);
+                    branch.appendChild(createIcon('fa-code-fork'));
+                    branch.addEventListener('click', () => branchDiscussion(item.name));
+
                     const rename = document.createElement('button');
                     rename.className = 'rename';
                     rename.type = 'button';
@@ -495,7 +518,7 @@
                     rename.setAttribute('aria-label', `Edit name for ${item.name}`);
                     rename.appendChild(createIcon('fa-pencil'));
                     rename.addEventListener('click', () => renameDiscussion(item.name));
-                    div.append(name, rename);
+                    div.append(name, branch, rename);
                 }
 
                 const remove = document.createElement('button');
@@ -537,6 +560,7 @@
 
         // ─── Load a saved discussion ───
         function loadDiscussion(name) {
+            cancelDiscussionBranch();
             syncActiveDiscussion();
             const list = getSaved();
             const item = list.find(d => d.name === name);
@@ -563,6 +587,70 @@
         function renameDiscussion(name) {
             editingDiscussion = name;
             renderSavedList();
+        }
+
+        function branchDiscussion(name) {
+            syncActiveDiscussion();
+            if (!getSaved().some(item => item.name === name)) return;
+
+            branchingDiscussion = name;
+            document.getElementById('branchDiscussionName').value = '';
+            document.getElementById('branchKeywords').value = '';
+            document.getElementById('branchDiscussionSection').hidden = false;
+            document.getElementById('branchDiscussionName').focus();
+        }
+
+        function cancelDiscussionBranch() {
+            branchingDiscussion = null;
+            document.getElementById('branchDiscussionSection').hidden = true;
+        }
+
+        function createDiscussionBranch() {
+            const name = document.getElementById('branchDiscussionName').value.trim();
+            const keywords = document.getElementById('branchKeywords').value
+                .split(',')
+                .map(keyword => keyword.trim().toLowerCase())
+                .filter(Boolean);
+
+            if (!name) {
+                alert('Give the branch a discussion name.');
+                return;
+            }
+            if (keywords.length === 0) {
+                alert('Enter at least one keyword.');
+                return;
+            }
+
+            const list = getSaved();
+            const source = list.find(item => item.name === branchingDiscussion);
+            if (!source) {
+                alert('The source discussion could not be found.');
+                cancelDiscussionBranch();
+                return;
+            }
+            if (list.some(item => item.name === name)) {
+                alert('A discussion with that name already exists.');
+                return;
+            }
+
+            const terms = source.terms
+                .split(/\r?\n/)
+                .map(query => query.trim())
+                .filter(query => query && keywords.some(keyword => query.toLowerCase().includes(keyword)));
+            if (terms.length === 0) {
+                alert('No queries matched those keywords.');
+                return;
+            }
+
+            list.push({
+                name,
+                terms: terms.join('\n'),
+                time: source.time || '',
+                notes: ''
+            });
+            setSaved(list);
+            cancelDiscussionBranch();
+            loadDiscussion(name);
         }
 
         function saveDiscussionName(name, requestedName) {
@@ -803,6 +891,14 @@ function generateSearchDashboard() {
 
         // Init
         document.getElementById('discussionNotes').addEventListener('input', syncActiveDiscussion);
+        document.getElementById('branchDiscussionName').addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') document.getElementById('branchKeywords').focus();
+            if (event.key === 'Escape') cancelDiscussionBranch();
+        });
+        document.getElementById('branchKeywords').addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') createDiscussionBranch();
+            if (event.key === 'Escape') cancelDiscussionBranch();
+        });
         renderSavedList();
     </script>
 </body>
