@@ -398,10 +398,22 @@
             return icon;
         }
 
+        function updateSlowLoadButton(container = document.getElementById('resultsContainer')) {
+            const button = document.getElementById('slowLoadButton');
+            const frames = [...container.querySelectorAll('iframe')];
+            const allPagesLoaded = frames.length === 0 ||
+                frames.every(frame => frame.dataset.loaded === 'true');
+
+            if (allPagesLoaded && slowLoadInterval !== null) stopSlowLoad();
+            button.hidden = allPagesLoaded || container.scrollWidth <= container.clientWidth;
+        }
+
         function loadFrame(frame) {
             if (!frame.dataset.src) return;
+            frame.dataset.loaded = 'false';
             frame.src = frame.dataset.src;
             delete frame.dataset.src;
+            updateSlowLoadButton();
         }
 
         function observeLazyFrames(container) {
@@ -773,10 +785,17 @@ function generateSearchDashboard() {
         backButton.title = 'Return this frame to its search results';
         backButton.setAttribute('aria-label', `Return to search results for ${query}`);
         backButton.addEventListener('click', () => {
+            iframe.dataset.loaded = 'false';
             iframe.src = iframe.dataset.searchUrl;
+            updateSlowLoadButton();
         });
 
         iframe.loading = 'lazy';
+        iframe.dataset.loaded = 'false';
+        iframe.addEventListener('load', () => {
+            iframe.dataset.loaded = 'true';
+            updateSlowLoadButton();
+        });
         iframe.dataset.searchUrl = googleUrl;
         iframe.dataset.src = googleUrl;
 
@@ -802,8 +821,7 @@ function generateSearchDashboard() {
     if (firstNewCol) {
         firstNewCol.scrollIntoView({ behavior: 'smooth', inline: 'start' });
     }
-    document.getElementById('slowLoadButton').hidden =
-        container.scrollWidth <= container.clientWidth;
+    updateSlowLoadButton(container);
 }   
 
         function toggleSlowLoad() {
@@ -821,7 +839,7 @@ function generateSearchDashboard() {
             slowLoadInterval = setInterval(() => {
                 if (container.scrollLeft + container.clientWidth >= container.scrollWidth - 1) {
                     stopSlowLoad();
-                    button.hidden = true;
+                    updateSlowLoadButton(container);
                     return;
                 }
                 scrollContainer(400);
