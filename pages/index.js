@@ -2282,6 +2282,12 @@ export const tools = [
     "publishDate": "6th Sept 2026",
     "url": "/extractbeliefs"
   },
+  {
+    "title": "Extract Fears",
+    "description": "Extract fears from transcripts",
+    "publishDate": "7th Sept 2026",
+    "url": "/extractfears"
+  },
 ];
 
 export default function Home() {
