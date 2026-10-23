@@ -2288,6 +2288,12 @@ export const tools = [
     "publishDate": "7th Sept 2026",
     "url": "/extractfears"
   },
+  {
+    "title": "Extract Goals",
+    "description": "Extract goals from transcripts",
+    "publishDate": "22nd Oct 2026",
+    "url": "/extractgoals"
+  },
 ];
 
 export default function Home() {

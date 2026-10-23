@@ -76,13 +76,15 @@ export default function Home() {
 
   const extractfearWithReason = (sentence, index, allSentences) => {
     for (const pattern of fearPatterns) {
-      if (pattern.regex.test(sentence)) {
+      const match = sentence.match(pattern.regex)
+      if (match) {
         // Get context: 2 sentences before and after
         const contextBefore = allSentences.slice(Math.max(0, index - 2), index)
         const contextAfter = allSentences.slice(index + 1, Math.min(allSentences.length, index + 3))
 
         return {
           sentence: sentence.trim(),
+          matchedText: match[0],
           label: pattern.label,
           description: pattern.description,
           contextBefore,
@@ -206,6 +208,9 @@ export default function Home() {
                           {fear.label}
                         </span>
                         <span style={{ marginLeft: '8px', color: '#ccc' }}>— {fear.description}</span>
+                      </div>
+                      <div style={{ fontSize: '12px', color: '#ccc', marginTop: '6px' }}>
+                        Triggered by: <strong>{fear.matchedText}</strong>
                       </div>
                     </li>
                   ))}

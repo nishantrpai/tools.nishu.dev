@@ -305,6 +305,11 @@
         </div>
 
         <div class="input-group">
+            <label for="queryFilter">Query Filter</label>
+            <input type="text" id="queryFilter" placeholder="e.g. site:reddit.com">
+        </div>
+
+        <div class="input-group">
             <label for="discussionNotes">Notes</label>
             <textarea id="discussionNotes" placeholder="Add observations as you browse"></textarea>
         </div>
@@ -557,6 +562,7 @@
 
             const terms = document.getElementById('searchTerms').value;
             const timeVal = document.getElementById('timeRange').value;
+            const queryVal = document.getElementById('queryFilter').value;
             const notes = document.getElementById('discussionNotes').value;
 
             const list = getSaved();
@@ -564,9 +570,10 @@
             if (existing) {
                 existing.terms = terms;
                 existing.time = timeVal;
+                existing.query = queryVal;
                 existing.notes = notes;
             } else {
-                list.push({ name, terms, time: timeVal, notes });
+                list.push({ name, terms, time: timeVal, query: queryVal, notes });
             }
             setSaved(list);
             activeDiscussion = name;
@@ -583,6 +590,7 @@
             if (!item) return;
 
             document.getElementById('searchTerms').value = item.terms;
+            document.getElementById('queryFilter').value = item.query || '';
             document.getElementById('discussionNotes').value = item.notes || '';
             document.getElementById('timeRange').value = item.time || '';
             activeDiscussion = name;
@@ -662,6 +670,7 @@
                 name,
                 terms: terms.join('\n'),
                 time: source.time || '',
+                query: source.query || '',
                 notes: ''
             });
             setSaved(list);
@@ -703,6 +712,7 @@
 
             discussion.terms = document.getElementById('searchTerms').value;
             discussion.time = document.getElementById('timeRange').value;
+            discussion.query = document.getElementById('queryFilter').value;
             discussion.notes = document.getElementById('discussionNotes').value;
             setSaved(list);
         }
@@ -712,9 +722,11 @@ function generateSearchDashboard() {
     stopSlowLoad();
     const textarea = document.getElementById('searchTerms');
     const timeSelect = document.getElementById('timeRange');
+    const queryFilter = document.getElementById('queryFilter').value.trim();
     const container = document.getElementById('resultsContainer');
 
     const rawQueries = textarea.value.split('\n').map(q => q.trim()).filter(q => q !== "");
+    const queries = rawQueries.map(query => queryFilter ? `${query} ${queryFilter}` : query);
     const timeValue = timeSelect.value;
 
     syncActiveDiscussion();
@@ -730,8 +742,8 @@ function generateSearchDashboard() {
 
     // Build the set of keys we want
     const queryKeys = [];
-    for (let i = 0; i < rawQueries.length; i++) {
-        const key = `${rawQueries[i]}__${timeValue}`;
+    for (let i = 0; i < queries.length; i++) {
+        const key = `${queries[i]}__${timeValue}`;
         queryKeys.push(key);
         desiredKeys.add(key);
     }
@@ -753,8 +765,8 @@ function generateSearchDashboard() {
     if (welcome) welcome.remove();
 
     // Add new columns (append at end)
-    for (let i = 0; i < rawQueries.length; i++) {
-        const query = rawQueries[i];
+    for (let i = 0; i < queries.length; i++) {
+        const query = queries[i];
         const key = `${query}__${timeValue}`;
 
         // Skip if already in the container
@@ -913,6 +925,7 @@ function generateSearchDashboard() {
 
         // Init
         document.getElementById('discussionNotes').addEventListener('input', syncActiveDiscussion);
+        document.getElementById('queryFilter').addEventListener('input', syncActiveDiscussion);
         document.getElementById('branchDiscussionName').addEventListener('keydown', (event) => {
             if (event.key === 'Enter') document.getElementById('branchKeywords').focus();
             if (event.key === 'Escape') cancelDiscussionBranch();
