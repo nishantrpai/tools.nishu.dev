@@ -300,7 +300,7 @@
         <h2>Discussions</h2>
 
         <div class="input-group">
-            <label for="searchTerms">Search Keywords (one per line)</label>
+            <label for="searchTerms">Search Keywords (one per line; press Enter to search)</label>
             <textarea id="searchTerms" placeholder="e.g.&#10;Artificial Intelligence&#10;Quantum Computing"></textarea>
         </div>
 
@@ -924,6 +924,10 @@ function generateSearchDashboard() {
         }
 
         // Init
+        document.getElementById('searchTerms').addEventListener('keydown', (event) => {
+            if (event.key !== 'Enter' || event.isComposing || event.repeat) return;
+            if (event.currentTarget.value.trim()) generateSearchDashboard();
+        });
         document.getElementById('discussionNotes').addEventListener('input', syncActiveDiscussion);
         document.getElementById('queryFilter').addEventListener('input', syncActiveDiscussion);
         document.getElementById('branchDiscussionName').addEventListener('keydown', (event) => {
