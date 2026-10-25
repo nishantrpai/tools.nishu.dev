@@ -40,6 +40,14 @@
             color: #fff;
             border-bottom: 1px solid #333;
             padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .new-discussion-button {
+            white-space: nowrap;
         }
 
         .input-group {
@@ -297,8 +305,12 @@
 <body>
 
     <div class="control-panel">
-        <h2>Discussions</h2>
-
+        <h2>
+            <span>Discussions</span>
+            <button type="button" class="new-discussion-button" onclick="startNewDiscussion()" title="Start a new discussion">
+                <i class="fa fa-plus" aria-hidden="true"></i> New
+            </button>
+        </h2>
         <div class="input-group">
             <label for="searchTerms">Search Keywords (one per line; press Enter to search)</label>
             <textarea id="searchTerms" placeholder="e.g.&#10;Artificial Intelligence&#10;Quantum Computing"></textarea>
@@ -981,6 +993,19 @@ function generateSearchDashboard() {
             renderSavedList();
             document.getElementById('resultsContainer').innerHTML =
                 '<div class="welcome-msg">Enter terms and click "Generate" to start.</div>';
+        }
+
+        function startNewDiscussion() {
+            syncActiveDiscussion();
+            cancelDiscussionBranch();
+            clearAll();
+            document.getElementById('searchTerms').value = '';
+            document.getElementById('queryFilter').value = '';
+            document.getElementById('discussionNotes').value = '';
+            document.getElementById('timeRange').value = 'w';
+            document.getElementById('discussionName').value = '';
+            document.getElementById('saveDiscussionSection').hidden = false;
+            document.getElementById('searchTerms').focus();
         }
 
         // Init
