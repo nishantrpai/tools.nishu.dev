@@ -326,6 +326,17 @@
             </select>
         </div>
 
+        <div class="input-group">
+            <label for="searchEngine">Search Engine</label>
+            <select id="searchEngine">
+                <option value="google">Google</option>
+                <option value="ddg">DuckDuckGo</option>
+                <option value="brave">Brave Search</option>
+                <option value="youtube">YouTube Search</option>
+                <option value="searxng">SearXNG</option>
+            </select>
+        </div>
+
         <div class="btn-row">
             <button type="button" onclick="generateSearchDashboard()" title="Search" aria-label="Search">
                 <i class="fa fa-search" aria-hidden="true"></i>
@@ -382,6 +393,7 @@
 
     <script>
         const columnCache = new Map();
+        const searchEngines = ['google', 'ddg', 'brave', 'youtube', 'searxng'];
         let activeDiscussion = null;
         let editingDiscussion = null;
         let branchingDiscussion = null;
@@ -409,8 +421,8 @@
             const allPagesLoaded = frames.length === 0 ||
                 frames.every(frame => frame.dataset.loaded === 'true');
 
-            if (allPagesLoaded && slowLoadInterval !== null) stopSlowLoad();
-            button.hidden = allPagesLoaded || container.scrollWidth <= container.clientWidth;
+            button.hidden = container.scrollWidth <= container.clientWidth ||
+                (allPagesLoaded && slowLoadInterval === null);
         }
 
         function loadFrame(frame) {
@@ -564,6 +576,7 @@
             const timeVal = document.getElementById('timeRange').value;
             const queryVal = document.getElementById('queryFilter').value;
             const notes = document.getElementById('discussionNotes').value;
+            const engine = document.getElementById('searchEngine').value;
 
             const list = getSaved();
             const existing = list.find(d => d.name === name);
@@ -572,8 +585,9 @@
                 existing.time = timeVal;
                 existing.query = queryVal;
                 existing.notes = notes;
+                existing.engine = engine;
             } else {
-                list.push({ name, terms, time: timeVal, query: queryVal, notes });
+                list.push({ name, terms, time: timeVal, query: queryVal, notes, engine });
             }
             setSaved(list);
             activeDiscussion = name;
@@ -593,6 +607,11 @@
             document.getElementById('queryFilter').value = item.query || '';
             document.getElementById('discussionNotes').value = item.notes || '';
             document.getElementById('timeRange').value = item.time || '';
+            const engine = searchEngines.includes(item.engine)
+                ? item.engine
+                : localStorage.getItem('searchEngine') || 'google';
+            document.getElementById('searchEngine').value = engine;
+            localStorage.setItem('searchEngine', engine);
             activeDiscussion = name;
             document.getElementById('saveDiscussionSection').hidden = true;
             renderSavedList();
@@ -671,7 +690,8 @@
                 terms: terms.join('\n'),
                 time: source.time || '',
                 query: source.query || '',
-                notes: ''
+                notes: '',
+                engine: source.engine || localStorage.getItem('searchEngine') || 'google'
             });
             setSaved(list);
             cancelDiscussionBranch();
@@ -714,14 +734,54 @@
             discussion.time = document.getElementById('timeRange').value;
             discussion.query = document.getElementById('queryFilter').value;
             discussion.notes = document.getElementById('discussionNotes').value;
+            discussion.engine = document.getElementById('searchEngine').value;
             setSaved(list);
         }
 
         // ─── Core generate ───
+function buildSearchUrl(engine, query, timeValue) {
+    if (engine === 'google') {
+        const params = new URLSearchParams({ q: query });
+        if (timeValue) params.set('tbs', `qdr:${timeValue}`);
+        return `https://www.google.com/search?${params}`;
+    }
+    if (engine === 'ddg') {
+        const params = new URLSearchParams({ q: query });
+        const timeFilter = { d: 'd', w: 'w', m: 'm', y: 'y' }[timeValue];
+        if (timeFilter) params.set('df', timeFilter);
+        return `https://duckduckgo.com/?${params}`;
+    }
+    if (engine === 'brave') {
+        const params = new URLSearchParams({ q: query });
+        const timeFilter = { h: 'hour', d: 'day', w: 'week', m: 'month', y: 'year' }[timeValue];
+        if (timeFilter) params.set('tf', timeFilter);
+        return `https://search.brave.com/search?${params}`;
+    }
+    if (engine === 'youtube') {
+        const timeFilter = {
+            h: 'EgIIAQ==',
+            d: 'EgIIAg==',
+            w: 'EgIIAw==',
+            m: 'EgIIBQ==',
+            y: 'EgIIBA=='
+        }[timeValue];
+        const params = new URLSearchParams({ search_query: query });
+        if (timeFilter) params.set('sp', timeFilter);
+        return `https://www.youtube.com/results?${params}`;
+    }
+    if (engine === 'searxng') {
+        const params = new URLSearchParams({ q: query });
+        return `https://priv.au/search?${params}`;
+    }
+
+    return buildSearchUrl('google', query, timeValue);
+}
+
 function generateSearchDashboard() {
     stopSlowLoad();
     const textarea = document.getElementById('searchTerms');
     const timeSelect = document.getElementById('timeRange');
+    const engine = document.getElementById('searchEngine').value;
     const queryFilter = document.getElementById('queryFilter').value.trim();
     const container = document.getElementById('resultsContainer');
 
@@ -743,7 +803,7 @@ function generateSearchDashboard() {
     // Build the set of keys we want
     const queryKeys = [];
     for (let i = 0; i < queries.length; i++) {
-        const key = `${queries[i]}__${timeValue}`;
+        const key = `${engine}__${queries[i]}__${timeValue}`;
         queryKeys.push(key);
         desiredKeys.add(key);
     }
@@ -767,15 +827,14 @@ function generateSearchDashboard() {
     // Add new columns (append at end)
     for (let i = 0; i < queries.length; i++) {
         const query = queries[i];
-        const key = `${query}__${timeValue}`;
+        const key = `${engine}__${query}__${timeValue}`;
 
         // Skip if already in the container
         if (container.querySelector(`.flex-column[data-key="${CSS.escape(key)}"]`)) {
             continue;
         }
 
-        let googleUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
-        if (timeValue) googleUrl += `&tbs=qdr:${timeValue}`;
+        const searchUrl = buildSearchUrl(engine, query, timeValue);
 
         const colDiv = document.createElement('div');
         colDiv.className = 'flex-column';
@@ -808,8 +867,8 @@ function generateSearchDashboard() {
             iframe.dataset.loaded = 'true';
             updateSlowLoadButton();
         });
-        iframe.dataset.searchUrl = googleUrl;
-        iframe.dataset.src = googleUrl;
+        iframe.dataset.searchUrl = searchUrl;
+        iframe.dataset.src = searchUrl;
 
         headerDiv.append(title, backButton);
         colDiv.appendChild(headerDiv);
@@ -840,6 +899,7 @@ function generateSearchDashboard() {
             const container = document.getElementById('resultsContainer');
             if (slowLoadInterval !== null) {
                 stopSlowLoad();
+                updateSlowLoadButton(container);
                 return;
             }
             if (container.scrollWidth <= container.clientWidth) return;
@@ -927,6 +987,13 @@ function generateSearchDashboard() {
         document.getElementById('searchTerms').addEventListener('keydown', (event) => {
             if (event.key !== 'Enter' || event.isComposing || event.repeat) return;
             if (event.currentTarget.value.trim()) generateSearchDashboard();
+        });
+        const savedEngine = localStorage.getItem('searchEngine');
+        const searchEngineSelect = document.getElementById('searchEngine');
+        searchEngineSelect.value = searchEngines.includes(savedEngine) ? savedEngine : 'google';
+        searchEngineSelect.addEventListener('change', () => {
+            localStorage.setItem('searchEngine', searchEngineSelect.value);
+            syncActiveDiscussion();
         });
         document.getElementById('discussionNotes').addEventListener('input', syncActiveDiscussion);
         document.getElementById('queryFilter').addEventListener('input', syncActiveDiscussion);
