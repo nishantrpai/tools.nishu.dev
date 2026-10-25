@@ -1,849 +1,922 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Discussions</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            width: 100%;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-                Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-            display: flex;
-            overflow: hidden;
-            background-color: #000;
-            color: #fff;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Discussions</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <style>
+    body,
+    html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+        Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+      display: flex;
+      overflow: hidden;
+      background-color: #000;
+      color: #fff;
+    }
 
-        .control-panel {
-            width: 320px;
-            min-width: 320px;
-            background: #000;
-            color: #fff;
-            padding: 20px;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            border-right: 1px solid #333;
-            z-index: 10;
-            overflow-y: auto;
-        }
+    .control-panel {
+      width: 320px;
+      min-width: 320px;
+      background: #000;
+      color: #fff;
+      padding: 20px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      border-right: 1px solid #333;
+      z-index: 10;
+      overflow-y: auto;
+    }
 
-        .control-panel h2 {
-            margin-top: 0;
-            font-size: 20px;
-            color: #fff;
-            border-bottom: 1px solid #333;
-            padding-bottom: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-        }
+    .control-panel h2 {
+      margin-top: 0;
+      font-size: 20px;
+      color: #fff;
+      border-bottom: 1px solid #333;
+      padding-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
 
-        .new-discussion-button {
-            white-space: nowrap;
-        }
+    .new-discussion-button {
+      white-space: nowrap;
+    }
 
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
 
-        [hidden] {
-            display: none !important;
-        }
+    [hidden] {
+      display: none !important;
+    }
 
-        label {
-            font-size: 12px;
-            font-weight: bold;
-            color: #888;
-            text-transform: uppercase;
-        }
+    label {
+      font-size: 12px;
+      font-weight: bold;
+      color: #888;
+      text-transform: uppercase;
+    }
 
-        textarea {
-            width: 100%;
-            min-height: 90px;
-            padding: 10px;
-            box-sizing: border-box;
-            border: 1px solid #333;
-            border-radius: 10px;
-            background: #000;
-            color: #fff;
-            font-family: inherit;
-            resize: vertical;
-            outline: none;
-        }
+    textarea {
+      width: 100%;
+      min-height: 90px;
+      padding: 10px;
+      box-sizing: border-box;
+      border: 1px solid #333;
+      border-radius: 10px;
+      background: #000;
+      color: #fff;
+      font-family: inherit;
+      resize: vertical;
+      outline: none;
+    }
 
-        select, input[type="number"], input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            box-sizing: border-box;
-            border: 1px solid #333;
-            border-radius: 10px;
-            background: #000;
-            color: #fff;
-            outline: none;
-        }
+    select,
+    input[type="number"],
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      box-sizing: border-box;
+      border: 1px solid #333;
+      border-radius: 10px;
+      background: #000;
+      color: #fff;
+      outline: none;
+    }
 
-        button {
-            background-color: #222;
-            color: #fff;
-            border: 1px solid #111;
-            padding: 8px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: bold;
-            transition: background 0.2s;
-        }
+    button {
+      background-color: #222;
+      color: #fff;
+      border: 1px solid #111;
+      padding: 8px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: bold;
+      transition: background 0.2s;
+    }
 
-        button:hover { background-color: #333; }
-        button.danger { background: #222; color: #fff; border-color: #333; }
-        button.danger:hover { background: #3a2222; }
+    button:hover {
+      background-color: #333;
+    }
 
-        .btn-row {
-            display: flex;
-            gap: 8px;
-        }
-        .btn-row button { flex: 1; }
+    button.danger {
+      background: #222;
+      color: #fff;
+      border-color: #333;
+    }
 
-        /* ─── Saved discussions ─── */
-        .saved-section {
-            border-top: 1px solid #333;
-            padding-top: 12px;
-        }
+    button.danger:hover {
+      background: #3a2222;
+    }
 
-        .saved-section h3 {
-            font-size: 13px;
-            color: #888;
-            margin: 0 0 8px 0;
-            text-transform: uppercase;
-        }
+    .btn-row {
+      display: flex;
+      gap: 8px;
+    }
 
-        .saved-list {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            max-height: 200px;
-            overflow-y: auto;
-        }
+    .btn-row button {
+      flex: 1;
+    }
 
-        .saved-item {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            padding: 4px;
-            border-radius: 5px;
-            font-size: 12px;
-            transition: background 0.15s;
-        }
+    /* ─── Saved discussions ─── */
+    .saved-section {
+      border-top: 1px solid #333;
+      padding-top: 12px;
+    }
 
-        .saved-item:hover { background: #191919; }
-        /* .saved-item.active { background: #222; border-color: #555; } */
+    .saved-section h3 {
+      font-size: 13px;
+      color: #888;
+      margin: 0 0 8px 0;
+      text-transform: uppercase;
+    }
 
-        .saved-item .saved-name {
-            min-width: 0;
-            flex: 1;
-            padding: 4px;
-            border: 0;
-            background: transparent;
-            color: #fff;
-            font-size: 12px;
-            font-weight: normal;
-            text-align: left;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+    .saved-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
 
-        .saved-item .rename,
-        .saved-item .branch,
-        .saved-item .del {
-            padding: 4px 6px;
-            border: 0;
-            background: transparent;
-            color: #888;
-            font-size: 11px;
-        }
-        .saved-item .rename:hover { color: #fff; }
-        .saved-item .branch:hover { color: #fff; }
-        .saved-item .del:hover { color: #fff; background: #3a2222; }
-        .saved-item .rename-input {
-            min-width: 0;
-            flex: 1;
-            margin: 0;
-            padding: 6px;
-        }
+    .saved-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px;
+      border-radius: 5px;
+      font-size: 12px;
+      transition: background 0.15s;
+    }
 
-        /* ─── Scroll buttons ─── */
-        .scroll-controls {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 20;
-        }
-        .scroll-controls.left { left: 324px; }
-        .scroll-controls.right { right: 4px; }
+    .saved-item:hover {
+      background: #191919;
+    }
 
-        .scroll-btn {
-            width: 36px;
-            height: 60px;
-            background: #111;
-            color: #fff;
-            border: 1px solid #333;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0.8;
-        }
-        .scroll-btn:hover { opacity: 1; }
+    /* .saved-item.active { background: #222; border-color: #555; } */
 
-        /* ─── Flex container ─── */
-        .flex-container {
-            display: flex;
-            flex-direction: row;
-            height: 100vh;
-            flex-grow: 1;
-            overflow-x: auto;
-            background: #dadce0;
-            position: relative;
-            scroll-behavior: smooth;
-        }
+    .saved-item .saved-name {
+      min-width: 0;
+      flex: 1;
+      padding: 4px;
+      border: 0;
+      background: transparent;
+      color: #fff;
+      font-size: 12px;
+      font-weight: normal;
+      text-align: left;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
-        .flex-column {
-            flex: 0 0 768px;
-            min-width: 768px;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            background: #fff;
-        }
+    .saved-item .rename,
+    .saved-item .branch,
+    .saved-item .del {
+      padding: 4px 6px;
+      border: 0;
+      background: transparent;
+      color: #888;
+      font-size: 11px;
+    }
 
-        .drag-handle {
-            width: 6px;
-            min-width: 6px;
-            cursor: col-resize;
-            background: #ccc;
-            transition: background 0.2s;
-            z-index: 5;
-        }
-        .drag-handle:hover,
-        .drag-handle.active { background: #555; }
+    .saved-item .rename:hover {
+      color: #fff;
+    }
 
-        .column-header {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: #f1f3f4;
-            color: #3c4043;
-            padding: 8px 5px;
-            font-size: 12px;
-            font-weight: bold;
-            border-bottom: 1px solid #dadce0;
-        }
+    .saved-item .branch:hover {
+      color: #fff;
+    }
 
-        .column-title {
-            min-width: 0;
-            flex: 1;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+    .saved-item .del:hover {
+      color: #fff;
+      background: #3a2222;
+    }
 
-        .frame-back {
-            flex: none;
-            padding: 4px 8px;
-            border: 1px solid #333;
-            border-radius: 5px;
-            background: #222;
-            color: #fff;
-            font: inherit;
-            cursor: pointer;
-        }
+    .saved-item .rename-input {
+      min-width: 0;
+      flex: 1;
+      margin: 0;
+      padding: 6px;
+    }
 
-        .frame-back:hover { background: #333; }
+    /* ─── Scroll buttons ─── */
+    .scroll-controls {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 20;
+    }
 
-        iframe {
-            width: 100%;
-            flex: 1;
-            border: none;
-        }
+    .scroll-controls.left {
+      left: 324px;
+    }
 
-        .welcome-msg {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            color: #5f6368;
-            font-size: 16px;
-            text-align: center;
-            padding: 20px;
-        }
+    .scroll-controls.right {
+      right: 4px;
+    }
 
-        .cached-badge {
-            display: inline-block;
-            background: #34a853;
-            color: #fff;
-            font-size: 9px;
-            padding: 1px 5px;
-            border-radius: 3px;
-            margin-left: 6px;
-            vertical-align: middle;
-        }
-    </style>
+    .scroll-btn {
+      width: 36px;
+      height: 60px;
+      background: #111;
+      color: #fff;
+      border: 1px solid #333;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.8;
+    }
+
+    .scroll-btn:hover {
+      opacity: 1;
+    }
+
+    /* ─── Flex container ─── */
+    .flex-container {
+      display: flex;
+      flex-direction: row;
+      height: 100vh;
+      flex-grow: 1;
+      overflow-x: auto;
+      background: #dadce0;
+      position: relative;
+      scroll-behavior: smooth;
+    }
+
+    .flex-column {
+      flex: 0 0 768px;
+      min-width: 768px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+    }
+
+    .drag-handle {
+      width: 6px;
+      min-width: 6px;
+      cursor: col-resize;
+      background: #ccc;
+      transition: background 0.2s;
+      z-index: 5;
+    }
+
+    .drag-handle:hover,
+    .drag-handle.active {
+      background: #555;
+    }
+
+    .column-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #f1f3f4;
+      color: #3c4043;
+      padding: 8px 5px;
+      font-size: 12px;
+      font-weight: bold;
+      border-bottom: 1px solid #dadce0;
+    }
+
+    .column-title {
+      min-width: 0;
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .frame-back {
+      flex: none;
+      padding: 4px 8px;
+      border: 1px solid #333;
+      border-radius: 5px;
+      background: #222;
+      color: #fff;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .frame-back:hover {
+      background: #333;
+    }
+
+    iframe {
+      width: 100%;
+      flex: 1;
+      border: none;
+    }
+
+    .welcome-msg {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      color: #5f6368;
+      font-size: 16px;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .cached-badge {
+      display: inline-block;
+      background: #34a853;
+      color: #fff;
+      font-size: 9px;
+      padding: 1px 5px;
+      border-radius: 3px;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+
+    *::-webkit-scrollbar-track {
+      -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+      border-radius: 1px;
+      background-color: #000;
+    }
+
+    *::selection {
+      color: #fff;
+      background: #888;
+    }
+
+
+
+    *::-webkit-scrollbar {
+      width: 1px !important;
+      background-color: #f5f5f5;
+    }
+
+    *::-webkit-scrollbar-thumb {
+      border-radius: 10px;
+      -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+      background-color: #555;
+    }
+  </style>
 </head>
+
 <body>
 
-    <div class="control-panel">
-        <h2>
-            <span>Discussions</span>
-            <button type="button" class="new-discussion-button" onclick="startNewDiscussion()" title="Start a new discussion">
-                <i class="fa fa-plus" aria-hidden="true"></i> New
-            </button>
-        </h2>
-        <div class="input-group">
-            <label for="searchTerms">Search Keywords (one per line; press Enter to search)</label>
-            <textarea id="searchTerms" placeholder="e.g.&#10;Artificial Intelligence&#10;Quantum Computing"></textarea>
-        </div>
+  <div class="control-panel">
+    <h2>
+      <span>Discussions</span>
+      <button type="button" class="new-discussion-button" onclick="startNewDiscussion()" title="Start a new discussion">
+        <i class="fa fa-plus" aria-hidden="true"></i> New
+      </button>
+    </h2>
+    <div class="input-group">
+      <label for="searchTerms">Search Keywords (one per line; press Enter to search)</label>
+      <textarea id="searchTerms" placeholder="e.g.&#10;Artificial Intelligence&#10;Quantum Computing"></textarea>
+    </div>
 
-        <div class="input-group">
-            <label for="queryFilter">Query Filter</label>
-            <input type="text" id="queryFilter" placeholder="e.g. site:reddit.com">
-        </div>
+    <div class="input-group">
+      <label for="queryFilter">Query Filter</label>
+      <input type="text" id="queryFilter" placeholder="e.g. site:reddit.com">
+    </div>
 
-        <div class="input-group">
-            <label for="discussionNotes">Notes</label>
-            <textarea id="discussionNotes" placeholder="Add observations as you browse"></textarea>
-        </div>
+    <div class="input-group">
+      <label for="discussionNotes">Notes</label>
+      <textarea id="discussionNotes" placeholder="Add observations as you browse"></textarea>
+    </div>
 
-        <div class="input-group">
-            <label for="timeRange">Time Filter</label>
-            <select id="timeRange">
-                <option value="">Any time</option>
-                <option value="h">Past hour</option>
-                <option value="d">Past 24 hours</option>
-                <option value="w" selected>Past week</option>
-                <option value="m">Past month</option>
-                <option value="y">Past year</option>
-            </select>
-        </div>
+    <div class="input-group">
+      <label for="timeRange">Time Filter</label>
+      <select id="timeRange">
+        <option value="">Any time</option>
+        <option value="h">Past hour</option>
+        <option value="d">Past 24 hours</option>
+        <option value="w" selected>Past week</option>
+        <option value="m">Past month</option>
+        <option value="y">Past year</option>
+      </select>
+    </div>
 
-        <div class="input-group">
-            <label for="searchEngine">Search Engine</label>
-            <select id="searchEngine">
-                <option value="google">Google</option>
-                <option value="ddg">DuckDuckGo</option>
-                <option value="brave">Brave Search</option>
-                <option value="youtube">YouTube Search</option>
-                <option value="searxng">SearXNG</option>
-            </select>
-        </div>
+    <div class="input-group">
+      <label for="searchEngine">Search Engine</label>
+      <select id="searchEngine">
+        <option value="google">Google</option>
+        <option value="ddg">DuckDuckGo</option>
+        <option value="brave">Brave Search</option>
+        <option value="youtube">YouTube Search</option>
+        <option value="searxng">SearXNG</option>
+      </select>
+    </div>
 
-        <div class="btn-row">
-            <button type="button" onclick="generateSearchDashboard()" title="Search" aria-label="Search">
-                <i class="fa fa-search" aria-hidden="true"></i>
-            </button>
-            <!-- <button type="button" class="danger" onclick="clearAll()" title="Clear" aria-label="Clear">
+    <div class="btn-row">
+      <button type="button" onclick="generateSearchDashboard()" title="Search" aria-label="Search">
+        <i class="fa fa-search" aria-hidden="true"></i>
+      </button>
+      <!-- <button type="button" class="danger" onclick="clearAll()" title="Clear" aria-label="Clear">
                 <i class="fa fa-eraser" aria-hidden="true"></i>
             </button> -->
-        </div>
-        <button type="button" id="slowLoadButton" onclick="toggleSlowLoad()" title="Slowly load each page" hidden>
-            Slow load all pages
+    </div>
+    <button type="button" id="slowLoadButton" onclick="toggleSlowLoad()" title="Slowly load each page" hidden>
+      Slow load all pages
+    </button>
+
+    <div class="input-group" id="saveDiscussionSection" style="margin-top:4px;">
+      <label for="discussionName">Save Discussion</label>
+      <div style="display:flex;gap:6px;">
+        <input type="text" id="discussionName" placeholder="e.g. AI Research Thread">
+        <button type="button" onclick="saveDiscussion()" style="white-space:nowrap;" title="Save discussion"
+          aria-label="Save discussion">
+          <i class="fa fa-floppy-o" aria-hidden="true"></i>
         </button>
-
-        <div class="input-group" id="saveDiscussionSection" style="margin-top:4px;">
-            <label for="discussionName">Save Discussion</label>
-            <div style="display:flex;gap:6px;">
-                <input type="text" id="discussionName" placeholder="e.g. AI Research Thread">
-                <button type="button" onclick="saveDiscussion()" style="white-space:nowrap;" title="Save discussion" aria-label="Save discussion">
-                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
-                </button>
-            </div>
-        </div>
-
-        <div class="input-group" id="branchDiscussionSection" style="margin-top:4px;" hidden>
-            <label for="branchDiscussionName">Branch Discussion</label>
-            <input type="text" id="branchDiscussionName" placeholder="e.g. Copywriting">
-            <label for="branchKeywords">Keywords (comma-separated)</label>
-            <input type="text" id="branchKeywords" placeholder="e.g. copyai, jasper, writer, sonic">
-            <div class="btn-row">
-                <button type="button" onclick="createDiscussionBranch()">Create branch</button>
-                <button type="button" onclick="cancelDiscussionBranch()">Cancel</button>
-            </div>
-        </div>
-
-        <div class="saved-section">
-            <h3>Your Discussions</h3>
-            <div class="saved-list" id="savedList"></div>
-        </div>
+      </div>
     </div>
 
-    <div class="scroll-controls left">
-        <button type="button" class="scroll-btn" onclick="scrollContainer(-400)" title="Scroll left" aria-label="Scroll left">
-            <i class="fa fa-angle-left" aria-hidden="true"></i>
-        </button>
-    </div>
-    <div class="scroll-controls right">
-        <button type="button" class="scroll-btn" onclick="scrollContainer(400)" title="Scroll right" aria-label="Scroll right">
-            <i class="fa fa-angle-right" aria-hidden="true"></i>
-        </button>
-    </div>
-
-    <div class="flex-container" id="resultsContainer">
-        <div class="welcome-msg">Enter terms and click "Generate" to start.</div>
+    <div class="input-group" id="branchDiscussionSection" style="margin-top:4px;" hidden>
+      <label for="branchDiscussionName">Branch Discussion</label>
+      <input type="text" id="branchDiscussionName" placeholder="e.g. Copywriting">
+      <label for="branchKeywords">Keywords (comma-separated)</label>
+      <input type="text" id="branchKeywords" placeholder="e.g. copyai, jasper, writer, sonic">
+      <div class="btn-row">
+        <button type="button" onclick="createDiscussionBranch()">Create branch</button>
+        <button type="button" onclick="cancelDiscussionBranch()">Cancel</button>
+      </div>
     </div>
 
-    <script>
-        const columnCache = new Map();
-        const searchEngines = ['google', 'ddg', 'brave', 'youtube', 'searxng'];
-        let activeDiscussion = null;
-        let editingDiscussion = null;
-        let branchingDiscussion = null;
-        let frameObserver = null;
-        let slowLoadInterval = null;
+    <div class="saved-section">
+      <h3>Your Discussions</h3>
+      <div class="saved-list" id="savedList"></div>
+    </div>
+  </div>
 
-        // ─── Storage helpers ───
-        function getSaved() {
-            return JSON.parse(localStorage.getItem('discussions') || '[]');
+  <div class="scroll-controls left">
+    <button type="button" class="scroll-btn" onclick="scrollContainer(-400)" title="Scroll left"
+      aria-label="Scroll left">
+      <i class="fa fa-angle-left" aria-hidden="true"></i>
+    </button>
+  </div>
+  <div class="scroll-controls right">
+    <button type="button" class="scroll-btn" onclick="scrollContainer(400)" title="Scroll right"
+      aria-label="Scroll right">
+      <i class="fa fa-angle-right" aria-hidden="true"></i>
+    </button>
+  </div>
+
+  <div class="flex-container" id="resultsContainer">
+    <div class="welcome-msg">Enter terms and click "Generate" to start.</div>
+  </div>
+
+  <script>
+    const columnCache = new Map();
+    const searchEngines = ['google', 'ddg', 'brave', 'youtube', 'searxng'];
+    let activeDiscussion = null;
+    let editingDiscussion = null;
+    let branchingDiscussion = null;
+    let frameObserver = null;
+    let slowLoadInterval = null;
+
+    // ─── Storage helpers ───
+    function getSaved() {
+      return JSON.parse(localStorage.getItem('discussions') || '[]');
+    }
+    function setSaved(list) {
+      localStorage.setItem('discussions', JSON.stringify(list));
+    }
+
+    function createIcon(iconName) {
+      const icon = document.createElement('i');
+      icon.className = `fa ${iconName}`;
+      icon.setAttribute('aria-hidden', 'true');
+      return icon;
+    }
+
+    function updateSlowLoadButton(container = document.getElementById('resultsContainer')) {
+      const button = document.getElementById('slowLoadButton');
+      const frames = [...container.querySelectorAll('iframe')];
+      const allPagesLoaded = frames.length === 0 ||
+        frames.every(frame => frame.dataset.loaded === 'true');
+
+      button.hidden = container.scrollWidth <= container.clientWidth ||
+        (allPagesLoaded && slowLoadInterval === null);
+    }
+
+    function loadFrame(frame) {
+      if (!frame.dataset.src) return;
+      frame.dataset.loaded = 'false';
+      frame.src = frame.dataset.src;
+      delete frame.dataset.src;
+      updateSlowLoadButton();
+    }
+
+    function observeLazyFrames(container) {
+      const frames = container.querySelectorAll('iframe[data-src]');
+      if (!('IntersectionObserver' in window)) {
+        const loadVisibleFrames = () => {
+          const bounds = container.getBoundingClientRect();
+          container.querySelectorAll('iframe[data-src]').forEach(frame => {
+            const frameBounds = frame.getBoundingClientRect();
+            const horizontallyVisible =
+              frameBounds.right >= bounds.left - 200 &&
+              frameBounds.left <= bounds.right + 200;
+            const verticallyVisible =
+              frameBounds.bottom > bounds.top &&
+              frameBounds.top < bounds.bottom;
+            if (horizontallyVisible && verticallyVisible) loadFrame(frame);
+          });
+        };
+        if (!container.dataset.lazyScrollBound) {
+          container.addEventListener('scroll', loadVisibleFrames);
+          window.addEventListener('resize', loadVisibleFrames);
+          container.dataset.lazyScrollBound = 'true';
         }
-        function setSaved(list) {
-            localStorage.setItem('discussions', JSON.stringify(list));
-        }
+        loadVisibleFrames();
+        return;
+      }
 
-        function createIcon(iconName) {
-            const icon = document.createElement('i');
-            icon.className = `fa ${iconName}`;
-            icon.setAttribute('aria-hidden', 'true');
-            return icon;
-        }
+      if (!frameObserver) {
+        frameObserver = new IntersectionObserver(entries => {
+          entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            const frame = entry.target;
+            loadFrame(frame);
+            frameObserver.unobserve(frame);
+          });
+        }, {
+          root: container,
+          rootMargin: '0px 200px',
+          threshold: 0.01
+        });
+      }
 
-        function updateSlowLoadButton(container = document.getElementById('resultsContainer')) {
-            const button = document.getElementById('slowLoadButton');
-            const frames = [...container.querySelectorAll('iframe')];
-            const allPagesLoaded = frames.length === 0 ||
-                frames.every(frame => frame.dataset.loaded === 'true');
+      frames.forEach(frame => frameObserver.observe(frame));
+    }
 
-            button.hidden = container.scrollWidth <= container.clientWidth ||
-                (allPagesLoaded && slowLoadInterval === null);
-        }
+    // ─── Render saved list ───
+    function renderSavedList() {
+      const list = getSaved();
+      const el = document.getElementById('savedList');
+      el.innerHTML = '';
+      if (list.length === 0) {
+        const empty = document.createElement('div');
+        empty.textContent = 'No saved discussions yet.';
+        empty.style.cssText = 'color:#888;font-size:11px;';
+        el.appendChild(empty);
+        return;
+      }
+      list.forEach((item) => {
+        const div = document.createElement('div');
+        div.className = 'saved-item' + (activeDiscussion === item.name ? ' active' : '');
+        if (editingDiscussion === item.name) {
+          const input = document.createElement('input');
+          input.className = 'rename-input';
+          input.type = 'text';
+          input.value = item.name;
+          input.setAttribute('aria-label', `New name for ${item.name}`);
 
-        function loadFrame(frame) {
-            if (!frame.dataset.src) return;
-            frame.dataset.loaded = 'false';
-            frame.src = frame.dataset.src;
-            delete frame.dataset.src;
-            updateSlowLoadButton();
-        }
+          const saveName = document.createElement('button');
+          saveName.className = 'rename';
+          saveName.type = 'button';
+          saveName.title = 'Save name';
+          saveName.setAttribute('aria-label', 'Save name');
+          saveName.appendChild(createIcon('fa-floppy-o'));
+          saveName.addEventListener('click', () => saveDiscussionName(item.name, input.value));
 
-        function observeLazyFrames(container) {
-            const frames = container.querySelectorAll('iframe[data-src]');
-            if (!('IntersectionObserver' in window)) {
-                const loadVisibleFrames = () => {
-                    const bounds = container.getBoundingClientRect();
-                    container.querySelectorAll('iframe[data-src]').forEach(frame => {
-                        const frameBounds = frame.getBoundingClientRect();
-                        const horizontallyVisible =
-                            frameBounds.right >= bounds.left - 200 &&
-                            frameBounds.left <= bounds.right + 200;
-                        const verticallyVisible =
-                            frameBounds.bottom > bounds.top &&
-                            frameBounds.top < bounds.bottom;
-                        if (horizontallyVisible && verticallyVisible) loadFrame(frame);
-                    });
-                };
-                if (!container.dataset.lazyScrollBound) {
-                    container.addEventListener('scroll', loadVisibleFrames);
-                    window.addEventListener('resize', loadVisibleFrames);
-                    container.dataset.lazyScrollBound = 'true';
-                }
-                loadVisibleFrames();
-                return;
-            }
-
-            if (!frameObserver) {
-                frameObserver = new IntersectionObserver(entries => {
-                    entries.forEach(entry => {
-                        if (!entry.isIntersecting) return;
-                        const frame = entry.target;
-                        loadFrame(frame);
-                        frameObserver.unobserve(frame);
-                    });
-                }, {
-                    root: container,
-                    rootMargin: '0px 200px',
-                    threshold: 0.01
-                });
-            }
-
-            frames.forEach(frame => frameObserver.observe(frame));
-        }
-
-        // ─── Render saved list ───
-        function renderSavedList() {
-            const list = getSaved();
-            const el = document.getElementById('savedList');
-            el.innerHTML = '';
-            if (list.length === 0) {
-                const empty = document.createElement('div');
-                empty.textContent = 'No saved discussions yet.';
-                empty.style.cssText = 'color:#888;font-size:11px;';
-                el.appendChild(empty);
-                return;
-            }
-            list.forEach((item) => {
-                const div = document.createElement('div');
-                div.className = 'saved-item' + (activeDiscussion === item.name ? ' active' : '');
-                if (editingDiscussion === item.name) {
-                    const input = document.createElement('input');
-                    input.className = 'rename-input';
-                    input.type = 'text';
-                    input.value = item.name;
-                    input.setAttribute('aria-label', `New name for ${item.name}`);
-
-                    const saveName = document.createElement('button');
-                    saveName.className = 'rename';
-                    saveName.type = 'button';
-                    saveName.title = 'Save name';
-                    saveName.setAttribute('aria-label', 'Save name');
-                    saveName.appendChild(createIcon('fa-floppy-o'));
-                    saveName.addEventListener('click', () => saveDiscussionName(item.name, input.value));
-
-                    const cancelRename = document.createElement('button');
-                    cancelRename.className = 'rename';
-                    cancelRename.type = 'button';
-                    cancelRename.title = 'Cancel rename';
-                    cancelRename.setAttribute('aria-label', 'Cancel rename');
-                    cancelRename.appendChild(createIcon('fa-times'));
-                    cancelRename.addEventListener('click', () => {
-                        editingDiscussion = null;
-                        renderSavedList();
-                    });
-
-                    input.addEventListener('keydown', (event) => {
-                        if (event.key === 'Enter') saveDiscussionName(item.name, input.value);
-                        if (event.key === 'Escape') {
-                            editingDiscussion = null;
-                            renderSavedList();
-                        }
-                    });
-                    div.append(input, saveName, cancelRename);
-                    requestAnimationFrame(() => {
-                        input.focus();
-                        input.select();
-                    });
-                } else {
-                    const name = document.createElement('button');
-                    name.className = 'saved-name';
-                    name.textContent = item.name;
-                    name.title = item.name;
-                    name.addEventListener('click', () => loadDiscussion(item.name));
-
-                    const branch = document.createElement('button');
-                    branch.className = 'branch';
-                    branch.type = 'button';
-                    branch.title = 'Branch discussion';
-                    branch.setAttribute('aria-label', `Branch ${item.name}`);
-                    branch.appendChild(createIcon('fa-code-fork'));
-                    branch.addEventListener('click', () => branchDiscussion(item.name));
-
-                    const rename = document.createElement('button');
-                    rename.className = 'rename';
-                    rename.type = 'button';
-                    rename.title = 'Edit discussion name';
-                    rename.setAttribute('aria-label', `Edit name for ${item.name}`);
-                    rename.appendChild(createIcon('fa-pencil'));
-                    rename.addEventListener('click', () => renameDiscussion(item.name));
-                    div.append(name, branch, rename);
-                }
-
-                const remove = document.createElement('button');
-                remove.className = 'del';
-                remove.type = 'button';
-                remove.appendChild(createIcon('fa-trash'));
-                remove.title = 'Delete discussion';
-                remove.setAttribute('aria-label', `Delete ${item.name}`);
-                remove.addEventListener('click', () => deleteDiscussion(item.name));
-                div.appendChild(remove);
-                el.appendChild(div);
-            });
-        }
-
-        // ─── Save current terms as a discussion ───
-        function saveDiscussion() {
-            const nameInput = document.getElementById('discussionName');
-            const name = nameInput.value.trim();
-            if (!name) { alert('Give the discussion a name.'); return; }
-
-            const terms = document.getElementById('searchTerms').value;
-            const timeVal = document.getElementById('timeRange').value;
-            const queryVal = document.getElementById('queryFilter').value;
-            const notes = document.getElementById('discussionNotes').value;
-            const engine = document.getElementById('searchEngine').value;
-
-            const list = getSaved();
-            const existing = list.find(d => d.name === name);
-            if (existing) {
-                existing.terms = terms;
-                existing.time = timeVal;
-                existing.query = queryVal;
-                existing.notes = notes;
-                existing.engine = engine;
-            } else {
-                list.push({ name, terms, time: timeVal, query: queryVal, notes, engine });
-            }
-            setSaved(list);
-            activeDiscussion = name;
-            nameInput.value = '';
-            renderSavedList();
-        }
-
-        // ─── Load a saved discussion ───
-        function loadDiscussion(name) {
-            cancelDiscussionBranch();
-            syncActiveDiscussion();
-            const list = getSaved();
-            const item = list.find(d => d.name === name);
-            if (!item) return;
-
-            document.getElementById('searchTerms').value = item.terms;
-            document.getElementById('queryFilter').value = item.query || '';
-            document.getElementById('discussionNotes').value = item.notes || '';
-            document.getElementById('timeRange').value = item.time || '';
-            const engine = searchEngines.includes(item.engine)
-                ? item.engine
-                : localStorage.getItem('searchEngine') || 'google';
-            document.getElementById('searchEngine').value = engine;
-            localStorage.setItem('searchEngine', engine);
-            activeDiscussion = name;
-            document.getElementById('saveDiscussionSection').hidden = true;
-            renderSavedList();
-            generateSearchDashboard();
-        }
-
-        // ─── Delete a saved discussion ───
-        function deleteDiscussion(name) {
-            const list = getSaved().filter(d => d.name !== name);
-            setSaved(list);
-            if (activeDiscussion === name) activeDiscussion = null;
-            if (editingDiscussion === name) editingDiscussion = null;
-            renderSavedList();
-        }
-
-        function renameDiscussion(name) {
-            editingDiscussion = name;
-            renderSavedList();
-        }
-
-        function branchDiscussion(name) {
-            syncActiveDiscussion();
-            if (!getSaved().some(item => item.name === name)) return;
-
-            branchingDiscussion = name;
-            document.getElementById('branchDiscussionName').value = '';
-            document.getElementById('branchKeywords').value = '';
-            document.getElementById('branchDiscussionSection').hidden = false;
-            document.getElementById('branchDiscussionName').focus();
-        }
-
-        function cancelDiscussionBranch() {
-            branchingDiscussion = null;
-            document.getElementById('branchDiscussionSection').hidden = true;
-        }
-
-        function createDiscussionBranch() {
-            const name = document.getElementById('branchDiscussionName').value.trim();
-            const keywords = document.getElementById('branchKeywords').value
-                .split(',')
-                .map(keyword => keyword.trim().toLowerCase())
-                .filter(Boolean);
-
-            if (!name) {
-                alert('Give the branch a discussion name.');
-                return;
-            }
-            if (keywords.length === 0) {
-                alert('Enter at least one keyword.');
-                return;
-            }
-
-            const list = getSaved();
-            const source = list.find(item => item.name === branchingDiscussion);
-            if (!source) {
-                alert('The source discussion could not be found.');
-                cancelDiscussionBranch();
-                return;
-            }
-            if (list.some(item => item.name === name)) {
-                alert('A discussion with that name already exists.');
-                return;
-            }
-
-            const terms = source.terms
-                .split(/\r?\n/)
-                .map(query => query.trim())
-                .filter(query => query && keywords.some(keyword => query.toLowerCase().includes(keyword)));
-            if (terms.length === 0) {
-                alert('No queries matched those keywords.');
-                return;
-            }
-
-            list.push({
-                name,
-                terms: terms.join('\n'),
-                time: source.time || '',
-                query: source.query || '',
-                notes: '',
-                engine: source.engine || localStorage.getItem('searchEngine') || 'google'
-            });
-            setSaved(list);
-            cancelDiscussionBranch();
-            loadDiscussion(name);
-        }
-
-        function saveDiscussionName(name, requestedName) {
-            const newName = requestedName.trim();
-            if (!newName) {
-                alert('Give the discussion a name.');
-                return;
-            }
-            const list = getSaved();
-            const discussion = list.find(item => item.name === name);
-            if (!discussion) return;
-            if (newName === name) {
-                editingDiscussion = null;
-                renderSavedList();
-                return;
-            }
-            if (list.some(item => item.name === newName)) {
-                alert('A discussion with that name already exists.');
-                return;
-            }
-
-            discussion.name = newName;
-            setSaved(list);
-            if (activeDiscussion === name) activeDiscussion = newName;
+          const cancelRename = document.createElement('button');
+          cancelRename.className = 'rename';
+          cancelRename.type = 'button';
+          cancelRename.title = 'Cancel rename';
+          cancelRename.setAttribute('aria-label', 'Cancel rename');
+          cancelRename.appendChild(createIcon('fa-times'));
+          cancelRename.addEventListener('click', () => {
             editingDiscussion = null;
             renderSavedList();
+          });
+
+          input.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') saveDiscussionName(item.name, input.value);
+            if (event.key === 'Escape') {
+              editingDiscussion = null;
+              renderSavedList();
+            }
+          });
+          div.append(input, saveName, cancelRename);
+          requestAnimationFrame(() => {
+            input.focus();
+            input.select();
+          });
+        } else {
+          const name = document.createElement('button');
+          name.className = 'saved-name';
+          name.textContent = item.name;
+          name.title = item.name;
+          name.addEventListener('click', () => loadDiscussion(item.name));
+
+          const branch = document.createElement('button');
+          branch.className = 'branch';
+          branch.type = 'button';
+          branch.title = 'Branch discussion';
+          branch.setAttribute('aria-label', `Branch ${item.name}`);
+          branch.appendChild(createIcon('fa-code-fork'));
+          branch.addEventListener('click', () => branchDiscussion(item.name));
+
+          const rename = document.createElement('button');
+          rename.className = 'rename';
+          rename.type = 'button';
+          rename.title = 'Edit discussion name';
+          rename.setAttribute('aria-label', `Edit name for ${item.name}`);
+          rename.appendChild(createIcon('fa-pencil'));
+          rename.addEventListener('click', () => renameDiscussion(item.name));
+          div.append(name, branch, rename);
         }
 
-        function syncActiveDiscussion() {
-            if (!activeDiscussion) return;
-            const list = getSaved();
-            const discussion = list.find(item => item.name === activeDiscussion);
-            if (!discussion) return;
+        const remove = document.createElement('button');
+        remove.className = 'del';
+        remove.type = 'button';
+        remove.appendChild(createIcon('fa-trash'));
+        remove.title = 'Delete discussion';
+        remove.setAttribute('aria-label', `Delete ${item.name}`);
+        remove.addEventListener('click', () => deleteDiscussion(item.name));
+        div.appendChild(remove);
+        el.appendChild(div);
+      });
+    }
 
-            discussion.terms = document.getElementById('searchTerms').value;
-            discussion.time = document.getElementById('timeRange').value;
-            discussion.query = document.getElementById('queryFilter').value;
-            discussion.notes = document.getElementById('discussionNotes').value;
-            discussion.engine = document.getElementById('searchEngine').value;
-            setSaved(list);
-        }
+    // ─── Save current terms as a discussion ───
+    function saveDiscussion() {
+      const nameInput = document.getElementById('discussionName');
+      const name = nameInput.value.trim();
+      if (!name) { alert('Give the discussion a name.'); return; }
 
-        // ─── Core generate ───
-function buildSearchUrl(engine, query, timeValue) {
-    if (engine === 'google') {
+      const terms = document.getElementById('searchTerms').value;
+      const timeVal = document.getElementById('timeRange').value;
+      const queryVal = document.getElementById('queryFilter').value;
+      const notes = document.getElementById('discussionNotes').value;
+      const engine = document.getElementById('searchEngine').value;
+
+      const list = getSaved();
+      const existing = list.find(d => d.name === name);
+      if (existing) {
+        existing.terms = terms;
+        existing.time = timeVal;
+        existing.query = queryVal;
+        existing.notes = notes;
+        existing.engine = engine;
+      } else {
+        list.push({ name, terms, time: timeVal, query: queryVal, notes, engine });
+      }
+      setSaved(list);
+      activeDiscussion = name;
+      nameInput.value = '';
+      renderSavedList();
+    }
+
+    // ─── Load a saved discussion ───
+    function loadDiscussion(name) {
+      cancelDiscussionBranch();
+      syncActiveDiscussion();
+      const list = getSaved();
+      const item = list.find(d => d.name === name);
+      if (!item) return;
+
+      document.getElementById('searchTerms').value = item.terms;
+      document.getElementById('queryFilter').value = item.query || '';
+      document.getElementById('discussionNotes').value = item.notes || '';
+      document.getElementById('timeRange').value = item.time || '';
+      const engine = searchEngines.includes(item.engine)
+        ? item.engine
+        : localStorage.getItem('searchEngine') || 'google';
+      document.getElementById('searchEngine').value = engine;
+      localStorage.setItem('searchEngine', engine);
+      activeDiscussion = name;
+      document.getElementById('saveDiscussionSection').hidden = true;
+      renderSavedList();
+      generateSearchDashboard();
+    }
+
+    // ─── Delete a saved discussion ───
+    function deleteDiscussion(name) {
+      const list = getSaved().filter(d => d.name !== name);
+      setSaved(list);
+      if (activeDiscussion === name) activeDiscussion = null;
+      if (editingDiscussion === name) editingDiscussion = null;
+      renderSavedList();
+    }
+
+    function renameDiscussion(name) {
+      editingDiscussion = name;
+      renderSavedList();
+    }
+
+    function branchDiscussion(name) {
+      syncActiveDiscussion();
+      if (!getSaved().some(item => item.name === name)) return;
+
+      branchingDiscussion = name;
+      document.getElementById('branchDiscussionName').value = '';
+      document.getElementById('branchKeywords').value = '';
+      document.getElementById('branchDiscussionSection').hidden = false;
+      document.getElementById('branchDiscussionName').focus();
+    }
+
+    function cancelDiscussionBranch() {
+      branchingDiscussion = null;
+      document.getElementById('branchDiscussionSection').hidden = true;
+    }
+
+    function createDiscussionBranch() {
+      const name = document.getElementById('branchDiscussionName').value.trim();
+      const keywords = document.getElementById('branchKeywords').value
+        .split(',')
+        .map(keyword => keyword.trim().toLowerCase())
+        .filter(Boolean);
+
+      if (!name) {
+        alert('Give the branch a discussion name.');
+        return;
+      }
+      if (keywords.length === 0) {
+        alert('Enter at least one keyword.');
+        return;
+      }
+
+      const list = getSaved();
+      const source = list.find(item => item.name === branchingDiscussion);
+      if (!source) {
+        alert('The source discussion could not be found.');
+        cancelDiscussionBranch();
+        return;
+      }
+      if (list.some(item => item.name === name)) {
+        alert('A discussion with that name already exists.');
+        return;
+      }
+
+      const terms = source.terms
+        .split(/\r?\n/)
+        .map(query => query.trim())
+        .filter(query => query && keywords.some(keyword => query.toLowerCase().includes(keyword)));
+      if (terms.length === 0) {
+        alert('No queries matched those keywords.');
+        return;
+      }
+
+      list.push({
+        name,
+        terms: terms.join('\n'),
+        time: source.time || '',
+        query: source.query || '',
+        notes: '',
+        engine: source.engine || localStorage.getItem('searchEngine') || 'google'
+      });
+      setSaved(list);
+      cancelDiscussionBranch();
+      loadDiscussion(name);
+    }
+
+    function saveDiscussionName(name, requestedName) {
+      const newName = requestedName.trim();
+      if (!newName) {
+        alert('Give the discussion a name.');
+        return;
+      }
+      const list = getSaved();
+      const discussion = list.find(item => item.name === name);
+      if (!discussion) return;
+      if (newName === name) {
+        editingDiscussion = null;
+        renderSavedList();
+        return;
+      }
+      if (list.some(item => item.name === newName)) {
+        alert('A discussion with that name already exists.');
+        return;
+      }
+
+      discussion.name = newName;
+      setSaved(list);
+      if (activeDiscussion === name) activeDiscussion = newName;
+      editingDiscussion = null;
+      renderSavedList();
+    }
+
+    function syncActiveDiscussion() {
+      if (!activeDiscussion) return;
+      const list = getSaved();
+      const discussion = list.find(item => item.name === activeDiscussion);
+      if (!discussion) return;
+
+      discussion.terms = document.getElementById('searchTerms').value;
+      discussion.time = document.getElementById('timeRange').value;
+      discussion.query = document.getElementById('queryFilter').value;
+      discussion.notes = document.getElementById('discussionNotes').value;
+      discussion.engine = document.getElementById('searchEngine').value;
+      setSaved(list);
+    }
+
+    // ─── Core generate ───
+    function buildSearchUrl(engine, query, timeValue) {
+      if (engine === 'google') {
         const params = new URLSearchParams({ q: query });
         if (timeValue) params.set('tbs', `qdr:${timeValue}`);
         return `https://www.google.com/search?${params}`;
-    }
-    if (engine === 'ddg') {
+      }
+      if (engine === 'ddg') {
         const params = new URLSearchParams({ q: query });
         const timeFilter = { d: 'd', w: 'w', m: 'm', y: 'y' }[timeValue];
         if (timeFilter) params.set('df', timeFilter);
         return `https://duckduckgo.com/?${params}`;
-    }
-    if (engine === 'brave') {
+      }
+      if (engine === 'brave') {
         const params = new URLSearchParams({ q: query });
         const timeFilter = { h: 'hour', d: 'day', w: 'week', m: 'month', y: 'year' }[timeValue];
         if (timeFilter) params.set('tf', timeFilter);
         return `https://search.brave.com/search?${params}`;
-    }
-    if (engine === 'youtube') {
+      }
+      if (engine === 'youtube') {
         const timeFilter = {
-            h: 'EgIIAQ==',
-            d: 'EgIIAg==',
-            w: 'EgIIAw==',
-            m: 'EgIIBQ==',
-            y: 'EgIIBA=='
+          h: 'EgIIAQ==',
+          d: 'EgIIAg==',
+          w: 'EgIIAw==',
+          m: 'EgIIBQ==',
+          y: 'EgIIBA=='
         }[timeValue];
         const params = new URLSearchParams({ search_query: query });
         if (timeFilter) params.set('sp', timeFilter);
         return `https://www.youtube.com/results?${params}`;
-    }
-    if (engine === 'searxng') {
+      }
+      if (engine === 'searxng') {
         const params = new URLSearchParams({ q: query });
         return `https://priv.au/search?${params}`;
+      }
+
+      return buildSearchUrl('google', query, timeValue);
     }
 
-    return buildSearchUrl('google', query, timeValue);
-}
+    function generateSearchDashboard() {
+      stopSlowLoad();
+      const textarea = document.getElementById('searchTerms');
+      const timeSelect = document.getElementById('timeRange');
+      const engine = document.getElementById('searchEngine').value;
+      const queryFilter = document.getElementById('queryFilter').value.trim();
+      const container = document.getElementById('resultsContainer');
 
-function generateSearchDashboard() {
-    stopSlowLoad();
-    const textarea = document.getElementById('searchTerms');
-    const timeSelect = document.getElementById('timeRange');
-    const engine = document.getElementById('searchEngine').value;
-    const queryFilter = document.getElementById('queryFilter').value.trim();
-    const container = document.getElementById('resultsContainer');
+      const rawQueries = textarea.value.split('\n').map(q => q.trim()).filter(q => q !== "");
+      const queries = rawQueries.map(query => queryFilter ? `${query} ${queryFilter}` : query);
+      const timeValue = timeSelect.value;
 
-    const rawQueries = textarea.value.split('\n').map(q => q.trim()).filter(q => q !== "");
-    const queries = rawQueries.map(query => queryFilter ? `${query} ${queryFilter}` : query);
-    const timeValue = timeSelect.value;
+      syncActiveDiscussion();
 
-    syncActiveDiscussion();
-
-    if (rawQueries.length === 0) {
+      if (rawQueries.length === 0) {
         container.innerHTML = '<div class="welcome-msg">Enter at least one query.</div>';
         document.getElementById('slowLoadButton').hidden = true;
         return;
-    }
+      }
 
-    const desiredKeys = new Set();
-    let firstNewCol = null;
+      const desiredKeys = new Set();
+      let firstNewCol = null;
 
-    // Build the set of keys we want
-    const queryKeys = [];
-    for (let i = 0; i < queries.length; i++) {
+      // Build the set of keys we want
+      const queryKeys = [];
+      for (let i = 0; i < queries.length; i++) {
         const key = `${engine}__${queries[i]}__${timeValue}`;
         queryKeys.push(key);
         desiredKeys.add(key);
-    }
+      }
 
-    // Remove columns that are no longer needed
-    const existingCols = [...container.querySelectorAll('.flex-column')];
-    existingCols.forEach(col => {
+      // Remove columns that are no longer needed
+      const existingCols = [...container.querySelectorAll('.flex-column')];
+      existingCols.forEach(col => {
         if (!desiredKeys.has(col.dataset.key)) {
-            const next = col.nextElementSibling;
-            if (next && next.classList.contains('drag-handle')) next.remove();
-            const frame = col.querySelector('iframe');
-            if (frame) frameObserver?.unobserve(frame);
-            col.remove();
+          const next = col.nextElementSibling;
+          if (next && next.classList.contains('drag-handle')) next.remove();
+          const frame = col.querySelector('iframe');
+          if (frame) frameObserver?.unobserve(frame);
+          col.remove();
         }
-    });
+      });
 
-    // Remove welcome msg if present
-    const welcome = container.querySelector('.welcome-msg');
-    if (welcome) welcome.remove();
+      // Remove welcome msg if present
+      const welcome = container.querySelector('.welcome-msg');
+      if (welcome) welcome.remove();
 
-    // Add new columns (append at end)
-    for (let i = 0; i < queries.length; i++) {
+      // Add new columns (append at end)
+      for (let i = 0; i < queries.length; i++) {
         const query = queries[i];
         const key = `${engine}__${query}__${timeValue}`;
 
         // Skip if already in the container
         if (container.querySelector(`.flex-column[data-key="${CSS.escape(key)}"]`)) {
-            continue;
+          continue;
         }
 
         const searchUrl = buildSearchUrl(engine, query, timeValue);
@@ -868,16 +941,16 @@ function generateSearchDashboard() {
         backButton.title = 'Return this frame to its search results';
         backButton.setAttribute('aria-label', `Return to search results for ${query}`);
         backButton.addEventListener('click', () => {
-            iframe.dataset.loaded = 'false';
-            iframe.src = iframe.dataset.searchUrl;
-            updateSlowLoadButton();
+          iframe.dataset.loaded = 'false';
+          iframe.src = iframe.dataset.searchUrl;
+          updateSlowLoadButton();
         });
 
         iframe.loading = 'lazy';
         iframe.dataset.loaded = 'false';
         iframe.addEventListener('load', () => {
-            iframe.dataset.loaded = 'true';
-            updateSlowLoadButton();
+          iframe.dataset.loaded = 'true';
+          updateSlowLoadButton();
         });
         iframe.dataset.searchUrl = searchUrl;
         iframe.dataset.src = searchUrl;
@@ -888,149 +961,150 @@ function generateSearchDashboard() {
 
         // Add drag handle before this column
         if (container.children.length > 0) {
-            container.appendChild(createDragHandle());
+          container.appendChild(createDragHandle());
         }
         container.appendChild(colDiv);
 
         if (!firstNewCol) firstNewCol = colDiv;
-    }
+      }
 
-    observeLazyFrames(container);
+      observeLazyFrames(container);
 
-    // Re-attach drag resize to all handles
-    initDragResize(container);
+      // Re-attach drag resize to all handles
+      initDragResize(container);
 
-    // Scroll to the first new column
-    if (firstNewCol) {
+      // Scroll to the first new column
+      if (firstNewCol) {
         firstNewCol.scrollIntoView({ behavior: 'smooth', inline: 'start' });
+      }
+      updateSlowLoadButton(container);
     }
-    updateSlowLoadButton(container);
-}   
 
-        function toggleSlowLoad() {
-            const container = document.getElementById('resultsContainer');
-            if (slowLoadInterval !== null) {
-                stopSlowLoad();
-                updateSlowLoadButton(container);
-                return;
-            }
-            if (container.scrollWidth <= container.clientWidth) return;
+    function toggleSlowLoad() {
+      const container = document.getElementById('resultsContainer');
+      if (slowLoadInterval !== null) {
+        stopSlowLoad();
+        updateSlowLoadButton(container);
+        return;
+      }
+      if (container.scrollWidth <= container.clientWidth) return;
 
-            const button = document.getElementById('slowLoadButton');
-            button.textContent = 'Stop loading';
-            button.title = 'Stop slowly loading pages';
-            button.setAttribute('aria-label', 'Stop loading pages');
-            slowLoadInterval = setInterval(() => {
-                if (container.scrollLeft + container.clientWidth >= container.scrollWidth - 1) {
-                    stopSlowLoad();
-                    updateSlowLoadButton(container);
-                    return;
-                }
-                scrollContainer(400);
-            }, 2000);
+      const button = document.getElementById('slowLoadButton');
+      button.textContent = 'Stop loading';
+      button.title = 'Stop slowly loading pages';
+      button.setAttribute('aria-label', 'Stop loading pages');
+      slowLoadInterval = setInterval(() => {
+        if (container.scrollLeft + container.clientWidth >= container.scrollWidth - 1) {
+          stopSlowLoad();
+          updateSlowLoadButton(container);
+          return;
         }
+        scrollContainer(400);
+      }, 2000);
+    }
 
-        function stopSlowLoad() {
-            if (slowLoadInterval !== null) {
-                clearInterval(slowLoadInterval);
-                slowLoadInterval = null;
-            }
-            const button = document.getElementById('slowLoadButton');
-            button.textContent = 'Slow load all pages';
-            button.title = 'Slowly load each page';
-            button.removeAttribute('aria-label');
-        }
+    function stopSlowLoad() {
+      if (slowLoadInterval !== null) {
+        clearInterval(slowLoadInterval);
+        slowLoadInterval = null;
+      }
+      const button = document.getElementById('slowLoadButton');
+      button.textContent = 'Slow load all pages';
+      button.title = 'Slowly load each page';
+      button.removeAttribute('aria-label');
+    }
 
-        function createDragHandle() {
-            const h = document.createElement('div');
-            h.className = 'drag-handle';
-            return h;
-        }
+    function createDragHandle() {
+      const h = document.createElement('div');
+      h.className = 'drag-handle';
+      return h;
+    }
 
-        function initDragResize(container) {
-            container.querySelectorAll('.drag-handle').forEach(handle => {
-                let startX, startW, leftCol, rightCol;
-                handle.addEventListener('mousedown', (e) => {
-                    e.preventDefault();
-                    handle.classList.add('active');
-                    leftCol = handle.previousElementSibling;
-                    rightCol = handle.nextElementSibling;
-                    if (!leftCol?.classList.contains('flex-column') || !rightCol?.classList.contains('flex-column')) return;
-                    startX = e.clientX;
-                    startW = leftCol.offsetWidth;
-                    document.body.style.userSelect = 'none';
-                    document.body.style.cursor = 'col-resize';
-                    const move = (e) => {
-                        const delta = e.clientX - startX;
-                        leftCol.style.flex = `0 0 ${Math.max(768, startW + delta)}px`;
-                        rightCol.style.flex = `0 0 ${Math.max(768, rightCol.offsetWidth - (e.movementX))}px`;
-                    };
-                    const up = () => {
-                        handle.classList.remove('active');
-                        document.body.style.userSelect = '';
-                        document.body.style.cursor = '';
-                        document.removeEventListener('mousemove', move);
-                        document.removeEventListener('mouseup', up);
-                    };
-                    document.addEventListener('mousemove', move);
-                    document.addEventListener('mouseup', up);
-                });
-            });
-        }
-
-        function scrollContainer(amount) {
-            document.getElementById('resultsContainer').scrollBy({ left: amount, behavior: 'smooth' });
-        }
-
-        function clearAll() {
-            stopSlowLoad();
-            document.getElementById('slowLoadButton').hidden = true;
-            columnCache.clear();
-            activeDiscussion = null;
-            editingDiscussion = null;
-            frameObserver?.disconnect();
-            frameObserver = null;
-            renderSavedList();
-            document.getElementById('resultsContainer').innerHTML =
-                '<div class="welcome-msg">Enter terms and click "Generate" to start.</div>';
-        }
-
-        function startNewDiscussion() {
-            syncActiveDiscussion();
-            cancelDiscussionBranch();
-            clearAll();
-            document.getElementById('searchTerms').value = '';
-            document.getElementById('queryFilter').value = '';
-            document.getElementById('discussionNotes').value = '';
-            document.getElementById('timeRange').value = 'w';
-            document.getElementById('discussionName').value = '';
-            document.getElementById('saveDiscussionSection').hidden = false;
-            document.getElementById('searchTerms').focus();
-        }
-
-        // Init
-        document.getElementById('searchTerms').addEventListener('keydown', (event) => {
-            if (event.key !== 'Enter' || event.isComposing || event.repeat) return;
-            if (event.currentTarget.value.trim()) generateSearchDashboard();
+    function initDragResize(container) {
+      container.querySelectorAll('.drag-handle').forEach(handle => {
+        let startX, startW, leftCol, rightCol;
+        handle.addEventListener('mousedown', (e) => {
+          e.preventDefault();
+          handle.classList.add('active');
+          leftCol = handle.previousElementSibling;
+          rightCol = handle.nextElementSibling;
+          if (!leftCol?.classList.contains('flex-column') || !rightCol?.classList.contains('flex-column')) return;
+          startX = e.clientX;
+          startW = leftCol.offsetWidth;
+          document.body.style.userSelect = 'none';
+          document.body.style.cursor = 'col-resize';
+          const move = (e) => {
+            const delta = e.clientX - startX;
+            leftCol.style.flex = `0 0 ${Math.max(768, startW + delta)}px`;
+            rightCol.style.flex = `0 0 ${Math.max(768, rightCol.offsetWidth - (e.movementX))}px`;
+          };
+          const up = () => {
+            handle.classList.remove('active');
+            document.body.style.userSelect = '';
+            document.body.style.cursor = '';
+            document.removeEventListener('mousemove', move);
+            document.removeEventListener('mouseup', up);
+          };
+          document.addEventListener('mousemove', move);
+          document.addEventListener('mouseup', up);
         });
-        const savedEngine = localStorage.getItem('searchEngine');
-        const searchEngineSelect = document.getElementById('searchEngine');
-        searchEngineSelect.value = searchEngines.includes(savedEngine) ? savedEngine : 'google';
-        searchEngineSelect.addEventListener('change', () => {
-            localStorage.setItem('searchEngine', searchEngineSelect.value);
-            syncActiveDiscussion();
-        });
-        document.getElementById('discussionNotes').addEventListener('input', syncActiveDiscussion);
-        document.getElementById('queryFilter').addEventListener('input', syncActiveDiscussion);
-        document.getElementById('branchDiscussionName').addEventListener('keydown', (event) => {
-            if (event.key === 'Enter') document.getElementById('branchKeywords').focus();
-            if (event.key === 'Escape') cancelDiscussionBranch();
-        });
-        document.getElementById('branchKeywords').addEventListener('keydown', (event) => {
-            if (event.key === 'Enter') createDiscussionBranch();
-            if (event.key === 'Escape') cancelDiscussionBranch();
-        });
-        renderSavedList();
-    </script>
+      });
+    }
+
+    function scrollContainer(amount) {
+      document.getElementById('resultsContainer').scrollBy({ left: amount, behavior: 'smooth' });
+    }
+
+    function clearAll() {
+      stopSlowLoad();
+      document.getElementById('slowLoadButton').hidden = true;
+      columnCache.clear();
+      activeDiscussion = null;
+      editingDiscussion = null;
+      frameObserver?.disconnect();
+      frameObserver = null;
+      renderSavedList();
+      document.getElementById('resultsContainer').innerHTML =
+        '<div class="welcome-msg">Enter terms and click "Generate" to start.</div>';
+    }
+
+    function startNewDiscussion() {
+      syncActiveDiscussion();
+      cancelDiscussionBranch();
+      clearAll();
+      document.getElementById('searchTerms').value = '';
+      document.getElementById('queryFilter').value = '';
+      document.getElementById('discussionNotes').value = '';
+      document.getElementById('timeRange').value = 'w';
+      document.getElementById('discussionName').value = '';
+      document.getElementById('saveDiscussionSection').hidden = false;
+      document.getElementById('searchTerms').focus();
+    }
+
+    // Init
+    document.getElementById('searchTerms').addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter' || event.isComposing || event.repeat) return;
+      if (event.currentTarget.value.trim()) generateSearchDashboard();
+    });
+    const savedEngine = localStorage.getItem('searchEngine');
+    const searchEngineSelect = document.getElementById('searchEngine');
+    searchEngineSelect.value = searchEngines.includes(savedEngine) ? savedEngine : 'google';
+    searchEngineSelect.addEventListener('change', () => {
+      localStorage.setItem('searchEngine', searchEngineSelect.value);
+      syncActiveDiscussion();
+    });
+    document.getElementById('discussionNotes').addEventListener('input', syncActiveDiscussion);
+    document.getElementById('queryFilter').addEventListener('input', syncActiveDiscussion);
+    document.getElementById('branchDiscussionName').addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') document.getElementById('branchKeywords').focus();
+      if (event.key === 'Escape') cancelDiscussionBranch();
+    });
+    document.getElementById('branchKeywords').addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') createDiscussionBranch();
+      if (event.key === 'Escape') cancelDiscussionBranch();
+    });
+    renderSavedList();
+  </script>
 </body>
-</html>   
+
+</html>
