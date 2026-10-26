@@ -26,33 +26,8 @@ export default function Document() {
           alignContent: 'center',
           gap: 20
         }}>
-          <a href="https://etherscan.io/address/0x5A8064F8249D079f02bfb688f4AA86B6b2C65359" target="_blank" style={{
-            display: 'flex',
-          }}>
-            <img src="/ethereum-eth-logo.svg" style={{
-              width: 25,
-              height: 25,
-              borderRadius: 20
-            }}/>
-          </a>
-          <a href="https://www.blockchain.com/explorer/addresses/btc/BC1QD3ADA3NSL86FR33YTJL372QH63HX9R0APULGLE" target="_blank" style={{
-            display: 'flex',
-          }}>
-            <img src="/bitcoin-btc-logo.svg" style={{
-              width: 25,
-              height: 25,
-              borderRadius: 20
-            }}/>
-          </a>
-          <a href="https://explorer.solana.com/address/9dPN7gdN9cyGhjiQn5gBU9DQDBxUJafvS873BcW3mpFT" target="_blank" style={{
-            display: 'flex',
-          }}>
-            <img src="/solana-sol-logo.svg" style={{
-              width: 25,
-              height: 25,
-              borderRadius: 20
-            }}/>
-          </a>
+          
+
 
           <a href="https://twitter.com/PaiNishant" target="_blank" style={{
             display: 'flex',
@@ -64,13 +39,13 @@ export default function Document() {
             }}/>
           </a>
 
-          <a href="https://warpcast.com/nishu" target="_blank" style={{
+          <a href="https://linkedin.com/in/nishantrpai" target="_blank" style={{
             display: 'flex',
           }}>
-            <img src="/farcaster.png" style={{
+            <img src="/linkedin.ico" style={{
               width: 25,
               height: 25,
-              borderRadius: 20
+              borderRadius: 0
             }}/>
           </a>
 
