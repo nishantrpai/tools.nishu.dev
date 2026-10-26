@@ -2289,11 +2289,17 @@ export const tools = [
     "url": "/extractfears"
   },
   {
+    "title": "Multi Google Search",
+    "description": "Search multiple google queries parallelly and get results",
+    "publishDate": "21st Oct 2026",
+    "url": "/multigoogle.html"
+  },
+  {
     "title": "Extract Goals",
     "description": "Extract goals from transcripts",
     "publishDate": "22nd Oct 2026",
     "url": "/extractgoals"
-  },
+  }
 ];
 
 export default function Home() {
