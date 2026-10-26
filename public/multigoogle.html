@@ -426,6 +426,7 @@
         <option value="brave">Brave Search</option>
         <option value="youtube">YouTube Search</option>
         <option value="searxng">SearXNG</option>
+        <option value="reddit">Reddit Search</option>
       </select>
     </div>
 
@@ -488,7 +489,7 @@
 
   <script>
     const columnCache = new Map();
-    const searchEngines = ['google', 'ddg', 'brave', 'youtube', 'searxng'];
+    const searchEngines = ['google', 'ddg', 'brave', 'youtube', 'searxng', 'reddit'];
     let activeDiscussion = null;
     let editingDiscussion = null;
     let branchingDiscussion = null;
@@ -867,6 +868,12 @@
       if (engine === 'searxng') {
         const params = new URLSearchParams({ q: query });
         return `https://priv.au/search?${params}`;
+      }
+      if (engine === 'reddit') {
+        const params = new URLSearchParams({ q: query });
+        const timeFilter = { h: 'hour', d: 'day', w: 'week', m: 'month', y: 'year' }[timeValue];
+        if (timeFilter) params.set('t', timeFilter);
+        return `https://www.reddit.com/search/?${params}`;
       }
 
       return buildSearchUrl('google', query, timeValue);
